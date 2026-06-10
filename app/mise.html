@@ -250,8 +250,12 @@
 </div></div>
 
 <div class="scrim" id="askScrim"><div class="modal">
-  <h2>Ny ting fundet</h2>
+  <h2>Ukendt ting</h2>
   <p class="ask-text" id="askText"></p>
+  <div class="field">
+    <label>Navn</label>
+    <input id="askName" maxlength="40" autocomplete="off">
+  </div>
   <div class="ask-opts">
     <label class="ask-opt"><input type="radio" name="askmode" value="counter" checked> Som ny, selvstændig tæller</label>
     <label class="ask-opt"><input type="radio" name="askmode" value="sub"> Som underkategori til:</label>
@@ -520,8 +524,10 @@
       state.counters.forEach(c=>{c.label.toLowerCase().split(/\s+/).filter(w=>w.length>=3&&!STOPVERBS.has(w)).forEach(w=>{if(low.includes(w)&&(!cnt||w.length>cnt.len))cnt={label:c.label,len:w.length};});});
       if(cnt){actions.push({kind:"counter",counter:cnt.label,sub:"",delta});return;}
       // 4) unknown -> let the confirmation dialog handle it
-      const words=low.replace(/\d+/g,"").split(/\s+/).filter(w=>w&&!STOPVERBS.has(w));
-      if(words.length){const n=words[words.length-1];actions.push({kind:"counter",counter:n.charAt(0).toUpperCase()+n.slice(1),sub:"",delta});}
+      const numMatch=low.search(/\d/);
+      const nameStr=numMatch>=0?low.slice(numMatch).replace(/^\d+\s*/,""):low;
+      const words=nameStr.split(/\s+/).filter(w=>w&&!STOPVERBS.has(w));
+      if(words.length){const raw=words.join(" ");actions.push({kind:"counter",counter:raw.charAt(0).toUpperCase()+raw.slice(1),sub:"",delta});}
     });
     return actions;
   }
@@ -556,14 +562,19 @@
   }
   function openAsk(item,next,summary){
     const delta=parseInt(item.delta,10)||0;
-    const name=item.counter||"Ny ting";
-    $("#askText").innerHTML='Du loggede <b>'+esc((delta>0?"+":"")+delta+" "+name)+'</b>, men den findes ikke endnu. Hvordan vil du tilføje den?';
+    const detectedName=item.counter||"Ny ting";
+    $("#askText").innerHTML='<b>'+esc((delta>0?"+":"")+delta+" "+detectedName)+'</b> matcher ingen eksisterende kategori.';
+    const nameInput=$("#askName"); nameInput.value=detectedName;
     const sel=$("#askParent");
     sel.innerHTML=state.counters.map(c=>'<option value="'+c.id+'">'+esc(c.label)+'</option>').join("");
     const rCounter=document.querySelector('input[name="askmode"][value="counter"]');
     rCounter.checked=true; sel.disabled=true;
-    $("#askScrim").classList.add("open");
+    const scrim=$("#askScrim");
+    scrim._askSkip=()=>{scrim.classList.remove("open");scrim._askSkip=null;next();};
+    scrim.classList.add("open");
+    setTimeout(()=>nameInput.focus(),30);
     $("#askAdd").onclick=()=>{
+      const name=(nameInput.value||"").trim()||detectedName;
       const mode=document.querySelector('input[name="askmode"]:checked').value;
       if(mode==="sub"){
         const parent=state.counters.find(c=>c.id===sel.value);
@@ -575,15 +586,15 @@
         else{c.count=Math.max(0,delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
       }
       save();renderCounters();renderWines();renderCareer();
-      $("#askScrim").classList.remove("open");next();
+      scrim._askSkip=null;scrim.classList.remove("open");next();
     };
-    $("#askSkip").onclick=()=>{$("#askScrim").classList.remove("open");next();};
+    $("#askSkip").onclick=()=>{if(scrim._askSkip)scrim._askSkip();};
   }
   document.querySelectorAll('input[name="askmode"]').forEach(r=>r.addEventListener("change",()=>{$("#askParent").disabled=document.querySelector('input[name="askmode"]:checked').value!=="sub";}));
   $("#qlogInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runQuickLog();}});
 
-  document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s)s.classList.remove("open");}));
-  document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".scrim.open").forEach(s=>s.classList.remove("open"));});
+  document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s){if(s._askSkip)s._askSkip();else s.classList.remove("open");}}));
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".scrim.open").forEach(s=>{if(s._askSkip)s._askSkip();else s.classList.remove("open");});});
   document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");const v=t.dataset.view;$("#view-station").classList.toggle("active",v==="station");$("#view-vin").classList.toggle("active",v==="vin");}));
 
   (async function(){state=await load();$("#loading").style.display="none";$("#view-station").classList.add("active");renderCounters();renderWines();renderCareer();})();
