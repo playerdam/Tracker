@@ -73,8 +73,8 @@ app.post("/api/parse-log", async (req, res) => {
       '"snittet 500 rødløg" -> {"actions":[{"kind":"counter","counter":"Løg snittet","sub":"Rødløg","delta":500}]}\n' +
       '"åbnet 500 Gillardeau østers" -> {"actions":[{"kind":"counter","counter":"Østers åbnet","sub":"Gillardeau","delta":500}]}\n' +
       '"drukket 3 glas Tignanello" -> {"actions":[{"kind":"wine","wine":"Tignanello","measure":"glasses","delta":3,"producer":"","country":"","region":"","grape":""}]}\n\n' +
-      'Match eksisterende tæller/vin når det passer, og brug den eksisterende stavemåde. delta kan være negativt.\n' +
-      'Nævner brugeren en aktivitet eller et produkt der IKKE matcher nogen eksisterende tæller, returner den ALLIGEVEL som en counter-handling med et kortfattet dansk navn (fx "Artisjokker skåret" eller "Beurre blanc"). Returnér kun {"actions":[]} for rent ikke-trackbare sætninger (spørgsmål, snak etc.).';
+      'Match KUN til en eksisterende tæller hvis OBJEKTET/PRODUKTET der tælles passer til tællerens emne. Verbets lighed er IKKE nok — "snittet 500 dumle" må IKKE matche "Løg snittet" fordi dumle ikke er løg. "åbnet 3 øl" matcher heller ikke "Østers åbnet". Brug den eksisterende stavemåde når du matcher. delta kan være negativt.\n' +
+      'Er objektet nyt og passer ikke til nogen eksisterende tæller, returner det ALLIGEVEL som en counter-handling med et kortfattet dansk navn (fx "Dumle snittet", "Artisjokker skåret"). Returnér kun {"actions":[]} for rent ikke-trackbare sætninger (spørgsmål, snak etc.).';
 
     const out = await callClaude({
       model: PARSE_MODEL,
