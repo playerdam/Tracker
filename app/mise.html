@@ -75,12 +75,6 @@
   .ask-select:disabled{opacity:.4}
   .ask-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
 
-  /* vagt bar */
-  .vagtbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;font-size:13px;color:var(--dim)}
-  .vagtshift{font-family:"Fraunces",serif;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
-  .vagtbtn{appearance:none;background:none;border:1px solid var(--border-2);border-radius:8px;color:var(--dim);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;padding:6px 12px;transition:.15s}
-  .vagtbtn:hover{border-color:var(--accent);color:var(--accent)}
-  .vagtbtn.confirm{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
 
   /* counters */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;align-items:start}
@@ -259,10 +253,6 @@
   <div id="loading" class="loading">Indlæser…</div>
 
   <section class="view" id="view-station">
-    <div class="vagtbar">
-      <span style="font-size:13px;color:var(--dim)">Denne vagt: <span class="vagtshift" id="shiftNum" style="font-family:'Fraunces',serif;font-weight:600;color:var(--text)">0</span></span>
-      <button class="vagtbtn" id="nyVagtBtn">Ny vagt</button>
-    </div>
     <div class="grid" id="counterGrid"></div>
   </section>
 
@@ -369,28 +359,22 @@
       {id:id(),label:"Couverter serveret",count:0,subs:[],suggest:[]}
     ],
     wines:[{id:id(),name:"Tignanello",producer:"Antinori",land:"Italien",region:"Toscana",grape:"Sangiovese",vint:"2019",glasses:0,bottles:0}],
-    careerOffset:0
   };
 
-  let state={counters:[],wines:[],careerOffset:0}, mem=null, wineFilter="";
+  let state={counters:[],wines:[]}, mem=null, wineFilter="";
   let listView=localStorage.getItem("mise_listview")==="1";
   const logHistory=[];
 
   async function load(){if(hasStore){try{const r=await window.storage.get(STORE_KEY);if(r&&r.value)return normalize(JSON.parse(r.value));}catch(e){}return clone(DEFAULTS);}return mem?clone(mem):clone(DEFAULTS);}
   async function save(){if(hasStore){try{await window.storage.set(STORE_KEY,JSON.stringify(state));}catch(e){console.error(e);}}else mem=clone(state);}
   function normalize(s){
-    if(typeof s.careerOffset!=="number")s.careerOffset=0;
     s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
     s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0}));
     return s;
   }
   function counterTotal(c){return c.subs.length?c.subs.reduce((a,b)=>a+b.count,0):c.count;}
-  function shiftTotal(){let t=0;state.counters.forEach(c=>t+=counterTotal(c));state.wines.forEach(w=>t+=(w.glasses||0)+(w.bottles||0));return t;}
-  function career(){return (state.careerOffset||0)+shiftTotal();}
-  function renderCareer(){
-    $("#careerNum").textContent=career().toLocaleString("da-DK");
-    const se=$("#shiftNum");if(se)se.textContent=shiftTotal().toLocaleString("da-DK");
-  }
+  function career(){let t=0;state.counters.forEach(c=>t+=counterTotal(c));state.wines.forEach(w=>t+=(w.glasses||0)+(w.bottles||0));return t;}
+  function renderCareer(){$("#careerNum").textContent=career().toLocaleString("da-DK");}
 
   // ---- numtray ----
   let numtrayCallback=null;
@@ -536,26 +520,6 @@
   // ---- view toggle ----
   $("#btnGrid").addEventListener("click",()=>{listView=false;localStorage.setItem("mise_listview","0");renderCounters();});
   $("#btnList").addEventListener("click",()=>{listView=true;localStorage.setItem("mise_listview","1");renderCounters();});
-
-  // ---- ny vagt ----
-  let vagtConfirm=false,vagtTimer=null;
-  $("#nyVagtBtn").addEventListener("click",()=>{
-    if(!vagtConfirm){
-      vagtConfirm=true;
-      $("#nyVagtBtn").textContent="Er du sikker?";
-      $("#nyVagtBtn").classList.add("confirm");
-      vagtTimer=setTimeout(()=>{vagtConfirm=false;$("#nyVagtBtn").textContent="Ny vagt";$("#nyVagtBtn").classList.remove("confirm");},3000);
-    }else{
-      clearTimeout(vagtTimer);vagtConfirm=false;
-      state.careerOffset=(state.careerOffset||0)+shiftTotal();
-      state.counters.forEach(c=>{c.count=0;c.subs.forEach(s=>s.count=0);});
-      state.wines.forEach(w=>{w.glasses=0;w.bottles=0;});
-      save();renderCounters();renderWines();renderCareer();
-      logHistory.length=0;renderLogFeed();
-      showToast("Ny vagt startet — tællere nulstillet");
-      $("#nyVagtBtn").textContent="Ny vagt";$("#nyVagtBtn").classList.remove("confirm");
-    }
-  });
 
   let editC=null;
   function openCounterModal(cid){editC=cid;const c=cid?state.counters.find(x=>x.id===cid):null;$("#counterModalTitle").textContent=c?"Rediger tæller":"Ny tæller";$("#counterLabelInput").value=c?c.label:"";$("#counterDelete").style.display=c?"block":"none";$("#counterScrim").classList.add("open");setTimeout(()=>$("#counterLabelInput").focus(),30);}
