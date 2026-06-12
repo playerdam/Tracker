@@ -19,7 +19,7 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--text)}
-  body{font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;padding:0 0 90px;font-size:15px;line-height:1.45}
+  body{font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;padding:0 0 100px;font-size:15px;line-height:1.45}
   .wrap{max-width:760px;margin:0 auto;padding:0 20px}
   button{font-family:inherit}
 
@@ -31,21 +31,33 @@
   .career .num{font-family:"Fraunces",serif;font-weight:600;font-size:26px;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
   .career .lbl{font-size:11px;color:var(--faint);margin-top:3px;letter-spacing:.02em}
 
-  .tabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;margin-bottom:26px;width:fit-content}
+  .tabrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+  .tabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;width:fit-content}
   .tab{appearance:none;background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--dim);padding:9px 20px;border-radius:8px;transition:.15s}
   .tab:hover{color:var(--text)}
   .tab.active{background:var(--accent);color:#fff}
+  .view-toggle{display:flex;gap:4px}
+  .vtbtn{appearance:none;background:none;border:1px solid var(--border);border-radius:8px;padding:7px 10px;cursor:pointer;color:var(--faint);font-size:15px;line-height:1;transition:.15s}
+  .vtbtn.active{background:var(--surface);color:var(--text);border-color:var(--border-2);box-shadow:var(--shadow)}
+  .vtbtn:hover{color:var(--text)}
 
   .view{display:none}
   .view.active{display:block}
 
-  .qlog{position:relative;display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);margin-bottom:20px;padding:0 14px}
+  .qlog{position:relative;display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);margin-bottom:8px;padding:0 14px}
   .qlog:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .qlog-ic{color:var(--accent);flex:none}
   .qlog input{flex:1;border:none;background:none;color:var(--text);font-family:inherit;font-size:15px;padding:15px 12px}
   .qlog input:focus{outline:none}
   .qlog input::placeholder{color:var(--faint)}
   .qlog-spin{flex:none;padding-right:4px}
+
+  /* log feed */
+  .logfeed{margin-bottom:16px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)}
+  .logentry{display:flex;gap:10px;padding:7px 12px;font-size:13px;color:var(--dim);background:var(--surface-2)}
+  .logentry+.logentry{border-top:1px solid var(--border)}
+  .log-time{font-family:"Fraunces",serif;font-size:12px;color:var(--faint);flex:0 0 36px;padding-top:1px}
+  .log-text{flex:1;line-height:1.4}
 
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120%);display:flex;align-items:center;gap:16px;background:#1B1A18;color:#F4F3F0;border-radius:12px;padding:13px 16px 13px 18px;box-shadow:var(--shadow-lg);z-index:90;opacity:0;transition:transform .3s ease,opacity .3s ease;max-width:calc(100% - 32px)}
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
@@ -63,6 +75,13 @@
   .ask-select:disabled{opacity:.4}
   .ask-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
 
+  /* vagt bar */
+  .vagtbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;font-size:13px;color:var(--dim)}
+  .vagtshift{font-family:"Fraunces",serif;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+  .vagtbtn{appearance:none;background:none;border:1px solid var(--border-2);border-radius:8px;color:var(--dim);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;padding:6px 12px;transition:.15s}
+  .vagtbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .vagtbtn.confirm{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
   /* counters */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;align-items:start}
   .ccard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative}
@@ -70,27 +89,32 @@
   .kebab{position:absolute;top:14px;right:12px;appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;font-size:18px;line-height:1;padding:4px 8px;border-radius:6px;transition:.15s}
   .kebab:hover{color:var(--text);background:var(--surface-2)}
   .clabel{font-size:14px;font-weight:600;color:var(--text);padding-right:28px}
-  .cbig{font-family:"Fraunces",serif;font-weight:600;font-size:52px;line-height:1;margin:10px 0 16px;font-variant-numeric:tabular-nums}
+  .cbig{font-family:"Fraunces",serif;font-weight:600;font-size:52px;line-height:1;margin:10px 0 16px;font-variant-numeric:tabular-nums;transition:color .15s}
+  .cbig[data-act]{cursor:pointer}
+  .cbig[data-act]:hover{color:var(--accent)}
   .cbig.tick{animation:pop .3s ease}
   @keyframes pop{0%{transform:scale(1)}30%{transform:scale(1.1);color:var(--accent)}100%{transform:scale(1)}}
 
   .cstep{display:flex;gap:10px;margin-top:auto}
-  .step{appearance:none;border:1px solid var(--border-2);background:var(--surface);color:var(--text);height:44px;border-radius:var(--r-sm);cursor:pointer;font-size:22px;font-weight:500;line-height:1;display:grid;place-items:center;transition:.14s;-webkit-tap-highlight-color:transparent}
+  .step{appearance:none;border:1px solid var(--border-2);background:var(--surface);color:var(--text);height:44px;border-radius:var(--r-sm);cursor:pointer;font-size:22px;font-weight:500;line-height:1;display:grid;place-items:center;transition:.14s;-webkit-tap-highlight-color:transparent;user-select:none}
   .step:hover{border-color:var(--accent);color:var(--accent)}
   .step:active{transform:translateY(1px)}
   .step.minus{flex:0 0 52px}
   .step.plus{flex:1;background:var(--accent);border-color:var(--accent);color:#fff;font-size:24px}
   .step.plus:hover{background:var(--accent-h);border-color:var(--accent-h);color:#fff}
+  .step.plus.holding{opacity:.5;transform:scale(.97)}
 
   .sublist{display:flex;flex-direction:column;gap:2px;margin-bottom:10px}
   .subrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 0;border-top:1px solid var(--border)}
   .subname{font-size:14px;color:var(--text);font-weight:500}
   .subctrl{display:flex;align-items:center;gap:4px}
-  .sbtn{appearance:none;width:30px;height:30px;border:1px solid var(--border-2);background:var(--surface);border-radius:8px;color:var(--dim);cursor:pointer;font-size:17px;line-height:1;display:grid;place-items:center;transition:.14s}
+  .sbtn{appearance:none;width:30px;height:30px;border:1px solid var(--border-2);background:var(--surface);border-radius:8px;color:var(--dim);cursor:pointer;font-size:17px;line-height:1;display:grid;place-items:center;transition:.14s;user-select:none;-webkit-tap-highlight-color:transparent}
   .sbtn:hover{border-color:var(--accent);color:var(--accent)}
   .sbtn.plus{background:var(--accent);border-color:var(--accent);color:#fff}
   .sbtn.plus:hover{background:var(--accent-h)}
-  .subcount{font-family:"Fraunces",serif;font-weight:600;font-size:18px;min-width:26px;text-align:center;font-variant-numeric:tabular-nums}
+  .sbtn.plus.holding{opacity:.5}
+  .subcount{font-family:"Fraunces",serif;font-weight:600;font-size:18px;min-width:26px;text-align:center;font-variant-numeric:tabular-nums;cursor:pointer;transition:color .15s}
+  .subcount:hover{color:var(--accent)}
   .subcount.tick{animation:pop .3s ease}
 
   .addtype{appearance:none;background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;font-weight:600;padding:6px 0 0;text-align:left;transition:.15s}
@@ -102,6 +126,17 @@
 
   .addcard{background:none;border:1.5px dashed var(--border-2);color:var(--dim);border-radius:var(--r);min-height:120px;cursor:pointer;font-size:14px;font-weight:600;display:grid;place-items:center;transition:.15s}
   .addcard:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+  /* list view */
+  .grid.list{display:flex;flex-direction:column;gap:6px}
+  .grid.list .ccard,.grid.list .ccard.cat{grid-column:unset;flex-direction:row;align-items:center;padding:11px 14px;gap:12px}
+  .grid.list .clabel{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:0}
+  .grid.list .cbig{font-size:26px;margin:0;min-width:50px;text-align:right}
+  .grid.list .cstep{margin-top:0;flex:none}
+  .grid.list .step{height:38px}
+  .grid.list .step.minus{flex:0 0 44px}
+  .grid.list .kebab{position:static;flex:none}
+  .grid.list .sublist,.grid.list .addtype,.grid.list .addtype-box{display:none}
 
   /* wine */
   .searchwrap{position:relative;margin-bottom:14px}
@@ -173,6 +208,17 @@
   .btn.del:hover{color:var(--accent)}
   .loading{padding:80px 0;text-align:center;color:var(--faint);font-size:14px}
 
+  /* numtray — slides up from bottom for bulk input */
+  .numtray{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--border-2);padding:14px 20px 28px;display:flex;align-items:center;gap:12px;z-index:95;box-shadow:0 -4px 24px rgba(24,22,20,.12);transform:translateY(100%);transition:transform .22s ease}
+  .numtray.open{transform:translateY(0)}
+  .numtray-label{font-size:13px;color:var(--dim);white-space:nowrap;flex:none;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+  .numtray input{flex:1;border:1px solid var(--border-2);background:var(--surface-2);border-radius:var(--r-sm);color:var(--text);font-family:"Fraunces",serif;font-size:32px;font-weight:600;padding:8px 12px;text-align:right;font-variant-numeric:tabular-nums;min-width:0}
+  .numtray input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .numtray-ok{appearance:none;border:none;background:var(--accent);color:#fff;border-radius:var(--r-sm);font-family:inherit;font-size:15px;font-weight:600;padding:12px 18px;cursor:pointer;flex:none;transition:.15s}
+  .numtray-ok:hover{background:var(--accent-h)}
+  .numtray-cancel{appearance:none;border:1px solid var(--border-2);background:none;color:var(--dim);border-radius:var(--r-sm);font-family:inherit;font-size:20px;padding:8px 12px;cursor:pointer;flex:none;line-height:1;transition:.15s}
+  .numtray-cancel:hover{color:var(--text)}
+
   @media (max-width:560px){
     .wrap{padding:0 16px}
     .grid{grid-template-columns:1fr 1fr;gap:12px}
@@ -180,6 +226,7 @@
     .cbig{font-size:42px}
     .wsteps{width:100%;justify-content:space-between}
     .career .num{font-size:22px}
+    .numtray-label{display:none}
   }
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -193,18 +240,31 @@
 
   <div class="qlog">
     <svg class="qlog-ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4"/><path d="M13 3 16 10l7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>
-    <input id="qlogInput" placeholder="Skriv hvad du har lavet — fx “åbnet 500 Gillardeau østers”" autocomplete="off">
+    <input id="qlogInput" placeholder="Skriv hvad du har lavet — fx "åbnet 500 Gillardeau østers"" autocomplete="off">
     <span class="qlog-spin" id="qlogSpin" hidden><span class="spin"></span></span>
   </div>
+  <div id="logFeed" class="logfeed" hidden></div>
 
-  <div class="tabs">
-    <button class="tab active" data-view="station">Stationen</button>
-    <button class="tab" data-view="vin">Vinen</button>
+  <div class="tabrow">
+    <div class="tabs">
+      <button class="tab active" data-view="station">Stationen</button>
+      <button class="tab" data-view="vin">Vinen</button>
+    </div>
+    <div class="view-toggle" id="viewToggle">
+      <button class="vtbtn active" id="btnGrid" title="Gitteroversigt">⊞</button>
+      <button class="vtbtn" id="btnList" title="Listevisning">☰</button>
+    </div>
   </div>
 
   <div id="loading" class="loading">Indlæser…</div>
 
-  <section class="view" id="view-station"><div class="grid" id="counterGrid"></div></section>
+  <section class="view" id="view-station">
+    <div class="vagtbar">
+      <span style="font-size:13px;color:var(--dim)">Denne vagt: <span class="vagtshift" id="shiftNum" style="font-family:'Fraunces',serif;font-weight:600;color:var(--text)">0</span></span>
+      <button class="vagtbtn" id="nyVagtBtn">Ny vagt</button>
+    </div>
+    <div class="grid" id="counterGrid"></div>
+  </section>
 
   <section class="view" id="view-vin">
     <div class="searchwrap">
@@ -269,19 +329,24 @@
 
 <div class="toast" id="toast"><span class="toast-msg" id="toastMsg"></span><button class="toast-undo" id="toastUndo">Fortryd</button></div>
 
+<div class="numtray" id="numtray">
+  <span class="numtray-label" id="numtrayLabel">Tilføj antal</span>
+  <input id="numtrayInput" type="number" inputmode="numeric" min="0" placeholder="0">
+  <button class="numtray-cancel" id="numtrayCancel">✕</button>
+  <button class="numtray-ok" id="numtrayOk">OK</button>
+</div>
+
 <script>
 (function(){
   "use strict";
   const STORE_KEY="mise_state_v2";
-  // Valgfrit: hardcode din backend-URL hvis du åbner filen lokalt (file://).
-  // Serveres appen fra serveren (http/https), finder den selv adressen.
   const API_BASE="";
   function apiBase(){
     if(API_BASE)return API_BASE.replace(/\/$/,"");
     if(location.protocol==="http:"||location.protocol==="https:")return location.origin;
     return "";
   }
-  const hasStore = typeof window!=="undefined" && window.storage && typeof window.storage.get==="function";
+  const hasStore=typeof window!=="undefined"&&window.storage&&typeof window.storage.get==="function";
 
   const OYSTER_TYPES=["Gillardeau","Fine de Claire","Spéciale de Claire","Marennes-Oléron","Belon","Tsarskaya","Limfjordsøsters","Kumamoto","Blue Point","Utah Beach","Pied de Cheval"];
   const LANDE=["Frankrig","Italien","Spanien","Tyskland","Portugal","Østrig","USA","Argentina","Chile","Australien","New Zealand","Sydafrika","Danmark","Ungarn","Grækenland","Libanon","Georgien"];
@@ -303,25 +368,69 @@
       {id:id(),label:"Flasker åbnet",count:0,subs:[],suggest:seedFor("Flasker åbnet")},
       {id:id(),label:"Couverter serveret",count:0,subs:[],suggest:[]}
     ],
-    wines:[{id:id(),name:"Tignanello",producer:"Antinori",land:"Italien",region:"Toscana",grape:"Sangiovese",vint:"2019",glasses:0,bottles:0}]
+    wines:[{id:id(),name:"Tignanello",producer:"Antinori",land:"Italien",region:"Toscana",grape:"Sangiovese",vint:"2019",glasses:0,bottles:0}],
+    careerOffset:0
   };
 
-  let state={counters:[],wines:[]}, mem=null, wineFilter="";
+  let state={counters:[],wines:[],careerOffset:0}, mem=null, wineFilter="";
+  let listView=localStorage.getItem("mise_listview")==="1";
+  const logHistory=[];
 
   async function load(){if(hasStore){try{const r=await window.storage.get(STORE_KEY);if(r&&r.value)return normalize(JSON.parse(r.value));}catch(e){}return clone(DEFAULTS);}return mem?clone(mem):clone(DEFAULTS);}
   async function save(){if(hasStore){try{await window.storage.set(STORE_KEY,JSON.stringify(state));}catch(e){console.error(e);}}else mem=clone(state);}
   function normalize(s){
+    if(typeof s.careerOffset!=="number")s.careerOffset=0;
     s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
     s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0}));
     return s;
   }
   function counterTotal(c){return c.subs.length?c.subs.reduce((a,b)=>a+b.count,0):c.count;}
-  function career(){let t=0;state.counters.forEach(c=>t+=counterTotal(c));state.wines.forEach(w=>t+=(w.glasses||0)+(w.bottles||0));return t;}
-  function renderCareer(){$("#careerNum").textContent=career().toLocaleString("da-DK");}
+  function shiftTotal(){let t=0;state.counters.forEach(c=>t+=counterTotal(c));state.wines.forEach(w=>t+=(w.glasses||0)+(w.bottles||0));return t;}
+  function career(){return (state.careerOffset||0)+shiftTotal();}
+  function renderCareer(){
+    $("#careerNum").textContent=career().toLocaleString("da-DK");
+    const se=$("#shiftNum");if(se)se.textContent=shiftTotal().toLocaleString("da-DK");
+  }
 
+  // ---- numtray ----
+  let numtrayCallback=null;
+  const numtray=$("#numtray");
+  const numtrayInput=$("#numtrayInput");
+  function openNumtray(label,initialVal,onSave){
+    $("#numtrayLabel").textContent=label;
+    numtrayInput.value=initialVal!==""?initialVal:"";
+    numtrayCallback=onSave;
+    numtray.classList.add("open");
+    setTimeout(()=>{numtrayInput.select();numtrayInput.focus();},60);
+  }
+  function closeNumtray(){numtray.classList.remove("open");numtrayCallback=null;}
+  $("#numtrayOk").addEventListener("click",()=>{
+    const val=parseInt(numtrayInput.value,10);
+    if(!isNaN(val)&&numtrayCallback)numtrayCallback(val);
+    closeNumtray();
+  });
+  $("#numtrayCancel").addEventListener("click",closeNumtray);
+  numtrayInput.addEventListener("keydown",e=>{if(e.key==="Enter")$("#numtrayOk").click();if(e.key==="Escape")closeNumtray();});
+
+  // ---- log history ----
+  function addLogEntry(msg){
+    const now=new Date();
+    const time=now.getHours().toString().padStart(2,"0")+":"+now.getMinutes().toString().padStart(2,"0");
+    logHistory.unshift({time,msg});
+    if(logHistory.length>8)logHistory.pop();
+    renderLogFeed();
+  }
+  function renderLogFeed(){
+    const feed=$("#logFeed");
+    if(!logHistory.length){feed.hidden=true;return;}
+    feed.hidden=false;
+    feed.innerHTML=logHistory.map(e=>'<div class="logentry"><span class="log-time">'+esc(e.time)+'</span><span class="log-text">'+esc(e.msg)+'</span></div>').join("");
+  }
+
+  // ---- autocomplete ----
   function attachAC(input,getList){
-    if(input._acBound)return; input._acBound=true;
-    const dd=document.createElement("div"); dd.className="ac"; input.parentNode.appendChild(dd);
+    if(input._acBound)return;input._acBound=true;
+    const dd=document.createElement("div");dd.className="ac";input.parentNode.appendChild(dd);
     let items=[],active=-1;
     function close(){dd.style.display="none";dd.innerHTML="";active=-1;items=[];}
     function render(){const q=input.value.trim().toLowerCase();if(!q){close();return;}
@@ -336,28 +445,62 @@
     dd.addEventListener("mousedown",e=>{const it=e.target.closest(".ac-item");if(it){e.preventDefault();pick(items[+it.dataset.i]);}});
   }
   function uniq(arr){const seen=new Set(),out=[];arr.forEach(v=>{v=(v||"").trim();const k=v.toLowerCase();if(v&&!seen.has(k)){seen.add(k);out.push(v);}});return out;}
-  function wineSuggest(field){return uniq([...( {land:LANDE,region:OMRAADER,grape:DRUER}[field]||[] ),...state.wines.map(w=>w[field])]);}
+  function wineSuggest(field){return uniq([...({land:LANDE,region:OMRAADER,grape:DRUER}[field]||[]),...state.wines.map(w=>w[field])]);}
+
+  // ---- long-press binding for + buttons ----
+  function bindLongPress(btn,onLong){
+    if(btn._lpBound)return;btn._lpBound=true;
+    let t1=null,t2=null;
+    btn.addEventListener("pointerdown",()=>{
+      t1=setTimeout(()=>btn.classList.add("holding"),200);
+      t2=setTimeout(()=>{t1=t2=null;btn.classList.remove("holding");btn._longPressed=true;onLong();},500);
+    });
+    function cancel(){clearTimeout(t1);clearTimeout(t2);t1=t2=null;btn.classList.remove("holding");}
+    btn.addEventListener("pointerup",cancel);
+    btn.addEventListener("pointercancel",cancel);
+    btn.addEventListener("contextmenu",e=>e.preventDefault());
+  }
 
   // ---- counters ----
   function renderCounters(){
-    const grid=$("#counterGrid"); grid.innerHTML="";
+    const grid=$("#counterGrid");
+    grid.classList.toggle("list",listView);
+    grid.innerHTML="";
     state.counters.forEach(c=>{
       const isCat=c.subs.length>0;
-      const card=document.createElement("div"); card.className="ccard"+(isCat?" cat":""); card.dataset.id=c.id;
+      const card=document.createElement("div");card.className="ccard"+(isCat?" cat":"");card.dataset.id=c.id;
       const ph=(c.suggest&&c.suggest.length)?("fx "+c.suggest[0]):"Skriv en type…";
-      let html='<button class="kebab" data-act="edit" aria-label="Rediger">⋯</button><div class="clabel">'+esc(c.label)+'</div><div class="cbig">'+counterTotal(c)+'</div>';
+      const bigAct=isCat?"":"data-act=\"editnum\"";
+      let html='<button class="kebab" data-act="edit" aria-label="Rediger">⋯</button><div class="clabel">'+esc(c.label)+'</div><div class="cbig" '+bigAct+'>'+counterTotal(c)+'</div>';
       if(isCat){
         html+='<div class="sublist">';
-        c.subs.forEach(sub=>{html+='<div class="subrow" data-sid="'+sub.id+'"><span class="subname">'+esc(sub.name)+'</span><div class="subctrl"><button class="sbtn" data-act="subdec" aria-label="Træk fra">−</button><span class="subcount">'+sub.count+'</span><button class="sbtn plus" data-act="subinc" aria-label="Læg til">+</button></div></div>';});
+        c.subs.forEach(sub=>{html+='<div class="subrow" data-sid="'+sub.id+'"><span class="subname">'+esc(sub.name)+'</span><div class="subctrl"><button class="sbtn" data-act="subdec" aria-label="Træk fra">−</button><span class="subcount" data-act="subeditnum">'+sub.count+'</span><button class="sbtn plus" data-act="subinc" aria-label="Læg til">+</button></div></div>';});
         html+='</div>';
       }else{
         html+='<div class="cstep"><button class="step minus" data-act="dec" aria-label="Træk fra">−</button><button class="step plus" data-act="inc" aria-label="Læg til">+</button></div>';
       }
       html+='<button class="addtype" data-act="addtype">+ underkategori</button><div class="addtype-box"><input class="subadd-input" placeholder="'+esc(ph)+'" maxlength="40" autocomplete="off"></div>';
-      card.innerHTML=html; grid.appendChild(card);
+      card.innerHTML=html;grid.appendChild(card);
       attachAC(card.querySelector(".subadd-input"),()=>uniq([...c.suggest,...c.subs.map(s=>s.name)]));
+      // long press on main +
+      const plusBtn=card.querySelector('.step.plus[data-act="inc"]');
+      if(plusBtn)bindLongPress(plusBtn,()=>{
+        openNumtray("Tilføj til "+c.label,"",val=>{if(val>0)bumpSimple(card,val);});
+      });
+      // long press on each sub +
+      card.querySelectorAll('.sbtn.plus[data-act="subinc"]').forEach(btn=>{
+        const sid=btn.closest(".subrow").dataset.sid;
+        const s=c.subs.find(x=>x.id===sid);
+        if(!s)return;
+        bindLongPress(btn,()=>{
+          openNumtray("Tilføj til "+s.name,"",val=>{if(val>0)bumpSub(card,sid,val);});
+        });
+      });
     });
-    const add=document.createElement("button"); add.className="addcard"; add.id="addCounterBtn"; add.textContent="+ Ny tæller"; grid.appendChild(add);
+    const add=document.createElement("button");add.className="addcard";add.id="addCounterBtn";add.textContent="+ Ny tæller";grid.appendChild(add);
+    // update view toggle buttons
+    $("#btnGrid").classList.toggle("active",!listView);
+    $("#btnList").classList.toggle("active",listView);
   }
   function tickEl(el){if(!el)return;el.classList.remove("tick");void el.offsetWidth;el.classList.add("tick");}
   function bumpSimple(card,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c||c.subs.length)return;c.count=Math.max(0,c.count+d);const n=card.querySelector(".cbig");n.textContent=c.count;if(d>0)tickEl(n);renderCareer();save();}
@@ -366,17 +509,53 @@
 
   $("#counterGrid").addEventListener("click",e=>{
     if(e.target.closest("#addCounterBtn")){openCounterModal(null);return;}
-    const card=e.target.closest(".ccard"); if(!card)return;
-    const act=e.target.closest("[data-act]"); if(!act)return;
+    const card=e.target.closest(".ccard");if(!card)return;
+    const act=e.target.closest("[data-act]");if(!act)return;
     const a=act.dataset.act;
     if(a==="edit")openCounterModal(card.dataset.id);
-    else if(a==="inc")bumpSimple(card,1);
+    else if(a==="inc"){if(act._longPressed){act._longPressed=false;return;}bumpSimple(card,1);}
     else if(a==="dec")bumpSimple(card,-1);
-    else if(a==="subinc")bumpSub(card,act.closest(".subrow").dataset.sid,1);
+    else if(a==="subinc"){if(act._longPressed){act._longPressed=false;return;}bumpSub(card,act.closest(".subrow").dataset.sid,1);}
     else if(a==="subdec")bumpSub(card,act.closest(".subrow").dataset.sid,-1);
     else if(a==="addtype"){const b=card.querySelector(".addtype-box");b.classList.toggle("open");if(b.classList.contains("open"))card.querySelector(".subadd-input").focus();}
+    else if(a==="editnum"){
+      const c=state.counters.find(x=>x.id===card.dataset.id);if(!c||c.subs.length)return;
+      openNumtray("Sæt "+c.label+" til",c.count,val=>{if(val>=0){c.count=val;save();renderCounters();renderCareer();}});
+    }
+    else if(a==="subeditnum"){
+      const c=state.counters.find(x=>x.id===card.dataset.id);
+      const sid=act.closest(".subrow").dataset.sid;
+      const s=c&&c.subs.find(x=>x.id===sid);if(!s)return;
+      openNumtray("Sæt "+s.name+" til",s.count,val=>{
+        if(val>=0){s.count=val;const t=card.querySelector(".cbig");if(t)t.textContent=counterTotal(c);save();renderCareer();}
+      });
+    }
   });
   $("#counterGrid").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.classList.contains("subadd-input"))addType(e.target.closest(".ccard"),e.target.value);});
+
+  // ---- view toggle ----
+  $("#btnGrid").addEventListener("click",()=>{listView=false;localStorage.setItem("mise_listview","0");renderCounters();});
+  $("#btnList").addEventListener("click",()=>{listView=true;localStorage.setItem("mise_listview","1");renderCounters();});
+
+  // ---- ny vagt ----
+  let vagtConfirm=false,vagtTimer=null;
+  $("#nyVagtBtn").addEventListener("click",()=>{
+    if(!vagtConfirm){
+      vagtConfirm=true;
+      $("#nyVagtBtn").textContent="Er du sikker?";
+      $("#nyVagtBtn").classList.add("confirm");
+      vagtTimer=setTimeout(()=>{vagtConfirm=false;$("#nyVagtBtn").textContent="Ny vagt";$("#nyVagtBtn").classList.remove("confirm");},3000);
+    }else{
+      clearTimeout(vagtTimer);vagtConfirm=false;
+      state.careerOffset=(state.careerOffset||0)+shiftTotal();
+      state.counters.forEach(c=>{c.count=0;c.subs.forEach(s=>s.count=0);});
+      state.wines.forEach(w=>{w.glasses=0;w.bottles=0;});
+      save();renderCounters();renderWines();renderCareer();
+      logHistory.length=0;renderLogFeed();
+      showToast("Ny vagt startet — tællere nulstillet");
+      $("#nyVagtBtn").textContent="Ny vagt";$("#nyVagtBtn").classList.remove("confirm");
+    }
+  });
 
   let editC=null;
   function openCounterModal(cid){editC=cid;const c=cid?state.counters.find(x=>x.id===cid):null;$("#counterModalTitle").textContent=c?"Rediger tæller":"Ny tæller";$("#counterLabelInput").value=c?c.label:"";$("#counterDelete").style.display=c?"block":"none";$("#counterScrim").classList.add("open");setTimeout(()=>$("#counterLabelInput").focus(),30);}
@@ -391,57 +570,54 @@
   function sumHtml(shown){let g=0,b=0;shown.forEach(w=>{g+=w.glasses;b+=w.bottles;});return '<b>'+shown.length+'</b> vine&nbsp;·&nbsp; <b>'+g+'</b> glas&nbsp;·&nbsp; <b>'+b+'</b> flasker';}
   function renderWines(){
     const q=wineFilter.trim().toLowerCase();
-    const list=$("#wineList"); list.innerHTML="";
+    const list=$("#wineList");list.innerHTML="";
     const shown=state.wines.filter(w=>matchWine(w,q));
     $("#wineSum").innerHTML=sumHtml(shown);
-    if(!shown.length){list.innerHTML='<div class="empty">'+(state.wines.length?'Ingen vine i kælderen matcher din søgning. Vælg en fra dropdownen for at tilføje den.':'Ingen vine endnu — søg foroven for at tilføje din første.')+'</div>';return;}
+    if(!shown.length){list.innerHTML='<div class="empty">'+(state.wines.length?'Ingen vine matcher søgningen.':'Ingen vine endnu — søg foroven for at tilføje.')+'</div>';return;}
     shown.forEach(w=>{
-      const parts=[];
-      [w.producer,w.region,w.land,w.grape].forEach(v=>{if(v)parts.push(esc(v));});
+      const parts=[];[w.producer,w.region,w.land,w.grape].forEach(v=>{if(v)parts.push(esc(v));});
       const metaMid=parts.join('<span class="sep">·</span>');
       const vintHtml=w.vint?'<span class="vint">'+esc(w.vint)+'</span>':'<span class="novint" data-act="edit">+ årgang</span>';
       const meta=vintHtml+(parts.length?'<span class="sep">·</span>'+metaMid:'');
       const disp=w.name||w.producer||w.region||w.grape||"Unavngiven vin";
-      const row=document.createElement("div"); row.className="wrow"; row.dataset.id=w.id;
+      const row=document.createElement("div");row.className="wrow";row.dataset.id=w.id;
       row.innerHTML='<div class="winfo"><div class="wname">'+esc(disp)+'</div><div class="wmeta">'+meta+'</div></div>'+
         '<div class="wsteps">'+
-          '<div class="stepblock"><div class="steplabel">Glas</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
-          '<div class="stepblock"><div class="steplabel">Flasker</div><div class="stepctrl"><button class="sbtn" data-act="b-">−</button><span class="tnum" data-k="bottles">'+w.bottles+'</span><button class="sbtn plus" data-act="b+">+</button></div></div>'+
-          '<button class="wedit" data-act="edit" aria-label="Rediger">⋯</button>'+
+        '<div class="stepblock"><div class="steplabel">Glas</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
+        '<div class="stepblock"><div class="steplabel">Flasker</div><div class="stepctrl"><button class="sbtn" data-act="b-">−</button><span class="tnum" data-k="bottles">'+w.bottles+'</span><button class="sbtn plus" data-act="b+">+</button></div></div>'+
+        '<button class="wedit" data-act="edit" aria-label="Rediger">⋯</button>'+
         '</div>';
       list.appendChild(row);
     });
   }
   $("#wineList").addEventListener("click",e=>{
-    const row=e.target.closest(".wrow"); if(!row)return;
-    const act=e.target.closest("[data-act]"); if(!act)return;
-    const w=state.wines.find(x=>x.id===row.dataset.id); if(!w)return;
+    const row=e.target.closest(".wrow");if(!row)return;
+    const act=e.target.closest("[data-act]");if(!act)return;
+    const w=state.wines.find(x=>x.id===row.dataset.id);if(!w)return;
     const a=act.dataset.act;
     if(a==="edit"){openWineModal(w.id);return;}
-    let key,d; if(a==="g+"){key="glasses";d=1;}else if(a==="g-"){key="glasses";d=-1;}else if(a==="b+"){key="bottles";d=1;}else if(a==="b-"){key="bottles";d=-1;}else return;
+    let key,d;if(a==="g+"){key="glasses";d=1;}else if(a==="g-"){key="glasses";d=-1;}else if(a==="b+"){key="bottles";d=1;}else if(a==="b-"){key="bottles";d=-1;}else return;
     w[key]=Math.max(0,(w[key]||0)+d);
-    const n=row.querySelector('.tnum[data-k="'+key+'"]'); n.textContent=w[key]; if(d>0)tickEl(n);
+    const n=row.querySelector('.tnum[data-k="'+key+'"]');n.textContent=w[key];if(d>0)tickEl(n);
     $("#wineSum").innerHTML=sumHtml(state.wines.filter(x=>matchWine(x,wineFilter.trim().toLowerCase())));
-    renderCareer(); save();
+    renderCareer();save();
   });
 
-  // ---- AI wine lookup ----
   async function lookupWines(query){
-    const base=apiBase(); if(!base)throw new Error("no-backend");
+    const base=apiBase();if(!base)throw new Error("no-backend");
     const res=await fetch(base+"/api/wine-search",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query})});
     if(!res.ok)throw new Error("Backend "+res.status);
-    const data=await res.json();
-    return Array.isArray(data.wines)?data.wines:[];
+    const data=await res.json();return Array.isArray(data.wines)?data.wines:[];
   }
   const dd=$("#wineDD");
   let wlSeq=0,wlTimer=null,wlCands=[];
   function ddClose(){dd.classList.remove("open");dd.innerHTML="";}
   function ddOpen(html){dd.innerHTML=html;dd.classList.add("open");}
   function ddResults(){ddOpen('<div class="dd-head">Fra vindatabasen</div>'+wlCands.map((w,i)=>{const meta=[w.producer,w.region,w.country,w.grape].filter(Boolean).join(" · ");return '<div class="ri" data-i="'+i+'"><div class="ri-main"><div class="ri-name">'+esc(w.name||"Ukendt")+'</div>'+(meta?'<div class="ri-meta">'+esc(meta)+'</div>':'')+'</div><span class="ri-add">Tilføj</span></div>';}).join(""));}
-  async function wlRun(q){const seq=++wlSeq;try{const arr=await lookupWines(q);if(seq!==wlSeq)return;wlCands=arr;wlCands.length?ddResults():ddOpen('<div class="ri-status">Ingen match i databasen</div>');}catch(e){if(seq!==wlSeq)return;ddOpen('<div class="ri-status">'+(e&&e.message==="no-backend"?"Tilknyt din backend for at søge i databasen":"Kunne ikke søge — prøv igen")+'</div>');}}
+  async function wlRun(q){const seq=++wlSeq;try{const arr=await lookupWines(q);if(seq!==wlSeq)return;wlCands=arr;wlCands.length?ddResults():ddOpen('<div class="ri-status">Ingen match i databasen</div>');}catch(e){if(seq!==wlSeq)return;ddOpen('<div class="ri-status">'+(e&&e.message==="no-backend"?"Tilknyt backend for at søge":"Kunne ikke søge — prøv igen")+'</div>');}}
   $("#wineSearch").addEventListener("input",e=>{
-    wineFilter=e.target.value; renderWines();
-    const q=e.target.value.trim(); clearTimeout(wlTimer);
+    wineFilter=e.target.value;renderWines();
+    const q=e.target.value.trim();clearTimeout(wlTimer);
     if(q.length<2){wlCands=[];ddClose();return;}
     ddOpen('<div class="ri-status"><span class="spin"></span>Søger i databasen…</div>');
     wlTimer=setTimeout(()=>wlRun(q),400);
@@ -450,7 +626,6 @@
   $("#wineSearch").addEventListener("blur",()=>setTimeout(ddClose,180));
   dd.addEventListener("mousedown",e=>{const ri=e.target.closest(".ri[data-i]");if(!ri)return;e.preventDefault();const w=wlCands[+ri.dataset.i];if(!w)return;state.wines.unshift({id:id(),name:w.name||"",producer:w.producer||"",land:w.country||"",region:w.region||"",grape:w.grape||"",vint:"",glasses:0,bottles:0});save();wlCands=[];wineFilter="";$("#wineSearch").value="";ddClose();renderWines();renderCareer();});
 
-  // ---- wine modal ----
   let editW=null;
   function openWineModal(wid){editW=wid;const w=wid?state.wines.find(x=>x.id===wid):null;$("#wineModalTitle").textContent=w?"Rediger vin":"Tilføj vin manuelt";$("#w_name").value=w?w.name:"";$("#w_producer").value=w?w.producer:"";$("#w_land").value=w?w.land:"";$("#w_region").value=w?w.region:"";$("#w_grape").value=w?w.grape:"";$("#w_vint").value=w?w.vint:"";$("#wineDelete").style.display=w?"block":"none";$("#wineScrim").classList.add("open");setTimeout(()=>(w?$("#w_vint"):$("#w_name")).focus(),30);}
   function closeWineModal(){$("#wineScrim").classList.remove("open");editW=null;}
@@ -466,16 +641,14 @@
 
   // ---- natural-language quick log ----
   async function parseLog(text){
-    const base=apiBase(); if(!base)throw new Error("no-backend");
+    const base=apiBase();if(!base)throw new Error("no-backend");
     const counters=state.counters.map(c=>({label:c.label,subs:c.subs.map(s=>s.name),muligeTyper:c.suggest||[]}));
     const wines=state.wines.map(w=>w.name).filter(Boolean);
-    const _ctrl=new AbortController(); const _to=setTimeout(()=>_ctrl.abort(),8000);
+    const _ctrl=new AbortController();const _to=setTimeout(()=>_ctrl.abort(),8000);
     let data;
     try{
       const res=await fetch(base+"/api/parse-log",{signal:_ctrl.signal,method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,counters,wines})});
-      clearTimeout(_to);
-      if(!res.ok)throw new Error("Backend "+res.status);
-      data=await res.json();
+      clearTimeout(_to);if(!res.ok)throw new Error("Backend "+res.status);data=await res.json();
     }catch(e){clearTimeout(_to);throw e;}
     return Array.isArray(data.actions)?data.actions:[];
   }
@@ -489,7 +662,7 @@
   }
   function applyOne(a,summary){
     if(a.kind==="counter"){
-      const delta=parseInt(a.delta,10)||0; if(delta===0)return;
+      const delta=parseInt(a.delta,10)||0;if(delta===0)return;
       let c=findCounter(a.counter);
       if(!c){c={id:id(),label:a.counter||"Ny tæller",count:0,subs:[],suggest:seedFor(a.counter)};state.counters.push(c);}
       const subName=(a.sub||"").trim();
@@ -497,7 +670,7 @@
       else if(c.subs.length){let s=c.subs.find(x=>x.name==="Uden type");if(!s){s={id:id(),name:"Uden type",count:0};c.subs.push(s);}s.count=Math.max(0,s.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
       else{c.count=Math.max(0,c.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
     }else if(a.kind==="wine"){
-      const delta=parseInt(a.delta,10)||0; if(delta===0)return;
+      const delta=parseInt(a.delta,10)||0;if(delta===0)return;
       const measure=a.measure==="bottles"?"bottles":"glasses";
       const nm=(a.wine||"").toLowerCase();
       let w=state.wines.find(x=>x.name.toLowerCase()===nm)||state.wines.find(x=>x.name&&(x.name.toLowerCase().includes(nm)||nm.includes(x.name.toLowerCase())));
@@ -508,22 +681,18 @@
   }
   const STOPVERBS=new Set(["jeg","har","i","dag","idag","åbnet","åbnede","åbent","snittet","skåret","skar","hakket","serveret","stegt","grillet","lavet","lavede","poleret","polerede","drukket","smagt","tilberedt","til","en","et","af","med","og","stk","styk","styks","portioner","portion","glas","stykker"]);
   function localParse(text){
-    const clauses=text.split(/\s+og\s+|,/i); const actions=[];
+    const clauses=text.split(/\s+og\s+|,/i);const actions=[];
     clauses.forEach(cl=>{
-      const low=cl.toLowerCase(); const nm=low.match(/\d+/); const delta=nm?parseInt(nm[0],10):1;
-      // 1) named type/variety -> subcategory under its counter
+      const low=cl.toLowerCase();const nm=low.match(/\d+/);const delta=nm?parseInt(nm[0],10):1;
       let best=null;
       state.counters.forEach(c=>{[...(c.suggest||[]),...c.subs.map(s=>s.name)].forEach(cand=>{if(cand&&low.includes(cand.toLowerCase())&&(!best||cand.length>best.sub.length))best={counter:c.label,sub:cand};});});
       if(best){actions.push({kind:"counter",counter:best.counter,sub:best.sub,delta});return;}
-      // 2) known wine
       let wine=null;
       state.wines.forEach(w=>{if(w.name&&low.includes(w.name.toLowerCase())&&(!wine||w.name.length>wine.length))wine=w.name;});
       if(wine){actions.push({kind:"wine",wine,measure:/flask/.test(low)?"bottles":"glasses",delta});return;}
-      // 3) counter by keyword from its label
       let cnt=null;
       state.counters.forEach(c=>{c.label.toLowerCase().split(/\s+/).filter(w=>w.length>=3&&!STOPVERBS.has(w)).forEach(w=>{if(low.includes(w)&&(!cnt||w.length>cnt.len))cnt={label:c.label,len:w.length};});});
       if(cnt){actions.push({kind:"counter",counter:cnt.label,sub:"",delta});return;}
-      // 4) unknown -> let the confirmation dialog handle it
       const numMatch=low.search(/\d/);
       const nameStr=numMatch>=0?low.slice(numMatch).replace(/^\d+\s*/,""):low;
       const words=nameStr.split(/\s+/).filter(w=>w&&!STOPVERBS.has(w));
@@ -531,44 +700,46 @@
     });
     return actions;
   }
-  let toastTimer=null, undoSnapshot=null;
+  let toastTimer=null,undoSnapshot=null;
   function showToast(msg){
     clearTimeout(toastTimer);
     $("#toastMsg").textContent=msg;
-    const t=$("#toast"); t.classList.add("show");
+    const t=$("#toast");t.classList.add("show");
     toastTimer=setTimeout(()=>t.classList.remove("show"),6500);
   }
   $("#toastUndo").addEventListener("click",()=>{if(undoSnapshot){state=undoSnapshot;undoSnapshot=null;save();renderCounters();renderWines();renderCareer();}$("#toast").classList.remove("show");});
   async function runQuickLog(){
-    const input=$("#qlogInput"); const text=input.value.trim(); if(!text)return;
-    $("#qlogSpin").hidden=false; input.disabled=true;
+    const input=$("#qlogInput");const text=input.value.trim();if(!text)return;
+    $("#qlogSpin").hidden=false;input.disabled=true;
     let actions=[];
     try{actions=await parseLog(text);}catch(e){console.warn("AI-tolkning utilgængelig, bruger lokal:",e);}
     if(!actions.length)actions=localParse(text);
-    $("#qlogSpin").hidden=true; input.disabled=false;
-    if(!actions.length){showToast("Forstod ikke — prøv fx “snittet 500 rødløg”");input.focus();return;}
+    $("#qlogSpin").hidden=true;input.disabled=false;
+    if(!actions.length){showToast("Forstod ikke — prøv fx ”snittet 500 rødløg”");input.focus();return;}
     undoSnapshot=clone(state);
-    const summary=[]; const ask=[];
-    actions.forEach(a=>{ if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a); else applyOne(a,summary); });
+    const summary=[],ask=[];
+    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary);});
     input.value="";
-    save(); renderCounters(); renderWines(); renderCareer();
+    save();renderCounters();renderWines();renderCareer();
     if(!ask.length){finishLog(summary);return;}
     processAsk(ask,0,summary);
   }
-  function finishLog(summary){showToast(summary.length?("Logget: "+summary.join(", ")):"Intet tilføjet");$("#qlogInput").focus();}
-  function processAsk(ask,i,summary){
-    if(i>=ask.length){finishLog(summary);return;}
-    openAsk(ask[i],()=>processAsk(ask,i+1,summary),summary);
+  function finishLog(summary){
+    const msg=summary.length?("Logget: "+summary.join(", ")):"Intet tilføjet";
+    showToast(msg);
+    if(summary.length)addLogEntry(summary.join(" · "));
+    $("#qlogInput").focus();
   }
+  function processAsk(ask,i,summary){if(i>=ask.length){finishLog(summary);return;}openAsk(ask[i],()=>processAsk(ask,i+1,summary),summary);}
   function openAsk(item,next,summary){
     const delta=parseInt(item.delta,10)||0;
     const detectedName=item.counter||"Ny ting";
     $("#askText").innerHTML='<b>'+esc((delta>0?"+":"")+delta+" "+detectedName)+'</b> matcher ingen eksisterende kategori.';
-    const nameInput=$("#askName"); nameInput.value=detectedName;
+    const nameInput=$("#askName");nameInput.value=detectedName;
     const sel=$("#askParent");
     sel.innerHTML=state.counters.map(c=>'<option value="'+c.id+'">'+esc(c.label)+'</option>').join("");
     const rCounter=document.querySelector('input[name="askmode"][value="counter"]');
-    rCounter.checked=true; sel.disabled=true;
+    rCounter.checked=true;sel.disabled=true;
     const scrim=$("#askScrim");
     scrim._askSkip=()=>{scrim.classList.remove("open");scrim._askSkip=null;next();};
     scrim.classList.add("open");
@@ -576,10 +747,8 @@
     $("#askAdd").onclick=()=>{
       const name=(nameInput.value||"").trim()||detectedName;
       const mode=document.querySelector('input[name="askmode"]:checked').value;
-      if(mode==="sub"){
-        const parent=state.counters.find(c=>c.id===sel.value);
-        if(parent)addToSub(parent,name,delta,summary);
-      }else{
+      if(mode==="sub"){const parent=state.counters.find(c=>c.id===sel.value);if(parent)addToSub(parent,name,delta,summary);}
+      else{
         const c={id:id(),label:name,count:0,subs:[],suggest:seedFor(name)};state.counters.push(c);
         const subName=(item.sub||"").trim();
         if(subName)addToSub(c,subName,delta,summary);
@@ -594,8 +763,19 @@
   $("#qlogInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runQuickLog();}});
 
   document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s){if(s._askSkip)s._askSkip();else s.classList.remove("open");}}));
-  document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".scrim.open").forEach(s=>{if(s._askSkip)s._askSkip();else s.classList.remove("open");});});
-  document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");const v=t.dataset.view;$("#view-station").classList.toggle("active",v==="station");$("#view-vin").classList.toggle("active",v==="vin");}));
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){
+      if(numtray.classList.contains("open")){closeNumtray();return;}
+      document.querySelectorAll(".scrim.open").forEach(s=>{if(s._askSkip)s._askSkip();else s.classList.remove("open");});
+    }
+  });
+  document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");
+    const v=t.dataset.view;
+    $("#view-station").classList.toggle("active",v==="station");
+    $("#view-vin").classList.toggle("active",v==="vin");
+    $("#viewToggle").style.display=v==="station"?"":"none";
+  }));
 
   (async function(){state=await load();$("#loading").style.display="none";$("#view-station").classList.add("active");renderCounters();renderWines();renderCareer();})();
 })();
