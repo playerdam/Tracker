@@ -462,6 +462,26 @@
   function setLang(l){lang=l;localStorage.setItem("mise_lang",l);translateUI();renderCounters();renderWines();renderLogView();}
   $("#langBtn").addEventListener("click",()=>setLang(lang==="da"?"en":"da"));
 
+  // Translations for default counter/sub labels — user-created labels stay as-is
+  const LABEL_TRANSLATIONS={
+    "Østers åbnet":        {en:"Oysters opened"},
+    "Løg snittet":         {en:"Onions cut"},
+    "Flasker åbnet":       {en:"Bottles opened"},
+    "Couverter serveret":  {en:"Covers served"},
+    "Uden type":           {en:"Unspecified"},
+    "Gul løg":             {en:"Yellow onion"},
+    "Rødløg":              {en:"Red onion"},
+    "Skalotteløg":         {en:"Shallot"},
+    "Forårsløg":           {en:"Spring onion"},
+    "Perleløg":            {en:"Pearl onion"},
+    "Spanske løg":         {en:"Spanish onion"},
+    "Bananskalotte":       {en:"Banana shallot"},
+    "Porre":               {en:"Leek"},
+    "Konventionel vin":    {en:"Conventional wine"},
+    "Naturvin":            {en:"Natural wine"},
+  };
+  function tLabel(label){if(lang==="da")return label;return(LABEL_TRANSLATIONS[label]&&LABEL_TRANSLATIONS[label][lang])||label;}
+
   const OYSTER_TYPES=["Gillardeau","Fine de Claire","Spéciale de Claire","Marennes-Oléron","Belon","Tsarskaya","Limfjordsøsters","Kumamoto","Blue Point","Utah Beach","Pied de Cheval"];
   const LANDE=["Frankrig","Italien","Spanien","Tyskland","Portugal","Østrig","USA","Argentina","Chile","Australien","New Zealand","Sydafrika","Danmark","Ungarn","Grækenland","Libanon","Georgien"];
   const OMRAADER=["Bourgogne","Bordeaux","Champagne","Rhône","Loire","Alsace","Beaujolais","Jura","Languedoc","Provence","Toscana","Piemonte","Veneto","Lombardiet","Sicilien","Rioja","Ribera del Duero","Priorat","Rías Baixas","Mosel","Rheingau","Pfalz","Nahe","Douro","Dão","Wachau","Napa Valley","Sonoma","Willamette Valley","Barossa Valley","Marlborough","Mendoza","Stellenbosch"];
@@ -591,10 +611,10 @@
       const card=document.createElement("div");card.className="ccard"+(isCat?" cat":"");card.dataset.id=c.id;
       const ph=(c.suggest&&c.suggest.length)?(t("sub_ph").replace("Skriv","fx").replace("Type","e.g.")+" "+c.suggest[0]):t("sub_ph");
       const bigAct=isCat?"":"data-act=\"editnum\"";
-      let html='<button class="kebab" data-act="edit" aria-label="Edit">⋯</button><div class="clabel">'+esc(c.label)+'</div><div class="cbig" '+bigAct+'>'+counterTotal(c)+'</div>';
+      let html='<button class="kebab" data-act="edit" aria-label="Edit">⋯</button><div class="clabel">'+esc(tLabel(c.label))+'</div><div class="cbig" '+bigAct+'>'+counterTotal(c)+'</div>';
       if(isCat){
         html+='<div class="sublist">';
-        c.subs.forEach(sub=>{html+='<div class="subrow" data-sid="'+sub.id+'"><span class="subname">'+esc(sub.name)+'</span><div class="subctrl"><button class="sbtn" data-act="subdec">−</button><span class="subcount" data-act="subeditnum">'+sub.count+'</span><button class="sbtn plus" data-act="subinc">+</button></div></div>';});
+        c.subs.forEach(sub=>{html+='<div class="subrow" data-sid="'+sub.id+'"><span class="subname">'+esc(tLabel(sub.name))+'</span><div class="subctrl"><button class="sbtn" data-act="subdec">−</button><span class="subcount" data-act="subeditnum">'+sub.count+'</span><button class="sbtn plus" data-act="subinc">+</button></div></div>';});
         html+='</div>';
       }else{
         html+='<div class="cstep"><button class="step minus" data-act="dec">−</button><button class="step plus" data-act="inc">+</button></div>';
@@ -817,7 +837,7 @@
     const detectedName=item.counter||"Ny ting";
     $("#askText").innerHTML='<b>'+esc((delta>0?"+":"")+delta+" "+detectedName)+'</b> '+esc(t("ask_no_match"));
     const nameInput=$("#askName");nameInput.value=detectedName;
-    const sel=$("#askParent");sel.innerHTML=state.counters.map(c=>'<option value="'+c.id+'">'+esc(c.label)+'</option>').join("");
+    const sel=$("#askParent");sel.innerHTML=state.counters.map(c=>'<option value="'+c.id+'">'+esc(tLabel(c.label))+'</option>').join("");
     document.querySelector('input[name="askmode"][value="counter"]').checked=true;sel.disabled=true;
     const scrim=$("#askScrim");
     scrim._askSkip=()=>{scrim.classList.remove("open");scrim._askSkip=null;next();};
