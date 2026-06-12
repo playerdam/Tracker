@@ -1,0 +1,25 @@
+{
+  "name": "Craft Track",
+  "short_name": "Craft Track",
+  "description": "Track your craft — oysters, onions, covers and more",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F4F3F0",
+  "theme_color": "#8A2E3F",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

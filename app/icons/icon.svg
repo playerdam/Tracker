@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#8A2E3F"/>
+  <text x="256" y="348"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="272"
+    font-weight="700"
+    text-anchor="middle"
+    fill="#F4F3F0"
+    letter-spacing="-6">CT</text>
+</svg>
