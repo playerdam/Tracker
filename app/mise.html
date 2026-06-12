@@ -52,12 +52,20 @@
   .qlog input::placeholder{color:var(--faint)}
   .qlog-spin{flex:none;padding-right:4px}
 
-  /* log feed */
+  /* log feed (session strip) */
   .logfeed{margin-bottom:16px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)}
   .logentry{display:flex;gap:10px;padding:7px 12px;font-size:13px;color:var(--dim);background:var(--surface-2)}
   .logentry+.logentry{border-top:1px solid var(--border)}
   .log-time{font-family:"Fraunces",serif;font-size:12px;color:var(--faint);flex:0 0 36px;padding-top:1px}
   .log-text{flex:1;line-height:1.4}
+
+  /* log view tab */
+  .logview-day{margin-bottom:28px}
+  .logview-date{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--faint);text-transform:capitalize;letter-spacing:.02em;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:6px}
+  .logview-entry{display:flex;gap:14px;align-items:baseline;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-top:5px;box-shadow:var(--shadow)}
+  .logview-time{font-family:"Fraunces",serif;font-size:13px;color:var(--faint);flex:0 0 38px}
+  .logview-text{font-size:14px;color:var(--text);line-height:1.5;flex:1}
+  .logview-empty{padding:60px 20px;text-align:center;color:var(--faint);font-size:14px}
 
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120%);display:flex;align-items:center;gap:16px;background:#1B1A18;color:#F4F3F0;border-radius:12px;padding:13px 16px 13px 18px;box-shadow:var(--shadow-lg);z-index:90;opacity:0;transition:transform .3s ease,opacity .3s ease;max-width:calc(100% - 32px)}
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
@@ -243,6 +251,7 @@
     <div class="tabs">
       <button class="tab active" data-view="station">Stationen</button>
       <button class="tab" data-view="vin">Vinen</button>
+      <button class="tab" data-view="log">Log</button>
     </div>
     <div class="view-toggle" id="viewToggle">
       <button class="vtbtn active" id="btnGrid" title="Gitteroversigt">⊞</button>
@@ -254,6 +263,10 @@
 
   <section class="view" id="view-station">
     <div class="grid" id="counterGrid"></div>
+  </section>
+
+  <section class="view" id="view-log">
+    <div id="logView"></div>
   </section>
 
   <section class="view" id="view-vin">
@@ -359,9 +372,10 @@
       {id:id(),label:"Couverter serveret",count:0,subs:[],suggest:[]}
     ],
     wines:[{id:id(),name:"Tignanello",producer:"Antinori",land:"Italien",region:"Toscana",grape:"Sangiovese",vint:"2019",glasses:0,bottles:0}],
+    log:[]
   };
 
-  let state={counters:[],wines:[]}, mem=null, wineFilter="";
+  let state={counters:[],wines:[],log:[]}, mem=null, wineFilter="";
   let listView=localStorage.getItem("mise_listview")==="1";
   const logHistory=[];
 
@@ -370,6 +384,7 @@
   function normalize(s){
     s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
     s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0}));
+    s.log=Array.isArray(s.log)?s.log.filter(e=>e&&e.ts&&e.text):[];
     return s;
   }
   function counterTotal(c){return c.subs.length?c.subs.reduce((a,b)=>a+b.count,0):c.count;}
@@ -400,15 +415,37 @@
   function addLogEntry(msg){
     const now=new Date();
     const time=now.getHours().toString().padStart(2,"0")+":"+now.getMinutes().toString().padStart(2,"0");
+    // session feed (top 8, not persisted)
     logHistory.unshift({time,msg});
     if(logHistory.length>8)logHistory.pop();
     renderLogFeed();
+    // persistent log
+    if(!Array.isArray(state.log))state.log=[];
+    state.log.unshift({ts:now.getTime(),text:msg});
+    if(state.log.length>2000)state.log.length=2000;
+    save();
+    renderLogView();
   }
   function renderLogFeed(){
     const feed=$("#logFeed");
     if(!logHistory.length){feed.hidden=true;return;}
     feed.hidden=false;
     feed.innerHTML=logHistory.map(e=>'<div class="logentry"><span class="log-time">'+esc(e.time)+'</span><span class="log-text">'+esc(e.msg)+'</span></div>').join("");
+  }
+  function renderLogView(){
+    const el=$("#logView");if(!el)return;
+    const entries=state.log||[];
+    if(!entries.length){el.innerHTML='<div class="logview-empty">Ingen indgange endnu — brug quick-log foroven</div>';return;}
+    // group by calendar day
+    const days=[];const dayMap={};
+    entries.forEach(e=>{
+      const d=new Date(e.ts);
+      const key=d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+      if(!dayMap[key]){const label=d.toLocaleDateString("da-DK",{weekday:"long",day:"numeric",month:"long",year:"numeric"});dayMap[key]={label,entries:[]};days.push(dayMap[key]);}
+      const t=d.getHours().toString().padStart(2,"0")+":"+d.getMinutes().toString().padStart(2,"0");
+      dayMap[key].entries.push({t,text:e.text});
+    });
+    el.innerHTML=days.map(day=>'<div class="logview-day"><div class="logview-date">'+esc(day.label)+'</div>'+day.entries.map(e=>'<div class="logview-entry"><span class="logview-time">'+esc(e.t)+'</span><span class="logview-text">'+esc(e.text)+'</span></div>').join("")+'</div>').join("");
   }
 
   // ---- autocomplete ----
@@ -738,10 +775,12 @@
     const v=t.dataset.view;
     $("#view-station").classList.toggle("active",v==="station");
     $("#view-vin").classList.toggle("active",v==="vin");
+    $("#view-log").classList.toggle("active",v==="log");
     $("#viewToggle").style.display=v==="station"?"":"none";
+    if(v==="log")renderLogView();
   }));
 
-  (async function(){state=await load();$("#loading").style.display="none";$("#view-station").classList.add("active");renderCounters();renderWines();renderCareer();})();
+  (async function(){state=await load();if(!Array.isArray(state.log))state.log=[];$("#loading").style.display="none";$("#view-station").classList.add("active");renderCounters();renderWines();renderCareer();renderLogView();})();
 })();
 </script>
 </body>
