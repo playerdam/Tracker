@@ -341,6 +341,7 @@
   const API_BASE="";
   function apiBase(){if(API_BASE)return API_BASE.replace(/\/$/,"");if(location.protocol==="http:"||location.protocol==="https:")return location.origin;return "";}
   const hasStore=typeof window!=="undefined"&&window.storage&&typeof window.storage.get==="function";
+  const $=s=>document.querySelector(s);
 
   // ---- i18n ----
   const LANGS={
@@ -464,7 +465,6 @@
 
   function id(){return Math.random().toString(36).slice(2,10);}
   function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
-  const $=s=>document.querySelector(s);
   function clone(o){return JSON.parse(JSON.stringify(o));}
   function seedFor(label){const l=(label||"").toLowerCase();if(/østers|oyster/.test(l))return OYSTER_TYPES.slice();if(/løg/.test(l))return LOEG_TYPER.slice();if(/vin|flaske/.test(l))return VIN_TYPER.slice();return [];}
 
