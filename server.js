@@ -188,13 +188,31 @@ app.post("/api/log-entry", async (req, res) => {
 });
 
 // ---- Foto-upload ----
+const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+const MAX_PHOTO_BYTES = 20 * 1024 * 1024; // 20 MB raw file; after resize the base64 will be much smaller
+
 app.post("/api/upload-photo", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
-    const { data, contentType = "image/jpeg" } = req.body || {};
-    if (!data) return res.status(400).json({ error: "Ingen billeddata" });
-    const buffer = Buffer.from(data, "base64");
-    const ext = contentType === "image/png" ? "png" : "jpg";
+    const { dataUrl } = req.body || {};
+    if (!dataUrl) return res.status(400).json({ error: "Ingen billeddata" });
+
+    // Parse data URL: "data:<mime>;base64,<data>"
+    const match = dataUrl.match(/^data:([a-zA-Z0-9+/.-]+);base64,(.+)$/);
+    if (!match) return res.status(400).json({ error: "Ugyldigt format" });
+    const [, contentType, b64] = match;
+
+    if (!ALLOWED_PHOTO_TYPES.includes(contentType)) {
+      return res.status(400).json({ error: "Filtype ikke tilladt" });
+    }
+
+    const buffer = Buffer.from(b64, "base64");
+    if (buffer.length > MAX_PHOTO_BYTES) {
+      return res.status(413).json({ error: "Billedet er for stort (maks 20 MB)" });
+    }
+
+    const extMap = { "image/png": "png", "image/webp": "webp", "image/heic": "heic", "image/heif": "heif" };
+    const ext = extMap[contentType] || "jpg";
     const url = await uploadToStorage("log-photos", `${userId}/${Date.now()}.${ext}`, buffer, contentType);
     res.json({ url });
   } catch (err) {

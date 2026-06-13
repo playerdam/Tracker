@@ -323,7 +323,7 @@
     <input id="qlogInput" autocomplete="off">
     <img id="photoThumb" class="photo-thumb" alt="">
     <button id="photoBtn" class="qlog-cam" title="Tilføj billede"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
-    <input id="photoInput" type="file" accept="image/*" style="display:none">
+    <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
     <span class="qlog-spin" id="qlogSpin" hidden><span class="spin"></span></span>
   </div>
   <div id="logFeed" class="logfeed" hidden></div>
@@ -821,6 +821,9 @@
     camBtn.addEventListener("click",()=>photoInput.click());
     photoInput.addEventListener("change",async()=>{
       const file=photoInput.files[0];if(!file)return;
+      const allowed=["image/jpeg","image/png","image/webp","image/heic","image/heif"];
+      if(!allowed.includes(file.type)&&!file.type.startsWith("image/")){showToast("Kun billeder (JPEG, PNG, WebP)");photoInput.value="";return;}
+      if(file.size>20*1024*1024){showToast(lang==="da"?"Billedet er for stort (maks 20 MB)":"Image too large (max 20 MB)");photoInput.value="";return;}
       const url=await resizeImage(file,1200);
       pendingPhotoDataUrl=url;
       thumb.src=url;thumb.style.display="block";
