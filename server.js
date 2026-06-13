@@ -23,7 +23,7 @@ const SUPABASE_URL  = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY;
 const SUPABASE_ANON = process.env.SUPABASE_ANON_KEY || "";
 const PARSE_MODEL   = process.env.PARSE_MODEL || "claude-haiku-4-5-20251001";
-const WINE_MODEL    = process.env.WINE_MODEL  || "claude-haiku-4-5-20251001";
+const WINE_MODEL    = process.env.WINE_MODEL  || "claude-sonnet-4-6";
 
 // ---- Anthropic ----
 async function callClaude({ model, system, content, maxTokens = 1000 }) {
@@ -390,7 +390,7 @@ app.post("/api/wine-search", async (req, res) => {
     const out = await callClaude({
       model: WINE_MODEL,
       system: "Du er en vindatabase. Svar KUN med gyldig JSON. Ingen markdown.",
-      content: 'Find op til 7 virkelige vine der matcher "' + query + '". Returnér JSON-array med name, producer, country (dansk), region, grape. Tomme strenge hvis ukendt. Kun ægte vine.',
+      content: 'Find op til 7 virkelige vine der matcher "' + query + '". Returnér JSON-array med felterne: name, producer, country (på dansk), region, grape. Brug kun faktuel viden — returner tom streng for grape hvis du er usikker frem for at gætte. Kun ægte vine.',
     });
     const p = extractJSON(out);
     res.json({ wines: Array.isArray(p) ? p : (p && Array.isArray(p.wines)) ? p.wines : [] });
