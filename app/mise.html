@@ -244,6 +244,66 @@
     .numtray-label{display:none}
   }
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---- Social / Leaderboard ---- */
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:28px 0 12px}
+  .sec-head:first-child{margin-top:0}
+  .sec-title{font-family:"Fraunces",serif;font-size:18px;font-weight:600}
+  .sec-sub{font-size:12px;color:var(--faint);margin-left:8px}
+  .lb-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:5px}
+  .lb-row.lb-me{background:var(--accent-soft);border-color:var(--accent)}
+  .lb-rank{font-family:"Fraunces",serif;font-size:16px;font-weight:600;width:26px;flex:none;text-align:center;color:var(--faint)}
+  .lb-name{flex:1;min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lb-you{font-size:12px;color:var(--accent);font-weight:400}
+  .lb-prof{display:block;font-size:12px;color:var(--faint);font-weight:400}
+  .lb-score{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+  .lb-section{margin-top:14px}
+  .lb-empty{padding:28px 0;text-align:center;color:var(--faint);font-size:14px}
+  .social-empty{padding:28px 0;text-align:center;color:var(--faint);font-size:14px}
+  .challenge-card{background:var(--accent-soft);border:1.5px solid var(--accent);border-radius:var(--r);padding:18px 20px 14px;margin-bottom:6px}
+  .challenge-cat{font-family:"Fraunces",serif;font-size:20px;font-weight:600;color:var(--accent);margin-bottom:2px}
+  .challenge-sub{font-size:13px;color:var(--dim);margin-bottom:6px}
+  .challenge-mine{font-size:13px;color:var(--dim)}
+
+  /* ---- Hold ---- */
+  .team-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);margin-bottom:14px}
+  .team-name{font-family:"Fraunces",serif;font-size:20px;font-weight:600;margin-bottom:10px}
+  .team-code-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .team-code{font-family:"Fraunces",serif;font-size:20px;letter-spacing:.1em;color:var(--accent)}
+  .team-hint{font-size:14px;color:var(--dim);margin-bottom:12px}
+  .team-form{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  .team-form .input{flex:1}
+  .team-or{text-align:center;color:var(--faint);font-size:13px;margin:8px 0}
+  .btn-sm{font-size:13px;padding:8px 14px}
+
+  /* ---- Profil modal ---- */
+  .prof-select{width:100%;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:12px 13px}
+  .prof-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .subsection{font-size:12px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin:22px 0 10px;padding-top:18px;border-top:1px solid var(--border)}
+  .badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+  .badge-item{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 8px;text-align:center;transition:.15s}
+  .badge-locked{opacity:.3}
+  .badge-icon{font-size:26px;line-height:1;margin-bottom:5px}
+  .badge-label{font-size:11px;color:var(--dim);line-height:1.3}
+  .records-list{display:flex;flex-direction:column;gap:5px}
+  .records-item{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface-2);border-radius:var(--r-sm)}
+  .records-lbl{font-size:14px;font-weight:600}
+  .records-val{font-family:"Fraunces",serif;font-size:18px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+  .muted{font-size:13px;color:var(--faint)}
+
+  /* ---- Foto ---- */
+  .qlog-cam{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;flex:none;padding:4px 8px;line-height:1;transition:.15s}
+  .qlog-cam:hover,.qlog-cam.active{color:var(--accent)}
+  .photo-thumb{width:34px;height:34px;border-radius:6px;object-fit:cover;flex:none;display:none;cursor:pointer}
+  .photo-thumb.show{display:block}
+  .logview-photo{display:block;max-width:100%;max-height:240px;border-radius:var(--r-sm);margin-top:8px;object-fit:cover}
+
+  /* ---- Badge-toast ---- */
+  .badge-toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.8);background:var(--surface);border:2px solid var(--accent);border-radius:20px;padding:28px 36px;text-align:center;box-shadow:var(--shadow-lg);z-index:300;opacity:0;pointer-events:none;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .25s}
+  .badge-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  .badge-toast-icon{font-size:48px;line-height:1;margin-bottom:8px}
+  .badge-toast-lbl{font-size:12px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+  .badge-toast-name{font-family:"Fraunces",serif;font-size:20px;font-weight:600;color:var(--accent)}
 </style>
 </head>
 <body>
@@ -251,6 +311,7 @@
   <header>
     <div class="brand"><h1>Craft Track</h1><span class="tag" id="tagline"></span></div>
     <div class="header-right">
+      <button id="profileBtn" class="lang-btn" style="display:none" title="Profil">&#9679;</button>
       <button id="signOutBtn" class="auth-signout-btn"></button>
       <button id="langBtn" class="lang-btn">EN</button>
       <div class="career"><div class="num" id="careerNum">0</div><div class="lbl" id="totalLbl"></div></div>
@@ -260,6 +321,9 @@
   <div class="qlog">
     <svg class="qlog-ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4"/><path d="M13 3 16 10l7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>
     <input id="qlogInput" autocomplete="off">
+    <img id="photoThumb" class="photo-thumb" alt="">
+    <button id="photoBtn" class="qlog-cam" title="Tilføj billede"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
+    <input id="photoInput" type="file" accept="image/*" style="display:none">
     <span class="qlog-spin" id="qlogSpin" hidden><span class="spin"></span></span>
   </div>
   <div id="logFeed" class="logfeed" hidden></div>
@@ -269,6 +333,7 @@
       <button class="tab active" data-view="station" id="tab-station"></button>
       <button class="tab" data-view="vin" id="tab-vin"></button>
       <button class="tab" data-view="log" id="tab-log">Log</button>
+      <button class="tab" data-view="social" id="tab-social"></button>
     </div>
     <div class="view-toggle" id="viewToggle">
       <button class="vtbtn active" id="btnGrid">⊞</button>
@@ -284,6 +349,15 @@
 
   <section class="view" id="view-log">
     <div id="logView"></div>
+  </section>
+
+  <section class="view" id="view-social">
+    <div class="sec-head"><span class="sec-title" id="challengeTitle"></span><span class="sec-sub" id="challengeMeta"></span></div>
+    <div id="challengeContent" class="social-empty">…</div>
+    <div class="sec-head"><span class="sec-title" id="lbTitle"></span><span class="sec-sub" id="lbMeta"></span></div>
+    <div id="lbContent" class="social-empty">…</div>
+    <div class="sec-head"><span class="sec-title" id="teamTitle"></span></div>
+    <div id="teamContent"></div>
   </section>
 
   <section class="view" id="view-vin">
@@ -357,6 +431,26 @@
   </div>
 </div>
 
+<div class="scrim" id="profileScrim"><div class="modal">
+  <h2 id="profileTitle"></h2>
+  <div class="field"><label id="profileNickLbl"></label><input id="profileNick" maxlength="30" autocomplete="off"></div>
+  <div class="field"><label id="profileProfLbl"></label><select id="profileProf" class="prof-select"></select></div>
+  <div class="mactions" style="margin-top:16px">
+    <button class="btn primary" id="profileSave"></button>
+    <button class="btn ghost" id="profileClose"></button>
+  </div>
+  <div class="subsection" id="profileBadgesLbl"></div>
+  <div class="badge-grid" id="badgeGrid"></div>
+  <div class="subsection" id="profileRecordsLbl"></div>
+  <div class="records-list" id="recordsList"></div>
+</div></div>
+
+<div class="badge-toast" id="badgeToast">
+  <div class="badge-toast-icon" id="badgeToastIcon"></div>
+  <div class="badge-toast-lbl" id="badgeToastLbl"></div>
+  <div class="badge-toast-name" id="badgeToastName"></div>
+</div>
+
 <div class="toast" id="toast"><span class="toast-msg" id="toastMsg"></span><button class="toast-undo" id="toastUndo"></button></div>
 
 <div class="numtray" id="numtray">
@@ -417,6 +511,21 @@
       auth_no_account:"Ingen konto?",auth_have_account:"Har du allerede en konto?",
       auth_create:"Opret konto",auth_to_login:"Log ind",
       auth_signout:"Log ud",
+      tab_social:"Social",
+      challenge_title:"Ugens udfordring",challenge_days:"dage tilbage",challenge_ends:"{0} dage tilbage",
+      lb_title:"Ugentlig rangliste",lb_week:"uge fra",lb_anon:"Anonym",lb_you:"dig",lb_empty:"Ingen data endnu",
+      team_title:"Hold",team_create_ph:"fx Noma Kitchen",team_create_btn:"Opret hold",
+      team_join_ph:"XXXXXX",team_join_btn:"Tilslut",team_or:"eller",
+      team_create_or_join:"Opret et hold eller tilslut dig ét med en invite-kode.",
+      team_not_found:"Hold ikke fundet",team_copy:"Kopier",team_copied:"Kopieret",
+      team_this_week:"Denne uge",
+      profile_title:"Min profil",profile_nick_lbl:"Kaldenavn",profile_nick_ph:"fx Simon",
+      profile_prof_lbl:"Profession",profile_prof_default:"Vælg profession",
+      profile_save:"Gem",profile_close:"Luk",
+      profile_badges:"Badges",profile_badges_none:"Ingen badges endnu — begynd at logge!",
+      profile_records:"Personlige rekorder",profile_records_none:"Ingen rekorder endnu",
+      new_badge:"Nyt badge",new_record_msg:"Ny rekord",
+      professions:["Commis de cuisine","Chef de partie","Sous chef","Køkkenchef","Konditor","Serveringsmedarbejder","Sommelier","Bar","Andet"],
     },
     en:{
       tagline:"track your craft",total_label:"total",
@@ -458,6 +567,21 @@
       auth_no_account:"No account?",auth_have_account:"Already have an account?",
       auth_create:"Create account",auth_to_login:"Log in",
       auth_signout:"Sign out",
+      tab_social:"Social",
+      challenge_title:"Weekly challenge",challenge_days:"days left",challenge_ends:"{0} days left",
+      lb_title:"Weekly leaderboard",lb_week:"week from",lb_anon:"Anonymous",lb_you:"you",lb_empty:"No data yet",
+      team_title:"Team",team_create_ph:"e.g. Noma Kitchen",team_create_btn:"Create team",
+      team_join_ph:"XXXXXX",team_join_btn:"Join",team_or:"or",
+      team_create_or_join:"Create a team or join one with an invite code.",
+      team_not_found:"Team not found",team_copy:"Copy",team_copied:"Copied",
+      team_this_week:"This week",
+      profile_title:"My profile",profile_nick_lbl:"Nickname",profile_nick_ph:"e.g. Simon",
+      profile_prof_lbl:"Profession",profile_prof_default:"Select profession",
+      profile_save:"Save",profile_close:"Close",
+      profile_badges:"Badges",profile_badges_none:"No badges yet — start logging!",
+      profile_records:"Personal records",profile_records_none:"No records yet",
+      new_badge:"New badge",new_record_msg:"New record",
+      professions:["Commis de cuisine","Chef de partie","Sous chef","Head chef","Pastry chef","Service staff","Sommelier","Bar","Other"],
     }
   };
   let lang=localStorage.getItem("mise_lang")||"da";
@@ -499,6 +623,17 @@
     $("#authEmailLbl").textContent=t("auth_email");
     $("#authPwLbl").textContent=t("auth_pw");
     $("#signOutBtn").textContent=t("auth_signout");
+    const tSocial=$("#tab-social");if(tSocial)tSocial.textContent=t("tab_social");
+    const cTitle=$("#challengeTitle");if(cTitle)cTitle.textContent=t("challenge_title");
+    const lbTitle=$("#lbTitle");if(lbTitle)lbTitle.textContent=t("lb_title");
+    const teamTitle=$("#teamTitle");if(teamTitle)teamTitle.textContent=t("team_title");
+    const pSave=$("#profileSave");if(pSave)pSave.textContent=t("profile_save");
+    const pClose=$("#profileClose");if(pClose)pClose.textContent=t("profile_close");
+    const pNick=$("#profileNick");if(pNick)pNick.placeholder=t("profile_nick_ph");
+    const pNickLbl=$("#profileNickLbl");if(pNickLbl)pNickLbl.textContent=t("profile_nick_lbl");
+    const pProfLbl=$("#profileProfLbl");if(pProfLbl)pProfLbl.textContent=t("profile_prof_lbl");
+    const pBadgesLbl=$("#profileBadgesLbl");if(pBadgesLbl)pBadgesLbl.textContent=t("profile_badges");
+    const pRecLbl=$("#profileRecordsLbl");if(pRecLbl)pRecLbl.textContent=t("profile_records");
   }
   function setLang(l){lang=l;localStorage.setItem("mise_lang",l);translateUI();renderCounters();renderWines();renderLogView();}
   $("#langBtn").addEventListener("click",()=>setLang(lang==="da"?"en":"da"));
@@ -601,6 +736,7 @@
     $("#authScreen").style.display="none";
     document.querySelector(".wrap").style.display="";
     $("#signOutBtn").style.display="";
+    const pb=$("#profileBtn");if(pb)pb.style.display="";
   }
 
   async function initAuth(){
@@ -644,10 +780,11 @@
     updateMode();
   }
 
-  async function syncLogEntry(categoryLabel,delta){
+  async function syncLogEntry(categoryLabel,delta,imageUrl){
     const base=apiBase();if(!base)return;
     const token=await getToken();if(!token)return;
-    try{await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({categoryLabel,delta})});}catch(e){}
+    const body={categoryLabel,delta};if(imageUrl)body.imageUrl=imageUrl;
+    try{await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});}catch(e){}
   }
 
   async function load(){if(hasStore){try{const r=await window.storage.get(STORE_KEY);if(r&&r.value)return normalize(JSON.parse(r.value));}catch(e){}return clone(DEFAULTS);}return mem?clone(mem):clone(DEFAULTS);}
@@ -676,13 +813,100 @@
   $("#numtrayCancel").addEventListener("click",closeNumtray);
   numtrayInput.addEventListener("keydown",e=>{if(e.key==="Enter")$("#numtrayOk").click();if(e.key==="Escape")closeNumtray();});
 
+  // ---- photo ----
+  let pendingPhotoDataUrl=null;
+  function setupPhoto(){
+    const camBtn=$("#photoBtn"),photoInput=$("#photoInput"),thumb=$("#photoThumb");
+    if(!camBtn)return;
+    camBtn.addEventListener("click",()=>photoInput.click());
+    photoInput.addEventListener("change",async()=>{
+      const file=photoInput.files[0];if(!file)return;
+      const url=await resizeImage(file,1200);
+      pendingPhotoDataUrl=url;
+      thumb.src=url;thumb.style.display="block";
+      camBtn.style.color="var(--accent)";
+    });
+    thumb.addEventListener("click",()=>{pendingPhotoDataUrl=null;thumb.src="";thumb.style.display="none";camBtn.style.color="";photoInput.value="";});
+  }
+  function resizeImage(file,maxPx){
+    return new Promise(resolve=>{
+      const reader=new FileReader();
+      reader.onload=ev=>{
+        const img=new Image();img.onload=()=>{
+          let w=img.width,h=img.height;
+          if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
+          const c=document.createElement("canvas");c.width=w;c.height=h;
+          c.getContext("2d").drawImage(img,0,0,w,h);
+          resolve(c.toDataURL("image/jpeg",0.82));
+        };img.src=ev.target.result;
+      };reader.readAsDataURL(file);
+    });
+  }
+  async function uploadPendingPhoto(){
+    if(!pendingPhotoDataUrl)return null;
+    const base=apiBase();if(!base)return null;
+    const token=await getToken();if(!token)return null;
+    try{
+      const res=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:pendingPhotoDataUrl})});
+      const d=await res.json();
+      pendingPhotoDataUrl=null;
+      const thumb=$("#photoThumb");if(thumb){thumb.src="";thumb.style.display="none";}
+      const camBtn=$("#photoBtn");if(camBtn)camBtn.style.color="";
+      const photoInput=$("#photoInput");if(photoInput)photoInput.value="";
+      return d.url||null;
+    }catch(e){return null;}
+  }
+
+  // ---- badges ----
+  const BADGE_DEFS=[
+    {id:"first_log",   icon:"🔪", da:"Første hugger",   en:"First cut",      check:(s,e)=>s.log&&s.log.length>=1},
+    {id:"ten_logs",    icon:"📋", da:"10 logs",          en:"10 logs",        check:(s,e)=>s.log&&s.log.length>=10},
+    {id:"fifty_logs",  icon:"📜", da:"50 logs",          en:"50 logs",        check:(s,e)=>s.log&&s.log.length>=50},
+    {id:"career_100",  icon:"💯", da:"100 i karriere",   en:"100 in career",  check:(s,e)=>career()>=100},
+    {id:"career_1k",   icon:"🌟", da:"1.000 i karriere", en:"1,000 in career",check:(s,e)=>career()>=1000},
+    {id:"career_10k",  icon:"🏆", da:"10.000 i karriere",en:"10k in career",  check:(s,e)=>career()>=10000},
+    {id:"cat_3",       icon:"🗂", da:"3 kategorier",     en:"3 categories",   check:(s,e)=>s.counters&&s.counters.length>=3},
+    {id:"cat_10",      icon:"📁", da:"10 kategorier",    en:"10 categories",  check:(s,e)=>s.counters&&s.counters.length>=10},
+  ];
+  function getBadgesEarned(){return JSON.parse(localStorage.getItem("mise_badges")||"[]");}
+  function saveBadgesEarned(arr){localStorage.setItem("mise_badges",JSON.stringify(arr));}
+  function checkBadges(){
+    const earned=getBadgesEarned();let newOnes=[];
+    BADGE_DEFS.forEach(b=>{if(!earned.includes(b.id)&&b.check(state)){earned.push(b.id);newOnes.push(b);}});
+    if(newOnes.length){saveBadgesEarned(earned);newOnes.forEach((b,i)=>setTimeout(()=>showBadgeToast(b),i*3200));}
+  }
+  function showBadgeToast(b){
+    const toast=$("#badgeToast");if(!toast)return;
+    $("#badgeToastIcon").textContent=b.icon;
+    $("#badgeToastLbl").textContent=t("new_badge");
+    $("#badgeToastName").textContent=lang==="en"?b.en:b.da;
+    toast.classList.add("show");
+    setTimeout(()=>toast.classList.remove("show"),3000);
+  }
+
+  // ---- personal records ----
+  function getRecords(){return JSON.parse(localStorage.getItem("mise_records")||"{}");}
+  function saveRecords(r){localStorage.setItem("mise_records",JSON.stringify(r));}
+  function checkRecords(){
+    const records=getRecords();let updated=false;
+    state.counters.forEach(c=>{
+      const total=c.count+(c.subs||[]).reduce((a,s)=>a+s.count,0);
+      if(!records[c.id]||total>records[c.id].val){
+        records[c.id]={label:c.label,val:total};updated=true;
+      }
+    });
+    if(updated)saveRecords(records);
+  }
+
   // ---- log ----
-  function addLogEntry(msg){
+  function addLogEntry(msg,imageUrl){
     const now=new Date();
     const time=now.getHours().toString().padStart(2,"0")+":"+now.getMinutes().toString().padStart(2,"0");
     logHistory.unshift({time,msg});if(logHistory.length>8)logHistory.pop();renderLogFeed();
     if(!Array.isArray(state.log))state.log=[];
-    state.log.unshift({ts:now.getTime(),text:msg});
+    const entry={ts:now.getTime(),text:msg};
+    if(imageUrl)entry.img=imageUrl;
+    state.log.unshift(entry);
     if(state.log.length>2000)state.log.length=2000;
     save();renderLogView();
   }
@@ -706,9 +930,9 @@
       }
       const hh=new Date(e.ts).getHours().toString().padStart(2,"0");
       const mm=new Date(e.ts).getMinutes().toString().padStart(2,"0");
-      dayMap[key].entries.push({t:hh+":"+mm,text:e.text});
+      dayMap[key].entries.push({t:hh+":"+mm,text:e.text,img:e.img||null});
     });
-    el.innerHTML=days.map(day=>'<div class="logview-day"><div class="logview-date">'+esc(day.label)+'</div>'+day.entries.map(e=>'<div class="logview-entry"><span class="logview-time">'+esc(e.t)+'</span><span class="logview-text">'+esc(e.text)+'</span></div>').join("")+'</div>').join("");
+    el.innerHTML=days.map(day=>'<div class="logview-day"><div class="logview-date">'+esc(day.label)+'</div>'+day.entries.map(e=>'<div class="logview-entry"><span class="logview-time">'+esc(e.t)+'</span><span class="logview-text">'+esc(e.text)+'</span>'+(e.img?'<img class="logview-photo" src="'+esc(e.img)+'" loading="lazy">':'')+'</div>').join("")+'</div>').join("");
   }
 
   // ---- autocomplete ----
@@ -956,6 +1180,8 @@
   async function runQuickLog(){
     const input=$("#qlogInput");const text=input.value.trim();if(!text)return;
     $("#qlogSpin").hidden=false;input.disabled=true;
+    let imageUrl=null;
+    if(pendingPhotoDataUrl)imageUrl=await uploadPendingPhoto();
     let actions=[];
     try{actions=await parseLog(text);}catch(e){console.warn("AI parse unavailable:",e);}
     if(!actions.length)actions=localParse(text);
@@ -965,17 +1191,19 @@
     const summary=[],ask=[],syncItems=[];
     actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems);});
     input.value="";save();renderCounters();renderWines();renderCareer();
-    if(!ask.length){finishLog(summary,syncItems);return;}
-    processAsk(ask,0,summary,syncItems);
+    if(!ask.length){finishLog(summary,syncItems,imageUrl);return;}
+    processAsk(ask,0,summary,syncItems,imageUrl);
   }
-  function finishLog(summary,syncItems){
+  function finishLog(summary,syncItems,imageUrl){
     const msg=summary.length?(t("toast_logged")+summary.join(", ")):t("toast_nothing");
-    showToast(msg);if(summary.length)addLogEntry(summary.join(" · "));
-    if(syncItems&&syncItems.length)syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta));
+    showToast(msg);
+    if(summary.length)addLogEntry(summary.join(" · "),imageUrl);
+    if(syncItems&&syncItems.length)syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta,imageUrl));
+    checkBadges();checkRecords();
     $("#qlogInput").focus();
   }
-  function processAsk(ask,i,summary,syncItems){if(i>=ask.length){finishLog(summary,syncItems);return;}openAsk(ask[i],()=>processAsk(ask,i+1,summary,syncItems),summary,syncItems);}
-  function openAsk(item,next,summary,syncItems){
+  function processAsk(ask,i,summary,syncItems,imageUrl){if(i>=ask.length){finishLog(summary,syncItems,imageUrl);return;}openAsk(ask[i],()=>processAsk(ask,i+1,summary,syncItems,imageUrl),summary,syncItems,imageUrl);}
+  function openAsk(item,next,summary,syncItems,imageUrl){
     const delta=parseInt(item.delta,10)||0;
     const detectedName=item.counter||"Ny ting";
     $("#askText").innerHTML='<b>'+esc((delta>0?"+":"")+delta+" "+detectedName)+'</b> '+esc(t("ask_no_match"));
@@ -1007,14 +1235,192 @@
   document.querySelectorAll(".tab").forEach(tb=>tb.addEventListener("click",()=>{
     document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));tb.classList.add("active");
     const v=tb.dataset.view;
-    ["station","log","vin"].forEach(n=>$("#view-"+n).classList.toggle("active",v===n));
+    ["station","log","vin","social"].forEach(n=>$("#view-"+n).classList.toggle("active",v===n));
     $("#viewToggle").style.display=v==="station"?"":"none";
     if(v==="log")renderLogView();
+    if(v==="social")loadSocial();
   }));
+
+  // ---- social / leaderboard / challenge / team ----
+  function getJwtSub(){
+    if(!session||!session.access_token)return null;
+    try{const p=session.access_token.split(".")[1];const d=JSON.parse(atob(p.replace(/-/g,"+").replace(/_/g,"/")));return d.sub||null;}catch(e){return null;}
+  }
+
+  async function renderLeaderboard(){
+    const el=$("#lbContent");if(!el)return;
+    el.innerHTML='<div class="lb-loading">…</div>';
+    const base=apiBase();if(!base){el.innerHTML=esc(t("lb_empty"));return;}
+    try{
+      const token=await getToken();
+      const res=await fetch(base+"/api/leaderboard",{headers:token?{"Authorization":"Bearer "+token}:{}});
+      const data=await res.json();
+      const rows=data.rows||[];
+      const myId=getJwtSub();
+      if(!rows.length){el.innerHTML='<div class="lb-empty">'+esc(t("lb_empty"))+'</div>';return;}
+      el.innerHTML=rows.map((r,i)=>{
+        const isMe=r.user_id===myId;
+        const nick=esc(r.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
+        const prof=r.profession?'<span class="lb-prof">'+esc(r.profession)+'</span>':'';
+        return '<div class="lb-row'+(isMe?" lb-me":"")+'">'+'<span class="lb-rank">'+(i+1)+'</span>'+'<span class="lb-name">'+nick+prof+'</span>'+'<span class="lb-score">'+r.total+'</span></div>';
+      }).join("");
+    }catch(e){el.innerHTML=esc(t("lb_empty"));}
+  }
+
+  async function renderChallenge(){
+    const el=$("#challengeContent");if(!el)return;
+    el.innerHTML="…";
+    const base=apiBase();if(!base){el.innerHTML="";return;}
+    try{
+      const token=await getToken();
+      const res=await fetch(base+"/api/challenge/current",{headers:token?{"Authorization":"Bearer "+token}:{}});
+      const d=await res.json();
+      const myId=getJwtSub();
+      const monday=mondayLocal();
+      const msLeft=(monday.getTime()+7*24*3600*1000)-Date.now();
+      const daysLeft=Math.max(0,Math.ceil(msLeft/(24*3600*1000)));
+      const rows=d.rows||[];
+      const myEntry=rows.find(r=>r.user_id===myId);
+      el.innerHTML='<div class="challenge-card">'
+        +'<div class="challenge-cat">'+esc(d.category||"")+'</div>'
+        +'<div class="challenge-sub">'+t("challenge_ends",daysLeft)+'</div>'
+        +(myEntry?'<div class="challenge-mine">'+esc(t("team_this_week"))+': <b>'+myEntry.total+'</b></div>':'')
+        +'</div>'
+        +(rows.length?'<div class="lb-section">'
+          +rows.slice(0,10).map((r,i)=>{
+            const isMe=r.user_id===myId;
+            const nick=esc(r.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
+            return '<div class="lb-row'+(isMe?" lb-me":"")+'">'+'<span class="lb-rank">'+(i+1)+'</span>'+'<span class="lb-name">'+nick+'</span>'+'<span class="lb-score">'+r.total+'</span></div>';
+          }).join("")
+        +'</div>':'');
+    }catch(e){el.innerHTML="";}
+  }
+  function mondayLocal(){const d=new Date();d.setHours(0,0,0,0);const day=d.getDay();d.setDate(d.getDate()-((day+6)%7));return d;}
+
+  async function renderTeam(){
+    const el=$("#teamContent");if(!el)return;
+    const base=apiBase();if(!base){renderTeamCreate(el);return;}
+    const token=await getToken();if(!token){renderTeamCreate(el);return;}
+    try{
+      const res=await fetch(base+"/api/teams/mine",{headers:{"Authorization":"Bearer "+token}});
+      if(res.status===404){renderTeamCreate(el);return;}
+      const d=await res.json();
+      const team=d.team||{};
+      const members=d.members||[];
+      el.innerHTML='<div class="team-card">'
+        +'<div class="team-name">'+esc(team.name||"")+'</div>'
+        +'<div class="team-code-row"><span class="team-code-lbl">'+esc(t("team_join_ph"))+':</span><span class="team-code" id="teamCodeDisplay">'+esc(team.invite_code||"")+'</span><button class="btn ghost btn-sm" id="copyCodeBtn">'+esc(t("team_copy"))+'</button></div>'
+        +'</div>'
+        +'<div class="lb-section">'
+        +members.map((m,i)=>{
+          const isMe=m.user_id===getJwtSub();
+          const nick=esc(m.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
+          return '<div class="lb-row'+(isMe?" lb-me":"")+'">'+'<span class="lb-rank">'+(i+1)+'</span>'+'<span class="lb-name">'+nick+'</span>'+'<span class="lb-score">'+(m.week_total||0)+'</span></div>';
+        }).join("")
+        +'</div>';
+      const copyBtn=$("#copyCodeBtn");
+      if(copyBtn)copyBtn.addEventListener("click",()=>{navigator.clipboard.writeText(team.invite_code||"").then(()=>{copyBtn.textContent=t("team_copied");setTimeout(()=>copyBtn.textContent=t("team_copy"),2000);});});
+    }catch(e){renderTeamCreate(el);}
+  }
+  function renderTeamCreate(el){
+    el.innerHTML='<p class="team-hint">'+esc(t("team_create_or_join"))+'</p>'
+      +'<div class="team-form">'
+      +'<input id="teamNameInput" class="input" placeholder="'+esc(t("team_create_ph"))+'" maxlength="40">'
+      +'<button class="btn primary btn-sm" id="teamCreateBtn">'+esc(t("team_create_btn"))+'</button>'
+      +'</div>'
+      +'<div class="team-or">'+esc(t("team_or"))+'</div>'
+      +'<div class="team-form">'
+      +'<input id="teamCodeInput" class="input" placeholder="'+esc(t("team_join_ph"))+'" maxlength="6" style="text-transform:uppercase;font-family:monospace">'
+      +'<button class="btn ghost btn-sm" id="teamJoinBtn">'+esc(t("team_join_btn"))+'</button>'
+      +'</div>';
+    document.getElementById("teamCreateBtn").addEventListener("click",async()=>{
+      const name=(document.getElementById("teamNameInput").value||"").trim();if(!name)return;
+      const base=apiBase();const token=await getToken();if(!base||!token)return;
+      try{await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});renderTeam();}catch(e){}
+    });
+    document.getElementById("teamJoinBtn").addEventListener("click",async()=>{
+      const code=(document.getElementById("teamCodeInput").value||"").trim().toUpperCase();if(!code)return;
+      const base=apiBase();const token=await getToken();if(!base||!token)return;
+      try{
+        const res=await fetch(base+"/api/teams/join",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({code})});
+        const d=await res.json();
+        if(d.error){showToast(t("team_not_found"));}else{renderTeam();}
+      }catch(e){showToast(t("team_not_found"));}
+    });
+  }
+
+  async function loadSocial(){
+    renderChallenge();
+    renderLeaderboard();
+    renderTeam();
+  }
+
+  // ---- profile modal ----
+  function populateProfSelect(sel){
+    const profs=t("professions");
+    sel.innerHTML='<option value="">'+esc(t("profile_prof_default"))+'</option>'
+      +profs.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join("");
+  }
+  async function openProfile(){
+    const scrim=$("#profileScrim");if(!scrim)return;
+    const base=apiBase();const token=await getToken();
+    const profSel=$("#profileProf");populateProfSelect(profSel);
+    if(base&&token){
+      try{
+        const res=await fetch(base+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token}});
+        const d=await res.json();
+        if(d.nickname)$("#profileNick").value=d.nickname;
+        if(d.profession)profSel.value=d.profession;
+      }catch(e){}
+    }
+    renderBadgeGrid();renderRecordsList();
+    scrim.classList.add("open");
+  }
+  function renderBadgeGrid(){
+    const grid=$("#badgeGrid");if(!grid)return;
+    const earned=getBadgesEarned();
+    const items=BADGE_DEFS.map(b=>{
+      const has=earned.includes(b.id);
+      const name=lang==="en"?b.en:b.da;
+      return '<div class="badge-item'+(has?"":" badge-locked")+'" title="'+esc(name)+'">'+'<div class="badge-icon">'+b.icon+'</div>'+'<div class="badge-label">'+esc(name)+'</div></div>';
+    }).join("");
+    grid.innerHTML=items||'<p class="muted">'+esc(t("profile_badges_none"))+'</p>';
+  }
+  function renderRecordsList(){
+    const el=$("#recordsList");if(!el)return;
+    const records=getRecords();
+    const keys=Object.keys(records);
+    if(!keys.length){el.innerHTML='<p class="muted">'+esc(t("profile_records_none"))+'</p>';return;}
+    el.innerHTML=keys.map(k=>{
+      const r=records[k];
+      const label=state.counters.find(c=>c.id===k);
+      const name=label?tLabel(label.label):(r.label||k);
+      return '<div class="records-item"><span class="records-lbl">'+esc(name)+'</span><span class="records-val">'+r.val+'</span></div>';
+    }).join("");
+  }
+  function setupProfileModal(){
+    const profileBtn=$("#profileBtn");
+    if(profileBtn)profileBtn.addEventListener("click",()=>openProfile());
+    const saveBtn=$("#profileSave");
+    if(saveBtn)saveBtn.addEventListener("click",async()=>{
+      const nick=($("#profileNick").value||"").trim();
+      const prof=($("#profileProf").value||"").trim();
+      const base=apiBase();const token=await getToken();
+      if(base&&token){
+        try{await fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({nickname:nick,profession:prof})});}catch(e){}
+      }
+      $("#profileScrim").classList.remove("open");
+    });
+    const closeBtn=$("#profileClose");
+    if(closeBtn)closeBtn.addEventListener("click",()=>$("#profileScrim").classList.remove("open"));
+  }
 
   function startApp(){
     $("#view-station").classList.add("active");
     renderCounters();renderWines();renderCareer();renderLogView();
+    setupPhoto();
+    setupProfileModal();
+    const profileBtn=$("#profileBtn");if(profileBtn)profileBtn.style.display="";
   }
 
   (async function(){

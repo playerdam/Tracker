@@ -1,7 +1,10 @@
 // Craft Track backend
 // Endpoints: GET /api/config  POST /api/parse-log  POST /api/wine-search
 //            POST /api/user/profile  POST /api/user/update
-//            POST /api/log-entry     GET /api/health
+//            POST /api/log-entry     POST /api/upload-photo
+//            GET  /api/leaderboard   GET  /api/challenge/current
+//            POST /api/teams         POST /api/teams/join   GET /api/teams/mine
+//            GET  /api/health
 
 const express = require("express");
 const cors    = require("cors");
@@ -9,14 +12,14 @@ const path    = require("path");
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: "256kb" }));
+app.use(express.json({ limit: "2mb" }));
 
-const API_KEY          = process.env.ANTHROPIC_API_KEY;
-const SUPABASE_URL     = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
-const SUPABASE_KEY     = process.env.SUPABASE_SERVICE_KEY;
-const SUPABASE_ANON    = process.env.SUPABASE_ANON_KEY || "";
-const PARSE_MODEL      = process.env.PARSE_MODEL || "claude-haiku-4-5-20251001";
-const WINE_MODEL       = process.env.WINE_MODEL  || "claude-haiku-4-5-20251001";
+const API_KEY       = process.env.ANTHROPIC_API_KEY;
+const SUPABASE_URL  = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
+const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_ANON = process.env.SUPABASE_ANON_KEY || "";
+const PARSE_MODEL   = process.env.PARSE_MODEL || "claude-haiku-4-5-20251001";
+const WINE_MODEL    = process.env.WINE_MODEL  || "claude-haiku-4-5-20251001";
 
 // ---- Anthropic ----
 async function callClaude({ model, system, content, maxTokens = 1000 }) {
@@ -60,8 +63,23 @@ async function sb(path, opts = {}) {
   return data;
 }
 
+// ---- Supabase Storage ----
+async function uploadToStorage(bucket, objectPath, buffer, contentType) {
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${objectPath}`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": contentType,
+      "x-upsert": "true",
+    },
+    body: buffer,
+  });
+  if (!res.ok) throw new Error(`Storage upload fejlede: ${res.status}`);
+  return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${objectPath}`;
+}
+
 // ---- Auth token verification ----
-// Calls Supabase /auth/v1/user to validate the Bearer token and return the user UUID.
 async function verifyAuth(req) {
   const auth = req.headers.authorization || "";
   if (!auth.startsWith("Bearer ")) throw new Error("Ikke autoriseret");
@@ -75,17 +93,37 @@ async function verifyAuth(req) {
   return data.id;
 }
 
+function authErr(msg) {
+  return msg === "Ikke autoriseret" || msg === "Ugyldig token";
+}
+
+// ---- Hjælpefunktioner ----
+function genCode(len = 6) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < len; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function mondayOfWeek() {
+  const now = new Date();
+  const dow = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+  monday.setHours(0, 0, 0, 0);
+  return monday;
+}
+
 // ---- Statiske filer ----
 app.use(express.static(path.join(__dirname, "app")));
 app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "app", "mise.html")));
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "craft-track" }));
 
-// Eksponér public config (ikke secrets) til frontend
 app.get("/api/config", (_req, res) => {
   res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON });
 });
 
-// ---- Brugerprofil: opret (upsert) eller hent ----
+// ---- Brugerprofil: opret (upsert) ----
 app.post("/api/user/profile", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
@@ -97,11 +135,11 @@ app.post("/api/user/profile", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     console.error("user/profile:", err.message);
-    res.status(err.message === "Ikke autoriseret" || err.message === "Ugyldig token" ? 401 : 500).json({ error: err.message });
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
 
-// ---- Brugerprofil: opdatér kaldenavn/profession ----
+// ---- Brugerprofil: opdatér ----
 app.post("/api/user/update", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
@@ -113,7 +151,7 @@ app.post("/api/user/update", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     console.error("user/update:", err.message);
-    res.status(err.message === "Ikke autoriseret" || err.message === "Ugyldig token" ? 401 : 500).json({ error: err.message });
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
 
@@ -121,12 +159,11 @@ app.post("/api/user/update", async (req, res) => {
 app.post("/api/log-entry", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
-    const { categoryLabel } = req.body || {};
+    const { categoryLabel, imageUrl } = req.body || {};
     let { delta } = req.body || {};
     delta = parseInt(delta, 10);
     if (!categoryLabel || !delta) return res.status(400).json({ error: "Felter mangler" });
 
-    // Find eller opret kategori
     const existing = await sb(`categories?label_da=eq.${encodeURIComponent(categoryLabel)}&select=id`);
     let categoryId;
     if (existing && existing.length) {
@@ -141,12 +178,154 @@ app.post("/api/log-entry", async (req, res) => {
 
     await sb("log_entries", {
       method: "POST",
-      body: JSON.stringify({ user_id: userId, category_id: categoryId, delta }),
+      body: JSON.stringify({ user_id: userId, category_id: categoryId, delta, ...(imageUrl ? { image_url: imageUrl } : {}) }),
     });
     res.json({ ok: true });
   } catch (err) {
     console.error("log-entry:", err.message);
-    res.status(err.message === "Ikke autoriseret" || err.message === "Ugyldig token" ? 401 : 500).json({ error: err.message });
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Foto-upload ----
+app.post("/api/upload-photo", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { data, contentType = "image/jpeg" } = req.body || {};
+    if (!data) return res.status(400).json({ error: "Ingen billeddata" });
+    const buffer = Buffer.from(data, "base64");
+    const ext = contentType === "image/png" ? "png" : "jpg";
+    const url = await uploadToStorage("log-photos", `${userId}/${Date.now()}.${ext}`, buffer, contentType);
+    res.json({ url });
+  } catch (err) {
+    console.error("upload-photo:", err.message);
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Ugentlig rangliste ----
+app.get("/api/leaderboard", async (req, res) => {
+  try {
+    const monday = mondayOfWeek();
+    const rows = await sb(`log_entries?logged_at=gte.${monday.toISOString()}&select=user_id,delta,users(nickname,profession)`) || [];
+    const agg = {};
+    for (const r of rows) {
+      if (!agg[r.user_id]) agg[r.user_id] = { userId: r.user_id, total: 0, nickname: r.users?.nickname || null, profession: r.users?.profession || null };
+      if (r.delta > 0) agg[r.user_id].total += r.delta;
+    }
+    const leaderboard = Object.values(agg).sort((a, b) => b.total - a.total).slice(0, 25);
+    res.json({ leaderboard, weekStart: monday.toISOString() });
+  } catch (err) {
+    console.error("leaderboard:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ---- Ugens udfordring ----
+app.get("/api/challenge/current", async (req, res) => {
+  try {
+    const CATS = ["Oysters opened", "Onions cut", "Bottles opened", "Covers served"];
+    const CATS_DA = ["Østers åbnet", "Løg snittet", "Flasker åbnet", "Couverter serveret"];
+    const weekNum = Math.floor(Date.now() / (7 * 24 * 3600 * 1000));
+    const idx = weekNum % CATS_DA.length;
+    const categoryDa = CATS_DA[idx];
+    const categoryEn = CATS[idx];
+
+    const monday = mondayOfWeek();
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    const cats = await sb(`categories?label_da=eq.${encodeURIComponent(categoryDa)}&select=id`);
+    if (!cats?.length) return res.json({ categoryDa, categoryEn, leaderboard: [], weekStart: monday.toISOString(), weekEnd: sunday.toISOString() });
+
+    const rows = await sb(`log_entries?category_id=eq.${cats[0].id}&logged_at=gte.${monday.toISOString()}&select=user_id,delta,users(nickname,profession)`) || [];
+    const agg = {};
+    for (const r of rows) {
+      if (!agg[r.user_id]) agg[r.user_id] = { userId: r.user_id, total: 0, nickname: r.users?.nickname || null, profession: r.users?.profession || null };
+      if (r.delta > 0) agg[r.user_id].total += r.delta;
+    }
+    const leaderboard = Object.values(agg).sort((a, b) => b.total - a.total).slice(0, 25);
+    res.json({ categoryDa, categoryEn, leaderboard, weekStart: monday.toISOString(), weekEnd: sunday.toISOString() });
+  } catch (err) {
+    console.error("challenge:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ---- Hold: opret ----
+app.post("/api/teams", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { name } = req.body || {};
+    if (!name?.trim()) return res.status(400).json({ error: "Holdnavn mangler" });
+    const teams = await sb("teams", {
+      method: "POST",
+      body: JSON.stringify({ name: name.trim(), invite_code: genCode(6), created_by: userId }),
+    });
+    const team = teams[0];
+    await sb("team_members", {
+      method: "POST",
+      body: JSON.stringify({ user_id: userId, team_id: team.id }),
+      headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
+    });
+    res.json({ id: team.id, name: team.name, invite_code: team.invite_code });
+  } catch (err) {
+    console.error("teams/create:", err.message);
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Hold: tilslut ----
+app.post("/api/teams/join", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { code } = req.body || {};
+    if (!code) return res.status(400).json({ error: "Kode mangler" });
+    const teams = await sb(`teams?invite_code=eq.${encodeURIComponent(code.trim().toUpperCase())}`);
+    if (!teams?.length) return res.status(404).json({ error: "not_found" });
+    const team = teams[0];
+    await sb("team_members", {
+      method: "POST",
+      body: JSON.stringify({ user_id: userId, team_id: team.id }),
+      headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
+    });
+    res.json({ id: team.id, name: team.name, invite_code: team.invite_code });
+  } catch (err) {
+    console.error("teams/join:", err.message);
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Hold: hent mit hold + ugens stats ----
+app.get("/api/teams/mine", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const memberships = await sb(`team_members?user_id=eq.${userId}&select=team_id,teams(id,name,invite_code)`);
+    if (!memberships?.length) return res.json({ team: null });
+    const team = memberships[0].teams;
+    const members = await sb(`team_members?team_id=eq.${team.id}&select=user_id,users(nickname,profession)`) || [];
+    const memberIds = members.map(m => m.user_id);
+
+    const monday = mondayOfWeek();
+    let entries = [];
+    if (memberIds.length) {
+      entries = await sb(`log_entries?logged_at=gte.${monday.toISOString()}&user_id=in.(${memberIds.join(",")})&select=user_id,delta`) || [];
+    }
+    const stats = {};
+    for (const m of members) {
+      stats[m.user_id] = { userId: m.user_id, nickname: m.users?.nickname || null, profession: m.users?.profession || null, total: 0 };
+    }
+    for (const e of entries) {
+      if (stats[e.user_id] && e.delta > 0) stats[e.user_id].total += e.delta;
+    }
+    res.json({
+      team: { id: team.id, name: team.name, invite_code: team.invite_code },
+      members: Object.values(stats).sort((a, b) => b.total - a.total),
+    });
+  } catch (err) {
+    console.error("teams/mine:", err.message);
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
 
