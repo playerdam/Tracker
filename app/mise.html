@@ -74,6 +74,19 @@
   .logview-text{font-size:14px;color:var(--text);line-height:1.5;flex:1}
   .logview-empty{padding:60px 20px;text-align:center;color:var(--faint);font-size:14px}
 
+  .code-box{background:var(--accent-soft);border:1.5px solid var(--accent);border-radius:var(--r-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+  .code-val{font-family:"Fraunces",serif;font-size:28px;font-weight:600;letter-spacing:.12em;color:var(--accent)}
+  .code-copy{appearance:none;background:none;border:1px solid var(--accent);border-radius:8px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:700;padding:6px 11px;transition:.15s;flex:none}
+  .code-copy:hover{background:var(--accent);color:#fff}
+  .prof-select{width:100%;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:12px 13px}
+  .prof-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .recover-toggle{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;font-size:13px;padding:16px 0 4px;text-decoration:underline;text-underline-offset:3px;width:100%;text-align:left;transition:.15s}
+  .recover-toggle:hover{color:var(--text)}
+  .recover-box{margin-top:10px;display:flex;gap:8px}
+  .recover-box input{flex:1;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--r-sm);color:var(--text);font-family:"Fraunces",serif;font-size:20px;letter-spacing:.1em;padding:10px 12px;text-transform:uppercase}
+  .recover-box input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .recover-err{font-size:13px;color:var(--accent);margin-top:8px;display:none}
+
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120%);display:flex;align-items:center;gap:16px;background:#1B1A18;color:#F4F3F0;border-radius:12px;padding:13px 16px 13px 18px;box-shadow:var(--shadow-lg);z-index:90;opacity:0;transition:transform .3s ease,opacity .3s ease;max-width:calc(100% - 32px)}
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
   .toast-msg{font-size:14px}
@@ -331,6 +344,26 @@
   </div>
 </div></div>
 
+<div class="scrim" id="onboardScrim"><div class="modal">
+  <h2 id="onboardTitle"></h2>
+  <p id="onboardDesc" style="font-size:14px;color:var(--dim);line-height:1.6;margin-bottom:20px"></p>
+  <div class="code-box">
+    <span class="code-val" id="codeDisplay"></span>
+    <button class="code-copy" id="codeCopy"></button>
+  </div>
+  <div class="field"><label id="onboardNickLbl"></label><input id="onboardNickname" maxlength="30" autocomplete="off"></div>
+  <div class="field"><label id="onboardProfLbl"></label><select id="onboardProfession" class="prof-select"></select></div>
+  <div class="mactions">
+    <button class="btn primary" id="onboardDone"></button>
+  </div>
+  <button class="recover-toggle" id="recoverToggle"></button>
+  <div class="recover-box" id="recoverBox" style="display:none">
+    <input id="recoverCodeInput" maxlength="9" autocomplete="off">
+    <button class="btn primary" id="recoverSubmit"></button>
+  </div>
+  <div class="recover-err" id="recoverErr"></div>
+</div></div>
+
 <div class="toast" id="toast"><span class="toast-msg" id="toastMsg"></span><button class="toast-undo" id="toastUndo"></button></div>
 
 <div class="numtray" id="numtray">
@@ -385,6 +418,15 @@
       toast_logged:"Logget: ",toast_nothing:"Intet tilføjet",
       ask_no_match:"matcher ingen eksisterende kategori.",
       wines_count:"{0} vine",summary_glasses:"glas",summary_bottles:"flasker",
+      onboard_title:"Velkommen til Craft Track",
+      onboard_desc:"Gem din genopretningskode — den er din adgang hvis du skifter telefon.",
+      onboard_nick_lbl:"Kaldenavn (valgfrit)",onboard_nick_ph:"fx Simon",
+      onboard_prof_lbl:"Profession (valgfrit)",onboard_prof_default:"Vælg profession",
+      onboard_done:"Kom i gang",copy:"Kopiér",copied:"Kopieret",
+      recover_toggle:"Har du en kode fra en anden enhed?",
+      recover_ph:"XXXX-XXXX",recover_btn:"Genopret",
+      recover_not_found:"Koden blev ikke fundet",recover_ok:"Velkommen tilbage",
+      professions:["Commis de cuisine","Chef de partie","Sous chef","Køkkenchef","Konditor","Serveringsmedarbejder","Sommelier","Bar","Andet"],
     },
     en:{
       tagline:"track your craft",total_label:"total",
@@ -420,6 +462,15 @@
       toast_logged:"Logged: ",toast_nothing:"Nothing added",
       ask_no_match:"matches no existing category.",
       wines_count:"{0} wines",summary_glasses:"glasses",summary_bottles:"bottles",
+      onboard_title:"Welcome to Craft Track",
+      onboard_desc:"Save your recovery code — it's how you get back in if you change devices.",
+      onboard_nick_lbl:"Nickname (optional)",onboard_nick_ph:"e.g. Simon",
+      onboard_prof_lbl:"Profession (optional)",onboard_prof_default:"Select profession",
+      onboard_done:"Get started",copy:"Copy",copied:"Copied",
+      recover_toggle:"Have a code from another device?",
+      recover_ph:"XXXX-XXXX",recover_btn:"Recover",
+      recover_not_found:"Code not found",recover_ok:"Welcome back",
+      professions:["Commis de cuisine","Chef de partie","Sous chef","Head chef","Pastry chef","Waiter / Server","Sommelier","Bar","Other"],
     }
   };
   let lang=localStorage.getItem("mise_lang")||"da";
@@ -458,6 +509,17 @@
     $("#askAdd").textContent=t("ask_add");
     $("#askSkip").textContent=t("ask_skip");
     $("#toastUndo").textContent=t("undo");
+    $("#onboardTitle").textContent=t("onboard_title");
+    $("#onboardDesc").textContent=t("onboard_desc");
+    $("#onboardNickLbl").textContent=t("onboard_nick_lbl");
+    $("#onboardNickname").placeholder=t("onboard_nick_ph");
+    $("#onboardProfLbl").textContent=t("onboard_prof_lbl");
+    $("#onboardDone").textContent=t("onboard_done");
+    $("#codeCopy").textContent=t("copy");
+    $("#recoverToggle").textContent=t("recover_toggle");
+    $("#recoverCodeInput").placeholder=t("recover_ph");
+    $("#recoverSubmit").textContent=t("recover_btn");
+    const prof=$("#onboardProfession");prof.innerHTML='<option value="">'+esc(t("onboard_prof_default"))+'</option>'+t("professions").map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join("");
   }
   function setLang(l){lang=l;localStorage.setItem("mise_lang",l);translateUI();renderCounters();renderWines();renderLogView();}
   $("#langBtn").addEventListener("click",()=>setLang(lang==="da"?"en":"da"));
@@ -508,6 +570,77 @@
   let state={counters:[],wines:[],log:[]},mem=null,wineFilter="";
   let listView=localStorage.getItem("mise_listview")==="1";
   const logHistory=[];
+  let userId=localStorage.getItem("mise_user_id")||null;
+
+  async function initUser(){
+    if(userId)return;
+    const base=apiBase();if(!base)return;
+    try{
+      const res=await fetch(base+"/api/user/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({})});
+      if(!res.ok)return;
+      const data=await res.json();
+      userId=data.id;
+      localStorage.setItem("mise_user_id",data.id);
+      localStorage.setItem("mise_user_code",data.code);
+      showOnboarding(data.code);
+    }catch(e){console.warn("Kunne ikke oprette bruger:",e);}
+  }
+
+  function showOnboarding(code){
+    $("#codeDisplay").textContent=code;
+    $("#recoverBox").style.display="none";
+    $("#recoverErr").style.display="none";
+    $("#onboardNickname").value="";
+    $("#onboardProfession").value="";
+    $("#onboardScrim").classList.add("open");
+  }
+
+  function setupOnboarding(){
+    $("#codeCopy").addEventListener("click",()=>{
+      navigator.clipboard.writeText($("#codeDisplay").textContent).then(()=>{
+        $("#codeCopy").textContent=t("copied");setTimeout(()=>$("#codeCopy").textContent=t("copy"),2000);
+      }).catch(()=>{});
+    });
+    $("#recoverToggle").addEventListener("click",()=>{
+      const box=$("#recoverBox");box.style.display=box.style.display==="none"?"flex":"none";
+      if(box.style.display==="flex")$("#recoverCodeInput").focus();
+    });
+    $("#recoverSubmit").addEventListener("click",async()=>{
+      const code=$("#recoverCodeInput").value.trim().toUpperCase();if(!code)return;
+      const base=apiBase();if(!base)return;
+      try{
+        const res=await fetch(base+"/api/user/recover",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code})});
+        if(res.status===404){$("#recoverErr").textContent=t("recover_not_found");$("#recoverErr").style.display="block";return;}
+        if(!res.ok)return;
+        const data=await res.json();
+        userId=data.id;
+        localStorage.setItem("mise_user_id",data.id);
+        localStorage.setItem("mise_user_code",data.code);
+        if(data.nickname)$("#onboardNickname").value=data.nickname;
+        if(data.profession)$("#onboardProfession").value=data.profession;
+        $("#codeDisplay").textContent=data.code;
+        $("#recoverErr").style.display="none";
+        showToast(t("recover_ok"));
+      }catch(e){console.warn(e);}
+    });
+    $("#recoverCodeInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#recoverSubmit").click();});
+    $("#onboardDone").addEventListener("click",async()=>{
+      const nickname=$("#onboardNickname").value.trim();
+      const profession=$("#onboardProfession").value;
+      if((nickname||profession)&&userId){
+        const base=apiBase();
+        if(base)fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:userId,nickname,profession})}).catch(()=>{});
+      }
+      $("#onboardScrim").classList.remove("open");
+    });
+  }
+
+  async function syncLogEntry(categoryLabel,delta){
+    const base=apiBase();if(!base||!userId)return;
+    try{
+      await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId,categoryLabel,delta})});
+    }catch(e){}
+  }
 
   async function load(){if(hasStore){try{const r=await window.storage.get(STORE_KEY);if(r&&r.value)return normalize(JSON.parse(r.value));}catch(e){}return clone(DEFAULTS);}return mem?clone(mem):clone(DEFAULTS);}
   async function save(){if(hasStore){try{await window.storage.set(STORE_KEY,JSON.stringify(state));}catch(e){console.error(e);}}else mem=clone(state);}
@@ -766,7 +899,7 @@
     s.count=Math.max(0,s.count+delta);
     summary.push((delta>0?"+":"")+delta+" "+canon+" ("+c.label+")");
   }
-  function applyOne(a,summary){
+  function applyOne(a,summary,syncItems){
     if(a.kind==="counter"){
       const delta=parseInt(a.delta,10)||0;if(delta===0)return;
       let c=findCounter(a.counter);
@@ -775,6 +908,7 @@
       if(subName){addToSub(c,subName,delta,summary);}
       else if(c.subs.length){let s=c.subs.find(x=>x.name==="Uden type");if(!s){s={id:id(),name:"Uden type",count:0};c.subs.push(s);}s.count=Math.max(0,s.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
       else{c.count=Math.max(0,c.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
+      if(syncItems)syncItems.push({categoryLabel:c.label,delta});
     }else if(a.kind==="wine"){
       const delta=parseInt(a.delta,10)||0;if(delta===0)return;
       const measure=a.measure==="bottles"?"bottles":"glasses";
@@ -820,19 +954,20 @@
     $("#qlogSpin").hidden=true;input.disabled=false;
     if(!actions.length){showToast(t("toast_unknown"));input.focus();return;}
     undoSnapshot=clone(state);
-    const summary=[],ask=[];
-    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary);});
+    const summary=[],ask=[],syncItems=[];
+    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems);});
     input.value="";save();renderCounters();renderWines();renderCareer();
-    if(!ask.length){finishLog(summary);return;}
-    processAsk(ask,0,summary);
+    if(!ask.length){finishLog(summary,syncItems);return;}
+    processAsk(ask,0,summary,syncItems);
   }
-  function finishLog(summary){
+  function finishLog(summary,syncItems){
     const msg=summary.length?(t("toast_logged")+summary.join(", ")):t("toast_nothing");
     showToast(msg);if(summary.length)addLogEntry(summary.join(" · "));
+    if(syncItems&&syncItems.length)syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta));
     $("#qlogInput").focus();
   }
-  function processAsk(ask,i,summary){if(i>=ask.length){finishLog(summary);return;}openAsk(ask[i],()=>processAsk(ask,i+1,summary),summary);}
-  function openAsk(item,next,summary){
+  function processAsk(ask,i,summary,syncItems){if(i>=ask.length){finishLog(summary,syncItems);return;}openAsk(ask[i],()=>processAsk(ask,i+1,summary,syncItems),summary,syncItems);}
+  function openAsk(item,next,summary,syncItems){
     const delta=parseInt(item.delta,10)||0;
     const detectedName=item.counter||"Ny ting";
     $("#askText").innerHTML='<b>'+esc((delta>0?"+":"")+delta+" "+detectedName)+'</b> '+esc(t("ask_no_match"));
@@ -846,7 +981,7 @@
       const name=(nameInput.value||"").trim()||detectedName;
       const mode=document.querySelector('input[name="askmode"]:checked').value;
       if(mode==="sub"){const parent=state.counters.find(c=>c.id===sel.value);if(parent)addToSub(parent,name,delta,summary);}
-      else{const c={id:id(),label:name,count:0,subs:[],suggest:seedFor(name)};state.counters.push(c);const subName=(item.sub||"").trim();if(subName)addToSub(c,subName,delta,summary);else{c.count=Math.max(0,delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}}
+      else{const c={id:id(),label:name,count:0,subs:[],suggest:seedFor(name)};state.counters.push(c);const subName=(item.sub||"").trim();if(subName)addToSub(c,subName,delta,summary);else{c.count=Math.max(0,delta);summary.push((delta>0?"+":"")+delta+" "+c.label);if(syncItems)syncItems.push({categoryLabel:name,delta});}}
       save();renderCounters();renderWines();renderCareer();scrim._askSkip=null;scrim.classList.remove("open");next();
     };
     $("#askSkip").onclick=()=>{if(scrim._askSkip)scrim._askSkip();};
@@ -875,6 +1010,8 @@
     translateUI();
     $("#view-station").classList.add("active");
     renderCounters();renderWines();renderCareer();renderLogView();
+    await initUser();
+    setupOnboarding();
   })();
 })();
 </script>
