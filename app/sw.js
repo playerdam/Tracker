@@ -15,6 +15,22 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
+self.addEventListener('push', e => {
+  const data = e.data ? e.data.json() : {};
+  e.waitUntil(
+    self.registration.showNotification(data.title || 'Craft Track', {
+      body: data.body || '',
+      icon: '/icons/icon.svg',
+      badge: '/icons/icon.svg',
+    })
+  );
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(clients.openWindow('/'));
+});
+
 self.addEventListener('fetch', e => {
   // API-kald går altid på netværket
   if (e.request.url.includes('/api/')) return;

@@ -39,6 +39,8 @@
   .career{text-align:right}
   .career .num{font-family:"Fraunces",serif;font-weight:600;font-size:26px;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
   .career .lbl{font-size:11px;color:var(--faint);margin-top:3px;letter-spacing:.02em}
+  .streak{font-size:11px;color:var(--faint);margin-top:2px;letter-spacing:.02em;transition:color .3s}
+  .streak.hot{color:#E8640A}
 
   .tabrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
   .tabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;width:fit-content}
@@ -53,6 +55,14 @@
   .view{display:none}
   .view.active{display:block}
 
+  .upload-bar{height:3px;background:var(--accent-soft);border-radius:2px;margin:-6px 0 4px;overflow:hidden;display:none}
+  .upload-bar-fill{height:100%;background:var(--accent);width:0%;transition:width .3s ease}
+  .offline-dot{width:8px;height:8px;border-radius:50%;background:#E8640A;flex:none;display:none;cursor:default}
+  .offline-dot.show{display:block}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  .skel-row{height:46px;margin-bottom:5px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--border) 25%,var(--surface-2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
+  @keyframes swipeFlash{0%{background:var(--accent-soft)}100%{background:var(--surface)}}
+  .swipe-flash{animation:swipeFlash .35s ease forwards}
   .qlog{position:relative;display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);margin-bottom:8px;padding:0 14px}
   .qlog:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .qlog-ic{color:var(--accent);flex:none}
@@ -311,10 +321,11 @@
   <header>
     <div class="brand"><h1>Craft Track</h1><span class="tag" id="tagline"></span></div>
     <div class="header-right">
+      <div class="offline-dot" id="offlineDot" title=""></div>
       <button id="profileBtn" class="lang-btn" style="display:none" title="Profil">&#9679;</button>
       <button id="signOutBtn" class="auth-signout-btn"></button>
       <button id="langBtn" class="lang-btn">EN</button>
-      <div class="career"><div class="num" id="careerNum">0</div><div class="lbl" id="totalLbl"></div></div>
+      <div class="career"><div class="num" id="careerNum">0</div><div class="lbl" id="totalLbl"></div><div class="streak" id="streakLbl"></div></div>
     </div>
   </header>
 
@@ -326,6 +337,7 @@
     <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
     <span class="qlog-spin" id="qlogSpin" hidden><span class="spin"></span></span>
   </div>
+  <div class="upload-bar" id="uploadBar"><div class="upload-bar-fill" id="uploadBarFill"></div></div>
   <div id="logFeed" class="logfeed" hidden></div>
 
   <div class="tabrow">
@@ -526,6 +538,8 @@
       profile_records:"Personlige rekorder",profile_records_none:"Ingen rekorder endnu",
       new_badge:"Nyt badge",new_record_msg:"Ny rekord",
       professions:["Commis de cuisine","Chef de partie","Sous chef","Køkkenchef","Konditor","Serveringsmedarbejder","Sommelier","Bar","Andet"],
+      streak_day:"1 dag i træk",streak_days:"{0} dage i træk",
+      offline_pending:"{0} afventende sync",
     },
     en:{
       tagline:"track your craft",total_label:"total",
@@ -582,6 +596,8 @@
       profile_records:"Personal records",profile_records_none:"No records yet",
       new_badge:"New badge",new_record_msg:"New record",
       professions:["Commis de cuisine","Chef de partie","Sous chef","Head chef","Pastry chef","Service staff","Sommelier","Bar","Other"],
+      streak_day:"1 day in a row",streak_days:"{0} days in a row",
+      offline_pending:"{0} pending sync",
     }
   };
   let lang=localStorage.getItem("mise_lang")||"da";
@@ -623,6 +639,7 @@
     $("#authEmailLbl").textContent=t("auth_email");
     $("#authPwLbl").textContent=t("auth_pw");
     $("#signOutBtn").textContent=t("auth_signout");
+    renderStreak();
     const tSocial=$("#tab-social");if(tSocial)tSocial.textContent=t("tab_social");
     const cTitle=$("#challengeTitle");if(cTitle)cTitle.textContent=t("challenge_title");
     const lbTitle=$("#lbTitle");if(lbTitle)lbTitle.textContent=t("lb_title");
@@ -780,11 +797,27 @@
     updateMode();
   }
 
-  async function syncLogEntry(categoryLabel,delta,imageUrl){
-    const base=apiBase();if(!base)return;
-    const token=await getToken();if(!token)return;
+  const SYNC_Q_KEY="mise_sync_q";
+  function getSyncQ(){try{return JSON.parse(localStorage.getItem(SYNC_Q_KEY)||"[]");}catch(e){return [];}}
+  function saveSyncQ(q){localStorage.setItem(SYNC_Q_KEY,JSON.stringify(q));}
+  function updateOfflineDot(){const dot=$("#offlineDot");if(!dot)return;const q=getSyncQ();dot.classList.toggle("show",q.length>0);dot.title=q.length?t("offline_pending",q.length):"";}
+  async function flushSyncQ(){
+    if(!navigator.onLine)return;
+    const q=getSyncQ();if(!q.length)return;
+    saveSyncQ([]);
+    const failed=[];
+    for(const item of q){const ok=await syncLogEntry(item.categoryLabel,item.delta,item.imageUrl,true);if(!ok)failed.push(item);}
+    if(failed.length)saveSyncQ([...failed,...getSyncQ()]);
+    updateOfflineDot();
+  }
+  window.addEventListener("online",()=>flushSyncQ());
+  async function syncLogEntry(categoryLabel,delta,imageUrl,fromQueue){
+    const base=apiBase();if(!base)return false;
+    if(!navigator.onLine&&!fromQueue){const q=getSyncQ();q.push({categoryLabel,delta,imageUrl:imageUrl||null});saveSyncQ(q);updateOfflineDot();return false;}
+    const token=await getToken();if(!token)return false;
     const body={categoryLabel,delta};if(imageUrl)body.imageUrl=imageUrl;
-    try{await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});}catch(e){}
+    try{await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});return true;}
+    catch(e){if(!fromQueue){const q=getSyncQ();q.push({categoryLabel,delta,imageUrl:imageUrl||null});saveSyncQ(q);updateOfflineDot();}return false;}
   }
 
   async function load(){if(hasStore){try{const r=await window.storage.get(STORE_KEY);if(r&&r.value)return normalize(JSON.parse(r.value));}catch(e){}return clone(DEFAULTS);}return mem?clone(mem):clone(DEFAULTS);}
@@ -797,7 +830,7 @@
   }
   function counterTotal(c){return c.subs.length?c.subs.reduce((a,b)=>a+b.count,0):c.count;}
   function career(){let t=0;state.counters.forEach(c=>t+=counterTotal(c));state.wines.forEach(w=>t+=(w.glasses||0)+(w.bottles||0));return t;}
-  function renderCareer(){$("#careerNum").textContent=career().toLocaleString("da-DK");}
+  function renderCareer(){$("#careerNum").textContent=career().toLocaleString("da-DK");renderStreak();}
 
   // ---- numtray ----
   let numtrayCallback=null;
@@ -849,15 +882,21 @@
     if(!pendingPhotoDataUrl)return null;
     const base=apiBase();if(!base)return null;
     const token=await getToken();if(!token)return null;
+    const bar=$("#uploadBar"),fill=$("#uploadBarFill");
+    function barSet(pct){if(bar)bar.style.display=pct>0?"block":"none";if(fill)fill.style.width=pct+"%";}
+    barSet(20);
+    const ramp=setTimeout(()=>barSet(70),400);
     try{
       const res=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:pendingPhotoDataUrl})});
+      clearTimeout(ramp);barSet(100);
       const d=await res.json();
+      setTimeout(()=>barSet(0),350);
       pendingPhotoDataUrl=null;
       const thumb=$("#photoThumb");if(thumb){thumb.src="";thumb.style.display="none";}
       const camBtn=$("#photoBtn");if(camBtn)camBtn.style.color="";
       const photoInput=$("#photoInput");if(photoInput)photoInput.value="";
       return d.url||null;
-    }catch(e){return null;}
+    }catch(e){clearTimeout(ramp);barSet(0);return null;}
   }
 
   // ---- badges ----
@@ -880,11 +919,16 @@
   }
   function showBadgeToast(b){
     const toast=$("#badgeToast");if(!toast)return;
+    const name=lang==="en"?b.en:b.da;
     $("#badgeToastIcon").textContent=b.icon;
     $("#badgeToastLbl").textContent=t("new_badge");
-    $("#badgeToastName").textContent=lang==="en"?b.en:b.da;
+    $("#badgeToastName").textContent=name;
     toast.classList.add("show");
+    haptic(60);
     setTimeout(()=>toast.classList.remove("show"),3000);
+    if(Notification&&Notification.permission==="granted"){
+      try{new Notification(b.icon+" "+t("new_badge"),{body:name,icon:"/icons/icon.svg",silent:true});}catch(e){}
+    }
   }
 
   // ---- personal records ----
@@ -996,13 +1040,26 @@
         const sid=btn.closest(".subrow").dataset.sid;const s=c.subs.find(x=>x.id===sid);if(!s)return;
         bindLongPress(btn,()=>{openNumtray(t("numtray_add")+" "+s.name,"",val=>{if(val>0)bumpSub(card,sid,val);});});
       });
+      if(!isCat){
+        let _tx=0;
+        card.addEventListener("touchstart",e=>{_tx=e.touches[0].clientX;},{passive:true});
+        card.addEventListener("touchend",e=>{
+          const dx=e.changedTouches[0].clientX-_tx;
+          if(dx>52&&!e.target.closest("button")){
+            bumpSimple(card,1);
+            card.classList.add("swipe-flash");
+            setTimeout(()=>card.classList.remove("swipe-flash"),350);
+          }
+        },{passive:true});
+      }
     });
     const add=document.createElement("button");add.className="addcard";add.id="addCounterBtn";add.textContent=t("add_counter");grid.appendChild(add);
     $("#btnGrid").classList.toggle("active",!listView);$("#btnList").classList.toggle("active",listView);
   }
+  function haptic(ms){if(navigator.vibrate)navigator.vibrate(ms||30);}
   function tickEl(el){if(!el)return;el.classList.remove("tick");void el.offsetWidth;el.classList.add("tick");}
-  function bumpSimple(card,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c||c.subs.length)return;c.count=Math.max(0,c.count+d);const n=card.querySelector(".cbig");n.textContent=c.count;if(d>0)tickEl(n);renderCareer();save();}
-  function bumpSub(card,sid,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c)return;const s=c.subs.find(x=>x.id===sid);if(!s)return;s.count=Math.max(0,s.count+d);const p=card.querySelector('.subrow[data-sid="'+sid+'"] .subcount');if(p){p.textContent=s.count;if(d>0)tickEl(p);}const tv=card.querySelector(".cbig");if(tv){tv.textContent=counterTotal(c);if(d>0)tickEl(tv);}renderCareer();save();}
+  function bumpSimple(card,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c||c.subs.length)return;c.count=Math.max(0,c.count+d);const n=card.querySelector(".cbig");n.textContent=c.count;if(d>0){tickEl(n);haptic();}renderCareer();save();}
+  function bumpSub(card,sid,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c)return;const s=c.subs.find(x=>x.id===sid);if(!s)return;s.count=Math.max(0,s.count+d);const p=card.querySelector('.subrow[data-sid="'+sid+'"] .subcount');if(p){p.textContent=s.count;if(d>0){tickEl(p);haptic();}}const tv=card.querySelector(".cbig");if(tv){tv.textContent=counterTotal(c);if(d>0)tickEl(tv);}renderCareer();save();}
   function addType(card,name){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c)return;name=name.trim();if(!name)return;const ex=c.subs.find(s=>s.name.toLowerCase()===name.toLowerCase());if(ex){ex.count++;}else{if(c.subs.length===0&&c.count>0){c.subs.push({id:id(),name:"Uden type",count:c.count});c.count=0;}c.subs.push({id:id(),name,count:0});if(!c.suggest.some(s=>s.toLowerCase()===name.toLowerCase()))c.suggest.push(name);}save();renderCounters();renderCareer();}
 
   $("#counterGrid").addEventListener("click",e=>{
@@ -1154,22 +1211,46 @@
       summary.push((delta>0?"+":"")+delta+" "+(measure==="bottles"?t("bottles").toLowerCase():t("glasses").toLowerCase())+" "+w.name);
     }
   }
-  const STOPVERBS=new Set(["jeg","har","i","dag","idag","åbnet","åbnede","åbent","snittet","skåret","skar","hakket","serveret","stegt","grillet","lavet","lavede","poleret","polerede","drukket","smagt","tilberedt","til","en","et","af","med","og","stk","styk","styks","portioner","portion","glas","stykker","have","has","opened","open","cut","chopped","served","grilled","made","polished","drank","tasted","prepared","to","a","an","of","with","and","pcs","pieces","portions","glasses","i"]);
+  const STOPVERBS=new Set(["jeg","har","i","dag","idag","åbnet","åbnede","åbent","snittet","skåret","skar","hakkede","hakket","serveret","serverede","stegt","stegte","grillet","grillede","lavet","lavede","poleret","polerede","drukket","smagt","smagte","tilberedt","tilberedte","til","en","et","af","med","og","stk","styk","styks","portioner","portion","glas","stykker","have","has","opened","open","cut","chopped","served","grilled","made","polished","drank","tasted","prepared","to","a","an","of","with","and","pcs","pieces","portions","glasses","i","ca","ca.","cirka","approximately","about","nogle","some","approximately"]);
+  const DA_VERB_STEM={"åbnede":"åbnet","hakkede":"hakket","serverede":"serveret","stegte":"stegt","grillede":"grillet","lavede":"lavet","polerede":"poleret","smagte":"smagt","tilberedte":"tilberedt","snittet":"snit","skåret":"skær","drak":"drukket"};
+  function normWord(w){return DA_VERB_STEM[w]||w;}
   function localParse(text){
     const clauses=text.split(/\s+og\s+|\s+and\s+|,/i);const actions=[];
     clauses.forEach(cl=>{
-      const low=cl.toLowerCase();const nm=low.match(/\d+/);const delta=nm?parseInt(nm[0],10):1;
+      const low=cl.toLowerCase().trim();
+      // extract number: "500", "500 stk", also handle "et"=1
+      const numM=low.match(/\b(\d+)\b/);
+      const delta=numM?parseInt(numM[1],10):/\bet\b|\ben\b/i.test(low)?1:1;
+      const words=low.split(/\s+/).map(normWord);
+      const normLow=words.join(" ");
+
+      // 1. match suggest/sub names
       let best=null;
-      state.counters.forEach(c=>{[...(c.suggest||[]),...c.subs.map(s=>s.name)].forEach(cand=>{if(cand&&low.includes(cand.toLowerCase())&&(!best||cand.length>best.sub.length))best={counter:c.label,sub:cand};});});
+      state.counters.forEach(c=>{[...(c.suggest||[]),...c.subs.map(s=>s.name)].forEach(cand=>{
+        if(cand&&normLow.includes(cand.toLowerCase())&&(!best||cand.length>best.sub.length))
+          best={counter:c.label,sub:cand};
+      });});
       if(best){actions.push({kind:"counter",counter:best.counter,sub:best.sub,delta});return;}
-      let wine=null;state.wines.forEach(w=>{if(w.name&&low.includes(w.name.toLowerCase())&&(!wine||w.name.length>wine.length))wine=w.name;});
-      if(wine){actions.push({kind:"wine",wine,measure:/flask|bottle/.test(low)?"bottles":"glasses",delta});return;}
-      let cnt=null;state.counters.forEach(c=>{c.label.toLowerCase().split(/\s+/).filter(w=>w.length>=3&&!STOPVERBS.has(w)).forEach(w=>{if(low.includes(w)&&(!cnt||w.length>cnt.len))cnt={label:c.label,len:w.length};});});
+
+      // 2. match wine names
+      let wine=null;
+      state.wines.forEach(w=>{if(w.name&&normLow.includes(w.name.toLowerCase())&&(!wine||w.name.length>wine.length))wine=w.name;});
+      if(wine){actions.push({kind:"wine",wine,measure:/flask|flaske|bottle/.test(normLow)?"bottles":"glasses",delta});return;}
+
+      // 3. match counter label words (stem-normalized)
+      let cnt=null;
+      state.counters.forEach(c=>{
+        c.label.toLowerCase().split(/\s+/).map(normWord).filter(w=>w.length>=3&&!STOPVERBS.has(w)).forEach(w=>{
+          if(normLow.includes(w)&&(!cnt||w.length>cnt.len))cnt={label:c.label,len:w.length};
+        });
+      });
       if(cnt){actions.push({kind:"counter",counter:cnt.label,sub:"",delta});return;}
-      const numMatch=low.search(/\d/);
-      const nameStr=numMatch>=0?low.slice(numMatch).replace(/^\d+\s*/,""):low;
-      const words=nameStr.split(/\s+/).filter(w=>w&&!STOPVERBS.has(w));
-      if(words.length){const raw=words.join(" ");actions.push({kind:"counter",counter:raw.charAt(0).toUpperCase()+raw.slice(1),sub:"",delta});}
+
+      // 4. extract leftover noun words as new category name
+      const numStart=low.search(/\d/);
+      const nameStr=numStart>=0?low.slice(numStart).replace(/^\d+[\s,.]*(?:stk|styk|styks|pcs|pieces|x)?\s*/i,""):low;
+      const nouns=nameStr.split(/\s+/).map(normWord).filter(w=>w.length>=2&&!STOPVERBS.has(w));
+      if(nouns.length){const raw=nouns.join(" ");actions.push({kind:"counter",counter:raw.charAt(0).toUpperCase()+raw.slice(1),sub:"",delta});}
     });
     return actions;
   }
@@ -1200,7 +1281,7 @@
   function finishLog(summary,syncItems,imageUrl){
     const msg=summary.length?(t("toast_logged")+summary.join(", ")):t("toast_nothing");
     showToast(msg);
-    if(summary.length)addLogEntry(summary.join(" · "),imageUrl);
+    if(summary.length){addLogEntry(summary.join(" · "),imageUrl);haptic(40);}
     if(syncItems&&syncItems.length)syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta,imageUrl));
     checkBadges();checkRecords();
     $("#qlogInput").focus();
@@ -1244,6 +1325,46 @@
     if(v==="social")loadSocial();
   }));
 
+  function skeletonRows(n){return Array.from({length:n},()=>'<div class="skel-row"></div>').join("");}
+
+  // ---- streak ----
+  function calcStreak(){
+    if(!state.log||!state.log.length)return 0;
+    const days=new Set(state.log.map(e=>{const d=new Date(e.ts);return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}));
+    let streak=0;
+    const now=new Date();
+    for(let i=0;i<365;i++){
+      const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()-i);
+      const key=d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+      if(days.has(key)){streak++;}
+      else if(i>0)break;
+    }
+    return streak;
+  }
+  function renderStreak(){
+    const el=$("#streakLbl");if(!el)return;
+    const s=calcStreak();
+    if(s<=1){el.textContent="";return;}
+    el.textContent=s===1?t("streak_day"):t("streak_days",s);
+    el.classList.toggle("hot",s>=7);
+  }
+
+  // ---- smart qlog suggestions ----
+  function recentLogPhrases(){
+    const seen=new Set();const out=[];
+    (state.log||[]).slice(0,120).forEach(e=>{
+      if(!e.text)return;
+      e.text.split(" · ").forEach(p=>{p=p.trim();if(p.length>3&&!seen.has(p)){seen.add(p);out.push(p);}});
+    });
+    return out;
+  }
+
+  // ---- notification permission ----
+  async function requestNotifPermission(){
+    if(!("Notification" in window)||Notification.permission!=="default")return;
+    await Notification.requestPermission();
+  }
+
   // ---- social / leaderboard / challenge / team ----
   function getJwtSub(){
     if(!session||!session.access_token)return null;
@@ -1252,7 +1373,7 @@
 
   async function renderLeaderboard(){
     const el=$("#lbContent");if(!el)return;
-    el.innerHTML='<div class="lb-loading">…</div>';
+    el.innerHTML=skeletonRows(5);
     const base=apiBase();if(!base){el.innerHTML=esc(t("lb_empty"));return;}
     try{
       const token=await getToken();
@@ -1272,7 +1393,7 @@
 
   async function renderChallenge(){
     const el=$("#challengeContent");if(!el)return;
-    el.innerHTML="…";
+    el.innerHTML='<div class="skel-row" style="width:60%;margin-bottom:10px"></div>'+skeletonRows(3);
     const base=apiBase();if(!base){el.innerHTML="";return;}
     try{
       const token=await getToken();
@@ -1423,7 +1544,15 @@
     renderCounters();renderWines();renderCareer();renderLogView();
     setupPhoto();
     setupProfileModal();
+    updateOfflineDot();
     const profileBtn=$("#profileBtn");if(profileBtn)profileBtn.style.display="";
+    attachAC($("#qlogInput"),()=>{
+      const phrases=recentLogPhrases();
+      const labels=state.counters.map(c=>tLabel(c.label));
+      const subs=state.counters.flatMap(c=>c.subs.map(s=>tLabel(s.name)));
+      return [...new Set([...phrases,...labels,...subs])];
+    });
+    setTimeout(()=>requestNotifPermission(),4000);
   }
 
   (async function(){
