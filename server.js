@@ -1,8 +1,7 @@
 // Craft Track backend
-// Kør lokalt: npm install && npm start
-// Endpoints: POST /api/parse-log  POST /api/wine-search
-//            POST /api/user/create  POST /api/user/recover  POST /api/user/update
-//            POST /api/log-entry   GET /api/health
+// Endpoints: GET /api/config  POST /api/parse-log  POST /api/wine-search
+//            POST /api/user/profile  POST /api/user/update
+//            POST /api/log-entry     GET /api/health
 
 const express = require("express");
 const cors    = require("cors");
@@ -12,11 +11,12 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "256kb" }));
 
-const API_KEY        = process.env.ANTHROPIC_API_KEY;
-const SUPABASE_URL   = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
-const SUPABASE_KEY   = process.env.SUPABASE_SERVICE_KEY;
-const PARSE_MODEL    = process.env.PARSE_MODEL || "claude-haiku-4-5-20251001";
-const WINE_MODEL     = process.env.WINE_MODEL  || "claude-haiku-4-5-20251001";
+const API_KEY          = process.env.ANTHROPIC_API_KEY;
+const SUPABASE_URL     = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
+const SUPABASE_KEY     = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_ANON    = process.env.SUPABASE_ANON_KEY || "";
+const PARSE_MODEL      = process.env.PARSE_MODEL || "claude-haiku-4-5-20251001";
+const WINE_MODEL       = process.env.WINE_MODEL  || "claude-haiku-4-5-20251001";
 
 // ---- Anthropic ----
 async function callClaude({ model, system, content, maxTokens = 1000 }) {
@@ -40,7 +40,7 @@ function extractJSON(text) {
   return null;
 }
 
-// ---- Supabase ----
+// ---- Supabase data REST ----
 async function sb(path, opts = {}) {
   if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error("Supabase ikke konfigureret");
   const method = opts.method || "GET";
@@ -60,15 +60,19 @@ async function sb(path, opts = {}) {
   return data;
 }
 
-// Generér læsbar genopretningskode — ingen tvetydige tegn
-function genCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 8; i++) {
-    if (i === 4) code += "-";
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
+// ---- Auth token verification ----
+// Calls Supabase /auth/v1/user to validate the Bearer token and return the user UUID.
+async function verifyAuth(req) {
+  const auth = req.headers.authorization || "";
+  if (!auth.startsWith("Bearer ")) throw new Error("Ikke autoriseret");
+  const token = auth.slice(7);
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Ugyldig token");
+  const data = await res.json();
+  if (!data.id) throw new Error("Ukendt bruger");
+  return data.id;
 }
 
 // ---- Statiske filer ----
@@ -76,60 +80,51 @@ app.use(express.static(path.join(__dirname, "app")));
 app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "app", "mise.html")));
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "craft-track" }));
 
-// ---- Bruger: opret ----
-app.post("/api/user/create", async (req, res) => {
+// Eksponér public config (ikke secrets) til frontend
+app.get("/api/config", (_req, res) => {
+  res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON });
+});
+
+// ---- Brugerprofil: opret (upsert) eller hent ----
+app.post("/api/user/profile", async (req, res) => {
   try {
-    const { nickname, profession } = req.body || {};
-    const code = genCode();
-    const rows = await sb("users", {
+    const userId = await verifyAuth(req);
+    await sb("users", {
       method: "POST",
-      body: JSON.stringify({ code, nickname: nickname || null, profession: profession || null }),
+      body: JSON.stringify({ id: userId }),
+      headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
     });
-    res.json({ id: rows[0].id, code: rows[0].code });
+    res.json({ ok: true });
   } catch (err) {
-    console.error("user/create:", err.message);
-    res.status(500).json({ error: err.message });
+    console.error("user/profile:", err.message);
+    res.status(err.message === "Ikke autoriseret" || err.message === "Ugyldig token" ? 401 : 500).json({ error: err.message });
   }
 });
 
-// ---- Bruger: genopret via kode ----
-app.post("/api/user/recover", async (req, res) => {
-  try {
-    const { code } = req.body || {};
-    if (!code) return res.status(400).json({ error: "Kode mangler" });
-    const rows = await sb(`users?code=eq.${encodeURIComponent(code.trim().toUpperCase())}`);
-    if (!rows || !rows.length) return res.status(404).json({ error: "not_found" });
-    const u = rows[0];
-    res.json({ id: u.id, code: u.code, nickname: u.nickname, profession: u.profession });
-  } catch (err) {
-    console.error("user/recover:", err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ---- Bruger: opdatér kaldenavn/profession ----
+// ---- Brugerprofil: opdatér kaldenavn/profession ----
 app.post("/api/user/update", async (req, res) => {
   try {
-    const { id, nickname, profession } = req.body || {};
-    if (!id) return res.status(400).json({ error: "ID mangler" });
-    await sb(`users?id=eq.${id}`, {
+    const userId = await verifyAuth(req);
+    const { nickname, profession } = req.body || {};
+    await sb(`users?id=eq.${userId}`, {
       method: "PATCH",
       body: JSON.stringify({ nickname: nickname || null, profession: profession || null }),
     });
     res.json({ ok: true });
   } catch (err) {
     console.error("user/update:", err.message);
-    res.status(500).json({ error: err.message });
+    res.status(err.message === "Ikke autoriseret" || err.message === "Ugyldig token" ? 401 : 500).json({ error: err.message });
   }
 });
 
 // ---- Log-indgang ----
 app.post("/api/log-entry", async (req, res) => {
   try {
-    const { userId, categoryLabel } = req.body || {};
+    const userId = await verifyAuth(req);
+    const { categoryLabel } = req.body || {};
     let { delta } = req.body || {};
     delta = parseInt(delta, 10);
-    if (!userId || !categoryLabel || !delta) return res.status(400).json({ error: "Felter mangler" });
+    if (!categoryLabel || !delta) return res.status(400).json({ error: "Felter mangler" });
 
     // Find eller opret kategori
     const existing = await sb(`categories?label_da=eq.${encodeURIComponent(categoryLabel)}&select=id`);
@@ -151,7 +146,7 @@ app.post("/api/log-entry", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     console.error("log-entry:", err.message);
-    res.status(500).json({ error: err.message });
+    res.status(err.message === "Ikke autoriseret" || err.message === "Ugyldig token" ? 401 : 500).json({ error: err.message });
   }
 });
 

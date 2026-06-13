@@ -74,18 +74,16 @@
   .logview-text{font-size:14px;color:var(--text);line-height:1.5;flex:1}
   .logview-empty{padding:60px 20px;text-align:center;color:var(--faint);font-size:14px}
 
-  .code-box{background:var(--accent-soft);border:1.5px solid var(--accent);border-radius:var(--r-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
-  .code-val{font-family:"Fraunces",serif;font-size:28px;font-weight:600;letter-spacing:.12em;color:var(--accent)}
-  .code-copy{appearance:none;background:none;border:1px solid var(--accent);border-radius:8px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:700;padding:6px 11px;transition:.15s;flex:none}
-  .code-copy:hover{background:var(--accent);color:#fff}
-  .prof-select{width:100%;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:12px 13px}
-  .prof-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
-  .recover-toggle{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;font-size:13px;padding:16px 0 4px;text-decoration:underline;text-underline-offset:3px;width:100%;text-align:left;transition:.15s}
-  .recover-toggle:hover{color:var(--text)}
-  .recover-box{margin-top:10px;display:flex;gap:8px}
-  .recover-box input{flex:1;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--r-sm);color:var(--text);font-family:"Fraunces",serif;font-size:20px;letter-spacing:.1em;padding:10px 12px;text-transform:uppercase}
-  .recover-box input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
-  .recover-err{font-size:13px;color:var(--accent);margin-top:8px;display:none}
+  #authScreen{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+  .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px 28px;width:100%;max-width:400px;box-shadow:var(--shadow-lg)}
+  .auth-brand{font-family:"Fraunces",serif;font-size:26px;font-weight:600;color:var(--accent);margin-bottom:4px}
+  .auth-sub{font-size:13px;color:var(--faint);margin-bottom:28px}
+  .auth-err{background:#FEF2F3;border:1px solid #F5C0C6;border-radius:8px;color:var(--accent);font-size:13px;padding:10px 12px;margin-bottom:14px;display:none}
+  .auth-toggle{font-size:13px;color:var(--dim);margin-top:18px;text-align:center}
+  .auth-toggle a{color:var(--accent);cursor:pointer;font-weight:500}
+  .auth-toggle a:hover{text-decoration:underline}
+  .auth-signout-btn{appearance:none;background:none;border:1px solid var(--border-2);border-radius:8px;color:var(--dim);cursor:pointer;font-size:12px;font-weight:700;padding:5px 9px;letter-spacing:.05em;transition:.15s;display:none}
+  .auth-signout-btn:hover{border-color:var(--accent);color:var(--accent)}
 
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120%);display:flex;align-items:center;gap:16px;background:#1B1A18;color:#F4F3F0;border-radius:12px;padding:13px 16px 13px 18px;box-shadow:var(--shadow-lg);z-index:90;opacity:0;transition:transform .3s ease,opacity .3s ease;max-width:calc(100% - 32px)}
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
@@ -252,6 +250,7 @@
   <header>
     <div class="brand"><h1>Craft Track</h1><span class="tag" id="tagline"></span></div>
     <div class="header-right">
+      <button id="signOutBtn" class="auth-signout-btn"></button>
       <button id="langBtn" class="lang-btn">EN</button>
       <div class="career"><div class="num" id="careerNum">0</div><div class="lbl" id="totalLbl"></div></div>
     </div>
@@ -344,25 +343,17 @@
   </div>
 </div></div>
 
-<div class="scrim" id="onboardScrim"><div class="modal">
-  <h2 id="onboardTitle"></h2>
-  <p id="onboardDesc" style="font-size:14px;color:var(--dim);line-height:1.6;margin-bottom:20px"></p>
-  <div class="code-box">
-    <span class="code-val" id="codeDisplay"></span>
-    <button class="code-copy" id="codeCopy"></button>
+<div id="authScreen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-brand">Craft Track</div>
+    <p class="auth-sub" id="authSub"></p>
+    <div class="auth-err" id="authErr"></div>
+    <div class="field"><label id="authEmailLbl"></label><input id="authEmail" type="email" autocomplete="email" inputmode="email"></div>
+    <div class="field"><label id="authPwLbl"></label><input id="authPw" type="password" autocomplete="current-password"></div>
+    <button class="btn primary" id="authSubmit" style="width:100%;margin-top:8px"></button>
+    <p class="auth-toggle"><span id="authToggleText"></span> <a id="authToggleLink"></a></p>
   </div>
-  <div class="field"><label id="onboardNickLbl"></label><input id="onboardNickname" maxlength="30" autocomplete="off"></div>
-  <div class="field"><label id="onboardProfLbl"></label><select id="onboardProfession" class="prof-select"></select></div>
-  <div class="mactions">
-    <button class="btn primary" id="onboardDone"></button>
-  </div>
-  <button class="recover-toggle" id="recoverToggle"></button>
-  <div class="recover-box" id="recoverBox" style="display:none">
-    <input id="recoverCodeInput" maxlength="9" autocomplete="off">
-    <button class="btn primary" id="recoverSubmit"></button>
-  </div>
-  <div class="recover-err" id="recoverErr"></div>
-</div></div>
+</div>
 
 <div class="toast" id="toast"><span class="toast-msg" id="toastMsg"></span><button class="toast-undo" id="toastUndo"></button></div>
 
@@ -413,20 +404,17 @@
       ask_add:"Tilføj",ask_skip:"Spring over",
       undo:"Fortryd",
       numtray_add:"Tilføj til",numtray_set:"Sæt {0} til",
-      log_empty:"Ingen indgange endnu — brug quick-log foroven",
-      toast_unknown:"Forstod ikke — prøv fx „snittet 500 rødløg“",
-      toast_logged:"Logget: ",toast_nothing:"Intet tilføjet",
-      ask_no_match:"matcher ingen eksisterende kategori.",
-      wines_count:"{0} vine",summary_glasses:"glas",summary_bottles:"flasker",
-      onboard_title:"Velkommen til Craft Track",
-      onboard_desc:"Gem din genopretningskode — den er din adgang hvis du skifter telefon.",
-      onboard_nick_lbl:"Kaldenavn (valgfrit)",onboard_nick_ph:"fx Simon",
-      onboard_prof_lbl:"Profession (valgfrit)",onboard_prof_default:"Vælg profession",
-      onboard_done:"Kom i gang",copy:"Kopiér",copied:"Kopieret",
-      recover_toggle:"Har du en kode fra en anden enhed?",
-      recover_ph:"XXXX-XXXX",recover_btn:"Genopret",
-      recover_not_found:"Koden blev ikke fundet",recover_ok:"Velkommen tilbage",
-      professions:["Commis de cuisine","Chef de partie","Sous chef","Køkkenchef","Konditor","Serveringsmedarbejder","Sommelier","Bar","Andet"],
+      log_empty:”Ingen indgange endnu — brug quick-log foroven”,
+      toast_unknown:”Forstod ikke — prøv fx „snittet 500 rødløg””,
+      toast_logged:”Logget: “,toast_nothing:”Intet tilføjet”,
+      ask_no_match:”matcher ingen eksisterende kategori.”,
+      wines_count:”{0} vine”,summary_glasses:”glas”,summary_bottles:”flasker”,
+      auth_email:”Email”,auth_pw:”Adgangskode”,
+      auth_login:”Log ind”,auth_signup:”Opret konto”,
+      auth_sub_login:”Velkommen tilbage”,auth_sub_signup:”Opret din konto”,
+      auth_no_account:”Ingen konto?”,auth_have_account:”Har du allerede en konto?”,
+      auth_create:”Opret konto”,auth_to_login:”Log ind”,
+      auth_signout:”Log ud”,
     },
     en:{
       tagline:"track your craft",total_label:"total",
@@ -457,20 +445,17 @@
       ask_add:"Add",ask_skip:"Skip",
       undo:"Undo",
       numtray_add:"Add to",numtray_set:"Set {0} to",
-      log_empty:"No entries yet — use the quick-log above",
-      toast_unknown:"Didn’t understand — try e.g. “cut 500 onions”",
-      toast_logged:"Logged: ",toast_nothing:"Nothing added",
-      ask_no_match:"matches no existing category.",
-      wines_count:"{0} wines",summary_glasses:"glasses",summary_bottles:"bottles",
-      onboard_title:"Welcome to Craft Track",
-      onboard_desc:"Save your recovery code — it's how you get back in if you change devices.",
-      onboard_nick_lbl:"Nickname (optional)",onboard_nick_ph:"e.g. Simon",
-      onboard_prof_lbl:"Profession (optional)",onboard_prof_default:"Select profession",
-      onboard_done:"Get started",copy:"Copy",copied:"Copied",
-      recover_toggle:"Have a code from another device?",
-      recover_ph:"XXXX-XXXX",recover_btn:"Recover",
-      recover_not_found:"Code not found",recover_ok:"Welcome back",
-      professions:["Commis de cuisine","Chef de partie","Sous chef","Head chef","Pastry chef","Waiter / Server","Sommelier","Bar","Other"],
+      log_empty:”No entries yet — use the quick-log above”,
+      toast_unknown:”Didn’t understand — try e.g. “cut 500 onions””,
+      toast_logged:”Logged: “,toast_nothing:”Nothing added”,
+      ask_no_match:”matches no existing category.”,
+      wines_count:”{0} wines”,summary_glasses:”glasses”,summary_bottles:”bottles”,
+      auth_email:”Email”,auth_pw:”Password”,
+      auth_login:”Log in”,auth_signup:”Create account”,
+      auth_sub_login:”Welcome back”,auth_sub_signup:”Create your account”,
+      auth_no_account:”No account?”,auth_have_account:”Already have an account?”,
+      auth_create:”Create account”,auth_to_login:”Log in”,
+      auth_signout:”Sign out”,
     }
   };
   let lang=localStorage.getItem("mise_lang")||"da";
@@ -509,17 +494,9 @@
     $("#askAdd").textContent=t("ask_add");
     $("#askSkip").textContent=t("ask_skip");
     $("#toastUndo").textContent=t("undo");
-    $("#onboardTitle").textContent=t("onboard_title");
-    $("#onboardDesc").textContent=t("onboard_desc");
-    $("#onboardNickLbl").textContent=t("onboard_nick_lbl");
-    $("#onboardNickname").placeholder=t("onboard_nick_ph");
-    $("#onboardProfLbl").textContent=t("onboard_prof_lbl");
-    $("#onboardDone").textContent=t("onboard_done");
-    $("#codeCopy").textContent=t("copy");
-    $("#recoverToggle").textContent=t("recover_toggle");
-    $("#recoverCodeInput").placeholder=t("recover_ph");
-    $("#recoverSubmit").textContent=t("recover_btn");
-    const prof=$("#onboardProfession");prof.innerHTML='<option value="">'+esc(t("onboard_prof_default"))+'</option>'+t("professions").map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join("");
+    $("#authEmailLbl").textContent=t("auth_email");
+    $("#authPwLbl").textContent=t("auth_pw");
+    $("#signOutBtn").textContent=t("auth_signout");
   }
   function setLang(l){lang=l;localStorage.setItem("mise_lang",l);translateUI();renderCounters();renderWines();renderLogView();}
   $("#langBtn").addEventListener("click",()=>setLang(lang==="da"?"en":"da"));
@@ -570,76 +547,98 @@
   let state={counters:[],wines:[],log:[]},mem=null,wineFilter="";
   let listView=localStorage.getItem("mise_listview")==="1";
   const logHistory=[];
-  let userId=localStorage.getItem("mise_user_id")||null;
 
-  async function initUser(){
-    if(userId)return;
-    const base=apiBase();if(!base)return;
-    try{
-      const res=await fetch(base+"/api/user/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({})});
-      if(!res.ok)return;
-      const data=await res.json();
-      userId=data.id;
-      localStorage.setItem("mise_user_id",data.id);
-      localStorage.setItem("mise_user_code",data.code);
-      showOnboarding(data.code);
-    }catch(e){console.warn("Kunne ikke oprette bruger:",e);}
+  // ---- Auth ----
+  let session=JSON.parse(localStorage.getItem("mise_session")||"null");
+  let cfg={supabaseUrl:"",anonKey:""};
+  let authMode="login";
+
+  function saveSession(data){
+    session={access_token:data.access_token,refresh_token:data.refresh_token,expires_at:Date.now()+data.expires_in*1000};
+    localStorage.setItem("mise_session",JSON.stringify(session));
   }
 
-  function showOnboarding(code){
-    $("#codeDisplay").textContent=code;
-    $("#recoverBox").style.display="none";
-    $("#recoverErr").style.display="none";
-    $("#onboardNickname").value="";
-    $("#onboardProfession").value="";
-    $("#onboardScrim").classList.add("open");
+  async function supabaseAuth(path,body){
+    const res=await fetch(cfg.supabaseUrl+"/auth/v1/"+path,{method:"POST",headers:{"Content-Type":"application/json","apikey":cfg.anonKey},body:JSON.stringify(body)});
+    return res.json();
   }
 
-  function setupOnboarding(){
-    $("#codeCopy").addEventListener("click",()=>{
-      navigator.clipboard.writeText($("#codeDisplay").textContent).then(()=>{
-        $("#codeCopy").textContent=t("copied");setTimeout(()=>$("#codeCopy").textContent=t("copy"),2000);
-      }).catch(()=>{});
+  async function signIn(email,password){
+    const data=await supabaseAuth("token?grant_type=password",{email,password});
+    if(data.access_token){saveSession(data);return null;}
+    return data.error_description||data.msg||data.message||"Forkert email eller adgangskode";
+  }
+
+  async function signUp(email,password){
+    const data=await supabaseAuth("signup",{email,password});
+    if(data.access_token){saveSession(data);return null;}
+    if(data.id&&!data.access_token)return lang==="da"?"Tjek din email for at bekræfte kontoen":"Check your email to confirm your account";
+    return data.error_description||data.msg||data.message||"Fejl ved oprettelse";
+  }
+
+  async function refreshSession(){
+    if(!session||!session.refresh_token)return false;
+    const data=await supabaseAuth("token?grant_type=refresh_token",{refresh_token:session.refresh_token});
+    if(data.access_token){saveSession(data);return true;}
+    session=null;localStorage.removeItem("mise_session");return false;
+  }
+
+  async function getToken(){
+    if(!session)return null;
+    if(Date.now()>session.expires_at-60000){const ok=await refreshSession();if(!ok)return null;}
+    return session.access_token;
+  }
+
+  function showAuthScreen(){
+    $("#authScreen").style.display="flex";
+    document.querySelector(".wrap").style.display="none";
+    $("#signOutBtn").style.display="none";
+  }
+
+  function hideAuthScreen(){
+    $("#authScreen").style.display="none";
+    document.querySelector(".wrap").style.display="";
+    $("#signOutBtn").style.display="";
+  }
+
+  async function initAuth(){
+    try{const res=await fetch("/api/config");cfg=await res.json();}catch(e){console.warn("Config fetch fejlede",e);}
+    if(!session){showAuthScreen();return false;}
+    if(Date.now()>session.expires_at-60000){const ok=await refreshSession();if(!ok){showAuthScreen();return false;}}
+    try{await fetch("/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});}catch(e){}
+    hideAuthScreen();return true;
+  }
+
+  function setupAuthForm(){
+    const emailEl=$("#authEmail"),pwEl=$("#authPw"),submitBtn=$("#authSubmit"),errEl=$("#authErr"),toggleLink=$("#authToggleLink");
+    function updateMode(){
+      const isLogin=authMode==="login";
+      $("#authSub").textContent=isLogin?t("auth_sub_login"):t("auth_sub_signup");
+      submitBtn.textContent=isLogin?t("auth_login"):t("auth_signup");
+      $("#authToggleText").textContent=isLogin?t("auth_no_account"):t("auth_have_account");
+      toggleLink.textContent=isLogin?t("auth_create"):t("auth_to_login");
+      pwEl.autocomplete=isLogin?"current-password":"new-password";
+      errEl.style.display="none";
+    }
+    toggleLink.addEventListener("click",()=>{authMode=authMode==="login"?"signup":"login";updateMode();});
+    submitBtn.addEventListener("click",async()=>{
+      const email=emailEl.value.trim(),pw=pwEl.value;if(!email||!pw)return;
+      submitBtn.disabled=true;submitBtn.textContent="…";
+      const err=authMode==="login"?await signIn(email,pw):await signUp(email,pw);
+      submitBtn.disabled=false;updateMode();
+      if(err){errEl.textContent=err;errEl.style.display="block";return;}
+      try{await fetch("/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});}catch(e){}
+      hideAuthScreen();startApp();
     });
-    $("#recoverToggle").addEventListener("click",()=>{
-      const box=$("#recoverBox");box.style.display=box.style.display==="none"?"flex":"none";
-      if(box.style.display==="flex")$("#recoverCodeInput").focus();
-    });
-    $("#recoverSubmit").addEventListener("click",async()=>{
-      const code=$("#recoverCodeInput").value.trim().toUpperCase();if(!code)return;
-      const base=apiBase();if(!base)return;
-      try{
-        const res=await fetch(base+"/api/user/recover",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code})});
-        if(res.status===404){$("#recoverErr").textContent=t("recover_not_found");$("#recoverErr").style.display="block";return;}
-        if(!res.ok)return;
-        const data=await res.json();
-        userId=data.id;
-        localStorage.setItem("mise_user_id",data.id);
-        localStorage.setItem("mise_user_code",data.code);
-        if(data.nickname)$("#onboardNickname").value=data.nickname;
-        if(data.profession)$("#onboardProfession").value=data.profession;
-        $("#codeDisplay").textContent=data.code;
-        $("#recoverErr").style.display="none";
-        showToast(t("recover_ok"));
-      }catch(e){console.warn(e);}
-    });
-    $("#recoverCodeInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#recoverSubmit").click();});
-    $("#onboardDone").addEventListener("click",async()=>{
-      const nickname=$("#onboardNickname").value.trim();
-      const profession=$("#onboardProfession").value;
-      if((nickname||profession)&&userId){
-        const base=apiBase();
-        if(base)fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:userId,nickname,profession})}).catch(()=>{});
-      }
-      $("#onboardScrim").classList.remove("open");
-    });
+    [emailEl,pwEl].forEach(el=>el.addEventListener("keydown",e=>{if(e.key==="Enter")submitBtn.click();}));
+    $("#signOutBtn").addEventListener("click",()=>{session=null;localStorage.removeItem("mise_session");showAuthScreen();});
+    updateMode();
   }
 
   async function syncLogEntry(categoryLabel,delta){
-    const base=apiBase();if(!base||!userId)return;
-    try{
-      await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId,categoryLabel,delta})});
-    }catch(e){}
+    const base=apiBase();if(!base)return;
+    const token=await getToken();if(!token)return;
+    try{await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({categoryLabel,delta})});}catch(e){}
   }
 
   async function load(){if(hasStore){try{const r=await window.storage.get(STORE_KEY);if(r&&r.value)return normalize(JSON.parse(r.value));}catch(e){}return clone(DEFAULTS);}return mem?clone(mem):clone(DEFAULTS);}
@@ -1004,14 +1003,19 @@
     if(v==="log")renderLogView();
   }));
 
+  function startApp(){
+    $("#view-station").classList.add("active");
+    renderCounters();renderWines();renderCareer();renderLogView();
+  }
+
   (async function(){
+    document.querySelector(".wrap").style.display="none";
     state=await load();if(!Array.isArray(state.log))state.log=[];
     $("#loading").style.display="none";
     translateUI();
-    $("#view-station").classList.add("active");
-    renderCounters();renderWines();renderCareer();renderLogView();
-    await initUser();
-    setupOnboarding();
+    setupAuthForm();
+    const authed=await initAuth();
+    if(authed)startApp();
   })();
 })();
 </script>
