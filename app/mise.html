@@ -79,6 +79,7 @@
   .auth-brand{font-family:"Fraunces",serif;font-size:26px;font-weight:600;color:var(--accent);margin-bottom:4px}
   .auth-sub{font-size:13px;color:var(--faint);margin-bottom:28px}
   .auth-err{background:#FEF2F3;border:1px solid #F5C0C6;border-radius:8px;color:var(--accent);font-size:13px;padding:10px 12px;margin-bottom:14px;display:none}
+  .auth-info{background:#F0F7F4;border:1px solid #A8D5C2;border-radius:8px;color:#1D6648;font-size:13px;padding:12px 14px;margin-bottom:14px;display:none;line-height:1.5}
   .auth-toggle{font-size:13px;color:var(--dim);margin-top:18px;text-align:center}
   .auth-toggle a{color:var(--accent);cursor:pointer;font-weight:500}
   .auth-toggle a:hover{text-decoration:underline}
@@ -347,6 +348,7 @@
   <div class="auth-card">
     <div class="auth-brand">Craft Track</div>
     <p class="auth-sub" id="authSub"></p>
+    <div class="auth-info" id="authInfo"></div>
     <div class="auth-err" id="authErr"></div>
     <div class="field"><label id="authEmailLbl"></label><input id="authEmail" type="email" autocomplete="email" inputmode="email"></div>
     <div class="field"><label id="authPwLbl"></label><input id="authPw" type="password" autocomplete="current-password"></div>
@@ -572,7 +574,7 @@
   async function signUp(email,password){
     const data=await supabaseAuth("signup",{email,password});
     if(data.access_token){saveSession(data);return null;}
-    if(data.id&&!data.access_token)return lang==="da"?"Tjek din email for at bekræfte kontoen":"Check your email to confirm your account";
+    if(data.id&&!data.access_token)return{info:lang==="da"?"Vi har sendt en bekræftelsesmail til "+email+". Klik på linket i mailen og log derefter ind her.":"We've sent a confirmation email to "+email+". Click the link in the email, then log in here."};
     return data.error_description||data.msg||data.message||"Fejl ved oprettelse";
   }
 
@@ -618,15 +620,22 @@
       $("#authToggleText").textContent=isLogin?t("auth_no_account"):t("auth_have_account");
       toggleLink.textContent=isLogin?t("auth_create"):t("auth_to_login");
       pwEl.autocomplete=isLogin?"current-password":"new-password";
-      errEl.style.display="none";
+      errEl.style.display="none";$("#authInfo").style.display="none";
     }
     toggleLink.addEventListener("click",()=>{authMode=authMode==="login"?"signup":"login";updateMode();});
     submitBtn.addEventListener("click",async()=>{
       const email=emailEl.value.trim(),pw=pwEl.value;if(!email||!pw)return;
       submitBtn.disabled=true;submitBtn.textContent="…";
-      const err=authMode==="login"?await signIn(email,pw):await signUp(email,pw);
+      const result=authMode==="login"?await signIn(email,pw):await signUp(email,pw);
       submitBtn.disabled=false;updateMode();
-      if(err){errEl.textContent=err;errEl.style.display="block";return;}
+      if(result&&result.info){
+        $("#authInfo").textContent=result.info;$("#authInfo").style.display="block";
+        $("#authErr").style.display="none";
+        emailEl.value="";pwEl.value="";
+        authMode="login";updateMode();
+        return;
+      }
+      if(result){$("#authErr").textContent=result;$("#authErr").style.display="block";return;}
       try{await fetch("/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});}catch(e){}
       hideAuthScreen();startApp();
     });
