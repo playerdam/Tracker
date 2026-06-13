@@ -4,6 +4,10 @@
 //            POST /api/log-entry     POST /api/upload-photo
 //            GET  /api/leaderboard   GET  /api/challenge/current
 //            POST /api/teams         POST /api/teams/join   GET /api/teams/mine
+//            GET  /api/feed          POST /api/follow        DELETE /api/follow/:id
+//            POST /api/like/:id      DELETE /api/like/:id
+//            GET  /api/comments/:id  POST /api/comments/:id
+//            GET  /api/users/search
 //            GET  /api/health
 
 const express = require("express");
@@ -159,7 +163,7 @@ app.post("/api/user/update", async (req, res) => {
 app.post("/api/log-entry", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
-    const { categoryLabel, imageUrl } = req.body || {};
+    const { categoryLabel, imageUrl, summary } = req.body || {};
     let { delta } = req.body || {};
     delta = parseInt(delta, 10);
     if (!categoryLabel || !delta) return res.status(400).json({ error: "Felter mangler" });
@@ -176,10 +180,10 @@ app.post("/api/log-entry", async (req, res) => {
       categoryId = created[0].id;
     }
 
-    await sb("log_entries", {
-      method: "POST",
-      body: JSON.stringify({ user_id: userId, category_id: categoryId, delta, ...(imageUrl ? { image_url: imageUrl } : {}) }),
-    });
+    const row = { user_id: userId, category_id: categoryId, delta, is_public: true };
+    if (imageUrl) row.image_url = imageUrl;
+    if (summary) row.summary = summary.slice(0, 200);
+    await sb("log_entries", { method: "POST", body: JSON.stringify(row) });
     res.json({ ok: true });
   } catch (err) {
     console.error("log-entry:", err.message);
@@ -393,6 +397,161 @@ app.post("/api/wine-search", async (req, res) => {
   } catch (err) {
     console.error("wine-search:", err.message);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ---- Social: bruger-søgning ----
+app.get("/api/users/search", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const q = (req.query.q || "").trim();
+    if (!q || q.length < 2) return res.json({ users: [] });
+    const rows = await sb(`users?nickname=ilike.*${encodeURIComponent(q)}*&select=id,nickname,profession&limit=20`) || [];
+    const followRows = await sb(`follows?follower_id=eq.${userId}&select=following_id`) || [];
+    const followingSet = new Set(followRows.map(r => r.following_id));
+    const users = rows
+      .filter(r => r.id !== userId)
+      .map(r => ({ id: r.id, nickname: r.nickname, profession: r.profession, following: followingSet.has(r.id) }));
+    res.json({ users });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Social: følg ----
+app.post("/api/follow", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { targetId } = req.body || {};
+    if (!targetId || targetId === userId) return res.status(400).json({ error: "Ugyldigt" });
+    await sb("follows", { method: "POST", body: JSON.stringify({ follower_id: userId, following_id: targetId }) });
+    res.json({ ok: true });
+  } catch (err) {
+    // ignore duplicate (already following)
+    if (err.message && err.message.includes("duplicate")) return res.json({ ok: true });
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/follow/:targetId", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { targetId } = req.params;
+    await sb(`follows?follower_id=eq.${userId}&following_id=eq.${targetId}`, { method: "DELETE" });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Social: feed ----
+app.get("/api/feed", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const cursor = req.query.before || null;
+
+    // find who we follow
+    const followRows = await sb(`follows?follower_id=eq.${userId}&select=following_id`) || [];
+    const ids = followRows.map(r => r.following_id);
+    ids.push(userId); // include own entries
+
+    if (!ids.length) return res.json({ entries: [] });
+
+    const inClause = ids.map(i => `"${i}"`).join(",");
+    let path = `log_entries?user_id=in.(${ids.join(",")})&is_public=eq.true&order=logged_at.desc&limit=40&select=id,user_id,delta,summary,image_url,logged_at,categories(label_da,label_en),users(nickname,profession)`;
+    if (cursor) path += `&logged_at=lt.${encodeURIComponent(cursor)}`;
+
+    const entries = await sb(path) || [];
+
+    // fetch like counts + whether current user liked each
+    const entryIds = entries.map(e => e.id);
+    let likeCounts = {}, likedByMe = new Set();
+    if (entryIds.length) {
+      const likeRows = await sb(`likes?entry_id=in.(${entryIds.join(",")})&select=entry_id,user_id`) || [];
+      likeRows.forEach(l => {
+        likeCounts[l.entry_id] = (likeCounts[l.entry_id] || 0) + 1;
+        if (l.user_id === userId) likedByMe.add(l.entry_id);
+      });
+      const commentRows = await sb(`comments?entry_id=in.(${entryIds.join(",")})&select=entry_id`) || [];
+      var commentCounts = {};
+      commentRows.forEach(c => { commentCounts[c.entry_id] = (commentCounts[c.entry_id] || 0) + 1; });
+    }
+
+    const out = entries.map(e => ({
+      id: e.id,
+      userId: e.user_id,
+      nickname: e.users?.nickname || null,
+      profession: e.users?.profession || null,
+      delta: e.delta,
+      summary: e.summary || null,
+      imageUrl: e.image_url || null,
+      category: e.categories?.label_da || null,
+      categoryEn: e.categories?.label_en || null,
+      loggedAt: e.logged_at,
+      likes: likeCounts[e.id] || 0,
+      liked: likedByMe.has(e.id),
+      comments: (commentCounts || {})[e.id] || 0,
+      isOwn: e.user_id === userId,
+    }));
+    res.json({ entries: out });
+  } catch (err) {
+    console.error("feed:", err.message);
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Social: likes ----
+app.post("/api/like/:entryId", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { entryId } = req.params;
+    await sb("likes", { method: "POST", body: JSON.stringify({ user_id: userId, entry_id: entryId }) });
+    const rows = await sb(`likes?entry_id=eq.${entryId}&select=user_id`) || [];
+    res.json({ likes: rows.length });
+  } catch (err) {
+    if (err.message && err.message.includes("duplicate")) {
+      const rows = await sb(`likes?entry_id=eq.${req.params.entryId}&select=user_id`).catch(()=>[]);
+      return res.json({ likes: (rows||[]).length });
+    }
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/like/:entryId", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { entryId } = req.params;
+    await sb(`likes?user_id=eq.${userId}&entry_id=eq.${entryId}`, { method: "DELETE" });
+    const rows = await sb(`likes?entry_id=eq.${entryId}&select=user_id`) || [];
+    res.json({ likes: rows.length });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Social: kommentarer ----
+app.get("/api/comments/:entryId", async (req, res) => {
+  try {
+    await verifyAuth(req);
+    const { entryId } = req.params;
+    const rows = await sb(`comments?entry_id=eq.${entryId}&order=created_at.asc&select=id,text,created_at,users(nickname)`) || [];
+    res.json({ comments: rows.map(c => ({ id: c.id, text: c.text, createdAt: c.created_at, nickname: c.users?.nickname || null })) });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+app.post("/api/comments/:entryId", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { entryId } = req.params;
+    const text = (req.body.text || "").trim().slice(0, 280);
+    if (!text) return res.status(400).json({ error: "Tom kommentar" });
+    await sb("comments", { method: "POST", body: JSON.stringify({ user_id: userId, entry_id: entryId, text }) });
+    const rows = await sb(`comments?entry_id=eq.${entryId}&order=created_at.asc&select=id,text,created_at,users(nickname)`) || [];
+    res.json({ comments: rows.map(c => ({ id: c.id, text: c.text, createdAt: c.created_at, nickname: c.users?.nickname || null })) });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
 

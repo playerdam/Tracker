@@ -308,6 +308,46 @@
   .photo-thumb.show{display:block}
   .logview-photo{display:block;max-width:100%;max-height:240px;border-radius:var(--r-sm);margin-top:8px;object-fit:cover}
 
+  /* ---- Feed ---- */
+  .feed-search{display:flex;gap:8px;margin-bottom:18px}
+  .feed-search .input{flex:1}
+  .feed-results{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;margin-top:4px}
+  .feed-user-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border)}
+  .feed-user-row:last-child{border-bottom:none}
+  .feed-user-info{flex:1;min-width:0}
+  .feed-user-nick{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .feed-user-prof{font-size:12px;color:var(--faint)}
+  .feed-follow-btn{appearance:none;border:1px solid var(--accent);border-radius:8px;background:none;color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;padding:6px 14px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .feed-follow-btn.following{background:var(--accent);color:#fff}
+  .feed-follow-btn:hover{opacity:.8}
+
+  .feed-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px;box-shadow:var(--shadow)}
+  .feed-entry-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+  .feed-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-weight:600;font-size:15px;flex:none}
+  .feed-meta{flex:1;min-width:0}
+  .feed-nick{font-size:14px;font-weight:600}
+  .feed-time{font-size:12px;color:var(--faint)}
+  .feed-body{font-size:15px;line-height:1.45;margin-bottom:10px}
+  .feed-body .feed-num{font-family:"Fraunces",serif;font-weight:600;color:var(--accent)}
+  .feed-img{width:100%;max-height:280px;object-fit:cover;border-radius:var(--r-sm);margin-bottom:10px;display:block}
+  .feed-actions{display:flex;gap:8px}
+  .feed-action-btn{appearance:none;background:none;border:1px solid var(--border);border-radius:8px;color:var(--dim);font-family:inherit;font-size:13px;font-weight:500;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.15s}
+  .feed-action-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .feed-action-btn.liked{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .feed-load-more{width:100%;padding:12px;background:none;border:1px solid var(--border);border-radius:var(--r-sm);color:var(--dim);font-family:inherit;font-size:14px;cursor:pointer;margin-top:4px;transition:.15s}
+  .feed-load-more:hover{border-color:var(--accent);color:var(--accent)}
+  .feed-empty-msg{padding:32px 0;text-align:center;color:var(--faint);font-size:14px}
+  .feed-section-title{font-size:12px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin:0 0 10px}
+
+  .comment-list{max-height:260px;overflow-y:auto;margin-bottom:12px}
+  .comment-row{padding:8px 0;border-bottom:1px solid var(--border)}
+  .comment-row:last-child{border-bottom:none}
+  .comment-nick{font-size:13px;font-weight:600}
+  .comment-text{font-size:14px;margin-top:2px;line-height:1.4}
+  .comment-time{font-size:11px;color:var(--faint);margin-top:2px}
+  .comment-input-row{display:flex;gap:8px}
+  .comment-input-row .input{flex:1;font-size:14px;padding:10px 12px}
+
   /* ---- Badge-toast ---- */
   .badge-toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.8);background:var(--surface);border:2px solid var(--accent);border-radius:20px;padding:28px 36px;text-align:center;box-shadow:var(--shadow-lg);z-index:300;opacity:0;pointer-events:none;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .25s}
   .badge-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
@@ -346,6 +386,7 @@
       <button class="tab" data-view="vin" id="tab-vin"></button>
       <button class="tab" data-view="log" id="tab-log">Log</button>
       <button class="tab" data-view="social" id="tab-social"></button>
+      <button class="tab" data-view="feed" id="tab-feed"></button>
     </div>
     <div class="view-toggle" id="viewToggle">
       <button class="vtbtn active" id="btnGrid">⊞</button>
@@ -371,6 +412,26 @@
     <div class="sec-head"><span class="sec-title" id="teamTitle"></span></div>
     <div id="teamContent"></div>
   </section>
+
+  <section class="view" id="view-feed">
+    <div class="feed-search">
+      <input id="feedSearch" class="input" autocomplete="off">
+      <button class="btn ghost btn-sm" id="feedSearchBtn">🔍</button>
+    </div>
+    <div id="feedSearchResults" style="display:none"></div>
+    <div id="feedContent"></div>
+  </section>
+
+  <div class="scrim" id="commentScrim">
+    <div class="modal">
+      <h2 id="commentTitle"></h2>
+      <div class="comment-list" id="commentList"></div>
+      <div class="comment-input-row">
+        <input id="commentInput" class="input" maxlength="280" autocomplete="off">
+        <button class="btn primary btn-sm" id="commentSend"></button>
+      </div>
+    </div>
+  </div>
 
   <section class="view" id="view-vin">
     <div class="searchwrap">
@@ -540,6 +601,17 @@
       professions:["Commis de cuisine","Chef de partie","Sous chef","Køkkenchef","Konditor","Serveringsmedarbejder","Sommelier","Bar","Andet"],
       streak_day:"1 dag i træk",streak_days:"{0} dage i træk",
       offline_pending:"{0} afventende sync",
+      tab_feed:"Feed",
+      feed_empty:"Følg nogen for at se deres aktivitet her",
+      feed_empty_own:"Du har ikke logget noget endnu",
+      feed_load_more:"Indlæs mere",
+      feed_search_ph:"Søg på kaldenavn…",
+      feed_follow:"Følg",feed_unfollow:"Følger",
+      feed_like:"Synes godt om",feed_comment:"Kommentér",
+      feed_comments:"Kommentarer",feed_comment_ph:"Skriv en kommentar…",
+      feed_comment_send:"Send",feed_comment_empty:"Ingen kommentarer endnu",
+      feed_no_results:"Ingen brugere fundet",
+      feed_ago_now:"lige nu",feed_ago_min:"{0} min",feed_ago_h:"{0} t",feed_ago_day:"{0} d",
     },
     en:{
       tagline:"track your craft",total_label:"total",
@@ -598,6 +670,17 @@
       professions:["Commis de cuisine","Chef de partie","Sous chef","Head chef","Pastry chef","Service staff","Sommelier","Bar","Other"],
       streak_day:"1 day in a row",streak_days:"{0} days in a row",
       offline_pending:"{0} pending sync",
+      tab_feed:"Feed",
+      feed_empty:"Follow someone to see their activity here",
+      feed_empty_own:"You have not logged anything yet",
+      feed_load_more:"Load more",
+      feed_search_ph:"Search by nickname…",
+      feed_follow:"Follow",feed_unfollow:"Following",
+      feed_like:"Like",feed_comment:"Comment",
+      feed_comments:"Comments",feed_comment_ph:"Write a comment…",
+      feed_comment_send:"Send",feed_comment_empty:"No comments yet",
+      feed_no_results:"No users found",
+      feed_ago_now:"just now",feed_ago_min:"{0}m",feed_ago_h:"{0}h",feed_ago_day:"{0}d",
     }
   };
   let lang=localStorage.getItem("mise_lang")||"da";
@@ -641,6 +724,10 @@
     $("#signOutBtn").textContent=t("auth_signout");
     renderStreak();
     const tSocial=$("#tab-social");if(tSocial)tSocial.textContent=t("tab_social");
+    const tFeed=$("#tab-feed");if(tFeed)tFeed.textContent=t("tab_feed");
+    const fSearch=$("#feedSearch");if(fSearch)fSearch.placeholder=t("feed_search_ph");
+    const cSend=$("#commentSend");if(cSend)cSend.textContent=t("feed_comment_send");
+    const cInput=$("#commentInput");if(cInput)cInput.placeholder=t("feed_comment_ph");
     const cTitle=$("#challengeTitle");if(cTitle)cTitle.textContent=t("challenge_title");
     const lbTitle=$("#lbTitle");if(lbTitle)lbTitle.textContent=t("lb_title");
     const teamTitle=$("#teamTitle");if(teamTitle)teamTitle.textContent=t("team_title");
@@ -806,18 +893,18 @@
     const q=getSyncQ();if(!q.length)return;
     saveSyncQ([]);
     const failed=[];
-    for(const item of q){const ok=await syncLogEntry(item.categoryLabel,item.delta,item.imageUrl,true);if(!ok)failed.push(item);}
+    for(const item of q){const ok=await syncLogEntry(item.categoryLabel,item.delta,item.imageUrl,true,item.summary);if(!ok)failed.push(item);}
     if(failed.length)saveSyncQ([...failed,...getSyncQ()]);
     updateOfflineDot();
   }
   window.addEventListener("online",()=>flushSyncQ());
-  async function syncLogEntry(categoryLabel,delta,imageUrl,fromQueue){
+  async function syncLogEntry(categoryLabel,delta,imageUrl,fromQueue,summary){
     const base=apiBase();if(!base)return false;
-    if(!navigator.onLine&&!fromQueue){const q=getSyncQ();q.push({categoryLabel,delta,imageUrl:imageUrl||null});saveSyncQ(q);updateOfflineDot();return false;}
+    if(!navigator.onLine&&!fromQueue){const q=getSyncQ();q.push({categoryLabel,delta,imageUrl:imageUrl||null,summary:summary||null});saveSyncQ(q);updateOfflineDot();return false;}
     const token=await getToken();if(!token)return false;
-    const body={categoryLabel,delta};if(imageUrl)body.imageUrl=imageUrl;
+    const body={categoryLabel,delta};if(imageUrl)body.imageUrl=imageUrl;if(summary)body.summary=summary;
     try{await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});return true;}
-    catch(e){if(!fromQueue){const q=getSyncQ();q.push({categoryLabel,delta,imageUrl:imageUrl||null});saveSyncQ(q);updateOfflineDot();}return false;}
+    catch(e){if(!fromQueue){const q=getSyncQ();q.push({categoryLabel,delta,imageUrl:imageUrl||null,summary:summary||null});saveSyncQ(q);updateOfflineDot();}return false;}
   }
 
   async function load(){if(hasStore){try{const r=await window.storage.get(STORE_KEY);if(r&&r.value)return normalize(JSON.parse(r.value));}catch(e){}return clone(DEFAULTS);}return mem?clone(mem):clone(DEFAULTS);}
@@ -1282,7 +1369,8 @@
     const msg=summary.length?(t("toast_logged")+summary.join(", ")):t("toast_nothing");
     showToast(msg);
     if(summary.length){addLogEntry(summary.join(" · "),imageUrl);haptic(40);}
-    if(syncItems&&syncItems.length)syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta,imageUrl));
+    const logSummary=summary.join(" · ");
+    if(syncItems&&syncItems.length)syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta,imageUrl,false,logSummary));
     checkBadges();checkRecords();
     $("#qlogInput").focus();
   }
@@ -1319,10 +1407,11 @@
   document.querySelectorAll(".tab").forEach(tb=>tb.addEventListener("click",()=>{
     document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));tb.classList.add("active");
     const v=tb.dataset.view;
-    ["station","log","vin","social"].forEach(n=>$("#view-"+n).classList.toggle("active",v===n));
+    ["station","log","vin","social","feed"].forEach(n=>$("#view-"+n).classList.toggle("active",v===n));
     $("#viewToggle").style.display=v==="station"?"":"none";
     if(v==="log")renderLogView();
     if(v==="social")loadSocial();
+    if(v==="feed")loadFeed();
   }));
 
   function skeletonRows(n){return Array.from({length:n},()=>'<div class="skel-row"></div>').join("");}
@@ -1539,11 +1628,237 @@
     if(closeBtn)closeBtn.addEventListener("click",()=>$("#profileScrim").classList.remove("open"));
   }
 
+  // ---- feed ----
+  let feedCursor=null,feedLoading=false,activeCommentEntry=null;
+
+  function timeAgo(iso){
+    const ms=Date.now()-new Date(iso).getTime();
+    const m=Math.floor(ms/60000);
+    if(m<1)return t("feed_ago_now");
+    if(m<60)return t("feed_ago_min",m);
+    const h=Math.floor(m/60);
+    if(h<24)return t("feed_ago_h",h);
+    return t("feed_ago_day",Math.floor(h/24));
+  }
+
+  function feedEntryHtml(e){
+    const initial=(e.nickname||"?").charAt(0).toUpperCase();
+    const catLabel=lang==="en"?(e.categoryEn||e.category||""):e.category||"";
+    const bodyText=e.summary||((e.delta>0?"+":"")+e.delta+(catLabel?" "+catLabel:""));
+    const likeIcon=e.liked?"❤️":"🤍";
+    return '<div class="feed-entry" data-id="'+esc(e.id)+'">'
+      +'<div class="feed-entry-head">'
+      +'<div class="feed-avatar">'+esc(initial)+'</div>'
+      +'<div class="feed-meta">'
+      +'<div class="feed-nick">'+esc(e.nickname||t("lb_anon"))+(e.isOwn?' <span class="lb-you">('+t("lb_you")+')</span>':'')+'</div>'
+      +(e.profession?'<div class="feed-time">'+esc(e.profession)+'</div>':'')
+      +'<div class="feed-time">'+esc(timeAgo(e.loggedAt))+'</div>'
+      +'</div>'
+      +(e.isOwn?'':('<button class="feed-follow-btn'+(e._following?" following":"")+'" data-follow="'+esc(e.userId)+'" data-following="'+(e._following?"1":"0")+'">'+esc(e._following?t("feed_unfollow"):t("feed_follow"))+'</button>'))
+      +'</div>'
+      +(e.imageUrl?'<img class="feed-img" src="'+esc(e.imageUrl)+'" loading="lazy">':'')
+      +'<div class="feed-body"><span class="feed-num">'+esc((e.delta>0?"+":"")+e.delta)+'</span> '+esc(catLabel)+(e.summary&&e.summary!==bodyText?' — '+esc(e.summary):'')+'</div>'
+      +'<div class="feed-actions">'
+      +'<button class="feed-action-btn'+(e.liked?" liked":"")+'" data-like="'+esc(e.id)+'">'+likeIcon+' <span class="like-count">'+e.likes+'</span></button>'
+      +'<button class="feed-action-btn" data-comments="'+esc(e.id)+'">💬 <span class="comment-count">'+e.comments+'</span></button>'
+      +'</div>'
+      +'</div>';
+  }
+
+  let _followingCache={};
+  async function loadFeed(append){
+    if(feedLoading)return;
+    feedLoading=true;
+    const el=$("#feedContent");if(!el)return;
+    if(!append){feedCursor=null;el.innerHTML=skeletonRows(4);}
+    const base=apiBase();if(!base){el.innerHTML='<div class="feed-empty-msg">'+esc(t("feed_empty"))+'</div>';feedLoading=false;return;}
+    const token=await getToken();if(!token){feedLoading=false;return;}
+    try{
+      let url=base+"/api/feed";if(feedCursor)url+="?before="+encodeURIComponent(feedCursor);
+      const res=await fetch(url,{headers:{"Authorization":"Bearer "+token}});
+      const d=await res.json();
+      const entries=d.entries||[];
+
+      // build following set for this batch
+      const myId=getJwtSub();
+      const userIds=[...new Set(entries.filter(e=>!e.isOwn).map(e=>e.userId))];
+      if(userIds.length){
+        const fRows=await fetch(base+"/api/users/search?q=",{headers:{"Authorization":"Bearer "+token}}).then(r=>r.json()).catch(()=>({users:[]}));
+      }
+      // simple: mark following from cache
+      entries.forEach(e=>{e._following=!!_followingCache[e.userId];});
+
+      if(!entries.length&&!append){
+        el.innerHTML='<div class="feed-empty-msg">'+esc(t("feed_empty"))+'</div>';
+        feedLoading=false;return;
+      }
+      const html=entries.map(feedEntryHtml).join("");
+      const loadMoreBtn='<button class="feed-load-more" id="feedLoadMore">'+esc(t("feed_load_more"))+'</button>';
+      if(append){
+        const old=el.querySelector("#feedLoadMore");if(old)old.remove();
+        el.insertAdjacentHTML("beforeend",html+(entries.length===40?loadMoreBtn:""));
+      }else{
+        el.innerHTML=html+(entries.length===40?loadMoreBtn:"");
+      }
+      if(entries.length)feedCursor=entries[entries.length-1].loggedAt;
+    }catch(e){
+      if(!append)el.innerHTML='<div class="feed-empty-msg">'+esc(t("feed_empty"))+'</div>';
+    }
+    feedLoading=false;
+  }
+
+  async function toggleFollow(userId,currentlyFollowing){
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    try{
+      if(currentlyFollowing){
+        await fetch(base+"/api/follow/"+userId,{method:"DELETE",headers:{"Authorization":"Bearer "+token}});
+        _followingCache[userId]=false;
+      }else{
+        await fetch(base+"/api/follow",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({targetId:userId})});
+        _followingCache[userId]=true;
+      }
+    }catch(e){}
+  }
+
+  async function toggleLike(entryId,btn){
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    const liked=btn.classList.contains("liked");
+    try{
+      const method=liked?"DELETE":"POST";
+      const res=await fetch(base+"/api/like/"+entryId,{method,headers:{"Authorization":"Bearer "+token}});
+      const d=await res.json();
+      btn.classList.toggle("liked",!liked);
+      btn.querySelector(".like-count").textContent=d.likes||0;
+      btn.textContent="";
+      btn.insertAdjacentHTML("beforeend",(btn.classList.contains("liked")?"❤️":"🤍")+' <span class="like-count">'+((d.likes)||0)+'</span>');
+    }catch(e){}
+  }
+
+  async function openComments(entryId){
+    activeCommentEntry=entryId;
+    const scrim=$("#commentScrim");if(!scrim)return;
+    const listEl=$("#commentList");
+    const titleEl=$("#commentTitle");if(titleEl)titleEl.textContent=t("feed_comments");
+    listEl.innerHTML=skeletonRows(2);
+    scrim.classList.add("open");
+    const base=apiBase();const token=await getToken();
+    if(!base||!token){listEl.innerHTML='';return;}
+    try{
+      const res=await fetch(base+"/api/comments/"+entryId,{headers:{"Authorization":"Bearer "+token}});
+      const d=await res.json();
+      renderComments(listEl,d.comments||[]);
+    }catch(e){listEl.innerHTML='';}
+  }
+
+  function renderComments(el,comments){
+    if(!comments.length){el.innerHTML='<p class="muted" style="padding:8px 0">'+esc(t("feed_comment_empty"))+'</p>';return;}
+    el.innerHTML=comments.map(c=>'<div class="comment-row"><div class="comment-nick">'+esc(c.nickname||t("lb_anon"))+'</div><div class="comment-text">'+esc(c.text)+'</div><div class="comment-time">'+esc(timeAgo(c.createdAt))+'</div></div>').join("");
+    el.scrollTop=el.scrollHeight;
+  }
+
+  async function sendComment(){
+    const input=$("#commentInput");const text=(input.value||"").trim();
+    if(!text||!activeCommentEntry)return;
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    input.disabled=true;
+    try{
+      const res=await fetch(base+"/api/comments/"+activeCommentEntry,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({text})});
+      const d=await res.json();
+      renderComments($("#commentList"),d.comments||[]);
+      input.value="";
+      // update comment count in feed
+      const countEl=document.querySelector('[data-comments="'+activeCommentEntry+'"] .comment-count');
+      if(countEl)countEl.textContent=(d.comments||[]).length;
+    }catch(e){}
+    input.disabled=false;input.focus();
+  }
+
+  async function searchUsers(q){
+    const el=$("#feedSearchResults");if(!el)return;
+    if(!q||q.length<2){el.style.display="none";return;}
+    el.style.display="block";el.innerHTML=skeletonRows(2);
+    const base=apiBase();const token=await getToken();if(!base||!token){el.innerHTML="";return;}
+    try{
+      const res=await fetch(base+"/api/users/search?q="+encodeURIComponent(q),{headers:{"Authorization":"Bearer "+token}});
+      const d=await res.json();
+      const users=d.users||[];
+      if(!users.length){el.innerHTML='<div class="feed-empty-msg" style="padding:12px">'+esc(t("feed_no_results"))+'</div>';return;}
+      el.innerHTML='<div class="feed-results">'+users.map(u=>{
+        const following=_followingCache[u.id]!==undefined?_followingCache[u.id]:u.following;
+        return '<div class="feed-user-row">'
+          +'<div class="feed-user-info"><div class="feed-user-nick">'+esc(u.nickname||t("lb_anon"))+'</div>'+(u.profession?'<div class="feed-user-prof">'+esc(u.profession)+'</div>':'')+'</div>'
+          +'<button class="feed-follow-btn'+(following?" following":"")+'" data-follow="'+esc(u.id)+'" data-following="'+(following?"1":"0")+'">'+esc(following?t("feed_unfollow"):t("feed_follow"))+'</button>'
+          +'</div>';
+      }).join("")+'</div>';
+    }catch(e){el.innerHTML="";}
+  }
+
+  function setupFeed(){
+    const feedEl=$("#feedContent");
+    feedEl.addEventListener("click",async e=>{
+      // follow/unfollow
+      const followBtn=e.target.closest("[data-follow]");
+      if(followBtn){
+        const uid=followBtn.dataset.follow;
+        const wasFollowing=followBtn.dataset.following==="1";
+        followBtn.dataset.following=wasFollowing?"0":"1";
+        followBtn.textContent=wasFollowing?t("feed_follow"):t("feed_unfollow");
+        followBtn.classList.toggle("following",!wasFollowing);
+        await toggleFollow(uid,wasFollowing);
+        return;
+      }
+      // like
+      const likeBtn=e.target.closest("[data-like]");
+      if(likeBtn){await toggleLike(likeBtn.dataset.like,likeBtn);return;}
+      // comments
+      const commentBtn=e.target.closest("[data-comments]");
+      if(commentBtn){await openComments(commentBtn.dataset.comments);return;}
+      // load more
+      if(e.target.id==="feedLoadMore"){loadFeed(true);}
+    });
+
+    // search results follow buttons
+    const searchRes=$("#feedSearchResults");
+    if(searchRes){
+      searchRes.addEventListener("click",async e=>{
+        const followBtn=e.target.closest("[data-follow]");
+        if(!followBtn)return;
+        const uid=followBtn.dataset.follow;
+        const wasFollowing=followBtn.dataset.following==="1";
+        followBtn.dataset.following=wasFollowing?"0":"1";
+        followBtn.textContent=wasFollowing?t("feed_follow"):t("feed_unfollow");
+        followBtn.classList.toggle("following",!wasFollowing);
+        _followingCache[uid]=!wasFollowing;
+        await toggleFollow(uid,wasFollowing);
+      });
+    }
+
+    // search input
+    let searchTimer=null;
+    const searchInput=$("#feedSearch");
+    if(searchInput){
+      searchInput.addEventListener("input",e=>{
+        clearTimeout(searchTimer);
+        const q=e.target.value.trim();
+        if(!q){const r=$("#feedSearchResults");if(r)r.style.display="none";return;}
+        searchTimer=setTimeout(()=>searchUsers(q),350);
+      });
+      searchInput.addEventListener("blur",()=>setTimeout(()=>{const r=$("#feedSearchResults");if(r)r.style.display="none";},200));
+    }
+    const feedSearchBtn=$("#feedSearchBtn");
+    if(feedSearchBtn)feedSearchBtn.addEventListener("click",()=>{const q=($("#feedSearch").value||"").trim();if(q)searchUsers(q);});
+
+    // comment send
+    const sendBtn=$("#commentSend");if(sendBtn)sendBtn.addEventListener("click",sendComment);
+    const cInput=$("#commentInput");if(cInput)cInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendComment();}});
+  }
+
   function startApp(){
     $("#view-station").classList.add("active");
     renderCounters();renderWines();renderCareer();renderLogView();
     setupPhoto();
     setupProfileModal();
+    setupFeed();
     updateOfflineDot();
     const profileBtn=$("#profileBtn");if(profileBtn)profileBtn.style.display="";
     attachAC($("#qlogInput"),()=>{
