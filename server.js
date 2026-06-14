@@ -1,4 +1,4 @@
-// Craft Track backend
+// Craft Tracker backend
 // Endpoints: GET /api/config  POST /api/parse-log  POST /api/wine-search
 //            POST /api/user/profile  POST /api/user/update
 //            POST /api/log-entry     POST /api/upload-photo
@@ -595,4 +595,4 @@ app.post("/api/comments/:entryId", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Craft Track backend kører på port " + PORT));
+app.listen(PORT, () => console.log("Craft Tracker backend kører på port " + PORT));

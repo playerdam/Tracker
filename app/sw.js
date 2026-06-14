@@ -1,4 +1,4 @@
-const CACHE = 'craft-track-v1';
+const CACHE = 'craft-tracker-v1';
 const SHELL = ['/', '/mise.html'];
 
 self.addEventListener('install', e => {
@@ -18,7 +18,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('push', e => {
   const data = e.data ? e.data.json() : {};
   e.waitUntil(
-    self.registration.showNotification(data.title || 'Craft Track', {
+    self.registration.showNotification(data.title || 'Craft Tracker', {
       body: data.body || '',
       icon: '/icons/icon.svg',
       badge: '/icons/icon.svg',

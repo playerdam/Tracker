@@ -1,7 +1,7 @@
 {
-  "name": "Craft Track",
-  "short_name": "Craft Track",
-  "description": "Track your craft — oysters, onions, covers and more",
+  "name": "Craft Tracker",
+  "short_name": "Craft Tracker",
+  "description": "Craft Tracker — track your career",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
