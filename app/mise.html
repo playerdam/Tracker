@@ -473,33 +473,28 @@
   .feed-follow-btn:active,.feed-photo-follow:active,.shift-end-btn:active,.shift-start-btn:active{transform:scale(.94);transition:transform .06s}
   .addcard:active,.addwine:active{transform:scale(.98);transition:transform .08s}
 
-  /* Category card grid */
-  .cat-view{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
-  .cat-section{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;transition:border-color .15s}
-  .cat-section.expanded{border-color:var(--accent)}
-  .cat-card-top{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;display:block}
-  .cat-card-top:active .cat-illo{opacity:.88;transition:opacity .06s}
-  .cat-illo{aspect-ratio:1;background:var(--accent-soft);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:14%;gap:9px}
-  .cat-illo svg{flex:1;min-height:0;width:100%;overflow:visible;color:var(--accent)}
-  .cat-illo .spin{margin:auto}
-  .cat-card-foot{padding:8px 14px 14px;border-top:1.5px solid var(--border);text-align:center}
-  .cat-section.expanded .cat-card-foot{border-color:var(--accent)}
-  .cat-card-name{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);text-align:center;line-height:1.2;flex-shrink:0}
-  .cat-card-total{font-family:"Fraunces",serif;font-size:44px;font-weight:600;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
-  .cat-body{display:none;border-top:1px solid var(--border)}
-  .cat-body.open{display:flex;flex-direction:column;animation:viewIn .18s ease both}
-  .cat-body .grid{border:none;border-radius:0;gap:8px;padding:10px;background:var(--bg)}
-  .cat-body .grid.list{border:none;border-radius:0;background:var(--border);padding:0;gap:1px}
-  .cat-body .grid.list .ccard{border-radius:0}
-  .cat-body .grid.list .addcard{display:none}
-  .cat-add{appearance:none;background:var(--surface);border:none;border-top:1px solid var(--border);width:100%;padding:11px 16px;text-align:left;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  /* Category chip strip (Stories-style) */
+  .cat-strip{display:flex;overflow-x:auto;gap:10px;padding:8px 16px 22px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .cat-strip::-webkit-scrollbar{display:none}
+  .cat-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;width:66px}
+  .cat-chip-ring{width:58px;height:58px;border-radius:18px;border:2.5px solid var(--border);background:var(--accent-soft);display:flex;align-items:center;justify-content:center;transition:border-color .15s,box-shadow .15s;overflow:hidden}
+  .cat-chip-ring svg{width:36px;height:36px;color:var(--accent);overflow:visible}
+  .cat-chip-ring .spin{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+  .cat-chip.active .cat-chip-ring{border-color:var(--accent);border-width:3px;box-shadow:0 0 0 3px var(--accent-soft)}
+  .cat-chip:active .cat-chip-ring{opacity:.75;transition:opacity .06s}
+  .cat-chip-name{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);text-align:center;line-height:1.2;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cat-chip-total{font-family:"Fraunces",serif;font-size:20px;font-weight:600;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
+  .cat-chip.active .cat-chip-name,.cat-chip.active .cat-chip-total{color:var(--accent)}
+  /* Counter group (active category) */
+  .cat-group{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+  .cat-group .ccard{border-radius:0;border:none;border-top:1px solid var(--border)}
+  .cat-group .ccard:first-child{border-top:none}
+  .cat-add{appearance:none;background:var(--bg);border:none;border-top:1px solid var(--border);width:100%;padding:13px 18px;text-align:left;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   .cat-add:hover{background:var(--accent-soft)}
   .cat-add:active{transform:scale(.99);transition:transform .06s}
-  .station-add-global{margin-top:4px}
-  .station-new-cat{appearance:none;background:none;border:1.5px dashed var(--border);border-radius:12px;width:100%;padding:14px;color:var(--dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:8px}
+  .station-new-cat{appearance:none;background:none;border:1.5px dashed var(--border);border-radius:12px;width:100%;padding:13px;color:var(--dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:10px}
   .station-new-cat:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
   .station-new-cat:active{transform:scale(.98);transition:transform .06s}
-  .cat-illo .spin{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
   .kebab:active,.wedit:active{transform:scale(.84);transition:transform .05s}
   .feed-load-more:active{transform:scale(.98);transition:transform .07s}
 
@@ -1092,6 +1087,7 @@
 
   let state={counters:[],wines:[],log:[],customCats:[]},mem=null,wineFilter="";
   let listView=localStorage.getItem("mise_listview")==="1";
+  let activeCat=localStorage.getItem("mise_active_cat")||"";
   const logHistory=[];
 
   // ---- Auth ----
@@ -1457,45 +1453,42 @@
       const btn=document.createElement("button");btn.className="btn primary";btn.textContent=t("add_counter").replace("+ ","");btn.addEventListener("click",()=>openCounterModal(null));
       es.appendChild(btn);grid.appendChild(es);
       const add=document.createElement("button");add.className="addcard";add.id="addCounterBtn";add.textContent=t("add_counter");add.style.display="none";grid.appendChild(add);
-      $("#btnGrid").classList.toggle("active",!listView);$("#btnList").classList.toggle("active",listView);return;
+      return;
     }
     const recs=getRecords();
     const cats=allCats();
     const groups={};cats.forEach(cat=>{groups[cat.id]=[];});
     state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
-    cats.forEach(cat=>{
-      const counters=groups[cat.id]||[];if(!counters.length)return;
-      const catTot=counters.reduce((s,c)=>s+counterTotal(c),0);
-      const isOpen=expandedCats.has(cat.id);
-      const section=document.createElement("div");section.className="cat-section"+(isOpen?" expanded":"");section.dataset.catId=cat.id;
-      const cardTop=document.createElement("div");cardTop.className="cat-card-top";
-      const illo=document.createElement("div");
-      const catNameHtml='<div class="cat-card-name">'+esc(lang==="en"?cat.en:cat.da)+'</div>';
-      illo.className="cat-illo";
-      illo.innerHTML=catNameHtml+(cat.iconPending?'<div class="spin"></div>':cat.icon);
-      const foot=document.createElement("div");foot.className="cat-card-foot";
-      foot.innerHTML='<div class="cat-card-total" id="cat-total-'+cat.id+'">'+catTot+'</div>';
-      cardTop.appendChild(illo);cardTop.appendChild(foot);
-      const body=document.createElement("div");
-      body.className="cat-body"+(isOpen?" open":"");
-      body.id="cat-body-"+cat.id;
-      const cardGrid=document.createElement("div");
-      cardGrid.className="grid"+(listView?" list":"");
-      counters.forEach(c=>{cardGrid.appendChild(makeCounterCard(c,recs));});
-      const catAddBtn=document.createElement("button");
-      catAddBtn.className="cat-add";catAddBtn.dataset.catAdd=cat.id;
-      catAddBtn.innerHTML='+ '+(lang==="da"?"Tilføj tæller":"Add counter");
-      body.appendChild(cardGrid);body.appendChild(catAddBtn);
-      cardTop.addEventListener("click",()=>{
-        const open=body.classList.toggle("open");section.classList.toggle("expanded",open);
-        if(open)expandedCats.add(cat.id);else expandedCats.delete(cat.id);
-        saveExpandedCats();
-      });
-      section.appendChild(cardTop);section.appendChild(body);grid.appendChild(section);
+    const activeCats=cats.filter(cat=>(groups[cat.id]||[]).length>0);
+    if(!activeCats.length)return;
+    if(!activeCats.find(c=>c.id===activeCat))activeCat=activeCats[0].id;
+    // Chip strip
+    const strip=document.createElement("div");strip.className="cat-strip";
+    activeCats.forEach(cat=>{
+      const total=(groups[cat.id]||[]).reduce((s,c)=>s+counterTotal(c),0);
+      const chip=document.createElement("div");chip.className="cat-chip"+(cat.id===activeCat?" active":"");chip.dataset.chipCat=cat.id;
+      const ring=document.createElement("div");ring.className="cat-chip-ring";
+      ring.innerHTML=cat.iconPending?'<div class="spin"></div>':cat.icon;
+      const nameEl=document.createElement("div");nameEl.className="cat-chip-name";nameEl.textContent=lang==="en"?cat.en:cat.da;
+      const totalEl=document.createElement("div");totalEl.className="cat-chip-total";totalEl.id="cat-total-"+cat.id;totalEl.textContent=total;
+      chip.appendChild(ring);chip.appendChild(nameEl);chip.appendChild(totalEl);
+      chip.addEventListener("click",()=>{if(activeCat===cat.id)return;activeCat=cat.id;localStorage.setItem("mise_active_cat",cat.id);renderCounters();});
+      strip.appendChild(chip);
     });
-    const add=document.createElement("button");add.className="addcard station-add-global";add.id="addCounterBtn";add.textContent=t("add_counter");grid.appendChild(add);
-    const addCat=document.createElement("button");addCat.className="station-new-cat";addCat.id="addCatBtn";addCat.textContent=t("new_cat_btn");grid.appendChild(addCat);
-    $("#btnGrid").classList.toggle("active",!listView);$("#btnList").classList.toggle("active",listView);
+    grid.appendChild(strip);
+    // Counter group for active category
+    const counters=groups[activeCat]||[];
+    const grp=document.createElement("div");grp.className="cat-group";
+    counters.forEach(c=>{grp.appendChild(makeCounterCard(c,recs));});
+    const catAddBtn=document.createElement("button");catAddBtn.className="cat-add";catAddBtn.dataset.catAdd=activeCat;
+    catAddBtn.innerHTML='+ '+(lang==="da"?"Tilføj tæller":"Add counter");
+    grp.appendChild(catAddBtn);
+    grid.appendChild(grp);
+    // New category button
+    const addCat=document.createElement("button");addCat.className="station-new-cat";addCat.id="addCatBtn";addCat.textContent=t("new_cat_btn");
+    grid.appendChild(addCat);
+    // Hidden addCounterBtn for backward-compat click handler
+    const addH=document.createElement("button");addH.id="addCounterBtn";addH.style.display="none";grid.appendChild(addH);
   }
   function updateCatHeader(catId){
     const el=document.getElementById("cat-total-"+catId);if(!el)return;
@@ -1583,12 +1576,10 @@
   $("#newCatInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#newCatSave").click();});
 
   function updateCatIconInDom(catId,svg){
-    const section=document.querySelector('[data-cat-id="'+catId+'"]');
-    if(!section)return;
-    const illo=section.querySelector(".cat-illo");
-    if(!illo)return;
-    const nameEl=illo.querySelector(".cat-card-name");
-    illo.innerHTML=(nameEl?nameEl.outerHTML:"")+svg;
+    const chip=document.querySelector('[data-chip-cat="'+catId+'"]');
+    if(!chip)return;
+    const ring=chip.querySelector(".cat-chip-ring");
+    if(ring)ring.innerHTML=svg;
   }
   async function generateCatIcon(catId,name){
     const base=apiBase();if(!base)return;
@@ -1866,7 +1857,7 @@
       document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.view===v));
       document.querySelectorAll(".bnav-btn").forEach(x=>x.classList.toggle("active",x.dataset.tab===v));
       ["station","log","vin","social","feed"].forEach(n=>$("#view-"+n).classList.toggle("active",v===n));
-      $("#viewToggle").style.display=v==="station"?"":"none";
+      $("#viewToggle").style.display="none";
       if(v==="log")renderLogView();
       if(v==="social")loadSocial();
       if(v==="feed")loadFeed();
@@ -2487,6 +2478,7 @@
     setupShift();
     setupFeed();
     updateOfflineDot();
+    $("#viewToggle").style.display="none";
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.style.display="";
     const profileBtn=$("#profileBtn");if(profileBtn)profileBtn.style.display="";
     attachAC($("#qlogInput"),()=>{
