@@ -1,10 +1,12 @@
 // Craft Tracker backend
 // Endpoints: GET /api/config  POST /api/parse-log  POST /api/wine-search
 //            POST /api/user/profile  POST /api/user/update
+//            GET  /api/users/check-username
 //            POST /api/log-entry     POST /api/upload-photo
 //            GET  /api/leaderboard   GET  /api/challenge/current
 //            POST /api/teams         POST /api/teams/join   GET /api/teams/mine
-//            GET  /api/feed          POST /api/follow        DELETE /api/follow/:id
+//            GET  /api/feed          POST /api/follow        DELETE /api/follow/:targetId
+//            GET  /api/follow/requests  POST /api/follow/:followerId/accept  DELETE /api/follow/:followerId/reject
 //            POST /api/like/:id      DELETE /api/like/:id
 //            GET  /api/comments/:id  POST /api/comments/:id
 //            GET  /api/users/search  POST /api/gen-category-icon
@@ -127,7 +129,7 @@ app.get("/api/config", (_req, res) => {
   res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON });
 });
 
-// ---- Brugerprofil: opret (upsert) ----
+// ---- Brugerprofil: opret (upsert) + hent ----
 app.post("/api/user/profile", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
@@ -136,7 +138,9 @@ app.post("/api/user/profile", async (req, res) => {
       body: JSON.stringify({ id: userId }),
       headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
     });
-    res.json({ ok: true });
+    const rows = await sb(`users?id=eq.${userId}&select=nickname,profession,username`);
+    const u = (rows || [])[0] || {};
+    res.json({ ok: true, nickname: u.nickname || null, profession: u.profession || null, username: u.username || null });
   } catch (err) {
     console.error("user/profile:", err.message);
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
@@ -147,14 +151,34 @@ app.post("/api/user/profile", async (req, res) => {
 app.post("/api/user/update", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
-    const { nickname, profession } = req.body || {};
-    await sb(`users?id=eq.${userId}`, {
-      method: "PATCH",
-      body: JSON.stringify({ nickname: nickname || null, profession: profession || null }),
-    });
+    const { nickname, profession, username } = req.body || {};
+    const patch = { nickname: nickname || null, profession: profession || null };
+    if (username !== undefined) {
+      const u = (username || "").trim().toLowerCase();
+      if (u && !/^[a-z0-9_]{3,30}$/.test(u)) return res.status(400).json({ error: "invalid_username" });
+      if (u) {
+        const taken = await sb(`users?username=eq.${encodeURIComponent(u)}&select=id`);
+        if ((taken || []).some(r => r.id !== userId)) return res.status(409).json({ error: "username_taken" });
+      }
+      patch.username = u || null;
+    }
+    await sb(`users?id=eq.${userId}`, { method: "PATCH", body: JSON.stringify(patch) });
     res.json({ ok: true });
   } catch (err) {
     console.error("user/update:", err.message);
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Tjek brugernavn-tilgængelighed ----
+app.get("/api/users/check-username", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const u = (req.query.username || "").trim().toLowerCase();
+    if (!u || !/^[a-z0-9_]{3,30}$/.test(u)) return res.json({ available: false, error: "invalid" });
+    const rows = await sb(`users?username=eq.${encodeURIComponent(u)}&select=id`) || [];
+    res.json({ available: !rows.some(r => r.id !== userId) });
+  } catch (err) {
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
@@ -445,38 +469,83 @@ app.get("/api/users/search", async (req, res) => {
     const userId = await verifyAuth(req);
     const q = (req.query.q || "").trim();
     if (!q || q.length < 2) return res.json({ users: [] });
-    const rows = await sb(`users?nickname=ilike.*${encodeURIComponent(q)}*&select=id,nickname,profession&limit=20`) || [];
-    const followRows = await sb(`follows?follower_id=eq.${userId}&select=following_id`) || [];
-    const followingSet = new Set(followRows.map(r => r.following_id));
+    const qEnc = encodeURIComponent(q);
+    const rows = await sb(`users?or=(username.ilike.*${qEnc}*,nickname.ilike.*${qEnc}*)&select=id,nickname,profession,username&limit=20`) || [];
+    const followRows = await sb(`follows?follower_id=eq.${userId}&select=following_id,status`) || [];
+    const followMap = {};
+    followRows.forEach(r => { followMap[r.following_id] = r.status; });
     const users = rows
       .filter(r => r.id !== userId)
-      .map(r => ({ id: r.id, nickname: r.nickname, profession: r.profession, following: followingSet.has(r.id) }));
+      .map(r => ({ id: r.id, nickname: r.nickname, profession: r.profession, username: r.username, followStatus: followMap[r.id] || "none" }));
     res.json({ users });
   } catch (err) {
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
 
-// ---- Social: følg ----
+// ---- Social: send følge-anmodning ----
 app.post("/api/follow", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
     const { targetId } = req.body || {};
     if (!targetId || targetId === userId) return res.status(400).json({ error: "Ugyldigt" });
-    await sb("follows", { method: "POST", body: JSON.stringify({ follower_id: userId, following_id: targetId }) });
-    res.json({ ok: true });
+    await sb("follows", { method: "POST", body: JSON.stringify({ follower_id: userId, following_id: targetId, status: "pending" }) });
+    res.json({ ok: true, status: "pending" });
   } catch (err) {
-    // ignore duplicate (already following)
-    if (err.message && err.message.includes("duplicate")) return res.json({ ok: true });
+    if (err.message && err.message.includes("duplicate")) return res.json({ ok: true, status: "pending" });
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
 
+// ---- Social: annuller/unfollow ----
 app.delete("/api/follow/:targetId", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
     const { targetId } = req.params;
     await sb(`follows?follower_id=eq.${userId}&following_id=eq.${targetId}`, { method: "DELETE" });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Social: modtagne følge-anmodninger ----
+app.get("/api/follow/requests", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const rows = await sb(`follows?following_id=eq.${userId}&status=eq.pending&select=follower_id,created_at`) || [];
+    if (!rows.length) return res.json({ requests: [] });
+    const ids = rows.map(r => r.follower_id);
+    const users = await sb(`users?id=in.(${ids.join(",")})&select=id,nickname,username,profession`) || [];
+    const umap = {};
+    users.forEach(u => { umap[u.id] = u; });
+    res.json({ requests: rows.map(r => ({ followerId: r.follower_id, createdAt: r.created_at, nickname: umap[r.follower_id]?.nickname || null, username: umap[r.follower_id]?.username || null, profession: umap[r.follower_id]?.profession || null })) });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Social: godkend følge-anmodning ----
+app.post("/api/follow/:followerId/accept", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { followerId } = req.params;
+    await sb(`follows?follower_id=eq.${followerId}&following_id=eq.${userId}&status=eq.pending`, {
+      method: "PATCH",
+      body: JSON.stringify({ status: "accepted" }),
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Social: afvis følge-anmodning ----
+app.delete("/api/follow/:followerId/reject", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { followerId } = req.params;
+    await sb(`follows?follower_id=eq.${followerId}&following_id=eq.${userId}`, { method: "DELETE" });
     res.json({ ok: true });
   } catch (err) {
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
@@ -489,8 +558,8 @@ app.get("/api/feed", async (req, res) => {
     const userId = await verifyAuth(req);
     const cursor = req.query.before || null;
 
-    // find who we follow
-    const followRows = await sb(`follows?follower_id=eq.${userId}&select=following_id`) || [];
+    // find who we follow (only accepted)
+    const followRows = await sb(`follows?follower_id=eq.${userId}&status=eq.accepted&select=following_id`) || [];
     const ids = followRows.map(r => r.following_id);
     ids.push(userId); // include own entries
 

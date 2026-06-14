@@ -332,7 +332,25 @@
   .feed-user-prof{font-size:12px;color:var(--faint)}
   .feed-follow-btn{appearance:none;border:1px solid var(--accent);border-radius:7px;background:none;color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;padding:6px 14px;cursor:pointer;transition:.12s;white-space:nowrap}
   .feed-follow-btn.following{background:var(--accent);color:#fff}
+  .feed-follow-btn.pending{background:var(--bg);border-color:var(--border);color:var(--dim)}
   .feed-follow-btn:hover{opacity:.8}
+  .username-wrap{display:flex;align-items:center;background:var(--surface-2,var(--bg));border:1px solid var(--border);border-radius:var(--r-sm,8px);overflow:hidden}
+  .username-at{padding:10px 0 10px 12px;font-size:15px;color:var(--dim);font-weight:600;line-height:1;flex:none}
+  .username-wrap input{flex:1;border:none;background:transparent;color:var(--text);font-family:inherit;font-size:15px;padding:10px 12px 10px 4px;outline:none}
+  .username-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .username-status{font-size:12px;margin-top:5px;min-height:16px;font-weight:500}
+  .username-status.ok{color:#16a34a}.username-status.err{color:#dc2626}.username-status.checking{color:var(--dim)}
+  .follow-req-banner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+  .follow-req-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;border-bottom:1px solid var(--border)}
+  .follow-req-title{font-size:13px;font-weight:700;color:var(--text)}
+  .follow-req-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+  .follow-req-row:last-child{border-bottom:none}
+  .follow-req-info{flex:1;min-width:0}
+  .follow-req-name{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .follow-req-handle{font-size:12px;color:var(--faint)}
+  .follow-req-actions{display:flex;gap:6px;flex:none}
+  .follow-req-accept{appearance:none;background:var(--accent);border:none;border-radius:6px;color:#fff;font-family:inherit;font-size:13px;font-weight:600;padding:6px 14px;cursor:pointer;transition:.12s}
+  .follow-req-reject{appearance:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--dim);font-family:inherit;font-size:13px;font-weight:600;padding:6px 12px;cursor:pointer;transition:.12s}
 
   /* Text entry */
   .feed-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:8px}
@@ -600,6 +618,7 @@
       <button class="btn ghost btn-sm" id="feedSearchBtn">🔍</button>
     </div>
     <div id="feedSearchResults" style="display:none"></div>
+    <div id="followRequestsBanner" style="display:none"></div>
     <div id="feedContent"></div>
   </section>
 
@@ -709,6 +728,11 @@
 
 <div class="scrim" id="profileScrim"><div class="modal">
   <h2 id="profileTitle"></h2>
+  <div class="field">
+    <label id="profileUsernameLbl"></label>
+    <div class="username-wrap"><span class="username-at">@</span><input id="profileUsername" maxlength="30" autocomplete="off" spellcheck="false" inputmode="url"></div>
+    <div class="username-status" id="profileUsernameStatus"></div>
+  </div>
   <div class="field"><label id="profileNickLbl"></label><input id="profileNick" maxlength="30" autocomplete="off"></div>
   <div class="field"><label id="profileProfLbl"></label><select id="profileProf" class="prof-select"></select></div>
   <div class="mactions" style="margin-top:16px">
@@ -719,6 +743,19 @@
   <div class="badge-grid" id="badgeGrid"></div>
   <div class="subsection" id="profileRecordsLbl"></div>
   <div class="records-list" id="recordsList"></div>
+</div></div>
+
+<div class="scrim" id="usernameSetupScrim"><div class="modal">
+  <h2 id="usernameSetupTitle"></h2>
+  <p id="usernameSetupHint" style="font-size:13px;color:var(--dim);margin:0 0 16px;line-height:1.5"></p>
+  <div class="field">
+    <div class="username-wrap"><span class="username-at">@</span><input id="usernameSetupInput" maxlength="30" autocomplete="off" spellcheck="false" inputmode="url" placeholder="ditbrugernavn"></div>
+    <div class="username-status" id="usernameSetupStatus"></div>
+  </div>
+  <div class="mactions" style="margin-top:16px">
+    <button class="btn primary" id="usernameSetupSave"></button>
+    <button class="btn ghost" id="usernameSetupSkip"></button>
+  </div>
 </div></div>
 
 <div class="badge-toast" id="badgeToast">
@@ -821,9 +858,14 @@
       team_create_or_join:"Opret et hold eller tilslut dig ét med en invite-kode.",
       team_not_found:"Hold ikke fundet",team_copy:"Kopier",team_copied:"Kopieret",
       team_this_week:"Denne uge",
-      profile_title:"Min profil",profile_nick_lbl:"Kaldenavn",profile_nick_ph:"fx Simon",
+      profile_title:"Min profil",profile_username_lbl:"Brugernavn",profile_nick_lbl:"Kaldenavn",profile_nick_ph:"fx Simon",
       profile_prof_lbl:"Profession",profile_prof_default:"Vælg profession",
       profile_save:"Gem",profile_close:"Luk",
+      username_checking:"Tjekker…",username_ok:"Ledigt",username_taken:"Optaget",username_invalid:"Kun bogstaver, tal og _ (3-30 tegn)",
+      username_setup_title:"Vælg et brugernavn",username_setup_hint:"Dit brugernavn bruges når andre søger efter dig. Du kan altid ændre det senere.",
+      username_setup_save:"Gem brugernavn",username_setup_skip:"Springe over",
+      follow_req_title:"Følgeanmodninger",follow_req_accept:"Godkend",follow_req_reject:"Afvis",
+      feed_requested:"Anmodet",
       profile_badges:"Badges",profile_badges_none:"Ingen badges endnu — begynd at logge!",
       profile_records:"Personlige rekorder",profile_records_none:"Ingen rekorder endnu",
       new_badge:"Nyt badge",new_record_msg:"Ny rekord",
@@ -900,9 +942,14 @@
       team_create_or_join:"Create a team or join one with an invite code.",
       team_not_found:"Team not found",team_copy:"Copy",team_copied:"Copied",
       team_this_week:"This week",
-      profile_title:"My profile",profile_nick_lbl:"Nickname",profile_nick_ph:"e.g. Simon",
+      profile_title:"My profile",profile_username_lbl:"Username",profile_nick_lbl:"Nickname",profile_nick_ph:"e.g. Simon",
       profile_prof_lbl:"Profession",profile_prof_default:"Select profession",
       profile_save:"Save",profile_close:"Close",
+      username_checking:"Checking…",username_ok:"Available",username_taken:"Taken",username_invalid:"Letters, numbers and _ only (3-30 chars)",
+      username_setup_title:"Choose a username",username_setup_hint:"Your username lets others find and follow you. You can change it later.",
+      username_setup_save:"Save username",username_setup_skip:"Skip for now",
+      follow_req_title:"Follow requests",follow_req_accept:"Accept",follow_req_reject:"Decline",
+      feed_requested:"Requested",
       profile_badges:"Badges",profile_badges_none:"No badges yet — start logging!",
       profile_records:"Personal records",profile_records_none:"No records yet",
       new_badge:"New badge",new_record_msg:"New record",
@@ -1002,9 +1049,14 @@
     const pClose=$("#profileClose");if(pClose)pClose.textContent=t("profile_close");
     const pNick=$("#profileNick");if(pNick)pNick.placeholder=t("profile_nick_ph");
     const pNickLbl=$("#profileNickLbl");if(pNickLbl)pNickLbl.textContent=t("profile_nick_lbl");
+    const pUsernameLbl=$("#profileUsernameLbl");if(pUsernameLbl)pUsernameLbl.textContent=t("profile_username_lbl");
     const pProfLbl=$("#profileProfLbl");if(pProfLbl)pProfLbl.textContent=t("profile_prof_lbl");
     const pBadgesLbl=$("#profileBadgesLbl");if(pBadgesLbl)pBadgesLbl.textContent=t("profile_badges");
     const pRecLbl=$("#profileRecordsLbl");if(pRecLbl)pRecLbl.textContent=t("profile_records");
+    const uSetupTitle=$("#usernameSetupTitle");if(uSetupTitle)uSetupTitle.textContent=t("username_setup_title");
+    const uSetupHint=$("#usernameSetupHint");if(uSetupHint)uSetupHint.textContent=t("username_setup_hint");
+    const uSetupSave=$("#usernameSetupSave");if(uSetupSave)uSetupSave.textContent=t("username_setup_save");
+    const uSetupSkip=$("#usernameSetupSkip");if(uSetupSkip)uSetupSkip.textContent=t("username_setup_skip");
   }
   function setLang(l){lang=l;localStorage.setItem("mise_lang",l);translateUI();renderCounters();renderWines();renderLogView();}
   $("#langBtn").addEventListener("click",()=>setLang(lang==="da"?"en":"da"));
@@ -1877,7 +1929,7 @@
       $("#viewToggle").style.display="none";
       if(v==="log")renderLogView();
       if(v==="social")loadSocial();
-      if(v==="feed")loadFeed();
+      if(v==="feed"){loadFeed();loadFollowRequests();}
       window.scrollTo({top:0,behavior:"instant"});
     }
     if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
@@ -2055,6 +2107,9 @@
         const d=await res.json();
         if(d.nickname)$("#profileNick").value=d.nickname;
         if(d.profession)profSel.value=d.profession;
+        const uInput=$("#profileUsername");
+        if(uInput)uInput.value=d.username||"";
+        $("#profileUsernameStatus").textContent="";$("#profileUsernameStatus").className="username-status";
       }catch(e){}
     }
     renderBadgeGrid();renderRecordsList();
@@ -2082,16 +2137,73 @@
       return '<div class="records-item"><span class="records-lbl">'+esc(name)+'</span><span class="records-val">'+r.val+'</span></div>';
     }).join("");
   }
+  let _usernameCheckTimer=null;
+  function setupUsernameInput(inputId,statusId,onValid){
+    const input=$("#"+inputId),status=$("#"+statusId);
+    if(!input||!status)return;
+    input.addEventListener("input",()=>{
+      const v=input.value.toLowerCase().replace(/[^a-z0-9_]/g,"");
+      if(input.value!==v)input.value=v;
+      if(v.length<3){status.textContent=v.length?t("username_invalid"):"";status.className="username-status"+(v.length?" err":"");if(onValid)onValid(false);return;}
+      status.textContent=t("username_checking");status.className="username-status checking";
+      if(_usernameCheckTimer)clearTimeout(_usernameCheckTimer);
+      _usernameCheckTimer=setTimeout(async()=>{
+        const base=apiBase();const token=await getToken();
+        if(!base||!token){status.textContent="";return;}
+        try{
+          const r=await fetch(base+"/api/users/check-username?username="+encodeURIComponent(v),{headers:{"Authorization":"Bearer "+token}});
+          const d=await r.json();
+          if(d.available){status.textContent=t("username_ok");status.className="username-status ok";if(onValid)onValid(true);}
+          else{status.textContent=d.error==="invalid"?t("username_invalid"):t("username_taken");status.className="username-status err";if(onValid)onValid(false);}
+        }catch(e){status.textContent="";if(onValid)onValid(false);}
+      },500);
+    });
+  }
+
+  async function maybeShowUsernameSetup(username){
+    if(username)return;
+    const scrim=$("#usernameSetupScrim");if(!scrim)return;
+    $("#usernameSetupInput").value="";
+    $("#usernameSetupStatus").textContent="";$("#usernameSetupStatus").className="username-status";
+    scrim.classList.add("open");
+  }
+
+  function setupUsernameSetupModal(){
+    let canSave=false;
+    setupUsernameInput("usernameSetupInput","usernameSetupStatus",v=>{canSave=v;});
+    $("#usernameSetupSave").addEventListener("click",async()=>{
+      const v=($("#usernameSetupInput").value||"").trim();
+      if(!canSave||!v)return;
+      const base=apiBase();const token=await getToken();if(!base||!token)return;
+      try{
+        const r=await fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({username:v})});
+        const d=await r.json();
+        if(d.ok){$("#usernameSetupScrim").classList.remove("open");}
+        else{const s=$("#usernameSetupStatus");s.textContent=t("username_taken");s.className="username-status err";}
+      }catch(e){}
+    });
+    $("#usernameSetupSkip").addEventListener("click",()=>$("#usernameSetupScrim").classList.remove("open"));
+  }
+
   function setupProfileModal(){
     const profileBtn=$("#profileBtn");
     if(profileBtn)profileBtn.addEventListener("click",()=>openProfile());
+    let profileUsernameValid=true;
+    setupUsernameInput("profileUsername","profileUsernameStatus",v=>{profileUsernameValid=v;});
     const saveBtn=$("#profileSave");
     if(saveBtn)saveBtn.addEventListener("click",async()=>{
       const nick=($("#profileNick").value||"").trim();
       const prof=($("#profileProf").value||"").trim();
+      const username=($("#profileUsername").value||"").trim();
       const base=apiBase();const token=await getToken();
       if(base&&token){
-        try{await fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({nickname:nick,profession:prof})});}catch(e){}
+        try{
+          const body={nickname:nick,profession:prof};
+          if(username)body.username=username;
+          const r=await fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});
+          const d=await r.json();
+          if(d.error==="username_taken"){const s=$("#profileUsernameStatus");s.textContent=t("username_taken");s.className="username-status err";return;}
+        }catch(e){}
       }
       $("#profileScrim").classList.remove("open");
     });
@@ -2255,7 +2367,8 @@
     const catLabel=lang==="en"?(e.categoryEn||e.category||""):e.category||"";
     const numStr=(e.delta>0?"+":"")+e.delta;
     const likeIcon=e.liked?"❤️":"🤍";
-    const followBtn=e.isOwn?'':('<button class="feed-follow-btn'+(e._following?" following":"")+'" data-follow="'+esc(e.userId)+'" data-following="'+(e._following?"1":"0")+'">'+esc(e._following?t("feed_unfollow"):t("feed_follow"))+'</button>');
+    const fs=e._followStatus||"none";
+    const followBtn=e.isOwn?'':('<button class="'+followBtnClass(fs)+'" data-follow="'+esc(e.userId)+'" data-follow-status="'+esc(fs)+'">'+esc(followBtnLabel(fs))+'</button>');
 
     if(e.imageUrl){
       // Photo-first card
@@ -2299,7 +2412,44 @@
       +'</div>';
   }
 
-  let _followingCache={};
+  let _followingCache={};  // userId -> 'pending'|'accepted'
+
+  async function loadFollowRequests(){
+    const banner=$("#followRequestsBanner");if(!banner)return;
+    const base=apiBase();const token=await getToken();if(!base||!token){banner.style.display="none";return;}
+    try{
+      const r=await fetch(base+"/api/follow/requests",{headers:{"Authorization":"Bearer "+token}});
+      const d=await r.json();
+      const reqs=d.requests||[];
+      if(!reqs.length){banner.style.display="none";return;}
+      banner.style.display="";
+      banner.innerHTML='<div class="follow-req-banner"><div class="follow-req-head"><span class="follow-req-title">'+esc(t("follow_req_title"))+'</span><span style="font-size:12px;color:var(--dim)">'+reqs.length+'</span></div>'
+        +reqs.map(r=>{
+          const name=r.nickname||("@"+(r.username||"?"));
+          const handle=r.username?"@"+r.username:"";
+          return '<div class="follow-req-row" data-req-id="'+esc(r.followerId)+'">'
+            +'<div class="follow-req-info"><div class="follow-req-name">'+esc(name)+'</div>'+(handle?'<div class="follow-req-handle">'+esc(handle)+'</div>':'')+'</div>'
+            +'<div class="follow-req-actions">'
+            +'<button class="follow-req-accept" data-req-accept="'+esc(r.followerId)+'">'+esc(t("follow_req_accept"))+'</button>'
+            +'<button class="follow-req-reject" data-req-reject="'+esc(r.followerId)+'">'+esc(t("follow_req_reject"))+'</button>'
+            +'</div></div>';
+        }).join("")+'</div>';
+      banner.addEventListener("click",async e=>{
+        const acceptBtn=e.target.closest("[data-req-accept]");
+        const rejectBtn=e.target.closest("[data-req-reject]");
+        const id=acceptBtn?.dataset.reqAccept||rejectBtn?.dataset.reqReject;
+        if(!id)return;
+        const row=banner.querySelector('[data-req-id="'+id+'"]');
+        if(row)row.style.opacity="0.4";
+        const method=acceptBtn?"POST":"DELETE";
+        const endpoint=acceptBtn?(base+"/api/follow/"+id+"/accept"):(base+"/api/follow/"+id+"/reject");
+        await fetch(endpoint,{method,headers:{"Authorization":"Bearer "+token}}).catch(()=>{});
+        if(acceptBtn){_followingCache[id]="accepted";}
+        await loadFollowRequests();
+      });
+    }catch(e){banner.style.display="none";}
+  }
+
   async function loadFeed(append){
     if(feedLoading)return;
     feedLoading=true;
@@ -2313,14 +2463,8 @@
       const d=await res.json();
       const entries=d.entries||[];
 
-      // build following set for this batch
-      const myId=getJwtSub();
-      const userIds=[...new Set(entries.filter(e=>!e.isOwn).map(e=>e.userId))];
-      if(userIds.length){
-        const fRows=await fetch(base+"/api/users/search?q=",{headers:{"Authorization":"Bearer "+token}}).then(r=>r.json()).catch(()=>({users:[]}));
-      }
-      // simple: mark following from cache
-      entries.forEach(e=>{e._following=!!_followingCache[e.userId];});
+      // mark follow status from cache
+      entries.forEach(e=>{e._followStatus=_followingCache[e.userId]||"none";});
 
       if(!entries.length&&!append){
         el.innerHTML='<div class="empty-state"><div class="empty-state-icon">🧭</div><div class="empty-state-title">'+esc(t("feed_empty"))+'</div><div class="empty-state-sub">'+(lang==="da"?"Søg på en kollegas kaldenavn foroven og tryk følg":"Search for a colleague by nickname above and follow them")+'</div></div>';
@@ -2341,17 +2485,28 @@
     feedLoading=false;
   }
 
-  async function toggleFollow(userId,currentlyFollowing){
+  async function toggleFollow(userId,currentStatus){
     const base=apiBase();const token=await getToken();if(!base||!token)return;
     try{
-      if(currentlyFollowing){
+      if(currentStatus==="accepted"||currentStatus==="pending"){
         await fetch(base+"/api/follow/"+userId,{method:"DELETE",headers:{"Authorization":"Bearer "+token}});
-        _followingCache[userId]=false;
+        delete _followingCache[userId];
       }else{
         await fetch(base+"/api/follow",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({targetId:userId})});
-        _followingCache[userId]=true;
+        _followingCache[userId]="pending";
       }
     }catch(e){}
+  }
+
+  function followBtnLabel(status){
+    if(status==="accepted")return t("feed_unfollow");
+    if(status==="pending")return t("feed_requested");
+    return t("feed_follow");
+  }
+  function followBtnClass(status){
+    if(status==="accepted")return "feed-follow-btn following";
+    if(status==="pending")return "feed-follow-btn pending";
+    return "feed-follow-btn";
   }
 
   async function toggleLike(entryId,btn){
@@ -2418,13 +2573,21 @@
       const users=d.users||[];
       if(!users.length){el.innerHTML='<div class="feed-empty-msg" style="padding:12px">'+esc(t("feed_no_results"))+'</div>';return;}
       el.innerHTML='<div class="feed-results">'+users.map(u=>{
-        const following=_followingCache[u.id]!==undefined?_followingCache[u.id]:u.following;
+        const fs=_followingCache[u.id]||u.followStatus||"none";
+        const name=u.nickname||(u.username?"@"+u.username:t("lb_anon"));
+        const handle=u.username?"@"+u.username:"";
         return '<div class="feed-user-row">'
-          +'<div class="feed-user-info"><div class="feed-user-nick">'+esc(u.nickname||t("lb_anon"))+'</div>'+(u.profession?'<div class="feed-user-prof">'+esc(u.profession)+'</div>':'')+'</div>'
-          +'<button class="feed-follow-btn'+(following?" following":"")+'" data-follow="'+esc(u.id)+'" data-following="'+(following?"1":"0")+'">'+esc(following?t("feed_unfollow"):t("feed_follow"))+'</button>'
+          +'<div class="feed-user-info"><div class="feed-user-nick">'+esc(name)+'</div>'+(handle&&handle!==name?'<div class="feed-user-prof">'+esc(handle)+'</div>':u.profession?'<div class="feed-user-prof">'+esc(u.profession)+'</div>':'')+'</div>'
+          +'<button class="'+followBtnClass(fs)+'" data-follow="'+esc(u.id)+'" data-follow-status="'+esc(fs)+'">'+esc(followBtnLabel(fs))+'</button>'
           +'</div>';
       }).join("")+'</div>';
     }catch(e){el.innerHTML="";}
+  }
+
+  function updateFollowBtn(btn,newStatus){
+    btn.className=followBtnClass(newStatus);
+    btn.textContent=followBtnLabel(newStatus);
+    btn.dataset.followStatus=newStatus;
   }
 
   function setupFeed(){
@@ -2434,11 +2597,11 @@
       const followBtn=e.target.closest("[data-follow]");
       if(followBtn){
         const uid=followBtn.dataset.follow;
-        const wasFollowing=followBtn.dataset.following==="1";
-        followBtn.dataset.following=wasFollowing?"0":"1";
-        followBtn.textContent=wasFollowing?t("feed_follow"):t("feed_unfollow");
-        followBtn.classList.toggle("following",!wasFollowing);
-        await toggleFollow(uid,wasFollowing);
+        const curStatus=followBtn.dataset.followStatus||"none";
+        const newStatus=(curStatus==="none")?"pending":"none";
+        updateFollowBtn(followBtn,newStatus);
+        _followingCache[uid]=newStatus==="none"?undefined:newStatus;
+        await toggleFollow(uid,curStatus);
         return;
       }
       // like
@@ -2458,12 +2621,11 @@
         const followBtn=e.target.closest("[data-follow]");
         if(!followBtn)return;
         const uid=followBtn.dataset.follow;
-        const wasFollowing=followBtn.dataset.following==="1";
-        followBtn.dataset.following=wasFollowing?"0":"1";
-        followBtn.textContent=wasFollowing?t("feed_follow"):t("feed_unfollow");
-        followBtn.classList.toggle("following",!wasFollowing);
-        _followingCache[uid]=!wasFollowing;
-        await toggleFollow(uid,wasFollowing);
+        const curStatus=followBtn.dataset.followStatus||"none";
+        const newStatus=(curStatus==="none")?"pending":"none";
+        updateFollowBtn(followBtn,newStatus);
+        _followingCache[uid]=newStatus==="none"?undefined:newStatus;
+        await toggleFollow(uid,curStatus);
       });
     }
 
@@ -2492,6 +2654,7 @@
     renderCounters();renderWines();renderCareer();renderLogView();
     setupPhoto();
     setupProfileModal();
+    setupUsernameSetupModal();
     setupShift();
     setupFeed();
     updateOfflineDot();
@@ -2509,6 +2672,15 @@
     setTimeout(()=>{
       (state.customCats||[]).filter(c=>c.iconPending&&c.name).forEach(c=>generateCatIcon(c.id,c.name));
     },1500);
+    // Check username + follow requests after login
+    setTimeout(async()=>{
+      const base=apiBase();const token=await getToken();if(!base||!token)return;
+      try{
+        const r=await fetch(base+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token}});
+        const d=await r.json();
+        if(!d.username)maybeShowUsernameSetup(null);
+      }catch(e){}
+    },1000);
   }
 
   (async function(){
