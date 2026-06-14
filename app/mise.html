@@ -479,11 +479,12 @@
   .cat-section.expanded{border-color:var(--accent)}
   .cat-card-top{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;display:block}
   .cat-card-top:active .cat-illo{opacity:.88;transition:opacity .06s}
-  .cat-illo{aspect-ratio:1;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;padding:16%}
-  .cat-illo svg{width:100%;height:100%;overflow:visible;color:var(--accent)}
-  .cat-card-foot{padding:10px 14px 16px;border-top:1.5px solid var(--border)}
+  .cat-illo{aspect-ratio:1;background:var(--accent-soft);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:14%;gap:9px}
+  .cat-illo svg{flex:1;min-height:0;width:100%;overflow:visible;color:var(--accent)}
+  .cat-illo .spin{margin:auto}
+  .cat-card-foot{padding:8px 14px 14px;border-top:1.5px solid var(--border);text-align:center}
   .cat-section.expanded .cat-card-foot{border-color:var(--accent)}
-  .cat-card-name{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+  .cat-card-name{font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);text-align:center;line-height:1.2;flex-shrink:0}
   .cat-card-total{font-family:"Fraunces",serif;font-size:44px;font-weight:600;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
   .cat-body{display:none;border-top:1px solid var(--border)}
   .cat-body.open{display:flex;flex-direction:column;animation:viewIn .18s ease both}
@@ -498,8 +499,7 @@
   .station-new-cat{appearance:none;background:none;border:1.5px dashed var(--border);border-radius:12px;width:100%;padding:14px;color:var(--dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:8px}
   .station-new-cat:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
   .station-new-cat:active{transform:scale(.98);transition:transform .06s}
-  .cat-illo-pending{display:flex;align-items:center;justify-content:center}
-  .cat-illo-pending .spin{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+  .cat-illo .spin{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
   .kebab:active,.wedit:active{transform:scale(.84);transition:transform .05s}
   .feed-load-more:active{transform:scale(.98);transition:transform .07s}
 
@@ -1470,10 +1470,11 @@
       const section=document.createElement("div");section.className="cat-section"+(isOpen?" expanded":"");section.dataset.catId=cat.id;
       const cardTop=document.createElement("div");cardTop.className="cat-card-top";
       const illo=document.createElement("div");
-      if(cat.iconPending){illo.className="cat-illo cat-illo-pending";illo.innerHTML='<div class="spin"></div>';}
-      else{illo.className="cat-illo";illo.innerHTML=cat.icon;}
+      const catNameHtml='<div class="cat-card-name">'+esc(lang==="en"?cat.en:cat.da)+'</div>';
+      illo.className="cat-illo";
+      illo.innerHTML=catNameHtml+(cat.iconPending?'<div class="spin"></div>':cat.icon);
       const foot=document.createElement("div");foot.className="cat-card-foot";
-      foot.innerHTML='<div class="cat-card-name">'+esc(lang==="en"?cat.en:cat.da)+'</div><div class="cat-card-total" id="cat-total-'+cat.id+'">'+catTot+'</div>';
+      foot.innerHTML='<div class="cat-card-total" id="cat-total-'+cat.id+'">'+catTot+'</div>';
       cardTop.appendChild(illo);cardTop.appendChild(foot);
       const body=document.createElement("div");
       body.className="cat-body"+(isOpen?" open":"");
@@ -1585,7 +1586,9 @@
     const section=document.querySelector('[data-cat-id="'+catId+'"]');
     if(!section)return;
     const illo=section.querySelector(".cat-illo");
-    if(illo){illo.className="cat-illo";illo.innerHTML=svg;}
+    if(!illo)return;
+    const nameEl=illo.querySelector(".cat-card-name");
+    illo.innerHTML=(nameEl?nameEl.outerHTML:"")+svg;
   }
   async function generateCatIcon(catId,name){
     const base=apiBase();if(!base)return;
