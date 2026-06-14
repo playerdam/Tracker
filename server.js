@@ -7,7 +7,7 @@
 //            GET  /api/feed          POST /api/follow        DELETE /api/follow/:id
 //            POST /api/like/:id      DELETE /api/like/:id
 //            GET  /api/comments/:id  POST /api/comments/:id
-//            GET  /api/users/search
+//            GET  /api/users/search  POST /api/gen-category-icon
 //            GET  /api/health
 
 const express = require("express");
@@ -397,6 +397,45 @@ app.post("/api/wine-search", async (req, res) => {
   } catch (err) {
     console.error("wine-search:", err.message);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ---- Kategori-ikon generering ----
+app.post("/api/gen-category-icon", async (req, res) => {
+  try {
+    await verifyAuth(req);
+    const { name } = req.body || {};
+    if (!name || typeof name !== "string" || name.trim().length < 1 || name.length > 60)
+      return res.status(400).json({ error: "invalid" });
+    const n = name.trim();
+    const out = await callClaude({
+      model: WINE_MODEL,
+      maxTokens: 1200,
+      system: "Du genererer SVG-ikoner til en restaurant-app. Svar KUN med rå SVG på én linje. Ingen markdown, ingen forklaring.",
+      content: `Lav et minimalt SVG-illustration-ikon for en køkkenkategori kaldet "${n}".
+
+REGLER:
+- Rod-element: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+- Farver: KUN fill="currentColor", fill="none", stroke="currentColor", fill="var(--surface)". ALDRIG hex-farver eller rgb().
+- Vis 2-3 genkendelige køkken/mad-objekter der repræsenterer "${n}"
+- Streger: outlines 2-2.5px, detaljer 1.2-1.8px. Objekter centreret i 64x64 canvas.
+- Returner KUN SVG på én linje, ingen markdown
+
+EKSEMPEL (Tilberedt - gryde med damp):
+<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14 C20 10 22 8 20 4" stroke-width="1.8"/><path d="M32 12 C32 8 34 6 32 2" stroke-width="1.8"/><path d="M44 14 C44 10 46 8 44 4" stroke-width="1.8"/><rect x="28" y="16" width="8" height="6" rx="3" fill="currentColor" stroke="none"/><path d="M16 28 C16 24 20 22 22 22 L42 22 C44 22 48 24 48 28" stroke-width="2.5"/><line x1="14" y1="28" x2="50" y2="28" stroke-width="2.5"/><path d="M14 28 L14 54 Q14 62 20 62 L44 62 Q50 62 50 54 L50 28"/><path d="M14 36 C10 36 8 38 8 42 C8 46 10 48 14 48" stroke-width="2"/><path d="M50 36 C54 36 56 38 56 42 C56 46 54 48 50 48" stroke-width="2"/></svg>
+
+EKSEMPEL (Serveret - fadfad med kuppel):
+<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="32" cy="56" rx="26" ry="6" stroke-width="2.5"/><path d="M8 56 C8 36 16 20 32 18 C48 20 56 36 56 56" stroke-width="2.5"/><path d="M14 46 C16 34 22 26 32 24 C42 26 48 34 50 46" stroke-width="1.2"/><circle cx="32" cy="10" r="5" fill="currentColor" stroke="none"/><line x1="32" y1="15" x2="32" y2="20" stroke-width="2.5"/></svg>`,
+    });
+    const svg = out.trim().replace(/^```[\w]*\n?/,"").replace(/\n?```$/,"").trim();
+    if (!svg.startsWith("<svg") || !svg.endsWith(">"))
+      return res.status(422).json({ error: "invalid_svg" });
+    if (/#[0-9a-fA-F]{3}/.test(svg) || /rgb\(/.test(svg) || /hsl\(/.test(svg))
+      return res.status(422).json({ error: "hardcoded_color" });
+    res.json({ svg });
+  } catch (err) {
+    console.error("gen-category-icon:", err.message);
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
 

@@ -495,6 +495,11 @@
   .cat-add:hover{background:var(--accent-soft)}
   .cat-add:active{transform:scale(.99);transition:transform .06s}
   .station-add-global{margin-top:4px}
+  .station-new-cat{appearance:none;background:none;border:1.5px dashed var(--border);border-radius:12px;width:100%;padding:14px;color:var(--dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:8px}
+  .station-new-cat:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .station-new-cat:active{transform:scale(.98);transition:transform .06s}
+  .cat-illo-pending{display:flex;align-items:center;justify-content:center}
+  .cat-illo-pending .spin{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
   .kebab:active,.wedit:active{transform:scale(.84);transition:transform .05s}
   .feed-load-more:active{transform:scale(.98);transition:transform .07s}
 
@@ -636,6 +641,16 @@
     <button class="btn primary" id="counterSave"></button>
     <button class="btn ghost" id="counterCancel"></button>
     <button class="btn del" id="counterDelete" style="display:none"></button>
+  </div>
+</div></div>
+
+<div class="scrim" id="newCatScrim"><div class="modal">
+  <h2 id="newCatTitle">Ny kategori</h2>
+  <div class="field"><label id="newCatLbl"></label><input id="newCatInput" maxlength="40" autocomplete="off" placeholder="fx Anrettet, Sauce, Garnish..."></div>
+  <p id="newCatHint" style="font-size:13px;color:var(--dim);margin:0 0 12px;line-height:1.4"></p>
+  <div class="mactions">
+    <button class="btn primary" id="newCatSave"></button>
+    <button class="btn ghost" id="newCatCancel"></button>
   </div>
 </div></div>
 
@@ -837,6 +852,9 @@
       shift_photo:"Tilføj billede",shift_post:"Post til feed",shift_discard:"Slet vagt",
       shift_no_data:"Ingen aktivitet logget",
       counter_cat_lbl:"Kategori",
+      new_cat_title:"Ny kategori",new_cat_lbl:"Navn",new_cat_save:"Opret",new_cat_cancel:"Annullér",
+      new_cat_hint:"Claude genererer automatisk et ikon i baggrunden.",
+      new_cat_btn:"+ Ny kategori",
     },
     en:{
       tagline:"track your craft",total_label:"total",
@@ -913,6 +931,9 @@
       shift_photo:"Add photo",shift_post:"Post to feed",shift_discard:"Discard shift",
       shift_no_data:"No activity logged",
       counter_cat_lbl:"Category",
+      new_cat_title:"New category",new_cat_lbl:"Name",new_cat_save:"Create",new_cat_cancel:"Cancel",
+      new_cat_hint:"Claude will automatically generate an icon in the background.",
+      new_cat_btn:"+ New category",
     }
   };
   let lang=localStorage.getItem("mise_lang")||"da";
@@ -933,6 +954,11 @@
     $("#counterQLabel").textContent=t("counter_q");
     $("#counterCatLbl").textContent=t("counter_cat_lbl");
     $("#counterLabelInput").placeholder=t("counter_ph");
+    $("#newCatTitle").textContent=t("new_cat_title");
+    $("#newCatLbl").textContent=t("new_cat_lbl");
+    $("#newCatHint").textContent=t("new_cat_hint");
+    $("#newCatSave").textContent=t("new_cat_save");
+    $("#newCatCancel").textContent=t("new_cat_cancel");
     $("#counterSave").textContent=t("save");
     $("#counterCancel").textContent=t("cancel");
     $("#counterDelete").textContent=t("del");
@@ -1036,6 +1062,10 @@
   }
   let expandedCats=new Set(JSON.parse(localStorage.getItem("mise_expanded_cats")||"null")||CATS.map(c=>c.id));
   function saveExpandedCats(){localStorage.setItem("mise_expanded_cats",JSON.stringify([...expandedCats]));}
+  const DOTS_ICON=CATS.find(c=>c.id==="andet").icon;
+  function allCats(){
+    return [...CATS,...(state.customCats||[]).map(c=>({id:c.id,da:c.name,en:c.name,icon:c.icon||DOTS_ICON,custom:true,iconPending:c.iconPending}))];
+  }
 
   const OYSTER_TYPES=["Gillardeau","Fine de Claire","Spéciale de Claire","Marennes-Oléron","Belon","Tsarskaya","Limfjordsøsters","Kumamoto","Blue Point","Utah Beach","Pied de Cheval"];
   const LANDE=["Frankrig","Italien","Spanien","Tyskland","Portugal","Østrig","USA","Argentina","Chile","Australien","New Zealand","Sydafrika","Danmark","Ungarn","Grækenland","Libanon","Georgien"];
@@ -1060,7 +1090,7 @@
     log:[]
   };
 
-  let state={counters:[],wines:[],log:[]},mem=null,wineFilter="";
+  let state={counters:[],wines:[],log:[],customCats:[]},mem=null,wineFilter="";
   let listView=localStorage.getItem("mise_listview")==="1";
   const logHistory=[];
 
@@ -1189,6 +1219,7 @@
     s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
     s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0}));
     s.log=Array.isArray(s.log)?s.log.filter(e=>e&&e.ts&&e.text):[];
+    s.customCats=Array.isArray(s.customCats)?s.customCats.map(c=>({id:c.id||id(),name:c.name||"",icon:c.icon||"",iconPending:!!c.iconPending})):[];
     return s;
   }
   function counterTotal(c){return c.subs.length?c.subs.reduce((a,b)=>a+b.count,0):c.count;}
@@ -1429,15 +1460,18 @@
       $("#btnGrid").classList.toggle("active",!listView);$("#btnList").classList.toggle("active",listView);return;
     }
     const recs=getRecords();
-    const groups={};CATS.forEach(cat=>{groups[cat.id]=[];});
+    const cats=allCats();
+    const groups={};cats.forEach(cat=>{groups[cat.id]=[];});
     state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
-    CATS.forEach(cat=>{
+    cats.forEach(cat=>{
       const counters=groups[cat.id]||[];if(!counters.length)return;
       const catTot=counters.reduce((s,c)=>s+counterTotal(c),0);
       const isOpen=expandedCats.has(cat.id);
       const section=document.createElement("div");section.className="cat-section"+(isOpen?" expanded":"");section.dataset.catId=cat.id;
       const cardTop=document.createElement("div");cardTop.className="cat-card-top";
-      const illo=document.createElement("div");illo.className="cat-illo";illo.innerHTML=cat.icon;
+      const illo=document.createElement("div");
+      if(cat.iconPending){illo.className="cat-illo cat-illo-pending";illo.innerHTML='<div class="spin"></div>';}
+      else{illo.className="cat-illo";illo.innerHTML=cat.icon;}
       const foot=document.createElement("div");foot.className="cat-card-foot";
       foot.innerHTML='<div class="cat-card-name">'+esc(lang==="en"?cat.en:cat.da)+'</div><div class="cat-card-total" id="cat-total-'+cat.id+'">'+catTot+'</div>';
       cardTop.appendChild(illo);cardTop.appendChild(foot);
@@ -1459,6 +1493,7 @@
       section.appendChild(cardTop);section.appendChild(body);grid.appendChild(section);
     });
     const add=document.createElement("button");add.className="addcard station-add-global";add.id="addCounterBtn";add.textContent=t("add_counter");grid.appendChild(add);
+    const addCat=document.createElement("button");addCat.className="station-new-cat";addCat.id="addCatBtn";addCat.textContent=t("new_cat_btn");grid.appendChild(addCat);
     $("#btnGrid").classList.toggle("active",!listView);$("#btnList").classList.toggle("active",listView);
   }
   function updateCatHeader(catId){
@@ -1492,6 +1527,7 @@
 
   $("#counterGrid").addEventListener("click",e=>{
     if(e.target.closest("#addCounterBtn")){openCounterModal(null);return;}
+    if(e.target.closest("#addCatBtn")){openNewCatModal();return;}
     const catAdd=e.target.closest("[data-cat-add]");if(catAdd){openCounterModal(null,catAdd.dataset.catAdd);return;}
     const card=e.target.closest(".ccard");if(!card)return;
     const act=e.target.closest("[data-act]");if(!act)return;const a=act.dataset.act;
@@ -1516,7 +1552,7 @@
     $("#counterLabelInput").value=c?c.label:"";
     $("#counterDelete").style.display=c?"block":"none";
     const sel=$("#counterCat");sel.innerHTML="";
-    CATS.forEach(cat=>{const o=document.createElement("option");o.value=cat.id;o.textContent=lang==="en"?cat.en:cat.da;sel.appendChild(o);});
+    allCats().forEach(cat=>{const o=document.createElement("option");o.value=cat.id;o.textContent=lang==="en"?cat.en:cat.da;sel.appendChild(o);});
     sel.value=c?(c.cat||"andet"):(defaultCat||"andet");
     $("#counterScrim").classList.add("open");setTimeout(()=>$("#counterLabelInput").focus(),30);
   }
@@ -1525,6 +1561,47 @@
   $("#counterSave").addEventListener("click",()=>{const v=$("#counterLabelInput").value.trim();if(!v)return;const cat=$("#counterCat").value||"andet";if(editC){const c=state.counters.find(x=>x.id===editC);if(c){c.label=v;c.cat=cat;}}else state.counters.push({id:id(),label:v,count:0,subs:[],suggest:seedFor(v),cat});save();renderCounters();closeCounterModal();});
   $("#counterDelete").addEventListener("click",()=>{state.counters=state.counters.filter(x=>x.id!==editC);save();renderCounters();renderCareer();closeCounterModal();});
   $("#counterLabelInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#counterSave").click();});
+
+  // ---- Custom categories ----
+  function openNewCatModal(){
+    $("#newCatInput").value="";
+    $("#newCatScrim").classList.add("open");
+    setTimeout(()=>$("#newCatInput").focus(),30);
+  }
+  function closeNewCatModal(){$("#newCatScrim").classList.remove("open");}
+  $("#newCatCancel").addEventListener("click",closeNewCatModal);
+  $("#newCatScrim").addEventListener("click",e=>{if(e.target===$("#newCatScrim"))closeNewCatModal();});
+  $("#newCatSave").addEventListener("click",()=>{
+    const name=$("#newCatInput").value.trim();if(!name)return;
+    const catId="custom-"+id();
+    if(!state.customCats)state.customCats=[];
+    state.customCats.push({id:catId,name,icon:"",iconPending:true});
+    save();renderCounters();closeNewCatModal();
+    generateCatIcon(catId,name);
+  });
+  $("#newCatInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#newCatSave").click();});
+
+  function updateCatIconInDom(catId,svg){
+    const section=document.querySelector('[data-cat-id="'+catId+'"]');
+    if(!section)return;
+    const illo=section.querySelector(".cat-illo");
+    if(illo){illo.className="cat-illo";illo.innerHTML=svg;}
+  }
+  async function generateCatIcon(catId,name){
+    const base=apiBase();if(!base)return;
+    const token=await getToken();if(!token)return;
+    try{
+      const res=await fetch(base+"/api/gen-category-icon",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});
+      if(!res.ok)return;
+      const {svg}=await res.json();
+      if(!svg||!svg.startsWith("<svg"))return;
+      const cat=(state.customCats||[]).find(c=>c.id===catId);
+      if(!cat)return;
+      cat.icon=svg;cat.iconPending=false;
+      save();
+      updateCatIconInDom(catId,svg);
+    }catch(e){/* keep dots */}
+  }
 
   // ---- wines ----
   function matchWine(w,q){if(!q)return true;return [w.name,w.producer,w.land,w.region,w.grape,w.vint].some(v=>(v||"").toLowerCase().includes(q));}
@@ -2416,6 +2493,10 @@
       return [...new Set([...phrases,...labels,...subs])];
     });
     setTimeout(()=>requestNotifPermission(),4000);
+    // Re-generate icons for any custom categories that were interrupted
+    setTimeout(()=>{
+      (state.customCats||[]).filter(c=>c.iconPending&&c.name).forEach(c=>generateCatIcon(c.id,c.name));
+    },1500);
   }
 
   (async function(){
