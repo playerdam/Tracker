@@ -128,7 +128,7 @@
   .cstep{display:flex;gap:8px;margin-top:auto}
   .step{appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--text);height:42px;border-radius:var(--r-sm);cursor:pointer;font-size:20px;font-weight:400;line-height:1;display:grid;place-items:center;transition:.12s;-webkit-tap-highlight-color:transparent;user-select:none}
   .step:hover{border-color:var(--border-2);background:var(--surface-2)}
-  .step:active{transform:translateY(1px)}
+  .step:active{transform:scale(.91);transition:transform .07s}
   .step.minus{flex:0 0 48px}
   .step.plus{flex:1;background:var(--accent);border-color:var(--accent);color:#fff;font-size:22px}
   .step.plus:hover{background:var(--accent-h);border-color:var(--accent-h);color:#fff}
@@ -439,6 +439,54 @@
     .tabrow{display:none}
     body{padding-bottom:88px}
   }
+
+  /* ========== Smoothness pass ========== */
+
+  /* Fjern 300ms tap-delay på iOS */
+  button,a,[role="button"],.ask-opt,.ri,.lb-row,.wrow,.logview-entry{touch-action:manipulation}
+
+  /* Ingen overscroll-bounce */
+  html{overscroll-behavior:none}
+
+  /* Momentum scroll inde i scroll-containere */
+  .modal,.comment-list,.dd,.ac,.tabs,.bottom-nav{-webkit-overflow-scrolling:touch}
+
+  /* Tab-view fade+slide ind */
+  @keyframes viewIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+  .view.active{animation:viewIn .2s cubic-bezier(.25,.46,.45,.94) both}
+
+  /* Scrim fader ind */
+  @keyframes scrimIn{from{opacity:0}to{opacity:1}}
+  .scrim.open{animation:scrimIn .18s ease both}
+
+  /* Dropdown fader ind */
+  @keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  .dd.open{animation:dropIn .14s ease both}
+
+  /* Press-states — øjeblikkelig taktil respons */
+  .sbtn:active{transform:scale(.87);transition:transform .06s}
+  .btn:active{transform:scale(.97);opacity:.9;transition:transform .06s,opacity .06s}
+  .tab:active{transform:scale(.92);transition:transform .07s}
+  .bnav-btn:active .bnav-icon{transform:scale(.82)!important;transition:transform .06s!important}
+  .vtbtn:active,.lang-btn:active,.auth-signout-btn:active{transform:scale(.91);transition:transform .06s}
+  .feed-action-btn:active,.feed-photo-action:active{transform:scale(.93);transition:transform .06s}
+  .feed-follow-btn:active,.feed-photo-follow:active,.shift-end-btn:active,.shift-start-btn:active{transform:scale(.94);transition:transform .06s}
+  .addcard:active,.addwine:active{transform:scale(.98);transition:transform .08s}
+  .kebab:active,.wedit:active{transform:scale(.84);transition:transform .05s}
+  .feed-load-more:active{transform:scale(.98);transition:transform .07s}
+
+  /* Bottom nav ikon-bounce ved aktiv tab */
+  .bnav-btn .bnav-icon{transition:transform .22s cubic-bezier(.34,1.56,.64,1),stroke-width .15s}
+  .bnav-btn.active .bnav-icon{transform:scale(1.14)}
+
+  /* Numtray slide op med spring */
+  .numtray{transition:transform .26s cubic-bezier(.34,1.2,.64,1)}
+
+  /* View Transition API — crossfade ved tab-skift (Safari 18+, Chrome 111+) */
+  @keyframes vt-fade-in{from{opacity:0}to{opacity:1}}
+  @keyframes vt-fade-out{from{opacity:1}to{opacity:0}}
+  ::view-transition-old(root){animation:vt-fade-out .15s ease both}
+  ::view-transition-new(root){animation:vt-fade-in .18s ease both}
 </style>
 </head>
 <body>
@@ -1629,6 +1677,7 @@
   }
   document.querySelectorAll('input[name="askmode"]').forEach(r=>r.addEventListener("change",()=>{$("#askParent").disabled=document.querySelector('input[name="askmode"]:checked').value!=="sub";}));
   $("#qlogInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runQuickLog();}});
+  $("#qlogInput").addEventListener("focus",()=>{setTimeout(()=>$("#qlogInput").scrollIntoView({behavior:"smooth",block:"center"}),300);});
 
   document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s){if(s._askSkip)s._askSkip();else s.classList.remove("open");}}));
   document.addEventListener("keydown",e=>{
@@ -1638,13 +1687,17 @@
     }
   });
   function switchTab(v){
-    document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.view===v));
-    document.querySelectorAll(".bnav-btn").forEach(x=>x.classList.toggle("active",x.dataset.tab===v));
-    ["station","log","vin","social","feed"].forEach(n=>$("#view-"+n).classList.toggle("active",v===n));
-    $("#viewToggle").style.display=v==="station"?"":"none";
-    if(v==="log")renderLogView();
-    if(v==="social")loadSocial();
-    if(v==="feed")loadFeed();
+    function doSwitch(){
+      document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.view===v));
+      document.querySelectorAll(".bnav-btn").forEach(x=>x.classList.toggle("active",x.dataset.tab===v));
+      ["station","log","vin","social","feed"].forEach(n=>$("#view-"+n).classList.toggle("active",v===n));
+      $("#viewToggle").style.display=v==="station"?"":"none";
+      if(v==="log")renderLogView();
+      if(v==="social")loadSocial();
+      if(v==="feed")loadFeed();
+      window.scrollTo({top:0,behavior:"instant"});
+    }
+    if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
   }
   document.querySelectorAll(".tab").forEach(tb=>tb.addEventListener("click",()=>switchTab(tb.dataset.view)));
   document.querySelectorAll(".bnav-btn").forEach(btn=>btn.addEventListener("click",()=>switchTab(btn.dataset.tab)));
