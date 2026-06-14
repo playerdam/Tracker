@@ -1226,12 +1226,23 @@
   let numtrayCallback=null;
   const numtray=$("#numtray");
   const numtrayInput=$("#numtrayInput");
+  function syncNumtrayToViewport(){
+    if(!numtray.classList.contains("open"))return;
+    const vv=window.visualViewport;
+    if(!vv)return;
+    const keyboardH=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+    numtray.style.bottom=keyboardH+"px";
+  }
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize",syncNumtrayToViewport);
+    window.visualViewport.addEventListener("scroll",syncNumtrayToViewport);
+  }
   function openNumtray(label,initialVal,onSave){
     $("#numtrayLabel").textContent=label;numtrayInput.value=initialVal!==""?initialVal:"";
     numtrayCallback=onSave;numtray.classList.add("open");
     setTimeout(()=>{numtrayInput.select();numtrayInput.focus();},60);
   }
-  function closeNumtray(){numtray.classList.remove("open");numtrayCallback=null;}
+  function closeNumtray(){numtray.classList.remove("open");numtray.style.bottom="";numtrayCallback=null;}
   $("#numtrayOk").addEventListener("click",()=>{const val=parseInt(numtrayInput.value,10);if(!isNaN(val)&&numtrayCallback)numtrayCallback(val);closeNumtray();});
   $("#numtrayCancel").addEventListener("click",closeNumtray);
   numtrayInput.addEventListener("keydown",e=>{if(e.key==="Enter")$("#numtrayOk").click();if(e.key==="Escape")closeNumtray();});
