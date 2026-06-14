@@ -472,6 +472,29 @@
   .feed-action-btn:active,.feed-photo-action:active{transform:scale(.93);transition:transform .06s}
   .feed-follow-btn:active,.feed-photo-follow:active,.shift-end-btn:active,.shift-start-btn:active{transform:scale(.94);transition:transform .06s}
   .addcard:active,.addwine:active{transform:scale(.98);transition:transform .08s}
+
+  /* Category sections */
+  .cat-view{display:flex;flex-direction:column;gap:10px}
+  .cat-section{display:flex;flex-direction:column}
+  .cat-header{display:flex;align-items:center;gap:13px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:.12s}
+  .cat-header.open{border-radius:var(--r) var(--r) 0 0}
+  .cat-header:active{transform:scale(.99);transition:transform .06s}
+  .cat-icon-wrap{width:40px;height:40px;border-radius:9px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex:none}
+  .cat-icon-wrap svg{width:20px;height:20px;color:var(--accent)}
+  .cat-name{flex:1;font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+  .cat-total{font-family:"Fraunces",serif;font-size:22px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;min-width:28px;text-align:right}
+  .cat-chevron{color:var(--faint);transition:transform .22s cubic-bezier(.34,1.56,.64,1);flex:none;font-size:11px;margin-left:2px;line-height:1}
+  .cat-header.open .cat-chevron{transform:rotate(180deg)}
+  .cat-body{display:none;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r) var(--r);overflow:hidden}
+  .cat-body.open{display:flex;flex-direction:column;animation:viewIn .18s ease both}
+  .cat-body .grid{border:none;border-radius:0;gap:10px;padding:10px;background:var(--bg)}
+  .cat-body .grid.list{border:none;border-radius:0;background:var(--border);padding:0;gap:1px}
+  .cat-body .grid.list .ccard{border-radius:0}
+  .cat-body .grid.list .addcard{display:none}
+  .cat-add{appearance:none;background:var(--surface);border:none;border-top:1px solid var(--border);width:100%;padding:11px 16px;text-align:left;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  .cat-add:hover{background:var(--accent-soft)}
+  .cat-add:active{transform:scale(.99);transition:transform .06s}
+  .station-add-global{margin-top:4px}
   .kebab:active,.wedit:active{transform:scale(.84);transition:transform .05s}
   .feed-load-more:active{transform:scale(.98);transition:transform .07s}
 
@@ -608,6 +631,7 @@
 <div class="scrim" id="counterScrim"><div class="modal">
   <h2 id="counterModalTitle"></h2>
   <div class="field"><label id="counterQLabel"></label><input id="counterLabelInput" maxlength="40" autocomplete="off"></div>
+  <div class="field"><label id="counterCatLbl"></label><select id="counterCat" class="ask-select"></select></div>
   <div class="mactions">
     <button class="btn primary" id="counterSave"></button>
     <button class="btn ghost" id="counterCancel"></button>
@@ -812,6 +836,7 @@
       shift_caption_ph:"Skriv en opsummering af vagten…",
       shift_photo:"Tilføj billede",shift_post:"Post til feed",shift_discard:"Slet vagt",
       shift_no_data:"Ingen aktivitet logget",
+      counter_cat_lbl:"Kategori",
     },
     en:{
       tagline:"track your craft",total_label:"total",
@@ -887,6 +912,7 @@
       shift_caption_ph:"Write a shift summary…",
       shift_photo:"Add photo",shift_post:"Post to feed",shift_discard:"Discard shift",
       shift_no_data:"No activity logged",
+      counter_cat_lbl:"Category",
     }
   };
   let lang=localStorage.getItem("mise_lang")||"da";
@@ -905,6 +931,7 @@
     $("#addWineBtn").textContent=t("add_wine");
     $("#wineSearch").placeholder=t("wine_search_ph");
     $("#counterQLabel").textContent=t("counter_q");
+    $("#counterCatLbl").textContent=t("counter_cat_lbl");
     $("#counterLabelInput").placeholder=t("counter_ph");
     $("#counterSave").textContent=t("save");
     $("#counterCancel").textContent=t("cancel");
@@ -980,6 +1007,35 @@
     "Naturvin":            {en:"Natural wine"},
   };
   function tLabel(label){if(lang==="da")return label;return(LABEL_TRANSLATIONS[label]&&LABEL_TRANSLATIONS[label][lang])||label;}
+
+  const CATS=[
+    {id:"aabnet-mad",da:"Åbnet mad",en:"Opened food",
+     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12c0-4.4 3.6-7 8-7s8 2.6 8 7"/><path d="M4 12c0 4.4 3.6 7 8 7s8-2.6 8-7"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>'},
+    {id:"aabnet-drikke",da:"Åbnet drikke",en:"Opened drinks",
+     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3h5M10 3v3.5L7.5 9v11a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V9L14 6.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg>'},
+    {id:"snittet",da:"Snittet",en:"Cut",
+     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="3"/><polyline points="21 3 17 3 21 7"/><polyline points="3 21 3 17 7 21"/></svg>'},
+    {id:"tilberedt",da:"Tilberedt",en:"Prepared",
+     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14v8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-8z"/><line x1="3" y1="11" x2="21" y2="11"/><path d="M8 11V8h8v3"/><path d="M10.5 5c0 2-1 2.5-1 2.5M13.5 5c0 2 1 2.5 1 2.5"/></svg>'},
+    {id:"serveret",da:"Serveret",en:"Served",
+     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="18" x2="21" y2="18"/><path d="M5 18a7 7 0 0 1 14 0"/><line x1="12" y1="11" x2="12" y2="7"/><circle cx="12" cy="6" r="1.5"/></svg>'},
+    {id:"andet",da:"Andet",en:"Other",
+     icon:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>'},
+  ];
+  function guessCategory(label){
+    const l=label.toLowerCase();
+    const m={
+      "aabnet-mad":["oyster","øster","musling","skaldyr","rejer","kaviar","laks","sild","tun","ål","hummer","krabbe","jomfruhummer","pighvar","torsk","blæk","squid"],
+      "aabnet-drikke":["flaske","vin","øl","champagne","prosecco","cava","spirits","whisky","vodka","rum","gin","aperitif","digestif","sodavand","vand","dåse","port","sherry","sake","cider"],
+      "snittet":["snit","hak","skær","julienne","brunoise","chiffonade","løg","gulerod","selleri","kartoffel","squash","peber","tomat","svamp","urt","purre","fennikel","aubergine","kål","salat","spinat","bønne","ærte","artiskok","rødbede"],
+      "tilberedt":["fond","sauce","sky","bouillon","marinade","vinaigrette","mayo","creme","mousse","sorbet","is","gelé","confit","emulsion","suppe","grød","risotto","polenta","brød","bolle","kage","dej","pasta","kogt","stegt","bagt","pocheret"],
+      "serveret":["couvert","gæst","bord","ret","menu","tasting","dessert","snack","amuse","forret","hoved","oste","kaffe","te","serveret"],
+    };
+    for(const[cat,words] of Object.entries(m)){if(words.some(w=>l.includes(w)))return cat;}
+    return "andet";
+  }
+  let expandedCats=new Set(JSON.parse(localStorage.getItem("mise_expanded_cats")||"null")||CATS.map(c=>c.id));
+  function saveExpandedCats(){localStorage.setItem("mise_expanded_cats",JSON.stringify([...expandedCats]));}
 
   const OYSTER_TYPES=["Gillardeau","Fine de Claire","Spéciale de Claire","Marennes-Oléron","Belon","Tsarskaya","Limfjordsøsters","Kumamoto","Blue Point","Utah Beach","Pied de Cheval"];
   const LANDE=["Frankrig","Italien","Spanien","Tyskland","Portugal","Østrig","USA","Argentina","Chile","Australien","New Zealand","Sydafrika","Danmark","Ungarn","Grækenland","Libanon","Georgien"];
@@ -1323,57 +1379,90 @@
   }
 
   // ---- counters ----
+  function makeCounterCard(c,recs){
+    const isCat=c.subs.length>0;
+    const card=document.createElement("div");card.className="ccard"+(isCat?" cat":"");card.dataset.id=c.id;
+    const ph=(c.suggest&&c.suggest.length)?(t("sub_ph").replace("Skriv","fx").replace("Type","e.g.")+" "+c.suggest[0]):t("sub_ph");
+    const bigAct=isCat?"":"data-act=\"editnum\"";
+    const total=counterTotal(c);const rec=recs[c.label]||total;
+    const barPct=rec>0?Math.min(100,Math.round((total/rec)*100)):0;
+    let html='<button class="kebab" data-act="edit" aria-label="Edit">&#8943;</button><div class="clabel">'+esc(tLabel(c.label))+'</div><div class="cbig" '+bigAct+'>'+total+'</div>';
+    if(isCat){
+      html+='<div class="sublist">';
+      c.subs.forEach(sub=>{html+='<div class="subrow" data-sid="'+sub.id+'"><span class="subname">'+esc(tLabel(sub.name))+'</span><div class="subctrl"><button class="sbtn" data-act="subdec">&#8722;</button><span class="subcount" data-act="subeditnum">'+sub.count+'</span><button class="sbtn plus" data-act="subinc">+</button></div></div>';});
+      html+='</div>';
+    }else{
+      html+='<div class="cstep"><button class="step minus" data-act="dec">&#8722;</button><button class="step plus" data-act="inc">+</button></div>';
+    }
+    html+='<div class="ccard-bar"><div class="ccard-bar-fill" style="width:'+barPct+'%"></div></div>';
+    html+='<button class="addtype" data-act="addtype">'+esc(t("add_sub"))+'</button><div class="addtype-box"><input class="subadd-input" placeholder="'+esc(ph)+'" maxlength="40" autocomplete="off"></div>';
+    card.innerHTML=html;
+    attachAC(card.querySelector(".subadd-input"),()=>uniq([...c.suggest,...c.subs.map(s=>s.name)]));
+    const plusBtn=card.querySelector('.step.plus[data-act="inc"]');
+    if(plusBtn)bindLongPress(plusBtn,()=>{openNumtray(t("numtray_add")+" "+c.label,"",val=>{if(val>0)bumpSimple(card,val);});});
+    card.querySelectorAll('.sbtn.plus[data-act="subinc"]').forEach(btn=>{
+      const sid=btn.closest(".subrow").dataset.sid;const s=c.subs.find(x=>x.id===sid);if(!s)return;
+      bindLongPress(btn,()=>{openNumtray(t("numtray_add")+" "+s.name,"",val=>{if(val>0)bumpSub(card,sid,val);});});
+    });
+    if(!isCat){
+      let _tx=0;
+      card.addEventListener("touchstart",e=>{_tx=e.touches[0].clientX;},{passive:true});
+      card.addEventListener("touchend",e=>{
+        const dx=e.changedTouches[0].clientX-_tx;
+        if(dx>52&&!e.target.closest("button")){bumpSimple(card,1);card.classList.add("swipe-flash");setTimeout(()=>card.classList.remove("swipe-flash"),350);}
+      },{passive:true});
+    }
+    return card;
+  }
   function renderCounters(){
-    const grid=$("#counterGrid");grid.classList.toggle("list",listView);grid.innerHTML="";
+    const grid=$("#counterGrid");grid.className="cat-view";grid.innerHTML="";
+    // Migrate: assign category to counters that don't have one yet
+    let migrated=false;
+    state.counters.forEach(c=>{if(!c.cat){c.cat=guessCategory(c.label);migrated=true;}});
+    if(migrated)save();
     if(!state.counters.length){
-      const es=document.createElement("div");es.className="empty-state";es.style.gridColumn="1/-1";
-      es.innerHTML='<div class="empty-state-icon">🍳</div><div class="empty-state-title">'+(lang==="da"?"Ingen tællere endnu":"No counters yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tilføj din første tæller og begynd at holde styr på håndværket":"Add your first counter and start tracking your craft")+'</div>';
+      const es=document.createElement("div");es.className="empty-state";
+      es.innerHTML='<div class="empty-state-icon">&#127859;</div><div class="empty-state-title">'+(lang==="da"?"Ingen tællere endnu":"No counters yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tilføj din første tæller og begynd at holde styr på håndværket":"Add your first counter and start tracking your craft")+'</div>';
       const btn=document.createElement("button");btn.className="btn primary";btn.textContent=t("add_counter").replace("+ ","");btn.addEventListener("click",()=>openCounterModal(null));
       es.appendChild(btn);grid.appendChild(es);
       const add=document.createElement("button");add.className="addcard";add.id="addCounterBtn";add.textContent=t("add_counter");add.style.display="none";grid.appendChild(add);
       $("#btnGrid").classList.toggle("active",!listView);$("#btnList").classList.toggle("active",listView);return;
     }
     const recs=getRecords();
-    state.counters.forEach(c=>{
-      const isCat=c.subs.length>0;
-      const card=document.createElement("div");card.className="ccard"+(isCat?" cat":"");card.dataset.id=c.id;
-      const ph=(c.suggest&&c.suggest.length)?(t("sub_ph").replace("Skriv","fx").replace("Type","e.g.")+" "+c.suggest[0]):t("sub_ph");
-      const bigAct=isCat?"":"data-act=\"editnum\"";
-      const total=counterTotal(c);const rec=recs[c.label]||total;
-      const barPct=rec>0?Math.min(100,Math.round((total/rec)*100)):0;
-      let html='<button class="kebab" data-act="edit" aria-label="Edit">⋯</button><div class="clabel">'+esc(tLabel(c.label))+'</div><div class="cbig" '+bigAct+'>'+total+'</div>';
-      if(isCat){
-        html+='<div class="sublist">';
-        c.subs.forEach(sub=>{html+='<div class="subrow" data-sid="'+sub.id+'"><span class="subname">'+esc(tLabel(sub.name))+'</span><div class="subctrl"><button class="sbtn" data-act="subdec">−</button><span class="subcount" data-act="subeditnum">'+sub.count+'</span><button class="sbtn plus" data-act="subinc">+</button></div></div>';});
-        html+='</div>';
-      }else{
-        html+='<div class="cstep"><button class="step minus" data-act="dec">−</button><button class="step plus" data-act="inc">+</button></div>';
-      }
-      html+='<div class="ccard-bar"><div class="ccard-bar-fill" style="width:'+barPct+'%"></div></div>';
-      html+='<button class="addtype" data-act="addtype">'+esc(t("add_sub"))+'</button><div class="addtype-box"><input class="subadd-input" placeholder="'+esc(ph)+'" maxlength="40" autocomplete="off"></div>';
-      card.innerHTML=html;grid.appendChild(card);
-      attachAC(card.querySelector(".subadd-input"),()=>uniq([...c.suggest,...c.subs.map(s=>s.name)]));
-      const plusBtn=card.querySelector('.step.plus[data-act="inc"]');
-      if(plusBtn)bindLongPress(plusBtn,()=>{openNumtray(t("numtray_add")+" "+c.label,"",val=>{if(val>0)bumpSimple(card,val);});});
-      card.querySelectorAll('.sbtn.plus[data-act="subinc"]').forEach(btn=>{
-        const sid=btn.closest(".subrow").dataset.sid;const s=c.subs.find(x=>x.id===sid);if(!s)return;
-        bindLongPress(btn,()=>{openNumtray(t("numtray_add")+" "+s.name,"",val=>{if(val>0)bumpSub(card,sid,val);});});
+    const groups={};CATS.forEach(cat=>{groups[cat.id]=[];});
+    state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
+    CATS.forEach(cat=>{
+      const counters=groups[cat.id]||[];if(!counters.length)return;
+      const catTot=counters.reduce((s,c)=>s+counterTotal(c),0);
+      const isOpen=expandedCats.has(cat.id);
+      const section=document.createElement("div");section.className="cat-section";section.dataset.catId=cat.id;
+      const header=document.createElement("div");
+      header.className="cat-header"+(isOpen?" open":"");
+      header.innerHTML='<div class="cat-icon-wrap">'+cat.icon+'</div><span class="cat-name">'+esc(lang==="en"?cat.en:cat.da)+'</span><span class="cat-total" id="cat-total-'+cat.id+'">'+catTot+'</span><span class="cat-chevron">&#9660;</span>';
+      const body=document.createElement("div");
+      body.className="cat-body"+(isOpen?" open":"");
+      body.id="cat-body-"+cat.id;
+      const cardGrid=document.createElement("div");
+      cardGrid.className="grid"+(listView?" list":"");
+      counters.forEach(c=>{cardGrid.appendChild(makeCounterCard(c,recs));});
+      const catAddBtn=document.createElement("button");
+      catAddBtn.className="cat-add";catAddBtn.dataset.catAdd=cat.id;
+      catAddBtn.innerHTML='+ '+(lang==="da"?"Tilføj tæller":"Add counter");
+      body.appendChild(cardGrid);body.appendChild(catAddBtn);
+      header.addEventListener("click",()=>{
+        const open=body.classList.toggle("open");header.classList.toggle("open",open);
+        if(open)expandedCats.add(cat.id);else expandedCats.delete(cat.id);
+        saveExpandedCats();
       });
-      if(!isCat){
-        let _tx=0;
-        card.addEventListener("touchstart",e=>{_tx=e.touches[0].clientX;},{passive:true});
-        card.addEventListener("touchend",e=>{
-          const dx=e.changedTouches[0].clientX-_tx;
-          if(dx>52&&!e.target.closest("button")){
-            bumpSimple(card,1);
-            card.classList.add("swipe-flash");
-            setTimeout(()=>card.classList.remove("swipe-flash"),350);
-          }
-        },{passive:true});
-      }
+      section.appendChild(header);section.appendChild(body);grid.appendChild(section);
     });
-    const add=document.createElement("button");add.className="addcard";add.id="addCounterBtn";add.textContent=t("add_counter");grid.appendChild(add);
+    const add=document.createElement("button");add.className="addcard station-add-global";add.id="addCounterBtn";add.textContent=t("add_counter");grid.appendChild(add);
     $("#btnGrid").classList.toggle("active",!listView);$("#btnList").classList.toggle("active",listView);
+  }
+  function updateCatHeader(catId){
+    const el=document.getElementById("cat-total-"+catId);if(!el)return;
+    const tot=state.counters.filter(c=>(c.cat||"andet")===catId).reduce((s,c)=>s+counterTotal(c),0);
+    el.textContent=tot;
   }
   function haptic(ms){if(navigator.vibrate)navigator.vibrate(ms||30);}
   function tickEl(el){if(!el)return;el.classList.remove("tick");void el.offsetWidth;el.classList.add("tick");}
@@ -1395,12 +1484,13 @@
     const pct=rec>0?Math.min(100,Math.round((total/rec)*100)):0;
     bar.style.width=pct+"%";
   }
-  function bumpSimple(card,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c||c.subs.length)return;const prev=c.count;c.count=Math.max(0,c.count+d);const n=card.querySelector(".cbig");animateCount(n,prev,c.count);if(d>0){tickEl(n);haptic();}updateCardBar(card,c);renderCareer();save();}
-  function bumpSub(card,sid,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c)return;const s=c.subs.find(x=>x.id===sid);if(!s)return;const prev=s.count;s.count=Math.max(0,s.count+d);const p=card.querySelector('.subrow[data-sid="'+sid+'"] .subcount');if(p){animateCount(p,prev,s.count);if(d>0){tickEl(p);haptic();}}const tv=card.querySelector(".cbig");if(tv){const prevT=counterTotal(c)-d;animateCount(tv,Math.max(0,prevT),counterTotal(c));if(d>0)tickEl(tv);}updateCardBar(card,c);renderCareer();save();}
+  function bumpSimple(card,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c||c.subs.length)return;const prev=c.count;c.count=Math.max(0,c.count+d);const n=card.querySelector(".cbig");animateCount(n,prev,c.count);if(d>0){tickEl(n);haptic();}updateCardBar(card,c);updateCatHeader(c.cat||"andet");renderCareer();save();}
+  function bumpSub(card,sid,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c)return;const s=c.subs.find(x=>x.id===sid);if(!s)return;const prev=s.count;s.count=Math.max(0,s.count+d);const p=card.querySelector('.subrow[data-sid="'+sid+'"] .subcount');if(p){animateCount(p,prev,s.count);if(d>0){tickEl(p);haptic();}}const tv=card.querySelector(".cbig");if(tv){const prevT=counterTotal(c)-d;animateCount(tv,Math.max(0,prevT),counterTotal(c));if(d>0)tickEl(tv);}updateCardBar(card,c);updateCatHeader(c.cat||"andet");renderCareer();save();}
   function addType(card,name){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c)return;name=name.trim();if(!name)return;const ex=c.subs.find(s=>s.name.toLowerCase()===name.toLowerCase());if(ex){ex.count++;}else{if(c.subs.length===0&&c.count>0){c.subs.push({id:id(),name:"Uden type",count:c.count});c.count=0;}c.subs.push({id:id(),name,count:0});if(!c.suggest.some(s=>s.toLowerCase()===name.toLowerCase()))c.suggest.push(name);}save();renderCounters();renderCareer();}
 
   $("#counterGrid").addEventListener("click",e=>{
     if(e.target.closest("#addCounterBtn")){openCounterModal(null);return;}
+    const catAdd=e.target.closest("[data-cat-add]");if(catAdd){openCounterModal(null,catAdd.dataset.catAdd);return;}
     const card=e.target.closest(".ccard");if(!card)return;
     const act=e.target.closest("[data-act]");if(!act)return;const a=act.dataset.act;
     if(a==="edit")openCounterModal(card.dataset.id);
@@ -1418,16 +1508,19 @@
   $("#btnList").addEventListener("click",()=>{listView=true;localStorage.setItem("mise_listview","1");renderCounters();});
 
   let editC=null;
-  function openCounterModal(cid){
+  function openCounterModal(cid,defaultCat){
     editC=cid;const c=cid?state.counters.find(x=>x.id===cid):null;
     $("#counterModalTitle").textContent=c?t("counter_edit"):t("counter_new");
     $("#counterLabelInput").value=c?c.label:"";
     $("#counterDelete").style.display=c?"block":"none";
+    const sel=$("#counterCat");sel.innerHTML="";
+    CATS.forEach(cat=>{const o=document.createElement("option");o.value=cat.id;o.textContent=lang==="en"?cat.en:cat.da;sel.appendChild(o);});
+    sel.value=c?(c.cat||"andet"):(defaultCat||"andet");
     $("#counterScrim").classList.add("open");setTimeout(()=>$("#counterLabelInput").focus(),30);
   }
   function closeCounterModal(){$("#counterScrim").classList.remove("open");editC=null;}
   $("#counterCancel").addEventListener("click",closeCounterModal);
-  $("#counterSave").addEventListener("click",()=>{const v=$("#counterLabelInput").value.trim();if(!v)return;if(editC){const c=state.counters.find(x=>x.id===editC);if(c)c.label=v;}else state.counters.push({id:id(),label:v,count:0,subs:[],suggest:seedFor(v)});save();renderCounters();closeCounterModal();});
+  $("#counterSave").addEventListener("click",()=>{const v=$("#counterLabelInput").value.trim();if(!v)return;const cat=$("#counterCat").value||"andet";if(editC){const c=state.counters.find(x=>x.id===editC);if(c){c.label=v;c.cat=cat;}}else state.counters.push({id:id(),label:v,count:0,subs:[],suggest:seedFor(v),cat});save();renderCounters();closeCounterModal();});
   $("#counterDelete").addEventListener("click",()=>{state.counters=state.counters.filter(x=>x.id!==editC);save();renderCounters();renderCareer();closeCounterModal();});
   $("#counterLabelInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#counterSave").click();});
 
