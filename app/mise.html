@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>Craft Tracker</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#D97706">
@@ -1230,13 +1230,19 @@
     if(!numtray.classList.contains("open"))return;
     const vv=window.visualViewport;
     if(!vv)return;
-    const keyboardH=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+    // For position:fixed elements, offsetTop is irrelevant — only height delta matters
+    const keyboardH=Math.max(0,window.innerHeight-vv.height);
     numtray.style.bottom=keyboardH+"px";
   }
   if(window.visualViewport){
     window.visualViewport.addEventListener("resize",syncNumtrayToViewport);
-    window.visualViewport.addEventListener("scroll",syncNumtrayToViewport);
   }
+  numtrayInput.addEventListener("focus",()=>{
+    // Retry at multiple points — keyboard animation takes ~300ms on iOS
+    setTimeout(syncNumtrayToViewport,100);
+    setTimeout(syncNumtrayToViewport,300);
+    setTimeout(syncNumtrayToViewport,500);
+  });
   function openNumtray(label,initialVal,onSave){
     $("#numtrayLabel").textContent=label;numtrayInput.value=initialVal!==""?initialVal:"";
     numtrayCallback=onSave;numtray.classList.add("open");
