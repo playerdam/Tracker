@@ -7,7 +7,10 @@ const dst = path.join(__dirname, "../www");
 if (!fs.existsSync(dst)) fs.mkdirSync(dst, { recursive: true });
 
 // mise.html → index.html (Capacitor entry point)
-fs.copyFileSync(path.join(src, "mise.html"), path.join(dst, "index.html"));
+// Inject the Railway backend URL so the app works outside a browser
+let html = fs.readFileSync(path.join(src, "mise.html"), "utf8");
+html = html.replace('const API_BASE="";', 'const API_BASE="https://tracker-production-1a62.up.railway.app";');
+fs.writeFileSync(path.join(dst, "index.html"), html);
 
 // Other web assets
 for (const f of ["manifest.json", "sw.js"]) {

@@ -6,8 +6,10 @@
     "androidScheme": "https"
   },
   "ios": {
-    "contentInset": "automatic",
-    "backgroundColor": "#F7F4F0"
+    "contentInset": "never",
+    "backgroundColor": "#F7F4F0",
+    "allowsLinkPreview": false,
+    "scrollEnabled": false
   },
   "plugins": {
     "SplashScreen": {

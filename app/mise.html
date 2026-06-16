@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Craft Tracker</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#D97706">
@@ -25,7 +25,7 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--text)}
-  body{font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;padding:0 0 100px;font-size:15px;line-height:1.6}
+  body{font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;padding:env(safe-area-inset-top,0px) 0 100px;font-size:15px;line-height:1.6}
   .wrap{max-width:760px;margin:0 auto;padding:0 20px}
   button{font-family:inherit}
 
@@ -246,7 +246,7 @@
   .ac-item{padding:9px 13px;font-size:14px;cursor:pointer;color:var(--dim)}
   .ac-item:hover,.ac-item.on{background:var(--surface-2);color:var(--text)}
 
-  .scrim{position:fixed;inset:0;background:rgba(12,10,9,.45);backdrop-filter:blur(4px);display:none;place-items:center;padding:20px;z-index:50}
+  .scrim{position:fixed;inset:0;background:rgba(12,10,9,.45);backdrop-filter:blur(4px);display:none;place-items:center;padding:20px;z-index:150}
   .scrim.open{display:grid}
   .modal{background:var(--surface);border-radius:14px;width:100%;max-width:420px;padding:32px 24px 24px;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg);border:1px solid var(--border)}
   .modal h2{font-family:"Fraunces",serif;font-weight:600;font-size:22px;margin-bottom:20px;color:var(--text)}
@@ -256,7 +256,7 @@
   .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .row2{display:flex;gap:10px}
   .row2 .field{flex:1}
-  .mactions{display:flex;gap:8px;margin-top:22px;align-items:center}
+  .mactions{display:flex;gap:8px;margin-top:22px;align-items:center;position:sticky;bottom:0;background:var(--surface);padding-bottom:4px;z-index:2}
   .btn{appearance:none;border:none;border-radius:var(--r-sm);cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;padding:11px 18px;transition:.12s;letter-spacing:-.01em}
   .btn.primary{background:var(--accent);color:#fff}
   .btn.primary:hover{background:var(--accent-h)}
@@ -521,6 +521,28 @@
   .feed-action-btn:active,.feed-photo-action:active{transform:scale(.93);transition:transform .06s}
   .feed-follow-btn:active,.feed-photo-follow:active,.shift-end-btn:active,.shift-start-btn:active{transform:scale(.94);transition:transform .06s}
   .addcard:active,.addwine:active{transform:scale(.98);transition:transform .08s}
+
+  /* Category picker bottom sheet */
+  .cat-picker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+  .cat-picker-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 6px;border-radius:var(--r);border:2px solid var(--border);background:var(--surface);cursor:pointer;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  .cat-picker-item:active{transform:scale(.94);transition:transform .06s}
+  .cat-picker-item.active{border-color:var(--accent);background:var(--accent-soft)}
+  .cat-picker-item-ring{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
+  .cat-picker-item-ring svg{width:24px;height:24px;color:var(--accent)}
+  .cat-picker-item.active .cat-picker-item-ring{background:var(--accent)}
+  .cat-picker-item.active .cat-picker-item-ring svg{color:#fff}
+  .cat-picker-item-name{font-size:10px;font-weight:800;color:var(--dim);text-align:center;letter-spacing:.03em;line-height:1.2;text-transform:uppercase}
+  .cat-picker-item.active .cat-picker-item-name{color:var(--accent)}
+  .cat-picker-item-total{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--text);line-height:1}
+  .cat-picker-new{display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 6px;border-radius:var(--r);border:1.5px dashed var(--border-2);background:none;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:.12s}
+  .cat-picker-new:active{transform:scale(.94);transition:transform .06s}
+  .cat-picker-new:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .cat-picker-new-icon{font-size:22px;line-height:1}
+  .cat-picker-new-lbl{font-size:10px;font-weight:800;color:var(--faint);text-align:center;letter-spacing:.03em;text-transform:uppercase}
+  .cat-all-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;width:66px}
+  .cat-all-ring{width:58px;height:58px;border-radius:18px;border:2.5px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;transition:border-color .15s,background .15s}
+  .cat-all-chip:active .cat-all-ring{opacity:.7;transition:opacity .06s}
+  .cat-all-name{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);text-align:center}
 
   /* Category chip strip (Stories-style) */
   .cat-strip{display:flex;overflow-x:auto;gap:10px;padding:8px 16px 22px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -840,6 +862,11 @@
   </div>
 </div></div>
 
+<div class="scrim" id="catPickerScrim"><div class="modal">
+  <h2 id="catPickerTitle"></h2>
+  <div class="cat-picker-grid" id="catPickerGrid"></div>
+</div></div>
+
 <div class="badge-toast" id="badgeToast">
   <div class="badge-toast-icon" id="badgeToastIcon"></div>
   <div class="badge-toast-lbl" id="badgeToastLbl"></div>
@@ -977,6 +1004,7 @@
       new_cat_title:"Ny kategori",new_cat_lbl:"Navn",new_cat_save:"Opret",new_cat_cancel:"Annullér",
       new_cat_hint:"Claude genererer automatisk et ikon i baggrunden.",
       new_cat_btn:"+ Ny kategori",
+      cat_picker_title:"Alle kategorier",cat_all_chip:"Alle",
     },
     en:{
       tagline:"track your career",total_label:"total",
@@ -1064,6 +1092,7 @@
       new_cat_title:"New category",new_cat_lbl:"Name",new_cat_save:"Create",new_cat_cancel:"Cancel",
       new_cat_hint:"Claude will automatically generate an icon in the background.",
       new_cat_btn:"+ New category",
+      cat_picker_title:"All categories",cat_all_chip:"All",
     }
   };
   let lang=localStorage.getItem("mise_lang")||"da";
@@ -1307,10 +1336,10 @@
   }
 
   async function initAuth(){
-    try{const res=await fetch("/api/config");cfg=await res.json();}catch(e){console.warn("Config fetch fejlede",e);}
+    try{const res=await fetch(apiBase()+"/api/config");cfg=await res.json();}catch(e){console.warn("Config fetch fejlede",e);}
     if(!session){showAuthScreen();return false;}
     if(Date.now()>session.expires_at-60000){const ok=await refreshSession();if(!ok){showAuthScreen();return false;}}
-    try{await fetch("/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});}catch(e){}
+    try{await fetch(apiBase()+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});}catch(e){}
     hideAuthScreen();return true;
   }
 
@@ -1339,7 +1368,7 @@
         return;
       }
       if(result){$("#authErr").textContent=result;$("#authErr").style.display="block";return;}
-      try{await fetch("/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});}catch(e){}
+      try{await fetch(apiBase()+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});}catch(e){}
       hideAuthScreen();startApp();
     });
     [emailEl,pwEl].forEach(el=>el.addEventListener("keydown",e=>{if(e.key==="Enter")submitBtn.click();}));
@@ -1640,9 +1669,13 @@
     const activeCats=cats.filter(cat=>(groups[cat.id]||[]).length>0);
     if(!activeCats.length)return;
     if(!activeCats.find(c=>c.id===activeCat))activeCat=activeCats[0].id;
-    // Chip strip
+    // Chip strip — max 4 visible + "Alle →" chip hvis der er flere
+    const STRIP_MAX=4;
     const strip=document.createElement("div");strip.className="cat-strip";
-    activeCats.forEach(cat=>{
+    const activeCatObj=activeCats.find(c=>c.id===activeCat);
+    const others=activeCats.filter(c=>c.id!==activeCat);
+    const stripCats=activeCats.length<=STRIP_MAX?activeCats:[activeCatObj,...others.slice(0,STRIP_MAX-1)];
+    stripCats.forEach(cat=>{
       const total=(groups[cat.id]||[]).reduce((s,c)=>s+counterTotal(c),0);
       const chip=document.createElement("div");chip.className="cat-chip"+(cat.id===activeCat?" active":"");chip.dataset.chipCat=cat.id;
       const ring=document.createElement("div");ring.className="cat-chip-ring";
@@ -1653,6 +1686,12 @@
       chip.addEventListener("click",()=>{if(activeCat===cat.id)return;activeCat=cat.id;localStorage.setItem("mise_active_cat",cat.id);renderCounters();});
       strip.appendChild(chip);
     });
+    if(activeCats.length>STRIP_MAX){
+      const allChip=document.createElement("div");allChip.className="cat-all-chip";
+      allChip.innerHTML='<div class="cat-all-ring">&#8942;</div><div class="cat-all-name">'+esc(t("cat_all_chip"))+'</div>';
+      allChip.addEventListener("click",()=>openCatPicker(activeCats,groups));
+      strip.appendChild(allChip);
+    }
     grid.appendChild(strip);
     // Counter group for active category
     const counters=groups[activeCat]||[];
@@ -1741,6 +1780,30 @@
     setTimeout(()=>$("#newCatInput").focus(),30);
   }
   function closeNewCatModal(){$("#newCatScrim").classList.remove("open");}
+
+  function openCatPicker(cats,groups){
+    const scrim=$("#catPickerScrim");if(!scrim)return;
+    $("#catPickerTitle").textContent=t("cat_picker_title");
+    const g=$("#catPickerGrid");g.innerHTML="";
+    cats.forEach(cat=>{
+      const total=(groups[cat.id]||[]).reduce((s,c)=>s+counterTotal(c),0);
+      const item=document.createElement("div");item.className="cat-picker-item"+(cat.id===activeCat?" active":"");
+      const ring=document.createElement("div");ring.className="cat-picker-item-ring";
+      ring.innerHTML=cat.iconPending?'<div class="spin"></div>':cat.icon;
+      const name=document.createElement("div");name.className="cat-picker-item-name";name.textContent=lang==="en"?cat.en:cat.da;
+      const tot=document.createElement("div");tot.className="cat-picker-item-total";tot.textContent=total;
+      item.appendChild(ring);item.appendChild(name);item.appendChild(tot);
+      item.addEventListener("click",()=>{activeCat=cat.id;localStorage.setItem("mise_active_cat",cat.id);closeCatPicker();renderCounters();});
+      g.appendChild(item);
+    });
+    const newBtn=document.createElement("button");newBtn.className="cat-picker-new";newBtn.type="button";
+    newBtn.innerHTML='<span class="cat-picker-new-icon">+</span><span class="cat-picker-new-lbl">'+esc(t("new_cat_btn").replace("+ ",""))+'</span>';
+    newBtn.addEventListener("click",()=>{closeCatPicker();openNewCatModal();});
+    g.appendChild(newBtn);
+    scrim.classList.add("open");
+  }
+  function closeCatPicker(){$("#catPickerScrim").classList.remove("open");}
+  $("#catPickerScrim").addEventListener("click",e=>{if(e.target===$("#catPickerScrim"))closeCatPicker();});
   $("#newCatCancel").addEventListener("click",closeNewCatModal);
   $("#newCatScrim").addEventListener("click",e=>{if(e.target===$("#newCatScrim"))closeNewCatModal();});
   $("#newCatSave").addEventListener("click",()=>{
