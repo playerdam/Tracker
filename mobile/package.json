@@ -1,0 +1,20 @@
+{
+  "name": "craft-tracker-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Craft Tracker iOS app (Capacitor wrapper)",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "sync": "npm run build && npx cap sync ios",
+    "open": "npx cap open ios",
+    "dev": "npm run build && npx cap sync ios && npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.6.6",
+    "@capacitor/ios": "^7.6.6"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.6.6"
+  }
+}

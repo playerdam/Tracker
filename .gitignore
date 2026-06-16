@@ -2,3 +2,9 @@ node_modules/
 .env
 *.log
 .DS_Store
+
+# Capacitor build output
+mobile/www/
+mobile/ios/App/Pods/
+mobile/ios/App/App/public/
+mobile/ios/DerivedData/

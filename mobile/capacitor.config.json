@@ -1,0 +1,17 @@
+{
+  "appId": "dk.crafttracker.app",
+  "appName": "Craft Tracker",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "backgroundColor": "#F7F4F0"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}
