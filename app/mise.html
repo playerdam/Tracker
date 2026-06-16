@@ -15,13 +15,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FAFAF9;--surface:#FFFFFF;--surface-2:#F5F4F2;
-    --text:#0C0A09;--dim:#57534E;--faint:#A8A29E;
-    --border:#E4E2DE;--border-2:#D1CEC9;
-    --accent:#D97706;--accent-h:#B45309;--accent-soft:#FFFBEB;--ring:rgba(217,119,6,.16);
-    --shadow:0 1px 2px rgba(0,0,0,.05),0 2px 8px rgba(0,0,0,.04);
-    --shadow-lg:0 4px 24px rgba(0,0,0,.09);
-    --r:10px;--r-sm:7px;
+    --bg:#F7F4F0;--surface:#FFFFFF;--surface-2:#F0EDE8;
+    --text:#1A1410;--dim:#6B5F58;--faint:#A89C94;
+    --border:#E5DDD5;--border-2:#D0C6BC;
+    --accent:#D97706;--accent-h:#B45309;--accent-soft:#FFF5E6;--ring:rgba(217,119,6,.14);
+    --shadow:0 2px 8px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+    --shadow-lg:0 8px 32px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.05);
+    --r:12px;--r-sm:8px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--text)}
@@ -64,10 +64,11 @@
   .skel-row{height:44px;margin-bottom:4px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--border) 25%,var(--surface-2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
   @keyframes swipeFlash{0%{background:var(--accent-soft)}100%{background:var(--surface)}}
   .swipe-flash{animation:swipeFlash .35s ease forwards}
-  .qlog{position:relative;display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;padding:0 14px;transition:.12s}
-  .qlog:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
-  .qlog-ic{color:var(--faint);flex:none}
-  .qlog input{flex:1;border:none;background:none;color:var(--text);font-family:inherit;font-size:15px;padding:13px 12px}
+  .qlog{position:relative;display:flex;align-items:center;background:var(--surface);border:1.5px solid transparent;border-radius:16px;margin-bottom:14px;padding:0 16px;transition:box-shadow .2s,border-color .15s;box-shadow:var(--shadow)}
+  .qlog:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring),var(--shadow)}
+  .qlog-ic{color:var(--dim);flex:none;transition:color .15s}
+  .qlog:focus-within .qlog-ic{color:var(--accent)}
+  .qlog input{flex:1;border:none;background:none;color:var(--text);font-family:inherit;font-size:15px;padding:15px 12px}
   .qlog input:focus{outline:none}
   .qlog input::placeholder{color:var(--faint)}
   .qlog-spin{flex:none;padding-right:4px}
@@ -123,7 +124,7 @@
   .cbig[data-act]{cursor:pointer}
   .cbig[data-act]:hover{color:var(--accent)}
   .cbig.tick{animation:pop .3s ease}
-  @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.16);color:var(--accent)}65%{transform:scale(.96)}100%{transform:scale(1)}}
+  @keyframes pop{0%{transform:scale(1)}18%{transform:scale(1.22) translateY(-2px);color:var(--accent)}50%{transform:scale(.94);color:var(--accent)}72%{transform:scale(1.06)}88%{transform:scale(.99)}100%{transform:scale(1)}}
 
   .cstep{display:flex;gap:8px;margin-top:auto}
   .step{appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--text);height:42px;border-radius:var(--r-sm);cursor:pointer;font-size:20px;font-weight:400;line-height:1;display:grid;place-items:center;transition:.12s;-webkit-tap-highlight-color:transparent;user-select:none}
@@ -355,7 +356,7 @@
   /* Text entry */
   .feed-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:8px}
   .feed-entry-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
-  .feed-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-weight:600;font-size:14px;flex:none;cursor:pointer;border:1.5px solid #FDE68A}
+  .feed-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-weight:600;font-size:15px;flex:none;cursor:pointer;border:none;box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--accent)}
   .feed-meta{flex:1;min-width:0}
   .feed-nick{font-size:14px;font-weight:700}
   .feed-time{font-size:12px;color:var(--faint)}
@@ -445,7 +446,7 @@
   .empty-state .btn{margin-top:16px}
 
   /* ---- Bottom nav (mobile) ---- */
-  .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:96;background:var(--surface);border-top:1px solid var(--border)}
+  .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:96;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.08)}
   .bnav-inner{display:flex;justify-content:space-around;align-items:center;padding:8px 0 max(env(safe-area-inset-bottom,4px),8px)}
   .bnav-btn{appearance:none;background:none;border:none;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;color:var(--faint);transition:.15s}
   .bnav-btn.active{color:var(--accent)}
@@ -498,7 +499,9 @@
   .cat-chip-ring{width:58px;height:58px;border-radius:18px;border:2.5px solid var(--border);background:var(--accent-soft);display:flex;align-items:center;justify-content:center;transition:border-color .15s,box-shadow .15s;overflow:hidden}
   .cat-chip-ring svg{width:36px;height:36px;color:var(--accent);overflow:visible}
   .cat-chip-ring .spin{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
-  .cat-chip.active .cat-chip-ring{border-color:var(--accent);border-width:3px;box-shadow:0 0 0 3px var(--accent-soft)}
+  .cat-chip.active .cat-chip-ring{background:var(--accent);border-color:var(--accent);border-width:0;box-shadow:0 4px 14px rgba(217,119,6,.38)}
+  .cat-chip.active .cat-chip-ring svg{color:#fff}
+  .cat-chip.active .cat-chip-ring .spin{border-color:rgba(255,255,255,.3);border-top-color:#fff}
   .cat-chip:active .cat-chip-ring{opacity:.75;transition:opacity .06s}
   .cat-chip-name{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);text-align:center;line-height:1.2;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .cat-chip-total{font-family:"Fraunces",serif;font-size:20px;font-weight:600;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
@@ -528,6 +531,36 @@
   @keyframes vt-fade-out{from{opacity:1}to{opacity:0}}
   ::view-transition-old(root){animation:vt-fade-out .15s ease both}
   ::view-transition-new(root){animation:vt-fade-in .18s ease both}
+
+  /* ---- Profil-avatar-knap ---- */
+  .profile-btn{appearance:none;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border);background:var(--accent-soft);color:var(--accent);cursor:pointer;font-family:"Fraunces",serif;font-size:13px;font-weight:600;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;transition:.15s;letter-spacing:0}
+  .profile-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .profile-btn:active{transform:scale(.88);transition:transform .06s}
+
+  /* ---- Feed-tab badge ---- */
+  .bnav-icon-wrap{position:relative;display:inline-flex}
+  .bnav-badge{position:absolute;top:-2px;right:-4px;width:8px;height:8px;border-radius:50%;background:#EF4444;border:2px solid white;display:none}
+  .bnav-badge.show{display:block}
+
+  /* ---- Bottom sheet på mobil ---- */
+  @media (max-width:600px){
+    .scrim{align-items:flex-end;padding:0}
+    .modal{border-radius:20px 20px 0 0;max-width:100%;width:100%;padding:0 20px max(32px,env(safe-area-inset-bottom,20px))}
+    .modal::before{content:'';display:block;width:32px;height:4px;background:var(--border-2);border-radius:2px;margin:12px auto 20px;flex:none}
+    @keyframes modalIn{from{transform:translateY(55%);opacity:.3}to{transform:none;opacity:1}}
+  }
+
+  /* ---- Counter-card hover ---- */
+  .ccard{transition:box-shadow .15s}
+  .ccard:hover{box-shadow:var(--shadow)}
+  .cat-group{box-shadow:var(--shadow)}
+
+  /* ---- Auth-screen subtil gradient ---- */
+  #authScreen{background:linear-gradient(160deg,var(--bg) 0%,#FDF8F0 100%)}
+
+  /* ---- Header brand refinement ---- */
+  .brand h1{letter-spacing:-.03em}
+  .brand .tag{font-size:11px;letter-spacing:.02em;color:var(--faint)}
 </style>
 </head>
 <body>
@@ -536,7 +569,7 @@
     <div class="brand"><h1>Craft Tracker</h1><span class="tag" id="tagline"></span></div>
     <div class="header-right">
       <div class="offline-dot" id="offlineDot" title=""></div>
-      <button id="profileBtn" class="lang-btn" style="display:none" title="Profil">&#9679;</button>
+      <button id="profileBtn" class="profile-btn" style="display:none" title="Profil"><span id="profileInitial">?</span></button>
       <button id="signOutBtn" class="auth-signout-btn"></button>
       <button id="langBtn" class="lang-btn">EN</button>
       <div class="career"><div class="num" id="careerNum">0</div><div class="lbl" id="totalLbl"></div><div class="streak" id="streakLbl"></div></div>
@@ -785,7 +818,7 @@
       <span class="bnav-label" id="bnav-lbl-social">Social</span>
     </button>
     <button class="bnav-btn" data-tab="feed" id="bnav-feed">
-      <svg class="bnav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76 13.12 13.12 7.76 16.24l3.12-5.36 5.36-3.12z" stroke-width="1.5"/></svg>
+      <span class="bnav-icon-wrap"><svg class="bnav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76 13.12 13.12 7.76 16.24l3.12-5.36 5.36-3.12z" stroke-width="1.5"/></svg><span class="bnav-badge" id="feedBadge"></span></span>
       <span class="bnav-label" id="bnav-lbl-feed">Feed</span>
     </button>
   </div>
@@ -2097,6 +2130,13 @@
     sel.innerHTML='<option value="">'+esc(t("profile_prof_default"))+'</option>'
       +profs.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join("");
   }
+  function setProfileInitial(nickname,username){
+    const el=$("#profileInitial");
+    if(!el)return;
+    const first=(nickname||username||"?").trim().charAt(0).toUpperCase();
+    el.textContent=first;
+  }
+
   async function openProfile(){
     const scrim=$("#profileScrim");if(!scrim)return;
     const base=apiBase();const token=await getToken();
@@ -2110,6 +2150,7 @@
         const uInput=$("#profileUsername");
         if(uInput)uInput.value=d.username||"";
         $("#profileUsernameStatus").textContent="";$("#profileUsernameStatus").className="username-status";
+        setProfileInitial(d.nickname,d.username);
       }catch(e){}
     }
     renderBadgeGrid();renderRecordsList();
@@ -2421,6 +2462,8 @@
       const r=await fetch(base+"/api/follow/requests",{headers:{"Authorization":"Bearer "+token}});
       const d=await r.json();
       const reqs=d.requests||[];
+      const badge=$("#feedBadge");
+      if(badge)badge.classList.toggle("show",reqs.length>0);
       if(!reqs.length){banner.style.display="none";return;}
       banner.style.display="";
       banner.innerHTML='<div class="follow-req-banner"><div class="follow-req-head"><span class="follow-req-title">'+esc(t("follow_req_title"))+'</span><span style="font-size:12px;color:var(--dim)">'+reqs.length+'</span></div>'
@@ -2678,6 +2721,7 @@
       try{
         const r=await fetch(base+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token}});
         const d=await r.json();
+        setProfileInitial(d.nickname,d.username);
         if(!d.username)maybeShowUsernameSetup(null);
       }catch(e){}
     },1000);
