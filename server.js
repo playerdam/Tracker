@@ -255,7 +255,7 @@ app.post("/api/upload-photo", async (req, res) => {
 app.get("/api/leaderboard", async (req, res) => {
   try {
     const monday = mondayOfWeek();
-    const rows = await sb(`log_entries?logged_at=gte.${monday.toISOString()}&select=user_id,delta,users!left(nickname,profession)`) || [];
+    const rows = await sb(`log_entries?logged_at=gte.${monday.toISOString()}&select=user_id,delta,users(nickname,profession)`) || [];
     const agg = {};
     for (const r of rows) {
       if (!agg[r.user_id]) agg[r.user_id] = { userId: r.user_id, total: 0, nickname: r.users?.nickname || null, profession: r.users?.profession || null };
@@ -287,7 +287,7 @@ app.get("/api/challenge/current", async (req, res) => {
     const cats = await sb(`categories?label_da=eq.${encodeURIComponent(categoryDa)}&select=id`);
     if (!cats?.length) return res.json({ categoryDa, categoryEn, leaderboard: [], weekStart: monday.toISOString(), weekEnd: sunday.toISOString() });
 
-    const rows = await sb(`log_entries?category_id=eq.${cats[0].id}&logged_at=gte.${monday.toISOString()}&select=user_id,delta,users!left(nickname,profession)`) || [];
+    const rows = await sb(`log_entries?category_id=eq.${cats[0].id}&logged_at=gte.${monday.toISOString()}&select=user_id,delta,users(nickname,profession)`) || [];
     const agg = {};
     for (const r of rows) {
       if (!agg[r.user_id]) agg[r.user_id] = { userId: r.user_id, total: 0, nickname: r.users?.nickname || null, profession: r.users?.profession || null };
@@ -352,7 +352,7 @@ app.get("/api/teams/mine", async (req, res) => {
     const memberships = await sb(`team_members?user_id=eq.${userId}&select=team_id,teams(id,name,invite_code)`);
     if (!memberships?.length) return res.json({ team: null });
     const team = memberships[0].teams;
-    const members = await sb(`team_members?team_id=eq.${team.id}&select=user_id,users!left(nickname,profession)`) || [];
+    const members = await sb(`team_members?team_id=eq.${team.id}&select=user_id,users(nickname,profession)`) || [];
     const memberIds = members.map(m => m.user_id);
 
     const monday = mondayOfWeek();
@@ -574,7 +574,7 @@ app.get("/api/feed", async (req, res) => {
     if (!ids.length) return res.json({ entries: [] });
 
     const inClause = ids.map(i => `"${i}"`).join(",");
-    let path = `log_entries?user_id=in.(${ids.join(",")})&is_public=eq.true&order=logged_at.desc&limit=40&select=id,user_id,delta,summary,image_url,logged_at,categories!left(label_da,label_en),users!left(nickname,profession)`;
+    let path = `log_entries?user_id=in.(${ids.join(",")})&is_public=eq.true&order=logged_at.desc&limit=40&select=id,user_id,delta,summary,image_url,logged_at,categories(label_da,label_en),users(nickname,profession)`;
     if (cursor) path += `&logged_at=lt.${encodeURIComponent(cursor)}`;
 
     const entries = await sb(path) || [];
