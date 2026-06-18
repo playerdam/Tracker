@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Craft Tracker</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#D97706">
@@ -26,6 +26,11 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--text)}
   body{font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;padding:env(safe-area-inset-top,0px) 0 100px;font-size:15px;line-height:1.6}
+  @media (max-width:600px){
+    html,body{height:100%;overflow:hidden}
+    body{padding:0!important;min-height:unset!important}
+    #appScroll{position:absolute;top:env(safe-area-inset-top,0px);left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+  }
   .wrap{max-width:760px;margin:0 auto;padding:0 20px}
   button{font-family:inherit}
 
@@ -252,7 +257,7 @@
   .modal h2{font-family:"Fraunces",serif;font-weight:600;font-size:22px;margin-bottom:20px;color:var(--text)}
   .field{margin-bottom:14px;position:relative}
   .field label{display:block;font-size:11px;font-weight:700;color:var(--faint);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
-  .field input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:11px 12px}
+  .field input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:16px;padding:11px 12px}
   .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .row2{display:flex;gap:10px}
   .row2 .field{flex:1}
@@ -353,6 +358,10 @@
   .wrow-photo{width:54px;height:70px;border-radius:var(--r-sm);object-fit:cover;flex:none;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.08)}
 
   /* ---- Feed ---- */
+  .feed-segtabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:3px;margin-bottom:14px}
+  .feed-segtab{flex:1;appearance:none;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--dim);padding:7px 12px;border-radius:6px;transition:.12s;-webkit-tap-highlight-color:transparent}
+  .feed-segtab.active{background:var(--accent);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .feed-segtab:active{transform:scale(.94);transition:transform .06s}
   .feed-search{display:flex;gap:8px;margin-bottom:16px}
   .feed-search .input{flex:1}
   .feed-results{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;margin-top:4px}
@@ -448,7 +457,7 @@
   .comment-input-row .input{flex:1;font-size:14px;padding:9px 12px}
 
   /* ---- Shared input class ---- */
-  .input{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:11px 12px;width:100%}
+  .input{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:16px;padding:11px 12px;width:100%}
   .input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .input::placeholder{color:var(--faint)}
 
@@ -477,7 +486,7 @@
 
   /* ---- Bottom nav (mobile) ---- */
   .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:96;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.08)}
-  .bnav-inner{display:flex;justify-content:space-around;align-items:center;padding:8px 0 max(env(safe-area-inset-bottom,4px),8px)}
+  .bnav-inner{display:flex;justify-content:space-around;align-items:center;padding:8px 5% max(env(safe-area-inset-bottom,4px),8px)}
   .bnav-btn{appearance:none;background:none;border:none;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;color:var(--faint);transition:.15s}
   .bnav-btn.active{color:var(--accent)}
   .bnav-btn .bnav-icon{width:22px;height:22px;stroke:currentColor;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.75;transition:.15s}
@@ -486,7 +495,6 @@
   @media (max-width:600px){
     .bottom-nav{display:block}
     .tabrow{display:none}
-    body{padding-bottom:88px}
   }
 
   /* ========== Smoothness pass ========== */
@@ -597,8 +605,9 @@
   /* ---- Bottom sheet på mobil ---- */
   @media (max-width:600px){
     .scrim{align-items:flex-end;padding:0}
-    .modal{border-radius:20px 20px 0 0;max-width:100%;width:100%;padding:0 20px max(32px,env(safe-area-inset-bottom,20px))}
+    .modal{border-radius:20px 20px 0 0;max-width:100%;width:100%;padding:0 20px max(32px,env(safe-area-inset-bottom,20px));max-height:calc(88vh - env(safe-area-inset-top,0px))}
     .modal::before{content:'';display:block;width:32px;height:4px;background:var(--border-2);border-radius:2px;margin:12px auto 20px;flex:none}
+    .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 96px);z-index:100}
     @keyframes modalIn{from{transform:translateY(55%);opacity:.3}to{transform:none;opacity:1}}
   }
 
@@ -614,6 +623,25 @@
   .brand h1{letter-spacing:-.03em}
   .brand .tag{font-size:11px;letter-spacing:.02em;color:var(--faint)}
 
+  /* ---- Onboarding ---- */
+  #onboardOverlay{position:fixed;inset:0;z-index:450;background:linear-gradient(160deg,var(--bg) 0%,#FAECD8 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 28px max(48px,env(safe-area-inset-bottom,48px));transition:opacity .3s;padding-top:env(safe-area-inset-top,0px)}
+  #onboardOverlay.hidden{opacity:0;pointer-events:none}
+  .onboard-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
+  .onboard-icon-wrap{width:90px;height:90px;border-radius:22px;overflow:hidden;margin-bottom:22px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+  .onboard-icon-wrap svg{width:100%;height:100%}
+  .onboard-title{font-family:"Fraunces",serif;font-size:26px;font-weight:600;color:var(--text);text-align:center;margin-bottom:6px}
+  .onboard-sub{font-size:14px;color:var(--dim);text-align:center;margin-bottom:36px;line-height:1.5}
+  .onboard-feats{display:flex;flex-direction:column;gap:18px;width:100%;margin-bottom:32px}
+  .onboard-feat{display:flex;align-items:flex-start;gap:14px}
+  .onboard-feat-ic{font-size:26px;line-height:1;flex:none;margin-top:1px}
+  .onboard-feat-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+  .onboard-feat-sub{font-size:13px;color:var(--dim);line-height:1.4}
+  .onboard-legal{font-size:11px;color:var(--faint);text-align:center;margin-top:14px;line-height:1.7}
+  .onboard-legal a{color:var(--faint);text-decoration:underline}
+  /* Auth legal link */
+  .auth-legal{font-size:11px;color:var(--faint);text-align:center;margin-top:14px;line-height:1.6}
+  .auth-legal a{color:var(--faint);text-decoration:underline}
+
   /* ---- Wine stats card ---- */
   .wine-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
   .wine-stat-tile{background:var(--surface);text-align:center;padding:12px 6px}
@@ -623,7 +651,7 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+<div id="appScroll"><div class="wrap">
   <header>
     <div class="brand"><h1>Craft Tracker</h1><span class="tag" id="tagline"></span></div>
     <div class="header-right">
@@ -653,24 +681,6 @@
   </div>
   <button class="shift-start-btn" id="shiftStartBtn" style="display:none"></button>
 
-  <div class="scrim" id="shiftScrim">
-    <div class="modal shift-modal">
-      <h2 id="shiftModalTitle"></h2>
-      <div class="shift-duration" id="shiftDuration"></div>
-      <div class="shift-totals" id="shiftTotals"></div>
-      <textarea id="shiftCaption" class="shift-caption" maxlength="300"></textarea>
-      <div class="field" style="margin-bottom:14px">
-        <img id="shiftPhotoThumb" class="photo-thumb" alt="" style="width:56px;height:56px">
-        <button class="btn ghost btn-sm" id="shiftPhotoBtn"></button>
-        <input id="shiftPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
-      </div>
-      <div class="mactions">
-        <button class="btn primary" id="shiftPost"></button>
-        <button class="btn ghost" id="shiftDiscard"></button>
-      </div>
-    </div>
-  </div>
-
   <div class="tabrow">
     <div class="tabs">
       <button class="tab active" data-view="station" id="tab-station"></button>
@@ -696,8 +706,6 @@
   </section>
 
   <section class="view" id="view-social">
-    <div class="sec-head"><span class="sec-title" id="challengeTitle"></span><span class="sec-sub" id="challengeMeta"></span></div>
-    <div id="challengeContent" class="social-empty">…</div>
     <div class="sec-head"><span class="sec-title" id="lbTitle"></span><span class="sec-sub" id="lbMeta"></span></div>
     <div id="lbContent" class="social-empty">…</div>
     <div class="sec-head"><span class="sec-title" id="teamTitle"></span></div>
@@ -705,12 +713,18 @@
   </section>
 
   <section class="view" id="view-feed">
-    <div class="feed-search">
-      <input id="feedSearch" class="input" autocomplete="off">
-      <button class="btn ghost btn-sm" id="feedSearchBtn">🔍</button>
-    </div>
-    <div id="feedSearchResults" style="display:none"></div>
     <div id="followRequestsBanner" style="display:none"></div>
+    <div class="feed-segtabs">
+      <button class="feed-segtab active" id="feedTabMine"></button>
+      <button class="feed-segtab" id="feedTabDiscover"></button>
+    </div>
+    <div id="feedDiscoverSearch" style="display:none">
+      <div class="feed-search">
+        <input id="feedSearch" class="input" autocomplete="off">
+        <button class="btn ghost btn-sm" id="feedSearchBtn">🔍</button>
+      </div>
+      <div id="feedSearchResults" style="display:none"></div>
+    </div>
     <div id="feedContent"></div>
   </section>
 
@@ -739,6 +753,25 @@
     <div id="wineList"></div>
     <button class="addwine" id="addWineBtn"></button>
   </section>
+</div></div>
+
+<div class="scrim" id="shiftScrim">
+  <div class="modal shift-modal">
+    <h2 id="shiftModalTitle"></h2>
+    <div class="shift-duration" id="shiftDuration"></div>
+    <div class="shift-totals" id="shiftTotals"></div>
+    <textarea id="shiftCaption" class="shift-caption" maxlength="300"></textarea>
+    <div class="field" style="margin-bottom:14px">
+      <img id="shiftPhotoThumb" class="photo-thumb" alt="" style="width:56px;height:56px">
+      <button class="btn ghost btn-sm" id="shiftPhotoBtn"></button>
+      <input id="shiftPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
+    </div>
+    <div class="mactions">
+      <button class="btn primary btn-sm" id="shiftPost"></button>
+      <button class="btn ghost btn-sm" id="shiftFeedPost" style="border-color:var(--accent);color:var(--accent)"></button>
+      <button class="btn ghost btn-sm" id="shiftDiscard" style="color:var(--faint)"></button>
+    </div>
+  </div>
 </div>
 
 <div class="scrim" id="counterScrim"><div class="modal">
@@ -827,6 +860,7 @@
     <div class="field"><label id="authPwLbl"></label><input id="authPw" type="password" autocomplete="current-password"></div>
     <button class="btn primary" id="authSubmit" style="width:100%;margin-top:8px"></button>
     <p class="auth-toggle"><span id="authToggleText"></span> <a id="authToggleLink"></a></p>
+    <p class="auth-legal">Ved at fortsætte accepterer du vores <a href="https://tracker-production-1a62.up.railway.app/privacy.html">privatlivspolitik</a> og <a href="https://tracker-production-1a62.up.railway.app/terms.html">vilkår</a></p>
   </div>
 </div>
 
@@ -843,10 +877,6 @@
     <button class="btn primary" id="profileSave"></button>
     <button class="btn ghost" id="profileClose"></button>
   </div>
-  <div class="subsection" id="profileBadgesLbl"></div>
-  <div class="badge-grid" id="badgeGrid"></div>
-  <div class="subsection" id="profileRecordsLbl"></div>
-  <div class="records-list" id="recordsList"></div>
 </div></div>
 
 <div class="scrim" id="usernameSetupScrim"><div class="modal">
@@ -867,11 +897,6 @@
   <div class="cat-picker-grid" id="catPickerGrid"></div>
 </div></div>
 
-<div class="badge-toast" id="badgeToast">
-  <div class="badge-toast-icon" id="badgeToastIcon"></div>
-  <div class="badge-toast-lbl" id="badgeToastLbl"></div>
-  <div class="badge-toast-name" id="badgeToastName"></div>
-</div>
 
 <div class="toast" id="toast"><span class="toast-msg" id="toastMsg"></span><button class="toast-undo" id="toastUndo"></button></div>
 
@@ -962,7 +987,7 @@
       auth_no_account:"Ingen konto?",auth_have_account:"Har du allerede en konto?",
       auth_create:"Opret konto",auth_to_login:"Log ind",
       auth_signout:"Log ud",
-      tab_social:"Social",
+      tab_social:"Leaderboard",
       challenge_title:"Ugens udfordring",challenge_days:"dage tilbage",challenge_ends:"{0} dage tilbage",
       lb_title:"Ugentlig rangliste",lb_week:"uge fra",lb_anon:"Anonym",lb_you:"dig",lb_empty:"Ingen data endnu",
       team_title:"Hold",team_create_ph:"fx Noma Kitchen",team_create_btn:"Opret hold",
@@ -984,9 +1009,10 @@
       professions:["Commis de cuisine","Chef de partie","Sous chef","Køkkenchef","Konditor","Serveringsmedarbejder","Sommelier","Bar","Andet"],
       streak_day:"1 dag i træk",streak_days:"{0} dage i træk",
       offline_pending:"{0} afventende sync",
-      tab_feed:"Feed",
+      tab_feed:"Social",
+      feed_tab_mine:"Mit feed",feed_tab_discover:"Discover",
       feed_empty:"Følg nogen for at se deres aktivitet her",
-      feed_empty_own:"Du har ikke logget noget endnu",
+      feed_empty_own:"Du har ikke postet noget endnu",
       feed_load_more:"Indlæs mere",
       feed_search_ph:"Søg på kaldenavn…",
       feed_follow:"Følg",feed_unfollow:"Følger",
@@ -998,7 +1024,7 @@
       shift_start:"Start vagt",shift_active:"Vagt i gang",shift_end:"Afslut vagt",
       shift_title:"Afslut vagt",shift_duration:"Varighed: {0}",
       shift_caption_ph:"Skriv en opsummering af vagten…",
-      shift_photo:"Tilføj billede",shift_post:"Post til feed",shift_discard:"Slet vagt",
+      shift_photo:"Tilføj billede",shift_post:"Afslut vagt",shift_post_feed:"Afslut og post til feed",shift_discard:"Slet vagt",
       shift_no_data:"Ingen aktivitet logget",
       counter_cat_lbl:"Kategori",
       new_cat_title:"Ny kategori",new_cat_lbl:"Navn",new_cat_save:"Opret",new_cat_cancel:"Annullér",
@@ -1050,7 +1076,7 @@
       auth_no_account:"No account?",auth_have_account:"Already have an account?",
       auth_create:"Create account",auth_to_login:"Log in",
       auth_signout:"Sign out",
-      tab_social:"Social",
+      tab_social:"Leaderboard",
       challenge_title:"Weekly challenge",challenge_days:"days left",challenge_ends:"{0} days left",
       lb_title:"Weekly leaderboard",lb_week:"week from",lb_anon:"Anonymous",lb_you:"you",lb_empty:"No data yet",
       team_title:"Team",team_create_ph:"e.g. Noma Kitchen",team_create_btn:"Create team",
@@ -1072,9 +1098,10 @@
       professions:["Commis de cuisine","Chef de partie","Sous chef","Head chef","Pastry chef","Service staff","Sommelier","Bar","Other"],
       streak_day:"1 day in a row",streak_days:"{0} days in a row",
       offline_pending:"{0} pending sync",
-      tab_feed:"Feed",
+      tab_feed:"Social",
+      feed_tab_mine:"My feed",feed_tab_discover:"Discover",
       feed_empty:"Follow someone to see their activity here",
-      feed_empty_own:"You have not logged anything yet",
+      feed_empty_own:"You have not posted anything yet",
       feed_load_more:"Load more",
       feed_search_ph:"Search by nickname…",
       feed_follow:"Follow",feed_unfollow:"Following",
@@ -1086,7 +1113,7 @@
       shift_start:"Start shift",shift_active:"Shift in progress",shift_end:"End shift",
       shift_title:"End shift",shift_duration:"Duration: {0}",
       shift_caption_ph:"Write a shift summary…",
-      shift_photo:"Add photo",shift_post:"Post to feed",shift_discard:"Discard shift",
+      shift_photo:"Add photo",shift_post:"End shift",shift_post_feed:"End & post to feed",shift_discard:"Delete shift",
       shift_no_data:"No activity logged",
       counter_cat_lbl:"Category",
       new_cat_title:"New category",new_cat_lbl:"Name",new_cat_save:"Create",new_cat_cancel:"Cancel",
@@ -1152,16 +1179,18 @@
     const bSoc=$("#bnav-lbl-social");if(bSoc)bSoc.textContent=t("tab_social");
     const bFeed=$("#bnav-lbl-feed");if(bFeed)bFeed.textContent=t("tab_feed");
     const fSearch=$("#feedSearch");if(fSearch)fSearch.placeholder=t("feed_search_ph");
+    const ftMine=$("#feedTabMine");if(ftMine)ftMine.textContent=t("feed_tab_mine");
+    const ftDiscover=$("#feedTabDiscover");if(ftDiscover)ftDiscover.textContent=t("feed_tab_discover");
     const cSend=$("#commentSend");if(cSend)cSend.textContent=t("feed_comment_send");
     const cInput=$("#commentInput");if(cInput)cInput.placeholder=t("feed_comment_ph");
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.textContent=t("shift_start");
     const shiftEndBtn=$("#shiftEndBtn");if(shiftEndBtn)shiftEndBtn.textContent=t("shift_end");
     const shiftLabel=$("#shiftLabel");if(shiftLabel)shiftLabel.textContent=t("shift_active");
     const shiftPost=$("#shiftPost");if(shiftPost)shiftPost.textContent=t("shift_post");
+    const shiftFeedPost=$("#shiftFeedPost");if(shiftFeedPost)shiftFeedPost.textContent=t("shift_post_feed");
     const shiftDiscard=$("#shiftDiscard");if(shiftDiscard)shiftDiscard.textContent=t("shift_discard");
     const shiftCap=$("#shiftCaption");if(shiftCap)shiftCap.placeholder=t("shift_caption_ph");
     const shiftPhotoBtn=$("#shiftPhotoBtn");if(shiftPhotoBtn)shiftPhotoBtn.textContent=t("shift_photo");
-    const cTitle=$("#challengeTitle");if(cTitle)cTitle.textContent=t("challenge_title");
     const lbTitle=$("#lbTitle");if(lbTitle)lbTitle.textContent=t("lb_title");
     const teamTitle=$("#teamTitle");if(teamTitle)teamTitle.textContent=t("team_title");
     const pSave=$("#profileSave");if(pSave)pSave.textContent=t("profile_save");
@@ -2205,7 +2234,7 @@
       $("#viewToggle").style.display="none";
       if(v==="log")renderLogView();
       if(v==="social")loadSocial();
-      if(v==="feed"){loadFeed();loadFollowRequests();}
+      if(v==="feed"){loadFeed(false,window._activeFeedTab?window._activeFeedTab()==="mine":true);loadFollowRequests();}
       window.scrollTo({top:0,behavior:"instant"});
     }
     if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
@@ -2362,7 +2391,6 @@
   }
 
   async function loadSocial(){
-    renderChallenge();
     renderLeaderboard();
     renderTeam();
   }
@@ -2396,7 +2424,6 @@
         setProfileInitial(d.nickname,d.username);
       }catch(e){}
     }
-    renderBadgeGrid();renderRecordsList();
     scrim.classList.add("open");
   }
   function renderBadgeGrid(){
@@ -2565,7 +2592,6 @@
   async function postShift(){
     const shift=getShift();if(!shift)return;
     const caption=($("#shiftCaption").value||"").trim();
-    const durationMs=Date.now()-new Date(shift.startedAt).getTime();
     const snapMap={};(shift.snap||[]).forEach(c=>{snapMap[c.id]={count:c.count,subs:{}};(c.subs||[]).forEach(s=>{snapMap[c.id].subs[s.id]=s.count;});});
     const changes=[];
     state.counters.forEach(c=>{
@@ -2573,8 +2599,8 @@
       if(c.subs.length){c.subs.forEach(s=>{const was=snap.subs[s.id]||0;const diff=s.count-was;if(diff>0)changes.push({label:c.label,delta:diff});});}
       else{const diff=c.count-(snap.count||0);if(diff>0)changes.push({label:c.label,delta:diff});}
     });
-    if(!changes.length&&!caption){$("#shiftScrim").classList.remove("open");saveShift(null);renderShiftBar();return;}
-    const btn=$("#shiftPost");if(btn){btn.disabled=true;btn.textContent="…";}
+    if(!changes.length){showToast(lang==="da"?"Intet logget i vagten — tæl noget før du poster":"Nothing logged in this shift");return;}
+    const btn=$("#shiftFeedPost");if(btn){btn.disabled=true;btn.textContent="…";}
 
     // upload photo if any
     let imageUrl=null;
@@ -2591,31 +2617,64 @@
       }
     }
 
-    // post the biggest change as the primary entry, others as secondary
     const total=changes.reduce((a,c)=>a+c.delta,0);
     const primaryCat=changes.sort((a,b)=>b.delta-a.delta)[0];
     const summaryParts=changes.map(c=>"+"+c.delta+" "+tLabel(c.label));
     const summary=(caption||summaryParts.join(", ")).slice(0,200);
 
     const base=apiBase();const token=await getToken();
-    if(base&&token&&primaryCat){
-      try{await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({categoryLabel:primaryCat.label,delta:total,imageUrl,summary})});}catch(e){}
+    let posted=false;
+    if(base&&token){
+      try{
+        const r=await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({categoryLabel:primaryCat.label,delta:total,imageUrl,summary})});
+        if(r.ok)posted=true;
+      }catch(e){}
     }
 
+    if(btn){btn.disabled=false;btn.textContent=t("shift_post_feed");}
+    if(!posted){showToast(lang==="da"?"Noget gik galt — prøv igen":"Something went wrong, try again");return;}
+
     haptic(60);
-    if(btn){btn.disabled=false;btn.textContent=t("shift_post");}
+    const ms2=Date.now()-new Date(shift.startedAt).getTime();
+    const dur2=Math.floor(ms2/3600000)+"t "+Math.floor((ms2%3600000)/60000)+"m";
+    const parts2=changes.map(c=>"+"+c.delta+" "+tLabel(c.label));
+    const logTxt2=(lang==="da"?"Vagt postet":"Shift posted")+": "+parts2.join(", ")+" ("+dur2+")";
+    if(!Array.isArray(state.log))state.log=[];
+    state.log.unshift({ts:Date.now(),text:logTxt2});
+    if(state.log.length>2000)state.log.length=2000;
+    save();renderLogView();
     $("#shiftScrim").classList.remove("open");
     saveShift(null);renderShiftBar();
-    showToast(lang==="da"?"Vagt postet!":"Shift posted!");
-    // refresh feed if on feed tab
-    const feedView=$("#view-feed");if(feedView&&feedView.classList.contains("active"))loadFeed();
+    showToast(lang==="da"?"Vagt postet til feed!":"Shift posted to feed!");
+    feedCursor=null;
+    const feedView=$("#view-feed");if(feedView&&feedView.classList.contains("active"))loadFeed(false,true);
   }
 
   function setupShift(){
     renderShiftBar();
     const startBtn=$("#shiftStartBtn");if(startBtn)startBtn.addEventListener("click",startShift);
     const endBtn=$("#shiftEndBtn");if(endBtn)endBtn.addEventListener("click",openShiftModal);
-    const postBtn=$("#shiftPost");if(postBtn)postBtn.addEventListener("click",postShift);
+    const postBtn=$("#shiftPost");if(postBtn)postBtn.addEventListener("click",()=>{
+      const sh=getShift();
+      if(sh){
+        const snapMap={};(sh.snap||[]).forEach(c=>{snapMap[c.id]={count:c.count,subs:{}};(c.subs||[]).forEach(s=>{snapMap[c.id].subs[s.id]=s.count;});});
+        const parts=[];
+        state.counters.forEach(c=>{
+          const snap=snapMap[c.id]||{count:0,subs:{}};
+          if(c.subs.length){c.subs.forEach(s=>{const d=s.count-(snap.subs[s.id]||0);if(d>0)parts.push("+"+d+" "+tLabel(s.name||c.label));});}
+          else{const d=c.count-(snap.count||0);if(d>0)parts.push("+"+d+" "+tLabel(c.label));}
+        });
+        const ms=Date.now()-new Date(sh.startedAt).getTime();
+        const dur=Math.floor(ms/3600000)+"t "+Math.floor((ms%3600000)/60000)+"m";
+        const txt=(lang==="da"?"Vagt afsluttet":"Shift ended")+(parts.length?" · "+parts.join(", "):"")+" ("+dur+")";
+        if(!Array.isArray(state.log))state.log=[];
+        state.log.unshift({ts:Date.now(),text:txt});
+        if(state.log.length>2000)state.log.length=2000;
+        save();renderLogView();
+      }
+      saveShift(null);renderShiftBar();$("#shiftScrim").classList.remove("open");showToast(lang==="da"?"Vagt afsluttet":"Shift ended");
+    });
+    const feedPostBtn=$("#shiftFeedPost");if(feedPostBtn)feedPostBtn.addEventListener("click",postShift);
     const discardBtn=$("#shiftDiscard");
     if(discardBtn)discardBtn.addEventListener("click",()=>{saveShift(null);renderShiftBar();$("#shiftScrim").classList.remove("open");});
     // shift photo picker
@@ -2736,15 +2795,16 @@
     }catch(e){banner.style.display="none";}
   }
 
-  async function loadFeed(append){
+  async function loadFeed(append,mine){
     if(feedLoading)return;
     feedLoading=true;
+    const isMine=mine!=null?mine:(window._activeFeedTab?window._activeFeedTab()==="mine":false);
     const el=$("#feedContent");if(!el)return;
     if(!append){feedCursor=null;el.innerHTML=skeletonRows(4);}
     const base=apiBase();if(!base){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">🧭</div><div class="empty-state-title">'+esc(t("feed_empty"))+'</div></div>';feedLoading=false;return;}
     const token=await getToken();if(!token){feedLoading=false;return;}
     try{
-      let url=base+"/api/feed";if(feedCursor)url+="?before="+encodeURIComponent(feedCursor);
+      let url=base+"/api/feed"+(isMine?"?mine=true":"");if(feedCursor)url+=(isMine?"&":"?")+"before="+encodeURIComponent(feedCursor);
       const res=await fetch(url,{headers:{"Authorization":"Bearer "+token}});
       const d=await res.json();
       const entries=d.entries||[];
@@ -2753,7 +2813,10 @@
       entries.forEach(e=>{e._followStatus=_followingCache[e.userId]||"none";});
 
       if(!entries.length&&!append){
-        el.innerHTML='<div class="empty-state"><div class="empty-state-icon">🧭</div><div class="empty-state-title">'+esc(t("feed_empty"))+'</div><div class="empty-state-sub">'+(lang==="da"?"Søg på en kollegas kaldenavn foroven og tryk følg":"Search for a colleague by nickname above and follow them")+'</div></div>';
+        const emptyIcon=isMine?"📝":"🧭";
+        const emptyTitle=isMine?t("feed_empty_own"):t("feed_empty");
+        const emptySub=isMine?(lang==="da"?"Afslut en vagt for at poste til dit feed":"End a shift to post to your feed"):(lang==="da"?"Søg på en kollegas kaldenavn og tryk følg":"Search for a colleague by nickname and follow them");
+        el.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+emptyIcon+'</div><div class="empty-state-title">'+esc(emptyTitle)+'</div><div class="empty-state-sub">'+esc(emptySub)+'</div></div>';
         feedLoading=false;return;
       }
       const html=entries.map(feedEntryHtml).join("");
@@ -2930,9 +2993,37 @@
     const feedSearchBtn=$("#feedSearchBtn");
     if(feedSearchBtn)feedSearchBtn.addEventListener("click",()=>{const q=($("#feedSearch").value||"").trim();if(q)searchUsers(q);});
 
+    // feed tabs
+    let activeFeedTab="mine";
+    function switchFeedTab(tab){
+      activeFeedTab=tab;
+      $("#feedTabMine").classList.toggle("active",tab==="mine");
+      $("#feedTabDiscover").classList.toggle("active",tab==="discover");
+      const discoverTop=$("#feedDiscoverSearch");
+      if(discoverTop)discoverTop.style.display=tab==="discover"?"block":"none";
+      loadFeed(false,tab==="mine");
+    }
+    const tabMine=$("#feedTabMine");if(tabMine)tabMine.addEventListener("click",()=>switchFeedTab("mine"));
+    const tabDiscover=$("#feedTabDiscover");if(tabDiscover)tabDiscover.addEventListener("click",()=>switchFeedTab("discover"));
+    // expose for external reload
+    window._switchFeedTab=switchFeedTab;
+    window._activeFeedTab=()=>activeFeedTab;
+
     // comment send
     const sendBtn=$("#commentSend");if(sendBtn)sendBtn.addEventListener("click",sendComment);
     const cInput=$("#commentInput");if(cInput)cInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendComment();}});
+  }
+
+  function maybeShowOnboarding(){
+    if(localStorage.getItem("mise_onboarded"))return;
+    const o=$("#onboardOverlay");if(!o)return;
+    o.style.display="flex";
+    const btn=$("#onboardDone");
+    if(btn)btn.addEventListener("click",()=>{
+      localStorage.setItem("mise_onboarded","1");
+      o.classList.add("hidden");
+      setTimeout(()=>{o.style.display="none";},320);
+    });
   }
 
   function startApp(){
@@ -2953,6 +3044,7 @@
       const subs=state.counters.flatMap(c=>c.subs.map(s=>tLabel(s.name)));
       return [...new Set([...phrases,...labels,...subs])];
     });
+    setTimeout(maybeShowOnboarding, 600);
     setTimeout(()=>requestNotifPermission(),4000);
     // Re-generate icons for any custom categories that were interrupted
     setTimeout(()=>{
@@ -2981,6 +3073,23 @@
   })();
 })();
 </script>
+<div id="onboardOverlay" style="display:none">
+  <div class="onboard-top">
+    <div class="onboard-icon-wrap">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="og" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#B45309"/></linearGradient></defs><rect width="512" height="512" rx="96" fill="url(#og)"/><text x="256" y="338" font-family="Georgia,serif" font-size="230" font-weight="700" text-anchor="middle" fill="#FFFFFF" opacity=".95" letter-spacing="-8">CT</text></svg>
+    </div>
+    <div class="onboard-title">Craft Tracker</div>
+    <div class="onboard-sub">Track din dag. Del med holdet.</div>
+    <div class="onboard-feats">
+      <div class="onboard-feat"><div class="onboard-feat-ic">📊</div><div><div class="onboard-feat-title">Log hvad du laver</div><div class="onboard-feat-sub">Opsæt kategorier og tæl anretninger, kokteails eller hvad du nu tracker</div></div></div>
+      <div class="onboard-feat"><div class="onboard-feat-ic">⏱</div><div><div class="onboard-feat-title">Følg din vagt</div><div class="onboard-feat-sub">Start en vagt og se et overblik over hvad du nåede — del det til feedet</div></div></div>
+      <div class="onboard-feat"><div class="onboard-feat-ic">🏆</div><div><div class="onboard-feat-title">Mål dig med kollegerne</div><div class="onboard-feat-sub">Følg andre, se leaderboardet og byg din trackinghistorik</div></div></div>
+    </div>
+    <button class="btn primary" id="onboardDone" style="width:100%;padding:15px;font-size:16px">Kom i gang</button>
+    <p class="onboard-legal">Ved at fortsætte accepterer du vores <a href="https://tracker-production-1a62.up.railway.app/terms.html">vilkår</a> og <a href="https://tracker-production-1a62.up.railway.app/privacy.html">privatlivspolitik</a></p>
+  </div>
+</div>
+
 <script>
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').catch(()=>{});

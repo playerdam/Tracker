@@ -12,8 +12,11 @@ let html = fs.readFileSync(path.join(src, "mise.html"), "utf8");
 html = html.replace('const API_BASE="";', 'const API_BASE="https://tracker-production-1a62.up.railway.app";');
 fs.writeFileSync(path.join(dst, "index.html"), html);
 
+// Strip console statements from production build
+html = html.replace(/console\.(log|warn|error|info)\([^)]*\);?/g, "");
+
 // Other web assets
-for (const f of ["manifest.json", "sw.js"]) {
+for (const f of ["manifest.json", "sw.js", "privacy.html", "terms.html"]) {
   fs.copyFileSync(path.join(src, f), path.join(dst, f));
 }
 
