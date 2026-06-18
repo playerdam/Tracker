@@ -568,7 +568,6 @@ app.get("/api/feed", async (req, res) => {
       // find who we follow (only accepted)
       const followRows = await sb(`follows?follower_id=eq.${userId}&status=eq.accepted&select=following_id`) || [];
       ids = followRows.map(r => r.following_id);
-      ids.push(userId); // include own entries
     }
 
     if (!ids.length) return res.json({ entries: [] });
