@@ -642,6 +642,9 @@
   .catalog-item.active .catalog-name{color:var(--accent)}
   .catalog-check{position:absolute;top:6px;right:6px;width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;display:none;place-items:center;font-size:9px;font-weight:800}
   .catalog-item.active .catalog-check{display:grid}
+  .catalog-plus{position:absolute;top:6px;right:6px;width:16px;height:16px;border-radius:50%;background:var(--border);color:var(--dim);display:grid;place-items:center;font-size:13px;font-weight:700;line-height:1;transition:.12s}
+  .catalog-item:hover .catalog-plus{background:var(--accent);color:#fff}
+  .catalog-item.active .catalog-plus{display:none}
   .kebab:active,.wedit:active{transform:scale(.84);transition:transform .05s}
   .feed-load-more:active{transform:scale(.98);transition:transform .07s}
 
@@ -2044,7 +2047,10 @@
     items.forEach(item=>{
       const active=isCatalogActive(item.id);
       const div=document.createElement("div");div.className="catalog-item"+(active?" active":"");
-      div.innerHTML='<div class="catalog-check">&#10003;</div><div class="catalog-icon">'+item.icon+'</div><div class="catalog-name">'+esc(lang==="en"?item.en:item.da)+'</div>';
+      const badge=active
+        ?'<div class="catalog-check" title="'+(lang==="da"?"Fjern":"Remove")+'">&#10003;</div>'
+        :'<div class="catalog-plus">+</div>';
+      div.innerHTML=badge+'<div class="catalog-icon">'+item.icon+'</div><div class="catalog-name">'+esc(lang==="en"?item.en:item.da)+'</div>';
       div.addEventListener("click",()=>toggleCatalogItem(item));
       grid.appendChild(div);
     });
@@ -2056,11 +2062,16 @@
       const hasData=c&&(c.count>0||(c.subs||[]).some(s=>s.count>0));
       if(hasData&&!confirm(lang==="da"?"Tælleren har registreringer. Fjern alligevel?":"Counter has data. Remove anyway?"))return;
       state.counters=state.counters.filter(x=>x.id!==item.id);
+      save();renderCounters();renderCareer();
+      renderCatalog($("#catalogSearch")?.value||"");
     }else{
-      state.counters.push({id:item.id,label:lang==="en"?item.en:item.da,count:0,subs:[],suggest:seedFor(lang==="en"?item.en:item.da),cat:item.cat||guessCategory(item.da)});
+      const cat=item.cat||guessCategory(item.da);
+      state.counters.push({id:item.id,label:lang==="en"?item.en:item.da,count:0,subs:[],suggest:seedFor(lang==="en"?item.en:item.da),cat});
+      activeCat=cat;localStorage.setItem("mise_active_cat",cat);
+      save();renderCounters();renderCareer();
+      closeCatalog();
+      showToast((lang==="da"?item.da:item.en)+(lang==="da"?" tilføjet":" added"));
     }
-    save();renderCounters();renderCareer();
-    renderCatalog($("#catalogSearch")?.value||"");
   }
   $("#catalogClose").addEventListener("click",closeCatalog);
   $("#catalogScrim").addEventListener("click",e=>{if(e.target===$("#catalogScrim"))closeCatalog();});
