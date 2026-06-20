@@ -626,6 +626,22 @@
   .station-new-cat{appearance:none;background:none;border:1.5px dashed var(--border);border-radius:12px;width:100%;padding:13px;color:var(--dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:10px}
   .station-new-cat:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
   .station-new-cat:active{transform:scale(.98);transition:transform .06s}
+  .station-catalog-btn{appearance:none;background:none;border:1.5px solid var(--border);border-radius:12px;width:100%;padding:13px;color:var(--dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:8px}
+  .station-catalog-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .station-catalog-btn:active{transform:scale(.98);transition:transform .06s}
+  .catalog-modal{display:flex;flex-direction:column;max-height:90vh;padding:0;overflow:hidden}
+  .catalog-head{padding:20px 20px 12px;flex:none}
+  #catalogGrid{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 16px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+  .catalog-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:.15s;text-align:center;position:relative;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none}
+  .catalog-item:hover{border-color:var(--border-2)}
+  .catalog-item.active{border-color:var(--accent);background:var(--accent-soft)}
+  .catalog-item:active{transform:scale(.94);transition:transform .07s}
+  .catalog-icon{width:44px;height:44px;color:var(--dim);flex:none}
+  .catalog-item.active .catalog-icon{color:var(--accent)}
+  .catalog-name{font-size:11px;font-weight:600;color:var(--dim);line-height:1.35}
+  .catalog-item.active .catalog-name{color:var(--accent)}
+  .catalog-check{position:absolute;top:6px;right:6px;width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;display:none;place-items:center;font-size:9px;font-weight:800}
+  .catalog-item.active .catalog-check{display:grid}
   .kebab:active,.wedit:active{transform:scale(.84);transition:transform .05s}
   .feed-load-more:active{transform:scale(.98);transition:transform .07s}
 
@@ -893,6 +909,23 @@
     <button class="btn del" id="counterDelete" style="display:none"></button>
   </div>
 </div></div>
+
+<div class="scrim" id="catalogScrim">
+  <div class="modal catalog-modal">
+    <div class="catalog-head">
+      <div style="width:32px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <h2 style="font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin:0">Katalog</h2>
+        <button id="catalogClose" style="appearance:none;background:none;border:none;color:var(--dim);cursor:pointer;font-size:20px;padding:4px 10px;line-height:1;border-radius:6px">&#x2715;</button>
+      </div>
+      <div style="position:relative">
+        <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--faint);pointer-events:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg>
+        <input id="catalogSearch" style="width:100%;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:inherit;font-size:14px;padding:10px 14px 10px 38px" placeholder="Søg i katalog...">
+      </div>
+    </div>
+    <div id="catalogGrid"></div>
+  </div>
+</div>
 
 <div class="scrim" id="newCatScrim"><div class="modal">
   <h2 id="newCatTitle">Ny kategori</h2>
@@ -1404,6 +1437,42 @@
     return [...CATS,...(state.customCats||[]).map(c=>({id:c.id,da:c.name,en:c.name,icon:c.icon||DOTS_ICON,custom:true,iconPending:c.iconPending}))];
   }
 
+  const CATALOG=[
+    {id:"preset_oyster",da:"Østers åbnet",en:"Oysters opened",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 38c0-14 9-22 22-22s22 8 22 22"/><path d="M10 38c4 7 12 12 22 12s18-5 22-12"/><ellipse cx="32" cy="40" rx="10" ry="6" fill="currentColor" opacity=".18"/><path d="M32 20c-2 4-3 10-3 18"/></svg>'},
+    {id:"preset_onion",da:"Løg snittet",en:"Onion sliced",cat:"prep",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="32" cy="40" rx="18" ry="14"/><path d="M32 26c0-10 7-14 7-14s-5 4-7 14"/><path d="M20 34h24M18 40h28M20 46h24"/></svg>'},
+    {id:"preset_bottle",da:"Flasker åbnet",en:"Bottles opened",cat:"drikke",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M27 12h10v8l5 8v20a3 3 0 01-3 3H25a3 3 0 01-3-3V28l5-8V12z"/><path d="M24 28h16"/><rect x="29" y="6" width="6" height="6" rx="1" fill="currentColor" opacity=".3" stroke="none"/><path d="M44 6l4-4"/></svg>'},
+    {id:"preset_cover",da:"Couverter serveret",en:"Covers served",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="32" cy="38" r="17"/><circle cx="32" cy="38" r="10" fill="currentColor" opacity=".12"/><path d="M16 12v8M19 12v4a3 3 0 01-6 0v-4"/><path d="M48 12c0 5-3 7-3 7v17"/></svg>'},
+    {id:"preset_coffee_art",da:"Kaffe lavet",en:"Coffee made",cat:"drikke",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 28h34l-4 22H18L14 28z"/><path d="M48 32h4a4 4 0 010 8h-4"/><ellipse cx="31" cy="28" rx="15" ry="4" fill="white" stroke="currentColor" stroke-width="1.5"/><path d="M31 24.5c-2.5-2-5.5-1.5-5.5 1s1.5 4 5.5 7c4-3 5.5-4.5 5.5-7s-3-3-5.5-1z" fill="currentColor" stroke="none" opacity=".62"/></svg>'},
+    {id:"preset_guest",da:"Gæster modtaget",en:"Guests welcomed",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="28" cy="18" r="8"/><path d="M12 52c0-10 7-16 16-16s16 6 16 16"/><path d="M46 20l6 4-6 4"/><path d="M46 24h-8"/></svg>'},
+    {id:"preset_order",da:"Bestillinger taget",en:"Orders taken",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="18" y="10" width="28" height="44" rx="3"/><path d="M24 22h16M24 30h16M24 38h10"/><path d="M36 42l3 3 6-7"/></svg>'},
+    {id:"preset_starter",da:"Forret serveret",en:"Starter served",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="32" cy="42" rx="20" ry="6"/><path d="M12 42c0-14 9-20 20-20s20 6 20 20"/><path d="M22 34c2-4 5-6 10-6"/></svg>'},
+    {id:"preset_main",da:"Hovedret serveret",en:"Main served",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="32" cy="46" rx="22" ry="5"/><path d="M10 46c0-16 10-26 22-26s22 10 22 26"/><path d="M32 20v-7"/><circle cx="32" cy="11" r="2.5" fill="currentColor"/></svg>'},
+    {id:"preset_dessert",da:"Dessert serveret",en:"Dessert served",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 48l10-30h16l10 30H14z"/><path d="M14 48h36"/><circle cx="32" cy="24" r="3" fill="currentColor" opacity=".4" stroke="none"/><path d="M24 40h16"/></svg>'},
+    {id:"preset_bill",da:"Regning præsenteret",en:"Bill presented",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="16" y="8" width="32" height="46" rx="2"/><path d="M16 54l8-6 8 6 8-6 8 6"/><path d="M22 20h20M22 28h20M22 36h12"/></svg>'},
+    {id:"preset_tableset",da:"Borde dækket",en:"Tables set",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="10" y="28" width="44" height="7" rx="2"/><path d="M16 35v16M48 35v16"/><circle cx="24" cy="20" r="5"/><circle cx="40" cy="20" r="5"/><path d="M24 15v-4M40 15v-4"/></svg>'},
+    {id:"preset_tableclear",da:"Borde ryddet",en:"Tables cleared",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="10" y="28" width="44" height="7" rx="2"/><path d="M16 35v16M48 35v16"/><path d="M24 13l14 14M38 13L24 27"/></svg>'},
+    {id:"preset_wine_present",da:"Vin præsenteret",en:"Wine presented",cat:"drikke",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10h24l-6 20a8 8 0 01-16 0L20 10z"/><line x1="32" y1="34" x2="32" y2="50"/><line x1="22" y1="50" x2="42" y2="50"/><line x1="23" y1="22" x2="41" y2="22" opacity=".35"/></svg>'},
+    {id:"preset_cocktail",da:"Cocktails mixet",en:"Cocktails mixed",cat:"drikke",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10h40L32 40v12"/><line x1="22" y1="50" x2="42" y2="50"/><circle cx="44" cy="17" r="4" fill="currentColor" opacity=".3" stroke="none"/><line x1="44" y1="10" x2="44" y2="22"/></svg>'},
+    {id:"preset_coffee",da:"Kaffe serveret",en:"Coffee served",cat:"drikke",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="14" y="28" width="30" height="24" rx="4"/><path d="M44 33h4a4 4 0 010 8h-4"/><path d="M22 16c0-4 3-6 3-10"/><path d="M31 16c0-4 3-6 3-10"/><line x1="10" y1="52" x2="54" y2="52"/></svg>'},
+    {id:"preset_water",da:"Vand skænket",en:"Water poured",cat:"drikke",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14h20a2 2 0 012 2v4H18v-4a2 2 0 012-2z"/><path d="M18 20h28l-4 30H22L18 20z"/><path d="M46 24l8-4"/><path d="M30 30c0 6-4 10-4 10s-4-4-4-10 4-8 4-8 4 2 4 8z" fill="currentColor" opacity=".2" stroke="none"/></svg>'},
+    {id:"preset_champagne",da:"Champagne åbnet",en:"Champagne opened",cat:"drikke",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 12h8v6l5 8v22a3 3 0 01-3 3H26a3 3 0 01-3-3V26l5-8V12z"/><path d="M24 26h16"/><circle cx="44" cy="12" r="2.5" fill="currentColor" opacity=".5" stroke="none"/><circle cx="49" cy="18" r="2" fill="currentColor" opacity=".4" stroke="none"/><circle cx="43" cy="20" r="1.5" fill="currentColor" opacity=".35" stroke="none"/></svg>'},
+    {id:"preset_wine_rec",da:"Vine anbefalet",en:"Wines recommended",cat:"drikke",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M27 10h10v8l5 8v22a3 3 0 01-3 3H25a3 3 0 01-3-3V26l5-8V10z"/><path d="M24 26h16"/><path d="M32 33l2.5 5h5.5l-4 4 1.5 5.5L32 45l-5.5 2.5 1.5-5.5-4-4h5.5L32 33z" fill="currentColor" opacity=".35" stroke="none"/></svg>'},
+    {id:"preset_allergy",da:"Allergier tjekket",en:"Allergies checked",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M32 10l20 8v14c0 12-9 20-20 26C21 52 12 44 12 32V18l20-8z"/><path d="M22 32l8 8 12-14"/></svg>'},
+    {id:"preset_amuse",da:"Amuse-bouche",en:"Amuse-bouche",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="32" cy="18" rx="11" ry="8"/><path d="M32 26v26"/><path d="M25 48c0 4 14 4 14 0"/></svg>'},
+    {id:"preset_bread",da:"Brød serveret",en:"Bread served",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 36c0-11 9-18 20-18s20 7 20 18v10H12V36z"/><path d="M12 46h40"/><path d="M20 30c2-4 6-6 12-6"/></svg>'},
+    {id:"preset_choc",da:"Chokolader serveret",en:"Chocolates served",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="26" width="40" height="26" rx="4"/><line x1="12" y1="38" x2="52" y2="38"/><line x1="29" y1="26" x2="29" y2="52"/><line x1="44" y1="26" x2="44" y2="52"/><path d="M20 20c0-4 3-6 3-10M32 20c0-4 3-6 3-10"/></svg>'},
+    {id:"preset_welcome",da:"Velkomstdrink",en:"Welcome drink",cat:"drikke",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 14h32l-4 36H20L16 14z"/><line x1="16" y1="26" x2="48" y2="26" opacity=".4"/><path d="M44 10l-12 14"/><circle cx="46" cy="8" r="3" fill="currentColor" opacity=".4" stroke="none"/></svg>'},
+    {id:"preset_check",da:"Tjekliste",en:"Checklist",cat:"prep",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="14" y="10" width="36" height="44" rx="4"/><path d="M22 22l4 4 8-8"/><path d="M22 34l4 4 8-8" opacity=".5"/><path d="M22 46h20" opacity=".2"/></svg>'},
+    {id:"preset_meat",da:"Kød skåret",en:"Meat cut",cat:"prep",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M44 10H22a4 4 0 000 8h22v24a4 4 0 01-8 0V26H14V18h6"/><path d="M36 26v16"/></svg>'},
+    {id:"preset_fish",da:"Fisk renset",en:"Fish cleaned",cat:"prep",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 32c6-14 18-18 30-10l10-10v20L40 22c-12 8-24 4-30 10z"/><path d="M10 32c6 14 18 18 30 10"/><circle cx="28" cy="28" r="2.5" fill="currentColor"/></svg>'},
+    {id:"preset_plate",da:"Portioner anrettet",en:"Portions plated",cat:"prep",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="20" cy="36" r="13"/><circle cx="44" cy="36" r="13"/><circle cx="20" cy="36" r="7" fill="currentColor" opacity=".12"/><circle cx="44" cy="36" r="7" fill="currentColor" opacity=".12"/></svg>'},
+    {id:"preset_sauce",da:"Saucer lavet",en:"Sauces made",cat:"prep",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 28h36v12a6 6 0 01-6 6H20a6 6 0 01-6-6V28z"/><path d="M50 32h6a2 2 0 010 5h-6"/><path d="M20 16c0-3 3-5 3-8M32 16c0-3 3-5 3-8"/></svg>'},
+    {id:"preset_mise",da:"Mise en place",en:"Mise en place",cat:"prep",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="38" width="44" height="16" rx="3"/><path d="M50 14L28 36"/><path d="M50 14c3-3 3-7 0-9s-7-2-9 0l-5 9 5 5 9-5z"/><line x1="24" y1="44" x2="24" y2="48"/><line x1="32" y1="44" x2="32" y2="48"/><line x1="40" y1="44" x2="40" y2="48"/></svg>'},
+    {id:"preset_snaps",da:"Snaps serveret",en:"Snaps served",cat:"drikke",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 18h20l-4 32H26L22 18z"/><line x1="20" y1="18" x2="44" y2="18" stroke-width="3"/><line x1="22" y1="28" x2="42" y2="28" opacity=".35"/></svg>'},
+    {id:"preset_cheese",da:"Oste serveret",en:"Cheese served",cat:"service",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 46l24-30 24 12v18H8z"/><circle cx="28" cy="38" r="3.5" fill="currentColor" opacity=".35" stroke="none"/><circle cx="40" cy="32" r="2.5" fill="currentColor" opacity=".35" stroke="none"/><circle cx="20" cy="42" r="2" fill="currentColor" opacity=".35" stroke="none"/></svg>'},
+    {id:"preset_temp",da:"Temperatur tjekket",en:"Temperature checked",cat:"prep",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="28" y="10" width="8" height="30" rx="4"/><circle cx="32" cy="46" r="8"/><line x1="32" y1="34" x2="32" y2="40" stroke-width="3" opacity=".5"/><line x1="36" y1="18" x2="42" y2="18" opacity=".5"/><line x1="36" y1="24" x2="40" y2="24" opacity=".4"/></svg>'},
+  ];
+
   const OYSTER_TYPES=["Gillardeau","Fine de Claire","Spéciale de Claire","Marennes-Oléron","Belon","Tsarskaya","Limfjordsøsters","Kumamoto","Blue Point","Utah Beach","Pied de Cheval"];
   const LANDE=["Frankrig","Italien","Spanien","Tyskland","Portugal","Østrig","USA","Argentina","Chile","Australien","New Zealand","Sydafrika","Danmark","Ungarn","Grækenland","Libanon","Georgien"];
   const OMRAADER=["Bourgogne","Bordeaux","Champagne","Rhône","Loire","Alsace","Beaujolais","Jura","Languedoc","Provence","Toscana","Piemonte","Veneto","Lombardiet","Sicilien","Rioja","Ribera del Duero","Priorat","Rías Baixas","Mosel","Rheingau","Pfalz","Nahe","Douro","Dão","Wachau","Napa Valley","Sonoma","Willamette Valley","Barossa Valley","Marlborough","Mendoza","Stellenbosch"];
@@ -1839,7 +1908,8 @@
       const es=document.createElement("div");es.className="empty-state";
       es.innerHTML='<div class="empty-state-icon">&#127859;</div><div class="empty-state-title">'+(lang==="da"?"Ingen tællere endnu":"No counters yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tilføj din første tæller og begynd at holde styr på håndværket":"Add your first counter and start tracking your craft")+'</div>';
       const btn=document.createElement("button");btn.className="btn primary";btn.textContent=t("add_counter").replace("+ ","");btn.addEventListener("click",()=>openCounterModal(null));
-      es.appendChild(btn);grid.appendChild(es);
+      const catBtnE=document.createElement("button");catBtnE.className="btn ghost";catBtnE.style.marginTop="10px";catBtnE.textContent=lang==="da"?"Vælg fra katalog":"Browse catalog";catBtnE.addEventListener("click",openCatalog);
+      es.appendChild(btn);es.appendChild(catBtnE);grid.appendChild(es);
       const add=document.createElement("button");add.className="addcard";add.id="addCounterBtn";add.textContent=t("add_counter");add.style.display="none";grid.appendChild(add);
       return;
     }
@@ -1882,9 +1952,12 @@
     catAddBtn.innerHTML='+ '+(lang==="da"?"Tilføj tæller":"Add counter");
     grp.appendChild(catAddBtn);
     grid.appendChild(grp);
-    // New category button
+    // New category + catalog buttons
     const addCat=document.createElement("button");addCat.className="station-new-cat";addCat.id="addCatBtn";addCat.textContent=t("new_cat_btn");
     grid.appendChild(addCat);
+    const catBtn=document.createElement("button");catBtn.className="station-catalog-btn";catBtn.id="catalogBtn";
+    catBtn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'+(lang==="da"?" Vælg fra katalog":" Browse catalog");
+    grid.appendChild(catBtn);
     // Hidden addCounterBtn for backward-compat click handler
     const addH=document.createElement("button");addH.id="addCounterBtn";addH.style.display="none";grid.appendChild(addH);
   }
@@ -1920,6 +1993,7 @@
   $("#counterGrid").addEventListener("click",e=>{
     if(e.target.closest("#addCounterBtn")){openCounterModal(null);return;}
     if(e.target.closest("#addCatBtn")){openNewCatModal();return;}
+    if(e.target.closest("#catalogBtn")){openCatalog();return;}
     const catAdd=e.target.closest("[data-cat-add]");if(catAdd){openCounterModal(null,catAdd.dataset.catAdd);return;}
     const card=e.target.closest(".ccard");if(!card)return;
     const act=e.target.closest("[data-act]");if(!act)return;const a=act.dataset.act;
@@ -1953,6 +2027,44 @@
   $("#counterSave").addEventListener("click",()=>{const v=$("#counterLabelInput").value.trim();if(!v)return;const cat=$("#counterCat").value||"andet";if(editC){const c=state.counters.find(x=>x.id===editC);if(c){c.label=v;c.cat=cat;}}else state.counters.push({id:id(),label:v,count:0,subs:[],suggest:seedFor(v),cat});save();renderCounters();closeCounterModal();});
   $("#counterDelete").addEventListener("click",()=>{state.counters=state.counters.filter(x=>x.id!==editC);save();renderCounters();renderCareer();closeCounterModal();});
   $("#counterLabelInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#counterSave").click();});
+
+  // ---- Catalog ----
+  function isCatalogActive(presetId){return state.counters.some(c=>c.id===presetId);}
+  function openCatalog(){
+    renderCatalog("");
+    const s=$("#catalogSearch");if(s)s.value="";
+    $("#catalogScrim").classList.add("open");
+  }
+  function closeCatalog(){$("#catalogScrim").classList.remove("open");}
+  function renderCatalog(filter){
+    const q=(filter||"").toLowerCase();
+    const grid=$("#catalogGrid");if(!grid)return;
+    grid.innerHTML="";
+    const items=q?CATALOG.filter(it=>it.da.toLowerCase().includes(q)||it.en.toLowerCase().includes(q)):CATALOG;
+    items.forEach(item=>{
+      const active=isCatalogActive(item.id);
+      const div=document.createElement("div");div.className="catalog-item"+(active?" active":"");
+      div.innerHTML='<div class="catalog-check">&#10003;</div><div class="catalog-icon">'+item.icon+'</div><div class="catalog-name">'+esc(lang==="en"?item.en:item.da)+'</div>';
+      div.addEventListener("click",()=>toggleCatalogItem(item));
+      grid.appendChild(div);
+    });
+    if(!items.length){const e=document.createElement("div");e.style.cssText="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--faint);font-size:14px";e.textContent=lang==="da"?"Ingen resultater":"No results";grid.appendChild(e);}
+  }
+  function toggleCatalogItem(item){
+    if(isCatalogActive(item.id)){
+      const c=state.counters.find(x=>x.id===item.id);
+      const hasData=c&&(c.count>0||(c.subs||[]).some(s=>s.count>0));
+      if(hasData&&!confirm(lang==="da"?"Tælleren har registreringer. Fjern alligevel?":"Counter has data. Remove anyway?"))return;
+      state.counters=state.counters.filter(x=>x.id!==item.id);
+    }else{
+      state.counters.push({id:item.id,label:lang==="en"?item.en:item.da,count:0,subs:[],suggest:seedFor(lang==="en"?item.en:item.da),cat:item.cat||guessCategory(item.da)});
+    }
+    save();renderCounters();renderCareer();
+    renderCatalog($("#catalogSearch")?.value||"");
+  }
+  $("#catalogClose").addEventListener("click",closeCatalog);
+  $("#catalogScrim").addEventListener("click",e=>{if(e.target===$("#catalogScrim"))closeCatalog();});
+  $("#catalogSearch").addEventListener("input",e=>renderCatalog(e.target.value));
 
   // ---- Custom categories ----
   function openNewCatModal(){
