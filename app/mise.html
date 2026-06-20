@@ -92,7 +92,7 @@
   .logview-text{font-size:14px;color:var(--text);line-height:1.5;flex:1}
   .logview-empty{padding:60px 20px;text-align:center;color:var(--faint);font-size:14px}
 
-  #authScreen{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+  #authScreen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
   .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:40px 32px;width:100%;max-width:400px;box-shadow:var(--shadow-lg)}
   .auth-brand{font-family:"Fraunces",serif;font-size:28px;font-weight:600;color:var(--text);margin-bottom:2px}
   .auth-sub{font-size:13px;color:var(--faint);margin-bottom:28px}
@@ -3332,6 +3332,7 @@
   }
 
   function startApp(){
+    $("#mainWrap").style.display="";
     $("#view-station").classList.add("active");
     renderCounters();renderWines();renderCareer();renderLogView();
     setupPhoto();
@@ -3374,8 +3375,8 @@
     $("#loading").style.display="none";
     translateUI();
     setupAuthForm();
-    const authed=await initAuth();
-    if(authed)startApp();
+    try{const authed=await initAuth();if(authed)startApp();else showAuthScreen();}
+    catch(e){console.error("init",e);showAuthScreen();}
   })();
 })();
 </script>
