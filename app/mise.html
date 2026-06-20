@@ -29,7 +29,7 @@
   @media (max-width:600px){
     html,body{height:100%;overflow:hidden}
     body{padding:0!important;min-height:unset!important}
-    #appHeader{position:fixed;top:0;left:0;right:0;z-index:97;background:rgba(247,244,240,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 10px;border-bottom:1px solid rgba(0,0,0,.08)}
+    #appHeader{position:fixed;top:0;left:0;right:0;z-index:97;background:rgba(247,244,240,.98);padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 10px;border-bottom:1px solid rgba(0,0,0,.08)}
     #appScroll{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:calc(54px + env(safe-area-inset-top,0px));padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
   }
   .wrap{max-width:760px;margin:0 auto;padding:0 20px}
@@ -92,7 +92,7 @@
   .logview-text{font-size:14px;color:var(--text);line-height:1.5;flex:1}
   .logview-empty{padding:60px 20px;text-align:center;color:var(--faint);font-size:14px}
 
-  #authScreen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+  #authScreen{position:fixed;inset:0;z-index:1000;background:#EFE9E1;display:flex;align-items:center;justify-content:center;padding:24px}
   .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:40px 32px;width:100%;max-width:400px;box-shadow:var(--shadow-lg)}
   .auth-brand{font-family:"Fraunces",serif;font-size:28px;font-weight:600;color:var(--text);margin-bottom:2px}
   .auth-sub{font-size:13px;color:var(--faint);margin-bottom:28px}
@@ -3334,30 +3334,31 @@
   function startApp(){
     $("#mainWrap").style.display="";
     $("#view-station").classList.add("active");
-    renderCounters();renderWines();renderCareer();renderLogView();
-    setupPhoto();
-    setupProfileModal();
-    setupUsernameSetupModal();
-    setupShift();
-    setupFeed();
-    setupLab();
-    updateOfflineDot();
+    try{renderCounters();}catch(e){console.error("renderCounters",e);}
+    try{renderWines();}catch(e){console.error("renderWines",e);}
+    try{renderCareer();}catch(e){console.error("renderCareer",e);}
+    try{renderLogView();}catch(e){console.error("renderLogView",e);}
+    try{setupPhoto();}catch(e){console.error("setupPhoto",e);}
+    try{setupProfileModal();}catch(e){console.error("setupProfileModal",e);}
+    try{setupUsernameSetupModal();}catch(e){console.error("setupUsernameSetupModal",e);}
+    try{setupShift();}catch(e){console.error("setupShift",e);}
+    try{setupFeed();}catch(e){console.error("setupFeed",e);}
+    try{setupLab();}catch(e){console.error("setupLab",e);}
+    try{updateOfflineDot();}catch(e){}
     $("#viewToggle").style.display="none";
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.style.display="";
     const profileBtn=$("#profileBtn");if(profileBtn)profileBtn.style.display="";
-    attachAC($("#qlogInput"),()=>{
+    try{attachAC($("#qlogInput"),()=>{
       const phrases=recentLogPhrases();
       const labels=state.counters.map(c=>tLabel(c.label));
       const subs=state.counters.flatMap(c=>c.subs.map(s=>tLabel(s.name)));
       return [...new Set([...phrases,...labels,...subs])];
-    });
+    });}catch(e){console.error("attachAC",e);}
     setTimeout(maybeShowOnboarding, 600);
     setTimeout(()=>requestNotifPermission(),4000);
-    // Re-generate icons for any custom categories that were interrupted
     setTimeout(()=>{
       (state.customCats||[]).filter(c=>c.iconPending&&c.name).forEach(c=>generateCatIcon(c.id,c.name));
     },1500);
-    // Check username + follow requests after login
     setTimeout(async()=>{
       const base=apiBase();const token=await getToken();if(!base||!token)return;
       try{
@@ -3375,8 +3376,14 @@
     $("#loading").style.display="none";
     translateUI();
     setupAuthForm();
-    try{const authed=await initAuth();if(authed)startApp();else showAuthScreen();}
-    catch(e){console.error("init",e);showAuthScreen();}
+    let authed=false;
+    try{authed=await initAuth();}
+    catch(e){console.error("initAuth",e);showAuthScreen();return;}
+    if(authed){
+      try{startApp();}catch(e){console.error("startApp",e);}
+    }else{
+      showAuthScreen();
+    }
   })();
 })();
 </script>
