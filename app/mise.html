@@ -407,6 +407,37 @@
   .feed-action-btn{appearance:none;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;color:var(--dim);font-family:inherit;font-size:13px;font-weight:500;padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.12s}
   .feed-action-btn:hover{border-color:var(--accent);color:var(--accent)}
   .feed-action-btn.liked{background:var(--accent-soft);border-color:#FDE68A;color:var(--accent)}
+  /* ---- The Lab ---- */
+  .lab-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .lab-hdr-left .lab-title{font-family:"Fraunces",serif;font-size:22px;font-weight:700;letter-spacing:-.3px;display:block}
+  .lab-hdr-left .lab-sub{font-size:12px;color:var(--faint)}
+  .lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .lab-card{background:var(--surface);border-radius:14px;overflow:hidden;cursor:pointer;border:1px solid var(--border);-webkit-tap-highlight-color:transparent;transition:.12s}
+  .lab-card:active{opacity:.85}
+  .lab-card-img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--bg)}
+  .lab-card-body{padding:9px 11px 11px}
+  .lab-card-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lab-card-hint{font-size:11px;color:var(--faint);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
+  .lab-fab{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent}
+  .lab-photo-zone{border:2px dashed var(--border);border-radius:14px;padding:30px 16px;text-align:center;cursor:pointer;margin-bottom:12px;transition:.15s;-webkit-tap-highlight-color:transparent;background:var(--bg)}
+  .lab-photo-zone.has-img{border-style:solid;padding:0;overflow:hidden;border-color:var(--accent)}
+  .lab-photo-zone img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+  .lab-pz-icon{font-size:28px;margin-bottom:8px}
+  .lab-pz-lbl{font-size:14px;color:var(--dim);font-weight:500}
+  .lab-pz-sub{font-size:12px;color:var(--faint);margin-top:4px}
+  .lab-result{background:var(--bg);border-radius:12px;padding:14px;margin-bottom:12px}
+  .lab-result-name{font-family:"Fraunces",serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .lab-result-desc{font-size:13px;color:var(--dim);line-height:1.5;margin-bottom:12px}
+  .lab-result-sugs{display:flex;flex-direction:column;gap:9px}
+  .lab-sug{display:flex;gap:9px;align-items:flex-start}
+  .lab-sug-dot{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
+  .lab-sug-txt{font-size:13px;color:var(--text);line-height:1.5}
+  .lab-loading{display:flex;flex-direction:column;align-items:center;padding:28px;gap:10px}
+  .lab-spinner{width:26px;height:26px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+  .lab-loading-txt{font-size:13px;color:var(--dim)}
+  /* Lab detail sheet */
+  .lab-detail-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:12px;margin-bottom:14px}
+  .lab-detail-date{font-size:12px;color:var(--faint);margin-bottom:14px}
 
   /* Photo-first entry */
   .feed-photo-entry{position:relative;border-radius:var(--r);overflow:hidden;margin-bottom:8px;background:#0C0A09;cursor:pointer}
@@ -755,7 +786,65 @@
     <div id="wineList"></div>
     <button class="addwine" id="addWineBtn"></button>
   </section>
+
+  <section class="view" id="view-lab">
+    <div class="lab-hdr">
+      <div class="lab-hdr-left">
+        <span class="lab-title">The Lab</span>
+        <span class="lab-sub" id="labSub"></span>
+      </div>
+    </div>
+    <button class="lab-fab" id="labFab">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="labFabLbl">Nyt eksperiment</span>
+    </button>
+    <div class="lab-grid" id="labGrid"></div>
+  </section>
 </div></div>
+
+<div class="scrim" id="labScrim">
+  <div class="modal" id="labModal">
+    <div style="width:32px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px"></div>
+    <h2 class="mtitle" id="labModalTitle" style="margin-bottom:16px">Nyt eksperiment</h2>
+    <input type="file" id="labPhotoInput" accept="image/*" capture="environment" style="display:none">
+    <div class="lab-photo-zone" id="labPhotoZone">
+      <div class="lab-pz-icon">📷</div>
+      <div class="lab-pz-lbl" id="labPzLbl">Tag et billede</div>
+      <div class="lab-pz-sub" id="labPzSub">Tryk for at vælge foto</div>
+      <img id="labPhotoPreview" style="display:none">
+    </div>
+    <div id="labLoading" style="display:none" class="lab-loading">
+      <div class="lab-spinner"></div>
+      <div class="lab-loading-txt" id="labLoadingTxt">AI analyserer retten…</div>
+    </div>
+    <div id="labResultArea" style="display:none">
+      <div class="lab-result">
+        <div class="lab-result-name" id="labResultName"></div>
+        <div class="lab-result-desc" id="labResultDesc"></div>
+        <div class="lab-result-sugs" id="labResultSugs"></div>
+      </div>
+    </div>
+    <div class="mactions" id="labActions">
+      <button class="btn primary btn-sm" id="labAnalyzeBtn"></button>
+      <button class="btn ghost btn-sm" id="labCancelBtn"></button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="labDetailScrim">
+  <div class="modal" id="labDetailModal">
+    <div style="width:32px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px"></div>
+    <img class="lab-detail-img" id="labDetailImg" src="" alt="">
+    <div class="lab-result-name" id="labDetailName" style="margin-bottom:4px"></div>
+    <div class="lab-detail-date" id="labDetailDate"></div>
+    <div class="lab-result-desc" id="labDetailDesc"></div>
+    <div class="lab-result-sugs" id="labDetailSugs" style="margin-bottom:16px"></div>
+    <div class="mactions">
+      <button class="btn ghost btn-sm" id="labDetailDelete" style="color:var(--faint)"></button>
+      <button class="btn ghost btn-sm" id="labDetailClose"></button>
+    </div>
+  </div>
+</div>
 
 <div class="scrim" id="shiftScrim">
   <div class="modal shift-modal">
@@ -908,9 +997,9 @@
       <svg class="bnav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
       <span class="bnav-label" id="bnav-lbl-station">Station</span>
     </button>
-    <button class="bnav-btn" data-tab="vin" id="bnav-vin">
-      <svg class="bnav-icon" viewBox="0 0 24 24"><path d="M8 22v-3h8v3M8 19h8M6 2h12l-2 8a4 4 0 0 1-8 0Z"/></svg>
-      <span class="bnav-label" id="bnav-lbl-vin">Vin</span>
+    <button class="bnav-btn" data-tab="lab" id="bnav-lab">
+      <svg class="bnav-icon" viewBox="0 0 24 24"><path d="M9 3h6M10 3v7l-4 6a4 4 0 0 0 3.3 6.2h5.4A4 4 0 0 0 18 16l-4-6V3"/><line x1="6.5" y1="14" x2="17.5" y2="14"/></svg>
+      <span class="bnav-label" id="bnav-lbl-lab">The Lab</span>
     </button>
     <button class="bnav-btn" data-tab="log" id="bnav-log">
       <svg class="bnav-icon" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
@@ -1017,6 +1106,18 @@
       feed_empty_own:"Du har ikke postet noget endnu",
       feed_load_more:"Indlæs mere",
       feed_search_ph:"Søg på kaldenavn…",
+      lab_sub:"Eksperimenter med dine retter",
+      lab_new:"Nyt eksperiment",
+      lab_photo_lbl:"Tag et billede",
+      lab_photo_sub:"Tryk for at vælge foto",
+      lab_analyze:"Analyser med AI",
+      lab_cancel:"Annuller",
+      lab_save:"Gem eksperiment",
+      lab_loading:"AI analyserer retten…",
+      lab_delete:"Slet",
+      lab_close:"Luk",
+      lab_empty_title:"Ingen eksperimenter endnu",
+      lab_empty_sub:"Tag et billede af en ret og lad AI løfte den",
       feed_follow:"Følg",feed_unfollow:"Følger",
       feed_like:"Synes godt om",feed_comment:"Kommentér",
       feed_comments:"Kommentarer",feed_comment_ph:"Skriv en kommentar…",
@@ -1102,6 +1203,18 @@
       offline_pending:"{0} pending sync",
       tab_feed:"Social",
       feed_tab_mine:"My feed",feed_tab_discover:"Discover",
+      lab_sub:"Experiment with your dishes",
+      lab_new:"New experiment",
+      lab_photo_lbl:"Take a photo",
+      lab_photo_sub:"Tap to choose photo",
+      lab_analyze:"Analyze with AI",
+      lab_cancel:"Cancel",
+      lab_save:"Save experiment",
+      lab_loading:"AI is analyzing the dish…",
+      lab_delete:"Delete",
+      lab_close:"Close",
+      lab_empty_title:"No experiments yet",
+      lab_empty_sub:"Take a photo of a dish and let AI elevate it",
       feed_empty:"Follow someone to see their activity here",
       feed_empty_own:"You have not posted anything yet",
       feed_load_more:"Load more",
@@ -2232,11 +2345,12 @@
     function doSwitch(){
       document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.view===v));
       document.querySelectorAll(".bnav-btn").forEach(x=>x.classList.toggle("active",x.dataset.tab===v));
-      ["station","log","vin","social","feed"].forEach(n=>$("#view-"+n).classList.toggle("active",v===n));
+      ["station","log","vin","social","feed","lab"].forEach(n=>$("#view-"+n).classList.toggle("active",v===n));
       $("#viewToggle").style.display="none";
       if(v==="log")renderLogView();
       if(v==="social")loadSocial();
       if(v==="feed"){loadFeed(false,window._activeFeedTab?window._activeFeedTab()==="mine":true);loadFollowRequests();}
+      if(v==="lab")loadLabEntries();
       window.scrollTo({top:0,behavior:"instant"});
     }
     if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
@@ -3031,6 +3145,160 @@
     });
   }
 
+  // ---- The Lab ----
+  function setupLab(){
+    const sub=$("#labSub");if(sub)sub.textContent=t("lab_sub");
+    const fab=$("#labFab");const fabLbl=$("#labFabLbl");if(fabLbl)fabLbl.textContent=t("lab_new");
+    const analyzeBtn=$("#labAnalyzeBtn");if(analyzeBtn)analyzeBtn.textContent=t("lab_analyze");
+    const cancelBtn=$("#labCancelBtn");if(cancelBtn)cancelBtn.textContent=t("lab_cancel");
+    const detailDelete=$("#labDetailDelete");if(detailDelete)detailDelete.textContent=t("lab_delete");
+    const detailClose=$("#labDetailClose");if(detailClose)detailClose.textContent=t("lab_close");
+    const pzLbl=$("#labPzLbl");if(pzLbl)pzLbl.textContent=t("lab_photo_lbl");
+    const pzSub=$("#labPzSub");if(pzSub)pzSub.textContent=t("lab_photo_sub");
+    const loadTxt=$("#labLoadingTxt");if(loadTxt)loadTxt.textContent=t("lab_loading");
+
+    let labPhotoDataUrl=null;
+    let labAnalysisData=null;
+    let labDetailId=null;
+
+    function openLabModal(){
+      labPhotoDataUrl=null;labAnalysisData=null;
+      const zone=$("#labPhotoZone");if(zone)zone.className="lab-photo-zone";
+      const prev=$("#labPhotoPreview");if(prev){prev.style.display="none";prev.src="";}
+      const pzIcon=zone&&zone.querySelector(".lab-pz-icon");if(pzIcon)pzIcon.style.display="";
+      const pzL=zone&&zone.querySelector(".lab-pz-lbl");if(pzL)pzL.style.display="";
+      const pzS=zone&&zone.querySelector(".lab-pz-sub");if(pzS)pzS.style.display="";
+      $("#labLoading").style.display="none";
+      $("#labResultArea").style.display="none";
+      const acts=$("#labActions");if(acts){
+        if(analyzeBtn){analyzeBtn.style.display="";analyzeBtn.disabled=true;analyzeBtn.textContent=t("lab_analyze");}
+        if(cancelBtn)cancelBtn.textContent=t("lab_cancel");
+      }
+      $("#labScrim").classList.add("open");
+    }
+
+    function setPhotoPreview(dataUrl){
+      labPhotoDataUrl=dataUrl;
+      const zone=$("#labPhotoZone");if(zone)zone.className="lab-photo-zone has-img";
+      const pzIcon=zone&&zone.querySelector(".lab-pz-icon");if(pzIcon)pzIcon.style.display="none";
+      const pzL=zone&&zone.querySelector(".lab-pz-lbl");if(pzL)pzL.style.display="none";
+      const pzS=zone&&zone.querySelector(".lab-pz-sub");if(pzS)pzS.style.display="none";
+      const prev=$("#labPhotoPreview");if(prev){prev.src=dataUrl;prev.style.display="block";}
+      if(analyzeBtn){analyzeBtn.disabled=false;}
+    }
+
+    if(fab)fab.addEventListener("click",openLabModal);
+
+    const photoZone=$("#labPhotoZone");
+    if(photoZone)photoZone.addEventListener("click",()=>$("#labPhotoInput").click());
+
+    const photoInput=$("#labPhotoInput");
+    if(photoInput)photoInput.addEventListener("change",e=>{
+      const f=e.target.files[0];if(!f)return;
+      const reader=new FileReader();
+      reader.onload=ev=>setPhotoPreview(ev.target.result);
+      reader.readAsDataURL(f);
+      photoInput.value="";
+    });
+
+    if(analyzeBtn)analyzeBtn.addEventListener("click",async()=>{
+      if(!labPhotoDataUrl)return;
+      $("#labLoading").style.display="flex";
+      $("#labResultArea").style.display="none";
+      analyzeBtn.disabled=true;analyzeBtn.textContent="…";
+      const base=apiBase();const token=await getToken();
+      try{
+        const r=await fetch(base+"/api/lab/analyze",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:labPhotoDataUrl})});
+        if(!r.ok)throw new Error("HTTP "+r.status);
+        const d=await r.json();
+        labPhotoDataUrl=d.imageUrl;
+        labAnalysisData=d.analysis;
+        $("#labResultName").textContent=d.analysis.name||"";
+        $("#labResultDesc").textContent=d.analysis.description||"";
+        const sugsEl=$("#labResultSugs");sugsEl.innerHTML=(d.analysis.suggestions||[]).map((s,i)=>'<div class="lab-sug"><div class="lab-sug-dot">'+(i+1)+'</div><div class="lab-sug-txt">'+esc(s)+'</div></div>').join("");
+        $("#labLoading").style.display="none";
+        $("#labResultArea").style.display="block";
+        analyzeBtn.style.display="none";
+        if(cancelBtn)cancelBtn.textContent=t("lab_cancel");
+        const saveBtn=document.createElement("button");
+        saveBtn.className="btn primary btn-sm";saveBtn.textContent=t("lab_save");
+        saveBtn.id="labSaveBtn";
+        const acts=$("#labActions");
+        const existing=$("#labSaveBtn");if(existing)existing.remove();
+        acts.insertBefore(saveBtn,cancelBtn||null);
+        saveBtn.addEventListener("click",async()=>{
+          saveBtn.disabled=true;saveBtn.textContent="…";
+          const rb=apiBase();const tok=await getToken();
+          try{
+            const sr=await fetch(rb+"/api/lab/entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({imageUrl:labPhotoDataUrl,analysis:labAnalysisData})});
+            if(!sr.ok)throw new Error("HTTP "+sr.status);
+            $("#labScrim").classList.remove("open");
+            showToast(lang==="da"?"Eksperiment gemt!":"Experiment saved!");
+            loadLabEntries();
+          }catch(e){saveBtn.disabled=false;saveBtn.textContent=t("lab_save");showToast(lang==="da"?"Noget gik galt":"Something went wrong");}
+        });
+      }catch(e){
+        $("#labLoading").style.display="none";
+        analyzeBtn.disabled=false;analyzeBtn.textContent=t("lab_analyze");
+        showToast(lang==="da"?"Analyse fejlede — prøv igen":"Analysis failed, try again");
+      }
+    });
+
+    if(cancelBtn)cancelBtn.addEventListener("click",()=>$("#labScrim").classList.remove("open"));
+
+    // Detail sheet
+    const detailScrim=$("#labDetailScrim");
+    if(detailClose)detailClose.addEventListener("click",()=>detailScrim.classList.remove("open"));
+    if(detailDelete)detailDelete.addEventListener("click",async()=>{
+      if(!labDetailId)return;
+      const base=apiBase();const token=await getToken();
+      try{
+        await fetch(base+"/api/lab/entry/"+labDetailId,{method:"DELETE",headers:{"Authorization":"Bearer "+token}});
+        detailScrim.classList.remove("open");
+        showToast(lang==="da"?"Slettet":"Deleted");
+        loadLabEntries();
+      }catch(e){}
+    });
+
+    const grid=$("#labGrid");
+    if(grid)grid.addEventListener("click",e=>{
+      const card=e.target.closest(".lab-card[data-lab-id]");
+      if(!card)return;
+      const entry=window._labEntries&&window._labEntries.find(x=>x.id===card.dataset.labId);
+      if(!entry)return;
+      labDetailId=entry.id;
+      const a=entry.analysis||{};
+      $("#labDetailImg").src=entry.imageUrl||"";
+      $("#labDetailName").textContent=a.name||"";
+      $("#labDetailDesc").textContent=a.description||"";
+      const d=new Date(entry.createdAt);
+      $("#labDetailDate").textContent=d.toLocaleDateString(lang==="da"?"da-DK":"en-GB",{day:"numeric",month:"long",year:"numeric"});
+      const sugsEl=$("#labDetailSugs");sugsEl.innerHTML=(a.suggestions||[]).map((s,i)=>'<div class="lab-sug"><div class="lab-sug-dot">'+(i+1)+'</div><div class="lab-sug-txt">'+esc(s)+'</div></div>').join("");
+      detailScrim.classList.add("open");
+    });
+  }
+
+  async function loadLabEntries(){
+    const grid=$("#labGrid");if(!grid)return;
+    const base=apiBase();const token=await getToken();
+    if(!base||!token){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🔬</div><div class="empty-state-title">'+esc(t("lab_empty_title"))+'</div><div class="empty-state-sub">'+esc(t("lab_empty_sub"))+'</div></div>';return;}
+    try{
+      const r=await fetch(base+"/api/lab/entries",{headers:{"Authorization":"Bearer "+token}});
+      if(!r.ok)throw new Error();
+      const d=await r.json();
+      window._labEntries=d.entries||[];
+      if(!window._labEntries.length){
+        grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🔬</div><div class="empty-state-title">'+esc(t("lab_empty_title"))+'</div><div class="empty-state-sub">'+esc(t("lab_empty_sub"))+'</div></div>';
+        return;
+      }
+      grid.innerHTML=window._labEntries.map(e=>{
+        const a=e.analysis||{};
+        const hint=(a.suggestions||[])[0]||a.description||"";
+        return '<div class="lab-card" data-lab-id="'+esc(e.id)+'"><img class="lab-card-img" src="'+esc(e.imageUrl||"")+'" loading="lazy"><div class="lab-card-body"><div class="lab-card-name">'+esc(a.name||"Eksperiment")+'</div><div class="lab-card-hint">'+esc(hint)+'</div></div></div>';
+      }).join("");
+    }catch(e){grid.innerHTML="";}
+  }
+
   function startApp(){
     $("#view-station").classList.add("active");
     renderCounters();renderWines();renderCareer();renderLogView();
@@ -3039,6 +3307,7 @@
     setupUsernameSetupModal();
     setupShift();
     setupFeed();
+    setupLab();
     updateOfflineDot();
     $("#viewToggle").style.display="none";
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.style.display="";

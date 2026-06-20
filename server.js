@@ -670,5 +670,88 @@ app.post("/api/comments/:entryId", async (req, res) => {
   }
 });
 
+// ---- The Lab ----
+app.post("/api/lab/analyze", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { dataUrl } = req.body || {};
+    if (!dataUrl) return res.status(400).json({ error: "Ingen billede" });
+
+    const match = dataUrl.match(/^data:([a-zA-Z0-9+/.-]+);base64,(.+)$/);
+    if (!match) return res.status(400).json({ error: "Ugyldigt billedformat" });
+    const [, contentType, b64] = match;
+    if (!["image/jpeg","image/png","image/webp","image/heic","image/heif"].includes(contentType))
+      return res.status(400).json({ error: "Filtype ikke tilladt" });
+
+    // Upload to storage
+    const buffer = Buffer.from(b64, "base64");
+    const extMap = { "image/png":"png","image/webp":"webp","image/heic":"heic","image/heif":"heif" };
+    const ext = extMap[contentType] || "jpg";
+    const imageUrl = await uploadToStorage("lab-photos", `${userId}/${Date.now()}.${ext}`, buffer, contentType);
+
+    // Claude Vision analysis
+    const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "x-api-key": API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 600,
+        messages: [{ role: "user", content: [
+          { type: "image", source: { type: "base64", media_type: contentType, data: b64 } },
+          { type: "text", text: "Du er en erfaren professionel kok. Se på denne ret og svar KUN i dette præcise JSON-format uden ekstra tekst:\n{\"name\":\"kort navn på retten (maks 5 ord)\",\"description\":\"én sætning der beskriver retten\",\"suggestions\":[\"konkret forslag 1 til at løfte retten\",\"konkret forslag 2\",\"konkret forslag 3\"]}\n\nFokuser forslagene på: smagskombinationer der mangler, teknik der kunne løfte retten, eller præsentation. Svar på dansk." }
+        ]}]
+      })
+    });
+    if (!claudeRes.ok) throw new Error("Claude fejlede");
+    const claudeData = await claudeRes.json();
+    const text = claudeData.content[0].text.trim();
+    const analysis = JSON.parse(text);
+    res.json({ imageUrl, analysis });
+  } catch (err) {
+    console.error("lab/analyze:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/lab/entry", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { imageUrl, analysis } = req.body || {};
+    if (!imageUrl || !analysis) return res.status(400).json({ error: "Mangler data" });
+    await sb("lab_entries", { method: "POST", body: JSON.stringify({ user_id: userId, image_url: imageUrl, analysis: JSON.stringify(analysis) }) });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("lab/entry:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/lab/entries", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const rows = await sb(`lab_entries?user_id=eq.${userId}&order=created_at.desc&limit=50&select=id,image_url,analysis,created_at`) || [];
+    const entries = rows.map(r => ({
+      id: r.id,
+      imageUrl: r.image_url,
+      analysis: typeof r.analysis === "string" ? JSON.parse(r.analysis) : r.analysis,
+      createdAt: r.created_at,
+    }));
+    res.json({ entries });
+  } catch (err) {
+    console.error("lab/entries:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/lab/entry/:id", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    await sb(`lab_entries?id=eq.${req.params.id}&user_id=eq.${userId}`, { method: "DELETE" });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Craft Tracker backend kører på port " + PORT));
