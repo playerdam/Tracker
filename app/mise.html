@@ -1056,7 +1056,7 @@
   const STORE_KEY="mise_state_v2";
   const API_BASE="";
   function apiBase(){if(API_BASE)return API_BASE.replace(/\/$/,"");if(location.protocol==="http:"||location.protocol==="https:")return location.origin;return "";}
-  const hasStore=typeof window!=="undefined"&&window.storage&&typeof window.storage.get==="function";
+  const hasStore=false;
   const $=s=>document.querySelector(s);
 
   // ---- i18n ----
@@ -1269,7 +1269,7 @@
   function translateUI(){
     document.documentElement.lang=lang;
     $("#langBtn").textContent=lang==="da"?"EN":"DA";
-    $("#tagline").textContent=t("tagline");
+    const tglEl=$("#tagline");if(tglEl)tglEl.textContent=t("tagline");
     $("#totalLbl").textContent=t("total_label");
     $("#tab-station").textContent=t("tab_station");
     $("#tab-vin").textContent=t("tab_wine");
@@ -1397,7 +1397,7 @@
     for(const[cat,words] of Object.entries(m)){if(words.some(w=>l.includes(w)))return cat;}
     return "andet";
   }
-  let expandedCats=new Set(JSON.parse(localStorage.getItem("mise_expanded_cats")||"null")||CATS.map(c=>c.id));
+  let expandedCats=new Set((()=>{try{return JSON.parse(localStorage.getItem("mise_expanded_cats")||"null");}catch(e){return null;}})()|| CATS.map(c=>c.id));
   function saveExpandedCats(){localStorage.setItem("mise_expanded_cats",JSON.stringify([...expandedCats]));}
   const DOTS_ICON=CATS.find(c=>c.id==="andet").icon;
   function allCats(){
@@ -1452,7 +1452,7 @@
   const logHistory=[];
 
   // ---- Auth ----
-  let session=JSON.parse(localStorage.getItem("mise_session")||"null");
+  let session=(()=>{try{return JSON.parse(localStorage.getItem("mise_session")||"null");}catch(e){return null;}})();
   let cfg={supabaseUrl:"",anonKey:""};
   let authMode="login";
 
@@ -1462,8 +1462,9 @@
   }
 
   async function supabaseAuth(path,body){
+    if(!cfg.supabaseUrl)throw new Error("config_not_loaded");
     const res=await fetch(cfg.supabaseUrl+"/auth/v1/"+path,{method:"POST",headers:{"Content-Type":"application/json","apikey":cfg.anonKey},body:JSON.stringify(body)});
-    return res.json();
+    try{return await res.json();}catch(e){throw new Error("server_error_"+res.status);}
   }
 
   async function signIn(email,password){
@@ -1481,9 +1482,11 @@
 
   async function refreshSession(){
     if(!session||!session.refresh_token)return false;
-    const data=await supabaseAuth("token?grant_type=refresh_token",{refresh_token:session.refresh_token});
-    if(data.access_token){saveSession(data);return true;}
-    session=null;localStorage.removeItem("mise_session");return false;
+    try{
+      const data=await supabaseAuth("token?grant_type=refresh_token",{refresh_token:session.refresh_token});
+      if(data.access_token){saveSession(data);return true;}
+      session=null;localStorage.removeItem("mise_session");return false;
+    }catch(e){return false;}
   }
 
   async function getToken(){
@@ -1535,7 +1538,9 @@
     submitBtn.addEventListener("click",async()=>{
       const email=emailEl.value.trim(),pw=pwEl.value;if(!email||!pw)return;
       submitBtn.disabled=true;submitBtn.textContent="…";
-      const result=authMode==="login"?await signIn(email,pw):await signUp(email,pw);
+      let result;
+      try{result=authMode==="login"?await signIn(email,pw):await signUp(email,pw);}
+      catch(e){result=e.message==="config_not_loaded"?(lang==="da"?"Server utilgængelig, prøv igen":"Server unavailable, try again"):e.message||"Netværksfejl";}
       submitBtn.disabled=false;updateMode();
       if(result&&result.info){
         $("#authInfo").textContent=result.info;$("#authInfo").style.display="block";
@@ -1684,7 +1689,7 @@
     {id:"cat_3",       icon:"🗂", da:"3 kategorier",     en:"3 categories",   check:(s,e)=>s.counters&&s.counters.length>=3},
     {id:"cat_10",      icon:"📁", da:"10 kategorier",    en:"10 categories",  check:(s,e)=>s.counters&&s.counters.length>=10},
   ];
-  function getBadgesEarned(){return JSON.parse(localStorage.getItem("mise_badges")||"[]");}
+  function getBadgesEarned(){try{return JSON.parse(localStorage.getItem("mise_badges")||"[]");}catch(e){return [];}}
   function saveBadgesEarned(arr){localStorage.setItem("mise_badges",JSON.stringify(arr));}
   function checkBadges(){
     const earned=getBadgesEarned();let newOnes=[];
@@ -1706,8 +1711,7 @@
   }
 
   // ---- personal records ----
-  function getRecords(){return JSON.parse(localStorage.getItem("mise_records")||"{}");}
-  function saveRecords(r){localStorage.setItem("mise_records",JSON.stringify(r));}
+  function getRecords(){try{return JSON.parse(localStorage.getItem("mise_records")||"{}");}catch(e){return {};}}  function saveRecords(r){localStorage.setItem("mise_records",JSON.stringify(r));}
   function checkRecords(){
     const records=getRecords();let updated=false;
     state.counters.forEach(c=>{
@@ -3378,16 +3382,21 @@
   }
 
   (async function(){
+    console.log("CT:IIFE start hasStore="+hasStore+" wstorage="+typeof window.storage);
     $("#mainWrap").style.display="none";
-    state=await load();if(!Array.isArray(state.log))state.log=[];
+    console.log("CT:before load");
+    state=await load();
+    console.log("CT:after load counters="+state.counters.length);
+    if(!Array.isArray(state.log))state.log=[];
     $("#loading").style.display="none";
-    translateUI();
-    setupAuthForm();
+    try{translateUI();}catch(e){console.error("CT:translateUI",e);}
+    try{setupAuthForm();}catch(e){console.error("CT:setupAuthForm",e);}
     let authed=false;
     try{authed=await initAuth();}
-    catch(e){console.error("initAuth",e);showAuthScreen();return;}
+    catch(e){console.error("CT:initAuth threw",e);showAuthScreen();return;}
+    console.log("CT:authed="+authed);
     if(authed){
-      try{startApp();}catch(e){console.error("startApp",e);}
+      try{startApp();}catch(e){console.error("CT:startApp threw",e);}
     }else{
       showAuthScreen();
     }
