@@ -1506,12 +1506,18 @@
     const pb=$("#profileBtn");if(pb)pb.style.display="";
   }
 
+  function fetchWithTimeout(url,opts,ms){
+    const ctl=new AbortController();
+    const t=setTimeout(()=>ctl.abort(),ms);
+    return fetch(url,{...opts,signal:ctl.signal}).finally(()=>clearTimeout(t));
+  }
   async function initAuth(){
-    try{const res=await fetch(apiBase()+"/api/config");cfg=await res.json();}catch(e){console.warn("Config fetch fejlede",e);}
-    if(!session){showAuthScreen();return false;}
-    if(Date.now()>session.expires_at-60000){const ok=await refreshSession();if(!ok){showAuthScreen();return false;}}
-    try{await fetch(apiBase()+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});}catch(e){}
-    hideAuthScreen();return true;
+    console.log("CT:initAuth start, session=",!!session);
+    try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},4000);cfg=await res.json();console.log("CT:config ok");}catch(e){console.warn("CT:config fail",e.message);}
+    if(!session){console.log("CT:no session");showAuthScreen();return false;}
+    if(Date.now()>session.expires_at-60000){console.log("CT:refreshing");const ok=await refreshSession();if(!ok){showAuthScreen();return false;}}
+    try{await fetchWithTimeout(apiBase()+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}},4000);}catch(e){console.warn("CT:profile fail",e.message);}
+    console.log("CT:authed ok");hideAuthScreen();return true;
   }
 
   function setupAuthForm(){
@@ -3332,6 +3338,7 @@
   }
 
   function startApp(){
+    console.log("CT:startApp");
     $("#mainWrap").style.display="";
     $("#view-station").classList.add("active");
     try{renderCounters();}catch(e){console.error("renderCounters",e);}
