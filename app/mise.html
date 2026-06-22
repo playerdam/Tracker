@@ -954,16 +954,6 @@
 </header>
 <div id="appScroll"><div class="wrap" id="mainWrap">
 
-  <div class="qlog">
-    <svg class="qlog-ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4"/><path d="M13 3 16 10l7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>
-    <input id="qlogInput" autocomplete="off">
-    <img id="photoThumb" class="photo-thumb" alt="">
-    <button id="photoBtn" class="qlog-cam" title="Tilføj billede"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="qlog-cam-lbl">Foto</span></button>
-    <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
-    <span class="qlog-spin" id="qlogSpin" hidden><span class="spin"></span></span>
-  </div>
-  <div class="upload-bar" id="uploadBar"><div class="upload-bar-fill" id="uploadBarFill"></div></div>
-
 <div id="qlogOverlay">
   <div id="qlogOverlayCard">
     <div class="qlog-ov-bar">
@@ -1000,6 +990,15 @@
   <div id="loading" class="loading"></div>
 
   <section class="view" id="view-station">
+    <div class="qlog">
+      <svg class="qlog-ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4"/><path d="M13 3 16 10l7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>
+      <input id="qlogInput" autocomplete="off">
+      <img id="photoThumb" class="photo-thumb" alt="">
+      <button id="photoBtn" class="qlog-cam" title="Tilføj billede"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="qlog-cam-lbl">Foto</span></button>
+      <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
+      <span class="qlog-spin" id="qlogSpin" hidden><span class="spin"></span></span>
+    </div>
+    <div class="upload-bar" id="uploadBar"><div class="upload-bar-fill" id="uploadBarFill"></div></div>
     <div class="grid" id="counterGrid"></div>
   </section>
 
@@ -4016,12 +4015,18 @@
   }
 
   async function createAndOpenDish(){
-    var base=apiBase();var token=await getToken();if(!base||!token)return;
+    var base=apiBase();var token=await getToken();
+    if(!base||!token){showToast(lang==="da"?"Ikke logget ind":"Not logged in");return;}
     try{
       var r=await fetch(base+"/api/lab/dishes",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name:lang==="da"?"Ny ret":"New dish",status:"idea",data:{}})});
       var dish=await r.json();
+      if(!r.ok)throw new Error(dish.error||("HTTP "+r.status));
       if(dish.id){_labDishes.unshift(dish);openDishEditor(dish);}
-    }catch(e){showToast(lang==="da"?"Noget gik galt":"Something went wrong");}
+      else throw new Error("Intet id retur");
+    }catch(e){
+      showToast(lang==="da"?"Kunne ikke oprette ret — er lab_dishes tabellen oprettet i Supabase?":"Failed — is the lab_dishes table created in Supabase?");
+      console.error("createAndOpenDish:",e);
+    }
   }
 
   function openDishEditor(dish){
