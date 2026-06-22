@@ -769,5 +769,72 @@ app.delete("/api/lab/entry/:id", async (req, res) => {
   }
 });
 
+// ---- Lab: Dish creation ----
+app.get("/api/lab/dishes", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const rows = await sb(`lab_dishes?user_id=eq.${userId}&order=updated_at.desc&limit=100&select=id,name,status,hero_url,data,created_at,updated_at`) || [];
+    res.json({ dishes: rows.map(r => ({
+      id: r.id, name: r.name, status: r.status, heroUrl: r.hero_url,
+      data: typeof r.data === "string" ? JSON.parse(r.data) : (r.data || {}),
+      createdAt: r.created_at, updatedAt: r.updated_at,
+    })) });
+  } catch (err) { res.status(authErr(err.message) ? 401 : 500).json({ error: err.message }); }
+});
+
+app.post("/api/lab/dishes", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { name = "Ny ret", status = "idea", heroUrl = null, data = {} } = req.body || {};
+    const rows = await sb("lab_dishes", { method: "POST",
+      body: JSON.stringify({ user_id: userId, name, status, hero_url: heroUrl, data })
+    });
+    const dish = Array.isArray(rows) ? rows[0] : rows;
+    res.json({ id: dish.id, name: dish.name, status: dish.status, heroUrl: dish.hero_url,
+      data: typeof dish.data === "string" ? JSON.parse(dish.data) : (dish.data || {}) });
+  } catch (err) { res.status(authErr(err.message) ? 401 : 500).json({ error: err.message }); }
+});
+
+app.put("/api/lab/dishes/:id", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const patch = { updated_at: new Date().toISOString() };
+    const { name, status, heroUrl, data } = req.body || {};
+    if (name !== undefined) patch.name = name;
+    if (status !== undefined) patch.status = status;
+    if (heroUrl !== undefined) patch.hero_url = heroUrl;
+    if (data !== undefined) patch.data = data;
+    await sb(`lab_dishes?id=eq.${req.params.id}&user_id=eq.${userId}`, { method: "PATCH", body: JSON.stringify(patch) });
+    res.json({ ok: true });
+  } catch (err) { res.status(authErr(err.message) ? 401 : 500).json({ error: err.message }); }
+});
+
+app.delete("/api/lab/dishes/:id", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    await sb(`lab_dishes?id=eq.${req.params.id}&user_id=eq.${userId}`, { method: "DELETE" });
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post("/api/lab/dishes/ai", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { dish, question } = req.body || {};
+    if (!question) return res.status(400).json({ error: "Mangler spørgsmål" });
+    const d = dish ? (dish.data || {}) : {};
+    const ings = (d.ingredients || []).map(i => `${i.amount}${i.unit} ${i.name}${i.prep ? " ("+i.prep+")" : ""}`).join(", ");
+    const steps = (d.steps || []).map((s, i) => `${i+1}. ${s.text}`).join("; ");
+    const rounds = (d.testRounds || []).map(r => `Runde ${r.date}: ${r.notes} (${r.rating}★)`).join("; ");
+    const ctx = `Ret: ${dish ? dish.name : "?"}\nStatus: ${dish ? dish.status : "?"}\nSæson: ${d.season||"?"}\nPortioner: ${d.portions||"?"}\nKoncept: ${d.concept||"–"}\nIngredienser: ${ings||"–"}\nTeknik: ${d.technique||"–"}, ${d.cookTime||"–"} min @ ${d.mainTemp||"–"}°C\nFremgangsmåde: ${steps||"–"}\nAnretning: ${d.plating||"–"}\nTestnoter: ${rounds||"–"}`;
+    const answer = await callClaude({
+      model: "claude-haiku-4-5-20251001", maxTokens: 700,
+      system: "Du er en erfaren michelinkok og kulinarisk rådgiver. Hjælp professionelle kokke med at løfte retter til næste niveau. Svar præcist og konkret på dansk. Gå direkte til substansen — max 5 sætninger eller bullet points.",
+      content: `Retoplysninger:\n${ctx}\n\nSpørgsmål: ${question}`
+    });
+    res.json({ answer });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Craft Tracker backend kører på port " + PORT));

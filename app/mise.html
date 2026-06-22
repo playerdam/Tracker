@@ -439,36 +439,113 @@
   .feed-action-btn:hover{border-color:var(--accent);color:var(--accent)}
   .feed-action-btn.liked{background:var(--accent-soft);border-color:#FDE68A;color:var(--accent)}
   /* ---- The Lab ---- */
-  .lab-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  /* ---- The Lab ---- */
+  .lab-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
   .lab-hdr-left .lab-title{font-family:"Fraunces",serif;font-size:22px;font-weight:700;letter-spacing:-.3px;display:block}
   .lab-hdr-left .lab-sub{font-size:12px;color:var(--faint)}
-  .lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-  .lab-card{background:var(--surface);border-radius:14px;overflow:hidden;cursor:pointer;border:1px solid var(--border);-webkit-tap-highlight-color:transparent;transition:.12s}
-  .lab-card:active{opacity:.85}
-  .lab-card-img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--bg)}
-  .lab-card-body{padding:9px 11px 11px}
-  .lab-card-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .lab-card-hint{font-size:11px;color:var(--faint);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
-  .lab-fab{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent}
-  .lab-photo-zone{border:2px dashed var(--border);border-radius:14px;padding:30px 16px;text-align:center;cursor:pointer;margin-bottom:12px;transition:.15s;-webkit-tap-highlight-color:transparent;background:var(--bg)}
-  .lab-photo-zone.has-img{border-style:solid;padding:0;overflow:hidden;border-color:var(--accent)}
-  .lab-photo-zone img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
-  .lab-pz-icon{font-size:28px;margin-bottom:8px}
-  .lab-pz-lbl{font-size:14px;color:var(--dim);font-weight:500}
-  .lab-pz-sub{font-size:12px;color:var(--faint);margin-top:4px}
-  .lab-result{background:var(--bg);border-radius:12px;padding:14px;margin-bottom:12px}
+  .lab-new-btn{appearance:none;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:9px 16px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;flex-shrink:0}
+  .lab-new-btn:active{opacity:.85}
+  .lab-filter-row{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .lab-filter-row::-webkit-scrollbar{display:none}
+  .lab-filter-chip{appearance:none;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:5px 13px;font-family:inherit;font-size:12px;font-weight:600;color:var(--dim);cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .lab-filter-chip.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  .lab-list{display:flex;flex-direction:column;gap:10px;margin-bottom:90px}
+  .dish-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.12s}
+  .dish-card:active{opacity:.85}
+  .dish-card-img{width:100%;height:130px;object-fit:cover;background:var(--bg);display:block}
+  .dish-card-body{padding:11px 14px 13px}
+  .dish-card-top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+  .dish-card-name{font-family:"Fraunces",serif;font-size:17px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dish-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em}
+  .dish-status-idea{background:#EEF2FF;color:#4338CA}
+  .dish-status-testing{background:#FEF3C7;color:#92400E}
+  .dish-status-ready{background:#D1FAE5;color:#065F46}
+  .dish-status-menu{background:var(--accent-soft);color:var(--accent)}
+  .dish-card-meta{font-size:12px;color:var(--faint)}
+  /* Dish editor — full-screen overlay */
+  .dish-editor{position:fixed;inset:0;z-index:200;background:var(--bg);transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .dish-editor.open{transform:translateX(0)}
+  .de-hdr{position:sticky;top:0;z-index:10;background:rgba(247,244,240,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+  .de-back{appearance:none;background:none;border:none;color:var(--accent);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;padding:4px 0;flex-shrink:0;display:flex;align-items:center;gap:4px;-webkit-tap-highlight-color:transparent}
+  .de-name{font-family:"Fraunces",serif;font-size:17px;font-weight:600;flex:1;min-width:0;background:none;border:none;color:var(--text);padding:0;outline:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .de-save{appearance:none;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:7px 14px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:.12s}
+  .de-save.saved{background:var(--surface-2);color:var(--faint)}
+  /* Status chips */
+  .de-status-bar{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+  .de-status-chip{appearance:none;border:1.5px solid var(--border);border-radius:20px;background:var(--bg);color:var(--dim);font-family:inherit;font-size:12px;font-weight:600;padding:5px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .de-status-chip.active-idea{border-color:#6366F1;background:#EEF2FF;color:#4338CA}
+  .de-status-chip.active-testing{border-color:#D97706;background:#FEF3C7;color:#92400E}
+  .de-status-chip.active-ready{border-color:#059669;background:#D1FAE5;color:#065F46}
+  .de-status-chip.active-menu{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  /* Sections */
+  .ds{border-bottom:1px solid var(--border)}
+  .ds-hd{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;background:var(--surface)}
+  .ds-hd:active{background:var(--surface-2)}
+  .ds-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);flex:1}
+  .ds-count{font-size:11px;color:var(--faint);margin-right:2px}
+  .ds-chev{color:var(--faint);transition:transform .2s;flex-shrink:0}
+  .ds.open .ds-chev{transform:rotate(90deg)}
+  .ds-bd{display:none;padding:14px 16px 18px;background:var(--bg)}
+  .ds.open .ds-bd{display:block}
+  /* Ingredient rows */
+  .ing-row{display:grid;grid-template-columns:58px 58px 1fr auto;gap:6px;align-items:center;margin-bottom:7px}
+  .ing-prep-row{display:grid;grid-template-columns:1fr auto;gap:6px;margin-bottom:10px;margin-top:-2px;padding-left:1px}
+  .ing-rm{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;padding:6px;line-height:1;font-size:16px;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+  .ing-rm:active{color:var(--text)}
+  .ing-add-btn{appearance:none;background:none;border:1.5px dashed var(--border);border-radius:var(--r-sm);width:100%;padding:9px;font-family:inherit;font-size:13px;font-weight:500;color:var(--faint);cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:4px}
+  .ing-add-btn:active{border-color:var(--accent);color:var(--accent)}
+  .ing-ai-btn{appearance:none;background:none;border:1.5px solid var(--border-2);border-radius:var(--r-sm);width:100%;padding:9px;font-family:inherit;font-size:12px;font-weight:600;color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .ing-ai-btn:active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  /* Step rows */
+  .step-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+  .step-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:10px}
+  .step-body{flex:1}
+  .step-txt{width:100%;min-height:60px;resize:vertical;margin-bottom:6px}
+  .step-meta{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center}
+  /* Test rounds */
+  .test-round{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:8px;position:relative}
+  .test-round-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .test-round-date{font-size:12px;font-weight:700;color:var(--dim);flex:1}
+  .test-stars{display:flex;gap:2px}
+  .test-star{font-size:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1}
+  .test-round-rm{appearance:none;background:none;border:none;color:var(--faint);font-size:13px;cursor:pointer;padding:0;font-family:inherit;-webkit-tap-highlight-color:transparent}
+  .test-round-rm:hover{color:var(--text)}
+  /* Photo gallery */
+  .photo-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+  .photo-thumb-de{aspect-ratio:1;border-radius:8px;object-fit:cover;width:100%;cursor:pointer;display:block}
+  .photo-add-tile{aspect-ratio:1;border-radius:8px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;background:var(--surface);color:var(--faint);font-size:22px}
+  .photo-add-tile:active{border-color:var(--accent);color:var(--accent)}
+  /* Plating photo */
+  .plating-photo{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r-sm);margin-bottom:10px;display:block;cursor:pointer}
+  .plating-photo-add{width:100%;aspect-ratio:4/3;border:2px dashed var(--border);border-radius:var(--r-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;margin-bottom:10px;color:var(--faint);font-size:13px;-webkit-tap-highlight-color:transparent;background:var(--surface)}
+  .plating-photo-add:active{border-color:var(--accent)}
+  /* AI floating button */
+  .ai-fab{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 74px);right:16px;z-index:199;appearance:none;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;border:none;border-radius:28px;padding:11px 18px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:none;align-items:center;gap:7px;box-shadow:0 4px 20px rgba(99,102,241,.38);-webkit-tap-highlight-color:transparent;transition:transform .12s}
+  .ai-fab:active{transform:scale(.95)}
+  .dish-editor.open+.ai-fab,.dish-editor.open~.ai-fab{display:flex}
+  /* AI sheet */
+  .ai-scrim{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.35);display:none;align-items:flex-end}
+  .ai-scrim.open{display:flex}
+  .ai-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:0 16px calc(env(safe-area-inset-bottom,0px)+20px);-webkit-overflow-scrolling:touch}
+  .ai-sheet-drag{width:32px;height:4px;background:var(--border-2);border-radius:2px;margin:12px auto 16px}
+  .ai-sheet-title{font-family:"Fraunces",serif;font-size:18px;font-weight:600;margin-bottom:14px}
+  .ai-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+  .ai-chip{appearance:none;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:6px 12px;font-family:inherit;font-size:12px;font-weight:600;color:var(--dim);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .ai-chip:active{border-color:#6366F1;background:#EEF2FF;color:#4338CA}
+  .ai-input-row{display:flex;gap:8px;margin-bottom:12px}
+  .ai-input-row .input{flex:1}
+  .ai-response{background:var(--bg);border-radius:var(--r-sm);padding:12px 14px;font-size:14px;line-height:1.65;color:var(--text);white-space:pre-wrap;margin-bottom:14px;display:none;border-left:3px solid #6366F1}
+  .ai-loading{display:none;align-items:center;gap:8px;padding:12px 0;color:var(--dim);font-size:13px;margin-bottom:12px}
+  .ai-spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:#6366F1;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  /* Lab loading */
+  .lab-spinner{width:26px;height:26px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+  /* Keep old experiment modal styles for fallback */
   .lab-result-name{font-family:"Fraunces",serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
   .lab-result-desc{font-size:13px;color:var(--dim);line-height:1.5;margin-bottom:12px}
   .lab-result-sugs{display:flex;flex-direction:column;gap:9px}
   .lab-sug{display:flex;gap:9px;align-items:flex-start}
   .lab-sug-dot{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
   .lab-sug-txt{font-size:13px;color:var(--text);line-height:1.5}
-  .lab-loading{display:flex;flex-direction:column;align-items:center;padding:28px;gap:10px}
-  .lab-spinner{width:26px;height:26px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
-  .lab-loading-txt{font-size:13px;color:var(--dim)}
-  /* Lab detail sheet */
-  .lab-detail-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:12px;margin-bottom:14px}
-  .lab-detail-date{font-size:12px;color:var(--faint);margin-bottom:14px}
 
   /* Photo-first entry */
   .feed-photo-entry{position:relative;border-radius:var(--r);overflow:hidden;margin-bottom:8px;background:#0C0A09;cursor:pointer}
@@ -981,55 +1058,169 @@
         <span class="lab-title">The Lab</span>
         <span class="lab-sub" id="labSub"></span>
       </div>
+      <button class="lab-new-btn" id="labNewBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span id="labNewBtnLbl">Ny ret</span>
+      </button>
     </div>
-    <button class="lab-fab" id="labFab">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span id="labFabLbl">Nyt eksperiment</span>
-    </button>
-    <div class="lab-grid" id="labGrid"></div>
+    <div class="lab-filter-row" id="labFilterRow">
+      <button class="lab-filter-chip active" data-filter="all" id="labFilterAll">Alle</button>
+      <button class="lab-filter-chip" data-filter="idea">Idé</button>
+      <button class="lab-filter-chip" data-filter="testing">Test</button>
+      <button class="lab-filter-chip" data-filter="ready">Klar</button>
+      <button class="lab-filter-chip" data-filter="menu">På menu</button>
+    </div>
+    <div class="lab-list" id="labList"></div>
   </section>
 </div></div>
 
-<div class="scrim" id="labScrim">
-  <div class="modal" id="labModal">
-    <div style="width:32px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px"></div>
-    <h2 class="mtitle" id="labModalTitle" style="margin-bottom:16px">Nyt eksperiment</h2>
-    <input type="file" id="labPhotoInput" accept="image/*" capture="environment" style="display:none">
-    <div class="lab-photo-zone" id="labPhotoZone">
-      <div class="lab-pz-icon">📷</div>
-      <div class="lab-pz-lbl" id="labPzLbl">Tag et billede</div>
-      <div class="lab-pz-sub" id="labPzSub">Tryk for at vælge foto</div>
-      <img id="labPhotoPreview" style="display:none">
+<!-- Dish editor — full-screen overlay -->
+<div class="dish-editor" id="dishEditor">
+  <div class="de-hdr">
+    <button class="de-back" id="deBack">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      <span id="deBackLbl">The Lab</span>
+    </button>
+    <input class="de-name" id="deName" placeholder="Navn på ret…" maxlength="80">
+    <button class="de-save" id="deSaveBtn" id="deSaveBtn"><span id="deSaveLbl">Gem</span></button>
+  </div>
+  <!-- Status -->
+  <div class="de-status-bar" id="deStatusBar">
+    <button class="de-status-chip" data-status="idea" id="dsChipIdea">Idé</button>
+    <button class="de-status-chip" data-status="testing" id="dsChipTesting">Test</button>
+    <button class="de-status-chip" data-status="ready" id="dsChipReady">Klar</button>
+    <button class="de-status-chip" data-status="menu" id="dsChipMenu">På menu</button>
+  </div>
+  <!-- Hero photo -->
+  <div id="deHeroWrap" style="position:relative;background:var(--bg);border-bottom:1px solid var(--border)">
+    <img id="deHeroImg" style="width:100%;height:180px;object-fit:cover;display:none;cursor:pointer" alt="">
+    <div id="deHeroAdd" style="height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:var(--faint)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span style="font-size:12px;font-weight:500" id="deHeroAddLbl">Tilføj forsidebillede</span>
     </div>
-    <div id="labLoading" style="display:none" class="lab-loading">
-      <div class="lab-spinner"></div>
-      <div class="lab-loading-txt" id="labLoadingTxt">AI analyserer retten…</div>
-    </div>
-    <div id="labResultArea" style="display:none">
-      <div class="lab-result">
-        <div class="lab-result-name" id="labResultName"></div>
-        <div class="lab-result-desc" id="labResultDesc"></div>
-        <div class="lab-result-sugs" id="labResultSugs"></div>
+    <input type="file" id="deHeroInput" accept="image/*" style="display:none">
+  </div>
+  <!-- Sections -->
+  <!-- Grundinfo -->
+  <div class="ds open" id="dsGrundinfo">
+    <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitleGrundinfo">Grundinfo</span></div>
+    <div class="ds-bd">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="field" style="margin:0"><label id="deLblSeason" style="font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Sæson</label>
+          <select class="input" id="deSeason"><option value="">Ingen</option><option value="Forår">Forår</option><option value="Sommer">Sommer</option><option value="Efterår">Efterår</option><option value="Vinter">Vinter</option><option value="Hele året">Hele året</option></select></div>
+        <div class="field" style="margin:0"><label id="deLblPortions" style="font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Portioner</label>
+          <div style="display:flex;gap:4px"><input class="input" id="dePortions" type="number" min="1" max="200" placeholder="4" style="width:64px;flex-shrink:0"><select class="input" id="dePortionUnit"><option value="prs">prs.</option><option value="port.">port.</option><option value="stk">stk.</option></select></div></div>
       </div>
+      <label style="font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px" id="deLblConcept">Koncept &amp; inspiration</label>
+      <textarea class="input" id="deConcept" rows="3" placeholder="Hvad er idéen bag retten? Hvad er sæsonen, fortællingen, teksturen…" style="resize:vertical;width:100%"></textarea>
     </div>
-    <div class="mactions" id="labActions">
-      <button class="btn primary btn-sm" id="labAnalyzeBtn"></button>
-      <button class="btn ghost btn-sm" id="labCancelBtn"></button>
+  </div>
+  <!-- Ingredienser -->
+  <div class="ds" id="dsIng">
+    <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitleIng">Ingredienser</span><span class="ds-count" id="dsIngCount"></span></div>
+    <div class="ds-bd">
+      <div style="display:grid;grid-template-columns:58px 58px 1fr auto;gap:6px;margin-bottom:5px">
+        <span style="font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;padding-left:2px">Mængde</span>
+        <span style="font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;padding-left:2px">Enhed</span>
+        <span style="font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;padding-left:2px">Ingrediens</span>
+        <span></span>
+      </div>
+      <div id="ingList"></div>
+      <button class="ing-add-btn" id="ingAddBtn">+ Tilføj ingrediens</button>
+      <button class="ing-ai-btn" id="ingAiBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+        Analyser ingredienser med AI
+      </button>
     </div>
+  </div>
+  <!-- Fremgangsmåde -->
+  <div class="ds" id="dsSteps">
+    <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitleSteps">Fremgangsmåde</span><span class="ds-count" id="dsStepsCount"></span></div>
+    <div class="ds-bd">
+      <div id="stepList"></div>
+      <button class="ing-add-btn" id="stepAddBtn">+ Tilføj trin</button>
+    </div>
+  </div>
+  <!-- Teknik & Tid -->
+  <div class="ds" id="dsTech">
+    <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitleTech">Teknik &amp; Tid</span></div>
+    <div class="ds-bd">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div><label style="font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px" id="deLblCookTime">Tilberedning</label><div style="display:flex;align-items:center;gap:4px"><input class="input" id="deCookTime" type="number" min="0" placeholder="45"><span style="font-size:12px;color:var(--faint);white-space:nowrap">min</span></div></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px" id="deLblRestTime">Hvile / sous vide tid</label><div style="display:flex;align-items:center;gap:4px"><input class="input" id="deRestTime" type="number" min="0" placeholder="10"><span style="font-size:12px;color:var(--faint);white-space:nowrap">min</span></div></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px" id="deLblMainTemp">Temperatur</label><div style="display:flex;align-items:center;gap:4px"><input class="input" id="deMainTemp" type="number" min="0" placeholder="180"><span style="font-size:12px;color:var(--faint);white-space:nowrap">°C</span></div></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px" id="deLblPlatingTime">Anretning</label><div style="display:flex;align-items:center;gap:4px"><input class="input" id="dePlatingTime" type="number" min="0" placeholder="5"><span style="font-size:12px;color:var(--faint);white-space:nowrap">min</span></div></div>
+      </div>
+      <label style="font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px" id="deLblTechnique">Primær teknik</label>
+      <input class="input" id="deTechnique" placeholder="fx ovn, sous vide, dampning, fermentering…" style="width:100%">
+    </div>
+  </div>
+  <!-- Anretning -->
+  <div class="ds" id="dsPlating">
+    <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitlePlating">Anretning</span></div>
+    <div class="ds-bd">
+      <div id="deHeroPlating">
+        <div class="plating-photo-add" id="dePlatingPhotoAdd">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span id="deLblPlatingPhoto" style="font-size:12px;color:var(--faint)">Tilføj anretningsbillede</span>
+        </div>
+        <img id="dePlatingPhoto" class="plating-photo" style="display:none" alt="">
+      </div>
+      <input type="file" id="dePlatingInput" accept="image/*" style="display:none">
+      <label style="font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px" id="deLblPlating">Beskrivelse af anretning</label>
+      <textarea class="input" id="dePlating" rows="3" placeholder="Beskriv opbygning, teksturer, løb, garnering, temperatur på tallerkenen…" style="resize:vertical;width:100%"></textarea>
+    </div>
+  </div>
+  <!-- Vine -->
+  <div class="ds" id="dsWine">
+    <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitleWine">Vine &amp; parring</span></div>
+    <div class="ds-bd">
+      <textarea class="input" id="deWine" rows="3" placeholder="Vinforslag, ølparring, mocktail, sake…" style="resize:vertical;width:100%;margin-bottom:10px"></textarea>
+      <button class="ing-ai-btn" id="wineAiBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+        AI: Foreslå vine baseret på ingredienser
+      </button>
+    </div>
+  </div>
+  <!-- Testnoter -->
+  <div class="ds" id="dsTest">
+    <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitleTest">Testnoter</span><span class="ds-count" id="dsTestCount"></span></div>
+    <div class="ds-bd">
+      <div id="testList"></div>
+      <button class="ing-add-btn" id="testAddBtn">+ Ny testrunde</button>
+    </div>
+  </div>
+  <!-- Billeder -->
+  <div class="ds" id="dsPhotos">
+    <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitlePhotos">Billeder</span><span class="ds-count" id="dsPhotosCount"></span></div>
+    <div class="ds-bd">
+      <div class="photo-gallery" id="dePhotoGrid"></div>
+      <input type="file" id="dePhotoInput" accept="image/*" style="display:none">
+    </div>
+  </div>
+  <!-- Slet ret -->
+  <div style="padding:16px;margin-bottom:100px">
+    <button class="btn ghost btn-sm" id="deDeleteBtn" style="width:100%;color:var(--faint)"></button>
   </div>
 </div>
 
-<div class="scrim" id="labDetailScrim">
-  <div class="modal" id="labDetailModal">
-    <div style="width:32px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px"></div>
-    <img class="lab-detail-img" id="labDetailImg" src="" alt="">
-    <div class="lab-result-name" id="labDetailName" style="margin-bottom:4px"></div>
-    <div class="lab-detail-date" id="labDetailDate"></div>
-    <div class="lab-result-desc" id="labDetailDesc"></div>
-    <div class="lab-result-sugs" id="labDetailSugs" style="margin-bottom:16px"></div>
-    <div class="mactions">
-      <button class="btn ghost btn-sm" id="labDetailDelete" style="color:var(--faint)"></button>
-      <button class="btn ghost btn-sm" id="labDetailClose"></button>
+<!-- AI floating button -->
+<button class="ai-fab" id="aiFab">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+  <span id="aiFabLbl">Spørg AI</span>
+</button>
+
+<!-- AI chat sheet -->
+<div class="ai-scrim" id="aiScrim">
+  <div class="ai-sheet">
+    <div class="ai-sheet-drag"></div>
+    <div class="ai-sheet-title" id="aiSheetTitle">Spørg AI om denne ret</div>
+    <div class="ai-chips" id="aiChips"></div>
+    <div class="ai-loading" id="aiLoading"><div class="ai-spinner"></div><span id="aiLoadingTxt">Tænker…</span></div>
+    <div class="ai-response" id="aiResponse"></div>
+    <div class="ai-input-row">
+      <input class="input" id="aiInput" placeholder="Stil et spørgsmål…">
+      <button class="btn primary btn-sm" id="aiSendBtn" id="aiSendBtn">Send</button>
     </div>
   </div>
 </div>
@@ -2828,7 +3019,7 @@
       $("#viewToggle").style.display="none";
       if(v==="social")loadSocial();
       if(v==="feed"){loadFeed(false,window._activeFeedTab?window._activeFeedTab()==="mine":true);loadFollowRequests();}
-      if(v==="lab")loadLabEntries();
+      if(v==="lab")loadLabDishes();
       window.scrollTo({top:0,behavior:"instant"});
     }
     if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
@@ -3677,158 +3868,424 @@
   }
 
   // ---- The Lab ----
+  var _labDishes=[];var _labFilter="all";var _currentDish=null;var _dishDirty=false;var _saveTimer=null;
+
   function setupLab(){
-    const sub=$("#labSub");if(sub)sub.textContent=t("lab_sub");
-    const fab=$("#labFab");const fabLbl=$("#labFabLbl");if(fabLbl)fabLbl.textContent=t("lab_new");
-    const analyzeBtn=$("#labAnalyzeBtn");if(analyzeBtn)analyzeBtn.textContent=t("lab_analyze");
-    const cancelBtn=$("#labCancelBtn");if(cancelBtn)cancelBtn.textContent=t("lab_cancel");
-    const detailDelete=$("#labDetailDelete");if(detailDelete)detailDelete.textContent=t("lab_delete");
-    const detailClose=$("#labDetailClose");if(detailClose)detailClose.textContent=t("lab_close");
-    const pzLbl=$("#labPzLbl");if(pzLbl)pzLbl.textContent=t("lab_photo_lbl");
-    const pzSub=$("#labPzSub");if(pzSub)pzSub.textContent=t("lab_photo_sub");
-    const loadTxt=$("#labLoadingTxt");if(loadTxt)loadTxt.textContent=t("lab_loading");
-
-    let labPhotoDataUrl=null;
-    let labAnalysisData=null;
-    let labDetailId=null;
-
-    function openLabModal(){
-      labPhotoDataUrl=null;labAnalysisData=null;
-      const zone=$("#labPhotoZone");if(zone)zone.className="lab-photo-zone";
-      const prev=$("#labPhotoPreview");if(prev){prev.style.display="none";prev.src="";}
-      const pzIcon=zone&&zone.querySelector(".lab-pz-icon");if(pzIcon)pzIcon.style.display="";
-      const pzL=zone&&zone.querySelector(".lab-pz-lbl");if(pzL)pzL.style.display="";
-      const pzS=zone&&zone.querySelector(".lab-pz-sub");if(pzS)pzS.style.display="";
-      $("#labLoading").style.display="none";
-      $("#labResultArea").style.display="none";
-      const acts=$("#labActions");if(acts){
-        if(analyzeBtn){analyzeBtn.style.display="";analyzeBtn.disabled=true;analyzeBtn.textContent=t("lab_analyze");}
-        if(cancelBtn)cancelBtn.textContent=t("lab_cancel");
-      }
-      $("#labScrim").classList.add("open");
+    const sub=$("#labSub");if(sub)sub.textContent=lang==="da"?"Opskrifter i udvikling":"Recipes in development";
+    // Filter chips
+    const filterRow=$("#labFilterRow");
+    if(filterRow)filterRow.addEventListener("click",e=>{
+      const chip=e.target.closest(".lab-filter-chip");if(!chip)return;
+      _labFilter=chip.dataset.filter||"all";
+      filterRow.querySelectorAll(".lab-filter-chip").forEach(c=>c.classList.toggle("active",c===chip));
+      renderLabList();
+    });
+    // New dish
+    var newBtn=$("#labNewBtn");
+    if(newBtn)newBtn.addEventListener("click",createAndOpenDish);
+    // Dish list clicks
+    var labList=$("#labList");
+    if(labList)labList.addEventListener("click",e=>{
+      var card=e.target.closest(".dish-card[data-dish-id]");if(!card)return;
+      var dish=_labDishes.find(function(d){return d.id===card.dataset.dishId;});
+      if(dish)openDishEditor(dish);
+    });
+    // Editor back
+    var deBack=$("#deBack");if(deBack)deBack.addEventListener("click",closeDishEditor);
+    // Editor save
+    var deSaveBtn=$("#deSaveBtn");if(deSaveBtn)deSaveBtn.addEventListener("click",function(){saveDish(true);});
+    // Status chips
+    var statusBar=$("#deStatusBar");
+    if(statusBar)statusBar.addEventListener("click",function(e){
+      var chip=e.target.closest(".de-status-chip");if(!chip||!_currentDish)return;
+      _currentDish.status=chip.dataset.status;updateStatusChips(_currentDish.status);markDirty();
+    });
+    // Section accordions
+    document.querySelectorAll(".ds .ds-hd").forEach(function(hd){
+      hd.addEventListener("click",function(){hd.closest(".ds").classList.toggle("open");});
+    });
+    // Ingredient add
+    var ingAddBtn=$("#ingAddBtn");
+    if(ingAddBtn)ingAddBtn.addEventListener("click",function(){
+      if(!_currentDish)return;
+      var id="i"+Date.now();
+      (_currentDish.data.ingredients=_currentDish.data.ingredients||[]).push({id:id,name:"",amount:"",unit:"g",prep:""});
+      renderIngredients();markDirty();
+      setTimeout(function(){var last=document.querySelector("#ingList .ing-row:last-of-type");var f=last&&last.querySelector(".ing-name-field");if(f)f.focus();},50);
+    });
+    // Ingredient AI
+    var ingAiBtn=$("#ingAiBtn");
+    if(ingAiBtn)ingAiBtn.addEventListener("click",function(){openAiSheet(lang==="da"?"Analyser mine ingredienser og foreslå hvad der mangler, hvilke smagskomponenter der supplerer godt, og én nøgleingrediensændring der løfter retten":"Analyze my ingredients and suggest what's missing, which flavor components complement well, and one key change to elevate the dish");});
+    // Wine AI
+    var wineAiBtn=$("#wineAiBtn");
+    if(wineAiBtn)wineAiBtn.addEventListener("click",function(){openAiSheet(lang==="da"?"Foreslå 2-3 specifikke vine (region, drue, stil) der passer perfekt til denne ret, og forklar kort hvorfor":"Suggest 2-3 specific wines (region, grape, style) that pair perfectly with this dish and briefly explain why");});
+    // Steps add
+    var stepAddBtn=$("#stepAddBtn");
+    if(stepAddBtn)stepAddBtn.addEventListener("click",function(){
+      if(!_currentDish)return;
+      var id="s"+Date.now();
+      (_currentDish.data.steps=_currentDish.data.steps||[]).push({id:id,text:"",time:"",temp:""});
+      renderSteps();markDirty();
+      setTimeout(function(){var last=document.querySelector("#stepList .step-row:last-of-type");var f=last&&last.querySelector(".step-txt");if(f)f.focus();},50);
+    });
+    // Test round add
+    var testAddBtn=$("#testAddBtn");
+    if(testAddBtn)testAddBtn.addEventListener("click",function(){
+      if(!_currentDish)return;
+      var id="t"+Date.now();
+      var today=new Date().toISOString().slice(0,10);
+      (_currentDish.data.testRounds=_currentDish.data.testRounds||[]).push({id:id,date:today,rating:0,notes:""});
+      renderTestRounds();markDirty();
+    });
+    // Delete dish
+    var deDeleteBtn=$("#deDeleteBtn");
+    if(deDeleteBtn){
+      deDeleteBtn.textContent=lang==="da"?"Slet denne ret":"Delete dish";
+      deDeleteBtn.addEventListener("click",async function(){
+        if(!_currentDish)return;
+        if(!confirm(lang==="da"?"Slet denne ret permanent?":"Delete this dish permanently?"))return;
+        var base=apiBase();var token=await getToken();
+        try{await fetch(base+"/api/lab/dishes/"+_currentDish.id,{method:"DELETE",headers:{"Authorization":"Bearer "+token}});closeDishEditor();_labDishes=_labDishes.filter(function(d){return d.id!==_currentDish.id;});renderLabList();showToast(lang==="da"?"Ret slettet":"Dish deleted");}
+        catch(e){showToast(lang==="da"?"Noget gik galt":"Something went wrong");}
+      });
     }
-
-    function setPhotoPreview(dataUrl){
-      labPhotoDataUrl=dataUrl;
-      const zone=$("#labPhotoZone");if(zone)zone.className="lab-photo-zone has-img";
-      const pzIcon=zone&&zone.querySelector(".lab-pz-icon");if(pzIcon)pzIcon.style.display="none";
-      const pzL=zone&&zone.querySelector(".lab-pz-lbl");if(pzL)pzL.style.display="none";
-      const pzS=zone&&zone.querySelector(".lab-pz-sub");if(pzS)pzS.style.display="none";
-      const prev=$("#labPhotoPreview");if(prev){prev.src=dataUrl;prev.style.display="block";}
-      if(analyzeBtn){analyzeBtn.disabled=false;}
-    }
-
-    if(fab)fab.addEventListener("click",openLabModal);
-
-    const photoZone=$("#labPhotoZone");
-    if(photoZone)photoZone.addEventListener("click",()=>$("#labPhotoInput").click());
-
-    const photoInput=$("#labPhotoInput");
-    if(photoInput)photoInput.addEventListener("change",e=>{
-      const f=e.target.files[0];if(!f)return;
-      const reader=new FileReader();
-      reader.onload=ev=>setPhotoPreview(ev.target.result);
-      reader.readAsDataURL(f);
-      photoInput.value="";
+    // Hero photo
+    var deHeroAdd=$("#deHeroAdd");var deHeroInput=$("#deHeroInput");var deHeroImg=$("#deHeroImg");
+    if(deHeroAdd)deHeroAdd.addEventListener("click",function(){if(deHeroInput)deHeroInput.click();});
+    if(deHeroImg)deHeroImg.addEventListener("click",function(){if(deHeroInput)deHeroInput.click();});
+    if(deHeroInput)deHeroInput.addEventListener("change",async function(e){
+      var f=e.target.files[0];if(!f||!_currentDish)return;deHeroInput.value="";
+      var compressed=await compressPhoto(f);var url=await uploadDishPhoto(compressed);
+      if(url){_currentDish.heroUrl=url;setHeroPhoto(url);markDirty();}
     });
-
-    if(analyzeBtn)analyzeBtn.addEventListener("click",async()=>{
-      if(!labPhotoDataUrl)return;
-      $("#labLoading").style.display="flex";
-      $("#labResultArea").style.display="none";
-      analyzeBtn.disabled=true;analyzeBtn.textContent="…";
-      const base=apiBase();const token=await getToken();
-      try{
-        const r=await fetch(base+"/api/lab/analyze",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:labPhotoDataUrl})});
-        if(!r.ok)throw new Error("HTTP "+r.status);
-        const d=await r.json();
-        labPhotoDataUrl=d.imageUrl;
-        labAnalysisData=d.analysis;
-        $("#labResultName").textContent=d.analysis.name||"";
-        $("#labResultDesc").textContent=d.analysis.description||"";
-        const sugsEl=$("#labResultSugs");sugsEl.innerHTML=(d.analysis.suggestions||[]).map((s,i)=>'<div class="lab-sug"><div class="lab-sug-dot">'+(i+1)+'</div><div class="lab-sug-txt">'+esc(s)+'</div></div>').join("");
-        $("#labLoading").style.display="none";
-        $("#labResultArea").style.display="block";
-        analyzeBtn.style.display="none";
-        if(cancelBtn)cancelBtn.textContent=t("lab_cancel");
-        const saveBtn=document.createElement("button");
-        saveBtn.className="btn primary btn-sm";saveBtn.textContent=t("lab_save");
-        saveBtn.id="labSaveBtn";
-        const acts=$("#labActions");
-        const existing=$("#labSaveBtn");if(existing)existing.remove();
-        acts.insertBefore(saveBtn,cancelBtn||null);
-        saveBtn.addEventListener("click",async()=>{
-          saveBtn.disabled=true;saveBtn.textContent="…";
-          const rb=apiBase();const tok=await getToken();
-          try{
-            const sr=await fetch(rb+"/api/lab/entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({imageUrl:labPhotoDataUrl,analysis:labAnalysisData})});
-            if(!sr.ok)throw new Error("HTTP "+sr.status);
-            $("#labScrim").classList.remove("open");
-            showToast(lang==="da"?"Eksperiment gemt!":"Experiment saved!");
-            loadLabEntries();
-          }catch(e){saveBtn.disabled=false;saveBtn.textContent=t("lab_save");showToast(lang==="da"?"Noget gik galt":"Something went wrong");}
-        });
-      }catch(e){
-        $("#labLoading").style.display="none";
-        analyzeBtn.disabled=false;analyzeBtn.textContent=t("lab_analyze");
-        showToast(lang==="da"?"Analyse fejlede — prøv igen":"Analysis failed, try again");
-      }
+    // Plating photo
+    var dePlatingPhotoAdd=$("#dePlatingPhotoAdd");var dePlatingInput=$("#dePlatingInput");var dePlatingPhoto=$("#dePlatingPhoto");
+    if(dePlatingPhotoAdd)dePlatingPhotoAdd.addEventListener("click",function(){if(dePlatingInput)dePlatingInput.click();});
+    if(dePlatingPhoto)dePlatingPhoto.addEventListener("click",function(){if(dePlatingInput)dePlatingInput.click();});
+    if(dePlatingInput)dePlatingInput.addEventListener("change",async function(e){
+      var f=e.target.files[0];if(!f||!_currentDish)return;dePlatingInput.value="";
+      var compressed=await compressPhoto(f);var url=await uploadDishPhoto(compressed);
+      if(url){(_currentDish.data=_currentDish.data||{}).platingUrl=url;setPlatingPhoto(url);markDirty();}
     });
-
-    if(cancelBtn)cancelBtn.addEventListener("click",()=>$("#labScrim").classList.remove("open"));
-
-    // Detail sheet
-    const detailScrim=$("#labDetailScrim");
-    if(detailClose)detailClose.addEventListener("click",()=>detailScrim.classList.remove("open"));
-    if(detailDelete)detailDelete.addEventListener("click",async()=>{
-      if(!labDetailId)return;
-      const base=apiBase();const token=await getToken();
-      try{
-        await fetch(base+"/api/lab/entry/"+labDetailId,{method:"DELETE",headers:{"Authorization":"Bearer "+token}});
-        detailScrim.classList.remove("open");
-        showToast(lang==="da"?"Slettet":"Deleted");
-        loadLabEntries();
-      }catch(e){}
+    // Gallery photo
+    var dePhotoInput=$("#dePhotoInput");
+    if(dePhotoInput)dePhotoInput.addEventListener("change",async function(e){
+      var f=e.target.files[0];if(!f||!_currentDish)return;dePhotoInput.value="";
+      var compressed=await compressPhoto(f);var url=await uploadDishPhoto(compressed);
+      if(url){(_currentDish.data.photos=_currentDish.data.photos||[]).push({url:url,caption:""});renderPhotoGallery();markDirty();}
     });
+    // AI fab + sheet
+    var aiFab=$("#aiFab");if(aiFab)aiFab.addEventListener("click",function(){openAiSheet("");});
+    var aiScrim=$("#aiScrim");if(aiScrim)aiScrim.addEventListener("click",function(e){if(e.target===aiScrim)closeAiSheet();});
+    var aiSendBtn=$("#aiSendBtn");if(aiSendBtn)aiSendBtn.addEventListener("click",sendAiMessage);
+    var aiInput=$("#aiInput");if(aiInput)aiInput.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendAiMessage();}});
+    // Name live save
+    var deName=$("#deName");if(deName)deName.addEventListener("input",function(){if(!_currentDish)return;_currentDish.name=deName.value||"Ny ret";markDirty();});
+  }
 
-    const grid=$("#labGrid");
-    if(grid)grid.addEventListener("click",e=>{
-      const card=e.target.closest(".lab-card[data-lab-id]");
-      if(!card)return;
-      const entry=window._labEntries&&window._labEntries.find(x=>x.id===card.dataset.labId);
-      if(!entry)return;
-      labDetailId=entry.id;
-      const a=entry.analysis||{};
-      $("#labDetailImg").src=entry.imageUrl||"";
-      $("#labDetailName").textContent=a.name||"";
-      $("#labDetailDesc").textContent=a.description||"";
-      const d=new Date(entry.createdAt);
-      $("#labDetailDate").textContent=d.toLocaleDateString(lang==="da"?"da-DK":"en-GB",{day:"numeric",month:"long",year:"numeric"});
-      const sugsEl=$("#labDetailSugs");sugsEl.innerHTML=(a.suggestions||[]).map((s,i)=>'<div class="lab-sug"><div class="lab-sug-dot">'+(i+1)+'</div><div class="lab-sug-txt">'+esc(s)+'</div></div>').join("");
-      detailScrim.classList.add("open");
+  function markDirty(){
+    _dishDirty=true;
+    var saveLbl=$("#deSaveLbl");var saveBtn=$("#deSaveBtn");
+    if(saveBtn)saveBtn.classList.remove("saved");
+    if(saveLbl)saveLbl.textContent=lang==="da"?"Gem":"Save";
+    clearTimeout(_saveTimer);_saveTimer=setTimeout(function(){saveDish(false);},900);
+  }
+
+  function updateStatusChips(status){
+    document.querySelectorAll(".de-status-chip").forEach(function(c){
+      c.className="de-status-chip";if(c.dataset.status===status)c.classList.add("active-"+status);
     });
   }
 
-  async function loadLabEntries(){
-    const grid=$("#labGrid");if(!grid)return;
-    const base=apiBase();const token=await getToken();
-    if(!base||!token){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🔬</div><div class="empty-state-title">'+esc(t("lab_empty_title"))+'</div><div class="empty-state-sub">'+esc(t("lab_empty_sub"))+'</div></div>';return;}
+  function setHeroPhoto(url){
+    var img=$("#deHeroImg");var add=$("#deHeroAdd");
+    if(img){img.src=url||"";img.style.display=url?"block":"none";}
+    if(add)add.style.display=url?"none":"flex";
+  }
+
+  function setPlatingPhoto(url){
+    var img=$("#dePlatingPhoto");var add=$("#dePlatingPhotoAdd");
+    if(img){img.src=url||"";img.style.display=url?"block":"none";}
+    if(add)add.style.display=url?"none":"flex";
+  }
+
+  async function uploadDishPhoto(dataUrl){
+    var base=apiBase();var token=await getToken();if(!base||!token)return null;
+    try{var r=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:dataUrl})});var d=await r.json();return d.url||null;}
+    catch(e){return null;}
+  }
+
+  async function createAndOpenDish(){
+    var base=apiBase();var token=await getToken();if(!base||!token)return;
     try{
-      const r=await fetch(base+"/api/lab/entries",{headers:{"Authorization":"Bearer "+token}});
-      if(!r.ok)throw new Error();
-      const d=await r.json();
-      window._labEntries=d.entries||[];
-      if(!window._labEntries.length){
-        grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🔬</div><div class="empty-state-title">'+esc(t("lab_empty_title"))+'</div><div class="empty-state-sub">'+esc(t("lab_empty_sub"))+'</div></div>';
-        return;
-      }
-      grid.innerHTML=window._labEntries.map(e=>{
-        const a=e.analysis||{};
-        const hint=(a.suggestions||[])[0]||a.description||"";
-        return '<div class="lab-card" data-lab-id="'+esc(e.id)+'"><img class="lab-card-img" src="'+esc(e.imageUrl||"")+'" loading="lazy"><div class="lab-card-body"><div class="lab-card-name">'+esc(a.name||"Eksperiment")+'</div><div class="lab-card-hint">'+esc(hint)+'</div></div></div>';
-      }).join("");
-    }catch(e){grid.innerHTML="";}
+      var r=await fetch(base+"/api/lab/dishes",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name:lang==="da"?"Ny ret":"New dish",status:"idea",data:{}})});
+      var dish=await r.json();
+      if(dish.id){_labDishes.unshift(dish);openDishEditor(dish);}
+    }catch(e){showToast(lang==="da"?"Noget gik galt":"Something went wrong");}
   }
+
+  function openDishEditor(dish){
+    _currentDish=JSON.parse(JSON.stringify(dish));
+    _currentDish.data=_currentDish.data||{};
+    _dishDirty=false;
+    var editor=$("#dishEditor");if(!editor)return;
+    var deName=$("#deName");if(deName)deName.value=_currentDish.name||"";
+    var deSaveLbl=$("#deSaveLbl");if(deSaveLbl)deSaveLbl.textContent=lang==="da"?"Gem":"Save";
+    var saveBtn=$("#deSaveBtn");if(saveBtn)saveBtn.classList.remove("saved");
+    updateStatusChips(_currentDish.status||"idea");
+    setHeroPhoto(_currentDish.heroUrl||"");
+    var d=_currentDish.data;
+    var deSeason=$("#deSeason");if(deSeason)deSeason.value=d.season||"";
+    var dePortions=$("#dePortions");if(dePortions)dePortions.value=d.portions||"";
+    var dePortionUnit=$("#dePortionUnit");if(dePortionUnit)dePortionUnit.value=d.portionUnit||"prs";
+    var deConcept=$("#deConcept");if(deConcept)deConcept.value=d.concept||"";
+    var deCookTime=$("#deCookTime");if(deCookTime)deCookTime.value=d.cookTime||"";
+    var deRestTime=$("#deRestTime");if(deRestTime)deRestTime.value=d.restTime||"";
+    var deMainTemp=$("#deMainTemp");if(deMainTemp)deMainTemp.value=d.mainTemp||"";
+    var dePlatingTime=$("#dePlatingTime");if(dePlatingTime)dePlatingTime.value=d.platingTime||"";
+    var deTechnique=$("#deTechnique");if(deTechnique)deTechnique.value=d.technique||"";
+    setPlatingPhoto(d.platingUrl||"");
+    var dePlating=$("#dePlating");if(dePlating)dePlating.value=d.plating||"";
+    var deWine=$("#deWine");if(deWine)deWine.value=d.winePairing||"";
+    renderIngredients();renderSteps();renderTestRounds();renderPhotoGallery();
+    ["deSeason","dePortions","dePortionUnit","deConcept","deCookTime","deRestTime","deMainTemp","dePlatingTime","deTechnique","dePlating","deWine"].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el&&!el._labWired){el._labWired=true;el.addEventListener("input",markDirty);}
+    });
+    editor.classList.add("open");editor.scrollTop=0;
+  }
+
+  function closeDishEditor(){
+    clearTimeout(_saveTimer);if(_dishDirty)saveDish(false);
+    var editor=$("#dishEditor");if(editor)editor.classList.remove("open");
+    _currentDish=null;loadLabDishes();
+  }
+
+  async function saveDish(showFeedback){
+    if(!_currentDish)return;
+    var d=_currentDish.data=_currentDish.data||{};
+    var deName=$("#deName");if(deName)_currentDish.name=deName.value||"Ny ret";
+    d.season=(document.getElementById("deSeason")||{}).value||"";
+    d.portions=parseInt((document.getElementById("dePortions")||{}).value)||null;
+    d.portionUnit=(document.getElementById("dePortionUnit")||{}).value||"prs";
+    d.concept=(document.getElementById("deConcept")||{}).value||"";
+    d.cookTime=(document.getElementById("deCookTime")||{}).value||"";
+    d.restTime=(document.getElementById("deRestTime")||{}).value||"";
+    d.mainTemp=(document.getElementById("deMainTemp")||{}).value||"";
+    d.platingTime=(document.getElementById("dePlatingTime")||{}).value||"";
+    d.technique=(document.getElementById("deTechnique")||{}).value||"";
+    d.plating=(document.getElementById("dePlating")||{}).value||"";
+    d.winePairing=(document.getElementById("deWine")||{}).value||"";
+    var base=apiBase();var token=await getToken();if(!base||!token)return;
+    try{
+      await fetch(base+"/api/lab/dishes/"+_currentDish.id,{method:"PUT",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name:_currentDish.name,status:_currentDish.status,heroUrl:_currentDish.heroUrl||null,data:d})});
+      _dishDirty=false;
+      if(showFeedback){
+        var saveBtn=$("#deSaveBtn");var saveLbl=$("#deSaveLbl");
+        if(saveBtn)saveBtn.classList.add("saved");if(saveLbl)saveLbl.textContent=lang==="da"?"Gemt ✓":"Saved ✓";
+        setTimeout(function(){if(saveBtn)saveBtn.classList.remove("saved");if(saveLbl)saveLbl.textContent=lang==="da"?"Gem":"Save";},2000);
+      }
+    }catch(e){if(showFeedback)showToast(lang==="da"?"Gemning fejlede":"Save failed");}
+  }
+
+  function renderIngredients(){
+    var list=$("#ingList");if(!list||!_currentDish)return;
+    var ings=_currentDish.data.ingredients||[];
+    var dsCount=$("#dsIngCount");if(dsCount)dsCount.textContent=ings.length?ings.length+"":"";
+    list.innerHTML=ings.map(function(ing){
+      return '<div class="ing-row" data-ing-id="'+esc(ing.id)+'">'
+        +'<input class="input ing-amt" value="'+esc(ing.amount||"")+'" placeholder="mæng." data-field="amount" data-ing-id="'+esc(ing.id)+'">'
+        +'<input class="input ing-unit" value="'+esc(ing.unit||"")+'" placeholder="enhed" data-field="unit" data-ing-id="'+esc(ing.id)+'" list="deUnitsList">'
+        +'<input class="input ing-name-field" value="'+esc(ing.name||"")+'" placeholder="Ingrediens…" data-field="name" data-ing-id="'+esc(ing.id)+'">'
+        +'<button class="ing-rm" data-rm-ing="'+esc(ing.id)+'" title="Slet">×</button>'
+        +'</div>'
+        +'<div class="ing-prep-row">'
+        +'<input class="input" style="font-size:12px" value="'+esc(ing.prep||"")+'" placeholder="Forbehandling (fx brunois, blancheret, fermenteret…)" data-field="prep" data-ing-id="'+esc(ing.id)+'">'
+        +'<span></span>'
+        +'</div>';
+    }).join("")+'<datalist id="deUnitsList"><option value="g"><option value="kg"><option value="ml"><option value="dl"><option value="L"><option value="tsk"><option value="spsk"><option value="stk"><option value="blade"><option value="kviste"><option value="fed"><option value="°C"><option value="timer"></datalist>';
+    list.querySelectorAll("input[data-field]").forEach(function(inp){
+      inp.addEventListener("input",function(){
+        var id=inp.dataset.ingId;var field=inp.dataset.field;
+        var ing=(_currentDish.data.ingredients||[]).find(function(x){return x.id===id;});
+        if(ing&&field)ing[field]=inp.value;
+        if(field==="name"){var c=$("#dsIngCount");if(c)c.textContent=(_currentDish.data.ingredients||[]).length||"";}
+        markDirty();
+      });
+    });
+    list.querySelectorAll("[data-rm-ing]").forEach(function(btn){
+      btn.addEventListener("click",function(){
+        var id=btn.dataset.rmIng;
+        _currentDish.data.ingredients=(_currentDish.data.ingredients||[]).filter(function(x){return x.id!==id;});
+        renderIngredients();markDirty();
+      });
+    });
+  }
+
+  function renderSteps(){
+    var list=$("#stepList");if(!list||!_currentDish)return;
+    var steps=_currentDish.data.steps||[];
+    var dsCount=$("#dsStepsCount");if(dsCount)dsCount.textContent=steps.length?(steps.length+(lang==="da"?" trin":" steps")):"";
+    list.innerHTML=steps.map(function(s,i){
+      return '<div class="step-row" data-step-id="'+esc(s.id)+'">'
+        +'<div class="step-num">'+(i+1)+'</div>'
+        +'<div class="step-body">'
+        +'<textarea class="input step-txt" placeholder="Beskriv trinnet…" data-field="text" data-step-id="'+esc(s.id)+'">'+esc(s.text||"")+'</textarea>'
+        +'<div class="step-meta">'
+        +'<div style="position:relative"><input class="input" type="number" placeholder="°C" value="'+esc(s.temp||"")+'" data-field="temp" data-step-id="'+esc(s.id)+'" style="padding-right:26px"><span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--faint);pointer-events:none">°C</span></div>'
+        +'<div style="position:relative"><input class="input" type="number" placeholder="tid" value="'+esc(s.time||"")+'" data-field="time" data-step-id="'+esc(s.id)+'" style="padding-right:26px"><span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--faint);pointer-events:none">min</span></div>'
+        +'<button class="ing-rm" data-rm-step="'+esc(s.id)+'">×</button>'
+        +'</div></div></div>';
+    }).join("");
+    list.querySelectorAll("input[data-field],textarea[data-field]").forEach(function(inp){
+      inp.addEventListener("input",function(){
+        var id=inp.dataset.stepId;var field=inp.dataset.field;
+        var step=(_currentDish.data.steps||[]).find(function(x){return x.id===id;});
+        if(step&&field)step[field]=inp.value;markDirty();
+      });
+    });
+    list.querySelectorAll("[data-rm-step]").forEach(function(btn){
+      btn.addEventListener("click",function(){
+        var id=btn.dataset.rmStep;
+        _currentDish.data.steps=(_currentDish.data.steps||[]).filter(function(x){return x.id!==id;});
+        renderSteps();markDirty();
+      });
+    });
+  }
+
+  function renderTestRounds(){
+    var list=$("#testList");if(!list||!_currentDish)return;
+    var rounds=_currentDish.data.testRounds||[];
+    var dsCount=$("#dsTestCount");if(dsCount)dsCount.textContent=rounds.length?(rounds.length+(lang==="da"?" runder":" rounds")):"";
+    list.innerHTML=rounds.map(function(r,i){
+      var stars=[1,2,3,4,5].map(function(n){return '<span class="test-star" data-round-id="'+esc(r.id)+'" data-star="'+n+'">'+(n<=(r.rating||0)?"★":"☆")+'</span>';}).join("");
+      return '<div class="test-round" data-round-id="'+esc(r.id)+'">'
+        +'<div class="test-round-hd">'
+        +'<span class="test-round-date">'+(lang==="da"?"Runde":"Round")+" "+(i+1)+'</span>'
+        +'<input type="date" class="input" value="'+esc(r.date||"")+'" data-field="date" data-round-id="'+esc(r.id)+'" style="font-size:12px;padding:4px 8px;width:auto">'
+        +'<div class="test-stars">'+stars+'</div>'
+        +'<button class="ing-rm" data-rm-round="'+esc(r.id)+'">×</button>'
+        +'</div>'
+        +'<textarea class="input" rows="2" placeholder="'+(lang==="da"?"Hvad gik godt? Hvad justeres næste gang?":"What worked? What needs adjusting?")+'" data-field="notes" data-round-id="'+esc(r.id)+'" style="resize:vertical;width:100%;font-size:13px">'+esc(r.notes||"")+'</textarea>'
+        +'</div>';
+    }).join("");
+    list.querySelectorAll("input[data-field],textarea[data-field]").forEach(function(inp){
+      inp.addEventListener("input",function(){
+        var id=inp.dataset.roundId;var field=inp.dataset.field;
+        var round=(_currentDish.data.testRounds||[]).find(function(x){return x.id===id;});
+        if(round&&field)round[field]=inp.value;markDirty();
+      });
+    });
+    list.querySelectorAll(".test-star").forEach(function(star){
+      star.addEventListener("click",function(){
+        var id=star.dataset.roundId;var val=parseInt(star.dataset.star)||0;
+        var round=(_currentDish.data.testRounds||[]).find(function(x){return x.id===id;});
+        if(round){round.rating=round.rating===val?0:val;renderTestRounds();markDirty();}
+      });
+    });
+    list.querySelectorAll("[data-rm-round]").forEach(function(btn){
+      btn.addEventListener("click",function(){
+        var id=btn.dataset.rmRound;
+        _currentDish.data.testRounds=(_currentDish.data.testRounds||[]).filter(function(x){return x.id!==id;});
+        renderTestRounds();markDirty();
+      });
+    });
+  }
+
+  function renderPhotoGallery(){
+    var grid=$("#dePhotoGrid");if(!grid||!_currentDish)return;
+    var photos=_currentDish.data.photos||[];
+    var dsCount=$("#dsPhotosCount");if(dsCount)dsCount.textContent=photos.length?photos.length+"":"";
+    grid.innerHTML=photos.map(function(p,i){return '<img class="photo-thumb-de" src="'+esc(p.url)+'" data-photo-idx="'+i+'" loading="lazy" alt="">';}).join("")
+      +'<div class="photo-add-tile" id="dePhotoAddTile">+</div>';
+    grid.querySelectorAll(".photo-thumb-de").forEach(function(img){
+      img.addEventListener("click",function(){
+        var idx=parseInt(img.dataset.photoIdx);
+        if(confirm(lang==="da"?"Slet dette billede?":"Delete this photo?")){_currentDish.data.photos.splice(idx,1);renderPhotoGallery();markDirty();}
+      });
+    });
+    var addTile=$("#dePhotoAddTile");
+    if(addTile)addTile.addEventListener("click",function(){var inp=$("#dePhotoInput");if(inp)inp.click();});
+  }
+
+  function openAiSheet(prefill){
+    var scrim=$("#aiScrim");var resp=$("#aiResponse");var loading=$("#aiLoading");
+    if(!scrim)return;
+    if(resp){resp.style.display="none";resp.textContent="";}
+    if(loading)loading.style.display="none";
+    var aiInput=$("#aiInput");if(aiInput)aiInput.value="";
+    var chipsEl=$("#aiChips");
+    if(chipsEl){
+      var chips=lang==="da"?["Hvad mangler i denne ret?","Foreslå smagsparringer","Vinforslag til retten","Idéer til anretning","Gør retten mere sæsonbetonet","Fermentering eller syrningsidéer"]:["What's missing from this dish?","Suggest flavor pairings","Wine pairing suggestions","Plating ideas","Make it more seasonal","Fermentation or curing ideas"];
+      chipsEl.innerHTML=chips.map(function(c){return '<button class="ai-chip">'+esc(c)+'</button>';}).join("");
+      chipsEl.querySelectorAll(".ai-chip").forEach(function(chip){
+        chip.addEventListener("click",function(){var inp=$("#aiInput");if(inp)inp.value=chip.textContent;sendAiMessage();});
+      });
+    }
+    if(prefill&&prefill.length){var aiInput2=$("#aiInput");if(aiInput2)aiInput2.value=prefill;setTimeout(sendAiMessage,80);}
+    scrim.classList.add("open");
+  }
+
+  function closeAiSheet(){var scrim=$("#aiScrim");if(scrim)scrim.classList.remove("open");}
+
+  async function sendAiMessage(){
+    var aiInput=$("#aiInput");var question=(aiInput&&aiInput.value||"").trim();if(!question)return;
+    var resp=$("#aiResponse");var loading=$("#aiLoading");var sendBtn=$("#aiSendBtn");
+    if(resp){resp.style.display="none";resp.textContent="";}
+    if(loading)loading.style.display="flex";if(sendBtn)sendBtn.disabled=true;
+    var base=apiBase();var token=await getToken();
+    try{
+      var r=await fetch(base+"/api/lab/dishes/ai",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dish:_currentDish,question:question})});
+      var d=await r.json();
+      if(loading)loading.style.display="none";
+      if(resp){resp.textContent=d.answer||"";resp.style.display="block";}
+    }catch(e){
+      if(loading)loading.style.display="none";
+      if(resp){resp.textContent=lang==="da"?"AI er ikke tilgængelig nu. Prøv igen.":"AI unavailable. Try again.";resp.style.display="block";}
+    }
+    if(sendBtn)sendBtn.disabled=false;
+  }
+
+  async function loadLabDishes(){
+    var list=$("#labList");if(!list)return;
+    list.innerHTML='<div style="display:flex;justify-content:center;padding:36px"><div class="lab-spinner"></div></div>';
+    var base=apiBase();var token=await getToken();
+    if(!base||!token){list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🔬</div><div class="empty-state-title">'+(lang==="da"?"Ingen retter endnu":"No dishes yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tryk \"Ny ret\" for at starte":"Tap \"New dish\" to start")+'</div></div>';return;}
+    try{
+      var r=await fetch(base+"/api/lab/dishes",{headers:{"Authorization":"Bearer "+token}});
+      var d=await r.json();
+      _labDishes=d.dishes||[];renderLabList();
+    }catch(e){list.innerHTML="";}
+  }
+
+  function renderLabList(){
+    var list=$("#labList");if(!list)return;
+    var statusLabels={idea:lang==="da"?"Idé":"Idea",testing:"Test",ready:lang==="da"?"Klar":"Ready",menu:lang==="da"?"På menu":"On menu"};
+    var filtered=_labFilter==="all"?_labDishes:_labDishes.filter(function(d){return d.status===_labFilter;});
+    if(!filtered.length){
+      list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🔬</div><div class="empty-state-title">'+(lang==="da"?"Ingen retter endnu":"No dishes yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tryk \"Ny ret\" for at starte":"Tap \"New dish\" to start")+'</div></div>';
+      return;
+    }
+    list.innerHTML=filtered.map(function(dish){
+      var d=dish.data||{};
+      var meta=[];
+      if(d.portions)meta.push(d.portions+(d.portionUnit?" "+d.portionUnit:""));
+      if(d.season)meta.push(d.season);if(d.technique)meta.push(d.technique);
+      var upd=new Date(dish.updatedAt||dish.createdAt);var now=new Date();
+      var diffDays=Math.floor((now-upd)/(1000*60*60*24));
+      var updTxt=diffDays===0?(lang==="da"?"I dag":"Today"):diffDays===1?(lang==="da"?"I går":"Yesterday"):(lang==="da"?"For "+diffDays+" dage siden":diffDays+" days ago");
+      return '<div class="dish-card" data-dish-id="'+esc(dish.id)+'">'
+        +(dish.heroUrl?'<img class="dish-card-img" src="'+esc(dish.heroUrl)+'" loading="lazy" alt="'+esc(dish.name||"")+'">'
+          :'<div class="dish-card-img" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--bg)">🍽</div>')
+        +'<div class="dish-card-body">'
+        +'<div class="dish-card-top"><span class="dish-card-name">'+esc(dish.name||"Ny ret")+'</span>'
+        +'<span class="dish-status dish-status-'+esc(dish.status||"idea")+'">'+esc(statusLabels[dish.status||"idea"]||dish.status)+'</span></div>'
+        +'<div class="dish-card-meta">'+(meta.length?esc(meta.join(" · "))+" · ":"")+'<span>'+esc(updTxt)+'</span></div>'
+        +'</div></div>';
+    }).join("");
+  }
+
+  async function loadLabEntries(){loadLabDishes();}
 
   // ---- Restaurant visits ----
   function getVisits(){try{return JSON.parse(localStorage.getItem("mise_visits")||"[]");}catch(e){return [];}}
