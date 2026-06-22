@@ -4022,7 +4022,7 @@
       var r=await fetch(base+"/api/lab/dishes",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name:lang==="da"?"Ny ret":"New dish",status:"idea",data:{}})});
       var dish=await r.json();
       if(!r.ok)throw new Error(dish.error||("HTTP "+r.status));
-      if(dish.id){_labDishes.unshift(dish);openDishEditor(dish);}
+      if(dish.id){_labDishes.unshift(dish);openDishEditor(dish,true);}
       else throw new Error("Intet id retur");
     }catch(e){
       showToast(lang==="da"?"Kunne ikke oprette ret — er lab_dishes tabellen oprettet i Supabase?":"Failed — is the lab_dishes table created in Supabase?");
@@ -4030,7 +4030,7 @@
     }
   }
 
-  function openDishEditor(dish){
+  function openDishEditor(dish,isNew){
     _currentDish=JSON.parse(JSON.stringify(dish));
     _currentDish.data=_currentDish.data||{};
     _dishDirty=false;
@@ -4059,6 +4059,7 @@
       if(el&&!el._labWired){el._labWired=true;el.addEventListener("input",markDirty);}
     });
     editor.classList.add("open");editor.scrollTop=0;
+    if(isNew){setTimeout(function(){var n=$("#deName");if(n){n.focus();n.select();}},350);}
   }
 
   function closeDishEditor(){
