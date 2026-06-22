@@ -10,6 +10,7 @@
 //            POST /api/like/:id      DELETE /api/like/:id
 //            GET  /api/comments/:id  POST /api/comments/:id
 //            GET  /api/users/search  POST /api/gen-category-icon
+//            POST /api/shift/summary
 //            GET  /api/health
 
 const express = require("express");
@@ -833,6 +834,26 @@ app.post("/api/lab/dishes/ai", async (req, res) => {
       content: `Retoplysninger:\n${ctx}\n\nSpørgsmål: ${question}`
     });
     res.json({ answer });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post("/api/shift/summary", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { changes = [], durationMs = 0, lang = "da" } = req.body || {};
+    const h = Math.floor(durationMs / 3600000);
+    const m = Math.floor((durationMs % 3600000) / 60000);
+    const durStr = h > 0 ? `${h}t ${m}min` : `${m}min`;
+    const logged = changes.map(c => `${c.label}: +${c.delta}`).join(", ");
+    const isDa = lang === "da";
+    const system = isDa
+      ? "Du er en præcis, professionel kökkencoach. Skriv ÉN sætning (max 180 tegn) der opsummerer en koks vagt. Vær specifik med tallene. Lyd som en pro der taler til en pro. Ingen hashtags. Ingen emoji. Kom til sagen med det samme."
+      : "You are a precise, professional kitchen coach. Write ONE sentence (max 180 chars) summarizing a chef's shift. Be specific with the numbers. Sound like a pro talking to a pro. No hashtags. No emoji. Get straight to the point.";
+    const prompt = isDa
+      ? `Vagten varede ${durStr}.\nLogget: ${logged || "Intet logget"}.\nSkriv én sætning der fanger vagten.`
+      : `Shift duration: ${durStr}.\nLogged: ${logged || "Nothing logged"}.\nWrite one sentence capturing the shift.`;
+    const summary = await callClaude({ model: "claude-haiku-4-5-20251001", maxTokens: 80, system, content: prompt });
+    res.json({ summary: summary.trim() });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

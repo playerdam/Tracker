@@ -589,8 +589,12 @@
   .shift-total-lbl{font-size:14px;font-weight:500}
   .shift-total-val{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--accent)}
   .shift-duration{font-size:13px;color:var(--faint);margin-bottom:12px}
-  .shift-caption{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:11px 12px;resize:none;min-height:70px;margin-bottom:10px}
+  .shift-caption{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:11px 12px;resize:none;min-height:70px;margin-bottom:6px}
   .shift-caption:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .shift-ai-btn{appearance:none;background:none;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:var(--dim);display:flex;align-items:center;gap:5px;padding:4px 0;margin-bottom:10px;-webkit-tap-highlight-color:transparent;transition:color .12s}
+  .shift-ai-btn:hover{color:#6366F1}
+  .shift-ai-btn svg{flex-shrink:0}
+  .shift-ai-btn.loading{opacity:.5;pointer-events:none}
 
   .comment-list{max-height:260px;overflow-y:auto;margin-bottom:12px}
   .comment-row{padding:8px 0;border-bottom:1px solid var(--border)}
@@ -1234,7 +1238,11 @@
     <h2 id="shiftModalTitle"></h2>
     <div class="shift-duration" id="shiftDuration"></div>
     <div class="shift-totals" id="shiftTotals"></div>
-    <textarea id="shiftCaption" class="shift-caption" maxlength="80"></textarea>
+    <textarea id="shiftCaption" class="shift-caption" maxlength="220"></textarea>
+    <button class="shift-ai-btn" id="shiftAiBtn" type="button">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+      <span id="shiftAiBtnLbl">Skriv med AI</span>
+    </button>
     <div class="field" style="margin-bottom:14px">
       <img id="shiftPhotoThumb" class="photo-thumb" alt="" style="width:56px;height:56px">
       <button class="btn ghost btn-sm" id="shiftPhotoBtn"></button>
@@ -1658,6 +1666,7 @@
       feed_comment_send:"Send",feed_comment_empty:"Ingen kommentarer endnu",
       feed_no_results:"Ingen brugere fundet",
       feed_ago_now:"lige nu",feed_ago_min:"{0} min",feed_ago_h:"{0} t",feed_ago_day:"{0} d",
+      shift_ai_btn:"Skriv med AI",shift_ai_loading:"Skriver…",shift_ai_err:"Kunne ikke generere — prøv igen",
       shift_start:"Start vagt",shift_active:"Vagt i gang",shift_end:"Afslut vagt",
       shift_title:"Afslut vagt",shift_duration:"Varighed: {0}",
       shift_caption_ph:"Skriv en opsummering af vagten…",
@@ -1801,6 +1810,7 @@
       feed_comment_send:"Send",feed_comment_empty:"No comments yet",
       feed_no_results:"No users found",
       feed_ago_now:"just now",feed_ago_min:"{0}m",feed_ago_h:"{0}h",feed_ago_day:"{0}d",
+      shift_ai_btn:"Write with AI",shift_ai_loading:"Writing…",shift_ai_err:"Could not generate — try again",
       shift_start:"Start shift",shift_active:"Shift in progress",shift_end:"End shift",
       shift_title:"End shift",shift_duration:"Duration: {0}",
       shift_caption_ph:"Write a shift summary…",
@@ -1896,6 +1906,7 @@
     const ftDiscover=$("#feedTabDiscover");if(ftDiscover)ftDiscover.textContent=t("feed_tab_discover");
     const cSend=$("#commentSend");if(cSend)cSend.textContent=t("feed_comment_send");
     const cInput=$("#commentInput");if(cInput)cInput.placeholder=t("feed_comment_ph");
+    const shiftAiBtnLbl=$("#shiftAiBtnLbl");if(shiftAiBtnLbl)shiftAiBtnLbl.textContent=t("shift_ai_btn");
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.textContent=t("shift_start");
     const shiftEndBtn=$("#shiftEndBtn");if(shiftEndBtn)shiftEndBtn.textContent=t("shift_end");
     const shiftLabel=$("#shiftLabel");if(shiftLabel)shiftLabel.textContent=t("shift_active");
@@ -3587,6 +3598,32 @@
     }
   }
 
+  async function generateShiftSummary(){
+    const shift=getShift();if(!shift)return;
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    const btn=$("#shiftAiBtn");const lbl=$("#shiftAiBtnLbl");
+    if(btn)btn.classList.add("loading");
+    if(lbl)lbl.textContent=t("shift_ai_loading");
+    const durationMs=Date.now()-new Date(shift.startedAt).getTime();
+    const snapMap={};(shift.snap||[]).forEach(c=>{snapMap[c.id]={count:c.count,subs:{}};(c.subs||[]).forEach(s=>{snapMap[c.id].subs[s.id]=s.count;});});
+    const changes=[];
+    state.counters.forEach(c=>{
+      const snap=snapMap[c.id]||{count:0,subs:{}};
+      if(c.subs.length){c.subs.forEach(s=>{const was=snap.subs[s.id]||0;const diff=s.count-was;if(diff>0)changes.push({label:tLabel(c.label)+(s.name?"/"+tLabel(s.name):""),delta:diff});});}
+      else{const diff=c.count-(snap.count||0);if(diff>0)changes.push({label:tLabel(c.label),delta:diff});}
+    });
+    try{
+      const r=await fetch(base+"/api/shift/summary",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({changes,durationMs,lang})});
+      const d=await r.json();
+      if(!r.ok||!d.summary)throw new Error(d.error||"no summary");
+      const cap=$("#shiftCaption");if(cap){cap.value=d.summary;cap.focus();}
+    }catch(e){showToast(t("shift_ai_err"));}
+    finally{
+      if(btn)btn.classList.remove("loading");
+      if(lbl)lbl.textContent=t("shift_ai_btn");
+    }
+  }
+
   function openShiftModal(){
     const shift=getShift();if(!shift)return;
     const durationMs=Date.now()-new Date(shift.startedAt).getTime();
@@ -3678,6 +3715,7 @@
     renderShiftBar();
     const startBtn=$("#shiftStartBtn");if(startBtn)startBtn.addEventListener("click",startShift);
     const endBtn=$("#shiftEndBtn");if(endBtn)endBtn.addEventListener("click",openShiftModal);
+    const aiBtn=$("#shiftAiBtn");if(aiBtn)aiBtn.addEventListener("click",generateShiftSummary);
     const postBtn=$("#shiftPost");if(postBtn)postBtn.addEventListener("click",()=>{
       const sh=getShift();
       if(sh){
