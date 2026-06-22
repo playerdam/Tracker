@@ -1190,10 +1190,22 @@
       <span class="va-drawer-link-label">Restaurantbesøg</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
-    <div class="sec-head" style="margin-top:8px;margin-bottom:4px"><span class="sec-title" id="teamTitle"></span></div>
-    <div id="teamContent"></div>
-    <div class="sec-head" style="margin-top:20px;margin-bottom:4px"><span class="sec-title" id="logDrawerTitle"></span></div>
+    <button class="va-drawer-link" id="teamDrawerLink">
+      <span class="va-drawer-link-icon">👥</span>
+      <span class="va-drawer-link-label" id="teamTitle"></span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
     <div id="logView"></div>
+  </div>
+</div>
+
+<div class="scrim" id="teamScrim">
+  <div class="modal" id="teamModal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <h2 style="font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin:0" id="teamModalTitle"></h2>
+      <button class="btn ghost btn-sm" id="teamModalClose"></button>
+    </div>
+    <div id="teamContent"></div>
   </div>
 </div>
 
@@ -1596,7 +1608,8 @@
     const shiftPhotoBtn=$("#shiftPhotoBtn");if(shiftPhotoBtn)shiftPhotoBtn.textContent=t("shift_photo");
     const lbTitle=$("#lbTitle");if(lbTitle)lbTitle.textContent=t("lb_title");
     const teamTitle=$("#teamTitle");if(teamTitle)teamTitle.textContent=t("team_title");
-    const logDrawerTitle=$("#logDrawerTitle");if(logDrawerTitle)logDrawerTitle.textContent=lang==="da"?"Log":"Log";
+    const teamModalTitle=$("#teamModalTitle");if(teamModalTitle)teamModalTitle.textContent=t("team_title");
+    const teamModalClose=$("#teamModalClose");if(teamModalClose)teamModalClose.textContent=lang==="da"?"Luk":"Close";
     const pSave=$("#profileSave");if(pSave)pSave.textContent=t("profile_save");
     const pClose=$("#profileClose");if(pClose)pClose.textContent=t("profile_close");
     const pNick=$("#profileNick");if(pNick)pNick.placeholder=t("profile_nick_ph");
@@ -2790,7 +2803,12 @@
   document.querySelectorAll(".tab").forEach(tb=>tb.addEventListener("click",()=>switchTab(tb.dataset.view)));
   document.querySelectorAll(".bnav-btn").forEach(btn=>btn.addEventListener("click",()=>switchTab(btn.dataset.tab)));
 
-  function openLogDrawer(){renderLogView();renderTeam();$("#logDrawer").classList.add("open");$("#logScrim").classList.add("open");}
+  function openLogDrawer(){renderLogView();$("#logDrawer").classList.add("open");$("#logScrim").classList.add("open");}
+  function openTeamModal(){renderTeam();$("#teamScrim").classList.add("open");}
+  function closeTeamModal(){$("#teamScrim").classList.remove("open");}
+  var _teamDrawerLink=$("#teamDrawerLink");if(_teamDrawerLink)_teamDrawerLink.addEventListener("click",()=>{closeLogDrawer();openTeamModal();});
+  var _teamModalClose=$("#teamModalClose");if(_teamModalClose)_teamModalClose.addEventListener("click",closeTeamModal);
+  var _teamScrim=$("#teamScrim");if(_teamScrim)_teamScrim.addEventListener("click",e=>{if(e.target===_teamScrim)closeTeamModal();});
   function closeLogDrawer(){$("#logDrawer").classList.remove("open");$("#logScrim").classList.remove("open");}
   var _burgerBtn=$("#burgerBtn");if(_burgerBtn)_burgerBtn.addEventListener("click",openLogDrawer);
   var _drawerClose=$("#logDrawerClose");if(_drawerClose)_drawerClose.addEventListener("click",closeLogDrawer);
