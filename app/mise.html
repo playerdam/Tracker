@@ -1264,7 +1264,7 @@
     <div class="catalog-head">
       <div style="width:32px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <h2 style="font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin:0">Katalog</h2>
+        <h2 id="catalogTitle" style="font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin:0">Katalog</h2>
         <button id="catalogClose" style="appearance:none;background:none;border:none;color:var(--dim);cursor:pointer;font-size:20px;padding:4px 10px;line-height:1;border-radius:6px">&#x2715;</button>
       </div>
       <div style="position:relative">
@@ -1352,7 +1352,7 @@
     <button class="btn primary" id="authSubmit" style="width:100%;margin-top:8px"></button>
     <p style="text-align:center;margin:6px 0 0"><a id="authForgot" href="#" style="font-size:13px;color:var(--dim);text-decoration:none;display:none"></a></p>
     <p class="auth-toggle"><span id="authToggleText"></span> <a id="authToggleLink"></a></p>
-    <p class="auth-legal">Ved at fortsætte accepterer du vores <a href="https://tracker-production-1a62.up.railway.app/privacy.html">privatlivspolitik</a> og <a href="https://tracker-production-1a62.up.railway.app/terms.html">vilkår</a></p>
+    <p class="auth-legal" id="authLegal">Ved at fortsætte accepterer du vores <a href="https://tracker-production-1a62.up.railway.app/privacy.html">privatlivspolitik</a> og <a href="https://tracker-production-1a62.up.railway.app/terms.html">vilkår</a></p>
   </div>
 </div>
 
@@ -1430,7 +1430,7 @@
       <span id="vaLeftLabel">Craft Tracker</span>
     </button>
     <span class="va-hdr-title" id="vaHdrTitle">Restaurantbesøg</span>
-    <button class="va-add-btn" id="vaRightBtn" aria-label="Nyt besøg">+</button>
+    <button class="va-add-btn" id="vaRightBtn" aria-label="Nyt besøg" id="vaRightBtn">+</button>
   </div>
   <div class="va-pages">
     <!-- Visit list -->
@@ -1438,7 +1438,7 @@
     <!-- Single edit page: everything inline -->
     <div class="va-page va-page-offscreen" id="vaEditPage">
       <div class="va-cover-wrap" id="vaEditCover">
-        <div class="va-cover-placeholder" id="vaEditCoverPlaceholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Tilføj coverbillede</div>
+        <div class="va-cover-placeholder" id="vaEditCoverPlaceholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span id="vaCoverPlaceholderLbl">Tilføj coverbillede</span></div>
       </div>
       <div class="va-edit-inner">
         <input class="va-detail-name" id="vaEditName" placeholder="Restaurantens navn" maxlength="80" autocomplete="off">
@@ -1449,21 +1449,21 @@
           <button class="va-price-btn" data-price="3">€€€</button>
           <button class="va-price-btn" data-price="4">€€€€</button>
         </div>
-        <span class="va-sec-label">Vurdering</span>
+        <span class="va-sec-label" id="vaLblRating">Vurdering</span>
         <div id="vaEditStars"></div>
-        <span class="va-sec-label">Kommentar</span>
+        <span class="va-sec-label" id="vaLblComment">Kommentar</span>
         <textarea class="va-notes" id="vaEditComment" rows="3" placeholder="Helhedsindtryk, stemning, service..."></textarea>
         <!-- Wines -->
         <div class="va-divider"></div>
-        <span class="va-sec-label">Vine</span>
+        <span class="va-sec-label" id="vaLblWines">Vine</span>
         <div id="vaWineList"></div>
         <div class="va-inline-form" id="vaWineForm" style="display:none">
           <div class="va-wine-type-strip" id="vaWineTypeStrip">
-            <button class="va-wine-type-btn" data-wtype="rod">🍷 Rød</button>
-            <button class="va-wine-type-btn" data-wtype="hvid">🍋 Hvid</button>
-            <button class="va-wine-type-btn" data-wtype="rose">🌸 Rosé</button>
-            <button class="va-wine-type-btn" data-wtype="champagne">🍾 Champagne</button>
-            <button class="va-wine-type-btn" data-wtype="mousserende">✨ Mousserende</button>
+            <button class="va-wine-type-btn" data-wtype="rod" id="vaWineTypeRod">🍷 Rød</button>
+            <button class="va-wine-type-btn" data-wtype="hvid" id="vaWineTypeHvid">🍋 Hvid</button>
+            <button class="va-wine-type-btn" data-wtype="rose" id="vaWineTypeRose">🌸 Rosé</button>
+            <button class="va-wine-type-btn" data-wtype="champagne" id="vaWineTypeChamp">🍾 Champagne</button>
+            <button class="va-wine-type-btn" data-wtype="mousserende" id="vaWineTypeMous">✨ Mousserende</button>
           </div>
           <input class="va-inline-input" id="vaWineFormName" placeholder="Navn / betegnelse" maxlength="80" autocomplete="off">
           <input class="va-inline-input" id="vaWineFormProducer" placeholder="Producent (valgfrit)" maxlength="60" autocomplete="off">
@@ -1472,20 +1472,20 @@
           <textarea class="va-inline-input va-inline-textarea" id="vaWineFormComment" placeholder="Smag, balance, aroma..."></textarea>
           <button class="va-inline-add-btn" id="vaWineFormSave">Tilføj vin</button>
         </div>
-        <button class="va-add-row" id="vaAddWineBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tilføj vin</button>
+        <button class="va-add-row" id="vaAddWineBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span id="vaAddWineBtnLbl">Tilføj vin</span></button>
         <!-- Dishes -->
         <div class="va-divider"></div>
-        <span class="va-sec-label">Retter</span>
+        <span class="va-sec-label" id="vaLblDishes">Retter</span>
         <div id="vaDishList"></div>
         <div class="va-inline-form" id="vaDishForm" style="display:none">
           <input class="va-inline-input" id="vaDishFormName" placeholder="Rettens navn" maxlength="80" autocomplete="off">
           <div id="vaDishFormStars" style="margin:4px 0 10px"></div>
           <textarea class="va-inline-input va-inline-textarea" id="vaDishFormComment" placeholder="Smag, tilberedning, præsentation..."></textarea>
-          <button class="va-photo-upload-btn" id="vaDishPhotoBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Tilføj foto</button>
+          <button class="va-photo-upload-btn" id="vaDishPhotoBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span id="vaDishPhotoBtnLbl">Tilføj foto</span></button>
           <img class="va-photo-preview" id="vaDishPhotoPreview" alt="">
           <button class="va-inline-add-btn" id="vaDishFormSave">Tilføj ret</button>
         </div>
-        <button class="va-add-row" id="vaAddDishBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tilføj ret</button>
+        <button class="va-add-row" id="vaAddDishBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span id="vaAddDishBtnLbl">Tilføj ret</span></button>
         <!-- Actions -->
         <div class="va-divider"></div>
         <button class="va-inline-add-btn" id="vaGemBtn">Gem</button>
@@ -1497,8 +1497,8 @@
     <div id="vaGemSheet" style="background:#1A0D14;border-top:1px solid #2C1520;border-radius:20px 20px 0 0;width:100%;padding:0 16px max(28px,env(safe-area-inset-bottom,16px))">
       <div style="width:32px;height:4px;background:#2C1520;border-radius:2px;margin:12px auto 20px"></div>
       <button class="va-gem-opt va-gem-primary" id="vaGemSave">Gem besøg</button>
-      <button class="va-gem-opt va-gem-feed" id="vaGemFeed"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Gem og del til feed</button>
-      <button class="va-gem-opt va-gem-del" id="vaGemDelete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Slet besøg</button>
+      <button class="va-gem-opt va-gem-feed" id="vaGemFeed"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span id="vaGemFeedLbl">Gem og del til feed</span></button>
+      <button class="va-gem-opt va-gem-del" id="vaGemDelete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg><span id="vaGemDeleteLbl">Slet besøg</span></button>
     </div>
   </div>
 </div>
@@ -1668,6 +1668,28 @@
       new_cat_hint:"Claude genererer automatisk et ikon i baggrunden.",
       new_cat_btn:"+ Ny kategori",
       cat_picker_title:"Alle kategorier",cat_all_chip:"Alle",
+      qlog_hint:"Enter for at logge",qlog_hint_full:"Enter for at logge · Esc for at lukke",
+      catalog_title:"Katalog",cat_search_ph:"Søg i katalog...",new_cat_ph:"fx Anrettet, Sauce, Garnish...",
+      onboard_sub:"Track din dag. Del med holdet.",onboard_btn:"Kom i gang",
+      onboard_feat1_title:"Log hvad du laver",onboard_feat1_sub:"Opsæt kategorier og tæl anretninger, kokteails eller hvad du nu tracker",
+      onboard_feat2_title:"Følg din vagt",onboard_feat2_sub:"Start en vagt og se et overblik over hvad du nåede — del det til feedet",
+      onboard_feat3_title:"Mål dig med kollegerne",onboard_feat3_sub:"Følg andre, se leaderboardet og byg din trackinghistorik",
+      va_hdr_title:"Restaurantbesøg",va_new_visit:"Nyt besøg",va_cover_ph:"Tilføj coverbillede",
+      va_name_ph:"Restaurantens navn",va_lbl_rating:"Vurdering",va_lbl_comment:"Kommentar",
+      va_comment_ph:"Helhedsindtryk, stemning, service...",va_lbl_wines:"Vine",
+      va_wine_name_ph:"Navn / betegnelse",va_wine_producer_ph:"Producent (valgfrit)",va_wine_vintage_ph:"Årgang",
+      va_wine_comment_ph:"Smag, balance, aroma...",va_add_wine:"Tilføj vin",va_lbl_dishes:"Retter",
+      va_dish_name_ph:"Rettens navn",va_dish_comment_ph:"Smag, tilberedning, præsentation...",
+      va_add_photo:"Tilføj foto",va_add_dish:"Tilføj ret",va_save:"Gem",
+      va_save_visit:"Gem besøg",va_save_feed:"Gem og del til feed",va_delete_visit:"Slet besøg",
+      va_wine_rod:"🍷 Rød",va_wine_hvid:"🍋 Hvid",va_wine_rose:"🌸 Rosé",va_wine_champ:"🍾 Champagne",va_wine_mous:"✨ Mousserende",
+      va_toast_wine:"Vin tilføjet",va_toast_dish:"Ret tilføjet",va_toast_saved:"Besøg gemt",
+      va_toast_shared:"Delt til feed!",va_toast_sharing:"Deler...",va_toast_login:"Log ind for at dele",va_toast_err:"Noget gik galt",
+      va_del_wine:"Slet vin",va_del_dish:"Slet ret",
+      va_empty_title:"Ingen besøg endnu",va_empty_sub:"Tryk + for at dokumentere dit første restaurantbesøg",
+      va_unknown:"Ukendt restaurant",va_edit_hdr:"Besøg",va_edit_back:"← Oversigt",
+      va_wine_single:"{0} vin",va_wine_plural:"{0} vine",va_dish_single:"{0} ret",va_dish_plural:"{0} retter",
+      img_only:"Kun billeder (JPEG, PNG, WebP)",
     },
     en:{
       tagline:"track your career",total_label:"total",
@@ -1789,6 +1811,28 @@
       new_cat_hint:"Claude will automatically generate an icon in the background.",
       new_cat_btn:"+ New category",
       cat_picker_title:"All categories",cat_all_chip:"All",
+      qlog_hint:"Enter to log",qlog_hint_full:"Enter to log · Esc to close",
+      catalog_title:"Catalogue",cat_search_ph:"Search catalogue...",new_cat_ph:"e.g. Plated, Sauce, Garnish...",
+      onboard_sub:"Track your day. Share with the team.",onboard_btn:"Get started",
+      onboard_feat1_title:"Log what you do",onboard_feat1_sub:"Set up categories and count dishes, cocktails, or whatever you track",
+      onboard_feat2_title:"Track your shift",onboard_feat2_sub:"Start a shift and see an overview of what you accomplished — share it to feed",
+      onboard_feat3_title:"Compete with colleagues",onboard_feat3_sub:"Follow others, check the leaderboard, and build your tracking history",
+      va_hdr_title:"Restaurant visit",va_new_visit:"New visit",va_cover_ph:"Add cover photo",
+      va_name_ph:"Restaurant name",va_lbl_rating:"Rating",va_lbl_comment:"Comment",
+      va_comment_ph:"Overall impression, atmosphere, service...",va_lbl_wines:"Wines",
+      va_wine_name_ph:"Name / label",va_wine_producer_ph:"Producer (optional)",va_wine_vintage_ph:"Vintage",
+      va_wine_comment_ph:"Taste, balance, aroma...",va_add_wine:"Add wine",va_lbl_dishes:"Dishes",
+      va_dish_name_ph:"Dish name",va_dish_comment_ph:"Taste, preparation, presentation...",
+      va_add_photo:"Add photo",va_add_dish:"Add dish",va_save:"Save",
+      va_save_visit:"Save visit",va_save_feed:"Save and share to feed",va_delete_visit:"Delete visit",
+      va_wine_rod:"🍷 Red",va_wine_hvid:"🍋 White",va_wine_rose:"🌸 Rosé",va_wine_champ:"🍾 Champagne",va_wine_mous:"✨ Sparkling",
+      va_toast_wine:"Wine added",va_toast_dish:"Dish added",va_toast_saved:"Visit saved",
+      va_toast_shared:"Shared to feed!",va_toast_sharing:"Sharing...",va_toast_login:"Log in to share",va_toast_err:"Something went wrong",
+      va_del_wine:"Delete wine",va_del_dish:"Delete dish",
+      va_empty_title:"No visits yet",va_empty_sub:"Tap + to document your first restaurant visit",
+      va_unknown:"Unknown restaurant",va_edit_hdr:"Visit",va_edit_back:"← Overview",
+      va_wine_single:"{0} wine",va_wine_plural:"{0} wines",va_dish_single:"{0} dish",va_dish_plural:"{0} dishes",
+      img_only:"Images only (JPEG, PNG, WebP)",
     }
   };
   let lang=localStorage.getItem("mise_lang")||"da";
@@ -1923,6 +1967,59 @@
     const aiSheetTitle=$("#aiSheetTitle");if(aiSheetTitle)aiSheetTitle.textContent=t("lab_ai_title");
     const aiLoadingTxt=$("#aiLoadingTxt");if(aiLoadingTxt)aiLoadingTxt.textContent=t("lab_ai_thinking");
     const aiInputEl=$("#aiInput");if(aiInputEl)aiInputEl.placeholder=t("lab_ai_ph");
+    // Catalog & new category
+    const catalogTitleEl=$("#catalogTitle");if(catalogTitleEl)catalogTitleEl.textContent=t("catalog_title");
+    const catalogSearchEl=$("#catalogSearch");if(catalogSearchEl)catalogSearchEl.placeholder=t("cat_search_ph");
+    const newCatInputEl=$("#newCatInput");if(newCatInputEl)newCatInputEl.placeholder=t("new_cat_ph");
+    // Onboarding
+    const obSub=$("#onboardSub");if(obSub)obSub.textContent=t("onboard_sub");
+    const obBtn=$("#onboardDone");if(obBtn)obBtn.textContent=t("onboard_btn");
+    const obF1T=$("#onboardFeat1Title");if(obF1T)obF1T.textContent=t("onboard_feat1_title");
+    const obF1S=$("#onboardFeat1Sub");if(obF1S)obF1S.textContent=t("onboard_feat1_sub");
+    const obF2T=$("#onboardFeat2Title");if(obF2T)obF2T.textContent=t("onboard_feat2_title");
+    const obF2S=$("#onboardFeat2Sub");if(obF2S)obF2S.textContent=t("onboard_feat2_sub");
+    const obF3T=$("#onboardFeat3Title");if(obF3T)obF3T.textContent=t("onboard_feat3_title");
+    const obF3S=$("#onboardFeat3Sub");if(obF3S)obF3S.textContent=t("onboard_feat3_sub");
+    const obLegal=$("#onboardLegal");if(obLegal)obLegal.innerHTML=lang==="da"
+      ?"Ved at fortsætte accepterer du vores <a href=\"https://tracker-production-1a62.up.railway.app/terms.html\">vilkår</a> og <a href=\"https://tracker-production-1a62.up.railway.app/privacy.html\">privatlivspolitik</a>"
+      :"By continuing you accept our <a href=\"https://tracker-production-1a62.up.railway.app/terms.html\">terms</a> and <a href=\"https://tracker-production-1a62.up.railway.app/privacy.html\">privacy policy</a>";
+    const authLegal=$("#authLegal");if(authLegal)authLegal.innerHTML=lang==="da"
+      ?"Ved at fortsætte accepterer du vores <a href=\"https://tracker-production-1a62.up.railway.app/privacy.html\">privatlivspolitik</a> og <a href=\"https://tracker-production-1a62.up.railway.app/terms.html\">vilkår</a>"
+      :"By continuing you accept our <a href=\"https://tracker-production-1a62.up.railway.app/privacy.html\">privacy policy</a> and <a href=\"https://tracker-production-1a62.up.railway.app/terms.html\">terms</a>";
+    // Bottom nav — The Lab stays "The Lab" in both languages
+    const bLab=$("#bnav-lbl-lab");if(bLab)bLab.textContent="The Lab";
+    // qlog hint (initial HTML)
+    const qlogHintEl=$("#qlogOvHint");if(qlogHintEl)qlogHintEl.textContent=t("qlog_hint");
+    // Visit App
+    const vaHdrT=$("#vaHdrTitle");if(vaHdrT)vaHdrT.textContent=t("va_hdr_title");
+    const vaRightB=$("#vaRightBtn");if(vaRightB)vaRightB.setAttribute("aria-label",t("va_new_visit"));
+    const vaCoverLbl=$("#vaCoverPlaceholderLbl");if(vaCoverLbl)vaCoverLbl.textContent=t("va_cover_ph");
+    const vaNameEl=$("#vaEditName");if(vaNameEl)vaNameEl.placeholder=t("va_name_ph");
+    const vaLblRat=$("#vaLblRating");if(vaLblRat)vaLblRat.textContent=t("va_lbl_rating");
+    const vaLblCom=$("#vaLblComment");if(vaLblCom)vaLblCom.textContent=t("va_lbl_comment");
+    const vaComEl=$("#vaEditComment");if(vaComEl)vaComEl.placeholder=t("va_comment_ph");
+    const vaLblWin=$("#vaLblWines");if(vaLblWin)vaLblWin.textContent=t("va_lbl_wines");
+    const vaWTRod=$("#vaWineTypeRod");if(vaWTRod)vaWTRod.textContent=t("va_wine_rod");
+    const vaWTHvid=$("#vaWineTypeHvid");if(vaWTHvid)vaWTHvid.textContent=t("va_wine_hvid");
+    const vaWTRose=$("#vaWineTypeRose");if(vaWTRose)vaWTRose.textContent=t("va_wine_rose");
+    const vaWTChamp=$("#vaWineTypeChamp");if(vaWTChamp)vaWTChamp.textContent=t("va_wine_champ");
+    const vaWTMous=$("#vaWineTypeMous");if(vaWTMous)vaWTMous.textContent=t("va_wine_mous");
+    const vaWFName=$("#vaWineFormName");if(vaWFName)vaWFName.placeholder=t("va_wine_name_ph");
+    const vaWFProd=$("#vaWineFormProducer");if(vaWFProd)vaWFProd.placeholder=t("va_wine_producer_ph");
+    const vaWFVint=$("#vaWineFormVintage");if(vaWFVint)vaWFVint.placeholder=t("va_wine_vintage_ph");
+    const vaWFCom=$("#vaWineFormComment");if(vaWFCom)vaWFCom.placeholder=t("va_wine_comment_ph");
+    const vaWFSave=$("#vaWineFormSave");if(vaWFSave)vaWFSave.textContent=t("va_add_wine");
+    const vaAddWLbl=$("#vaAddWineBtnLbl");if(vaAddWLbl)vaAddWLbl.textContent=t("va_add_wine");
+    const vaLblDish=$("#vaLblDishes");if(vaLblDish)vaLblDish.textContent=t("va_lbl_dishes");
+    const vaDFName=$("#vaDishFormName");if(vaDFName)vaDFName.placeholder=t("va_dish_name_ph");
+    const vaDFCom=$("#vaDishFormComment");if(vaDFCom)vaDFCom.placeholder=t("va_dish_comment_ph");
+    const vaDPBLbl=$("#vaDishPhotoBtnLbl");if(vaDPBLbl)vaDPBLbl.textContent=t("va_add_photo");
+    const vaDFSave=$("#vaDishFormSave");if(vaDFSave)vaDFSave.textContent=t("va_add_dish");
+    const vaAddDLbl=$("#vaAddDishBtnLbl");if(vaAddDLbl)vaAddDLbl.textContent=t("va_add_dish");
+    const vaGemB=$("#vaGemBtn");if(vaGemB)vaGemB.textContent=t("va_save");
+    const vaGemSaveB=$("#vaGemSave");if(vaGemSaveB)vaGemSaveB.textContent=t("va_save_visit");
+    const vaGemFeedL=$("#vaGemFeedLbl");if(vaGemFeedL)vaGemFeedL.textContent=t("va_save_feed");
+    const vaGemDelL=$("#vaGemDeleteLbl");if(vaGemDelL)vaGemDelL.textContent=t("va_delete_visit");
   }
   function setLang(l){lang=l;localStorage.setItem("mise_lang",l);translateUI();renderCounters();renderWines();renderLogView();}
   $("#langBtn").addEventListener("click",()=>setLang(lang==="da"?"en":"da"));
@@ -2258,7 +2355,7 @@
     photoInput.addEventListener("change",async()=>{
       const file=photoInput.files[0];if(!file)return;
       const allowed=["image/jpeg","image/png","image/webp","image/heic","image/heif"];
-      if(!allowed.includes(file.type)&&!file.type.startsWith("image/")){showToast("Kun billeder (JPEG, PNG, WebP)");photoInput.value="";return;}
+      if(!allowed.includes(file.type)&&!file.type.startsWith("image/")){showToast(t("img_only"));photoInput.value="";return;}
       if(file.size>20*1024*1024){showToast(lang==="da"?"Billedet er for stort (maks 20 MB)":"Image too large (max 20 MB)");photoInput.value="";return;}
       const url=await resizeImage(file,1200);
       pendingPhotoDataUrl=url;
@@ -3057,7 +3154,7 @@
   function openQlogOverlay(){
     const ov=$("#qlogOverlay");if(!ov)return;
     const inp=$("#qlogOverlayInput");
-    const hint=$("#qlogOvHint");if(hint)hint.textContent="Enter for at logge · Esc for at lukke";
+    const hint=$("#qlogOvHint");if(hint)hint.textContent=t("qlog_hint_full");
     if(inp){inp.placeholder=t("qlog_ph")||"";inp.value=$("#qlogInput").value||"";inp.style.height="auto";}
     ov.classList.add("open");
     setTimeout(()=>{if(inp){inp.focus();inp.style.height="auto";inp.style.height=inp.scrollHeight+"px";}},60);
@@ -4472,7 +4569,7 @@
     closeLogDrawer();
     renderVaList();
     vaShowPage("vaListPage");
-    vaSetHdr("Craft Tracker","Restaurantbesøg",true);
+    vaSetHdr("Craft Tracker",t("va_hdr_title"),true);
     const app=$("#visitApp");if(app)app.classList.add("open");
   }
 
@@ -4484,7 +4581,7 @@
   function vaGoBack(){
     const sc=$("#vaGemScrim");if(sc&&sc.style.display!=="none"){sc.style.display="none";return;}
     if(_vaCurPage==="vaEditPage"){
-      renderVaList();vaShowPage("vaListPage");vaSetHdr("Craft Tracker","Restaurantbesøg",true);
+      renderVaList();vaShowPage("vaListPage");vaSetHdr("Craft Tracker",t("va_hdr_title"),true);
     }else{closeVisitApp();}
   }
 
@@ -4514,6 +4611,7 @@
     const prev=$("#vaDishPhotoPreview");if(prev){prev.src="";prev.style.display="none";}
   }
 
+  function getWineLabels(){return{rod:t("va_wine_rod"),hvid:t("va_wine_hvid"),rose:t("va_wine_rose"),champagne:t("va_wine_champ"),mousserende:t("va_wine_mous")};}
   const WINE_LABELS={rod:"🍷 Rød",hvid:"🍋 Hvid",rose:"🌸 Rosé",champagne:"🍾 Champagne",mousserende:"✨ Mousserende"};
 
   function renderVaWines(visitId){
@@ -4522,10 +4620,10 @@
     el.innerHTML="";
     (visit.wines||[]).forEach(wine=>{
       const wc=document.createElement("div");wc.className="va-item-card";
-      const typeLabel=WINE_LABELS[wine.type]||wine.type||"";
+      const typeLabel=getWineLabels()[wine.type]||wine.type||"";
       const meta=[wine.producer,wine.vintage].filter(Boolean).join(", ");
-      wc.innerHTML=(typeLabel?'<div class="va-item-meta" style="margin-bottom:2px">'+esc(typeLabel)+'</div>':'')+'<div class="va-item-card-body"><div class="va-item-name">'+esc(wine.name||"Vin")+'</div>'+(meta?'<div class="va-item-meta">'+esc(meta)+'</div>':"")+(wine.rating?vaStarHtml(wine.rating):"")+(wine.comment?'<div class="va-item-comment">'+esc(wine.comment)+'</div>':"")+'</div>';
-      const del=document.createElement("button");del.className="va-item-del";del.innerHTML="&#x2715;";del.setAttribute("aria-label","Slet vin");
+      wc.innerHTML=(typeLabel?'<div class="va-item-meta" style="margin-bottom:2px">'+esc(typeLabel)+'</div>':'')+'<div class="va-item-card-body"><div class="va-item-name">'+esc(wine.name||(lang==="da"?"Vin":"Wine"))+'</div>'+(meta?'<div class="va-item-meta">'+esc(meta)+'</div>':"")+(wine.rating?vaStarHtml(wine.rating):"")+(wine.comment?'<div class="va-item-comment">'+esc(wine.comment)+'</div>':"")+'</div>';
+      const del=document.createElement("button");del.className="va-item-del";del.innerHTML="&#x2715;";del.setAttribute("aria-label",t("va_del_wine"));
       del.addEventListener("click",e=>{e.stopPropagation();const vs=getVisits();const v=vs.find(x=>x.id===visitId);if(v){v.wines=(v.wines||[]).filter(w=>w.id!==wine.id);saveVisits(vs);renderVaWines(visitId);}});
       wc.appendChild(del);el.appendChild(wc);
     });
@@ -4537,8 +4635,8 @@
     el.innerHTML="";
     (visit.dishes||[]).forEach(dish=>{
       const dc=document.createElement("div");dc.className="va-item-card";
-      dc.innerHTML=(dish.photo?'<img class="va-item-card-img" src="'+esc(dish.photo)+'" alt="" loading="lazy">':'')+'<div class="va-item-card-body"><div class="va-item-name">'+esc(dish.name||"Ret")+'</div>'+(dish.rating?vaStarHtml(dish.rating):"")+(dish.comment?'<div class="va-item-comment">'+esc(dish.comment)+'</div>':"")+'</div>';
-      const del=document.createElement("button");del.className="va-item-del";del.innerHTML="&#x2715;";del.setAttribute("aria-label","Slet ret");
+      dc.innerHTML=(dish.photo?'<img class="va-item-card-img" src="'+esc(dish.photo)+'" alt="" loading="lazy">':'')+'<div class="va-item-card-body"><div class="va-item-name">'+esc(dish.name||(lang==="da"?"Ret":"Dish"))+'</div>'+(dish.rating?vaStarHtml(dish.rating):"")+(dish.comment?'<div class="va-item-comment">'+esc(dish.comment)+'</div>':"")+'</div>';
+      const del=document.createElement("button");del.className="va-item-del";del.innerHTML="&#x2715;";del.setAttribute("aria-label",t("va_del_dish"));
       del.addEventListener("click",e=>{e.stopPropagation();const vs=getVisits();const v=vs.find(x=>x.id===visitId);if(v){v.dishes=(v.dishes||[]).filter(d=>d.id!==dish.id);saveVisits(vs);renderVaDishes(visitId);}});
       dc.appendChild(del);el.appendChild(dc);
     });
@@ -4576,25 +4674,26 @@
 
     vaHideWineForm();vaHideDishForm();
     renderVaWines(visitId);renderVaDishes(visitId);
-    vaShowPage("vaEditPage");vaSetHdr("← Oversigt","Besøg",false);
+    vaShowPage("vaEditPage");vaSetHdr(t("va_edit_back"),t("va_edit_hdr"),false);
   }
 
   function renderVaList(){
     const el=$("#vaList");if(!el)return;
     const visits=getVisits();
     if(!visits.length){
-      el.innerHTML='<div class="va-empty"><div class="va-empty-icon">🍽️</div><div class="va-empty-title">Ingen besøg endnu</div><div class="va-empty-sub">Tryk + for at dokumentere dit første restaurantbesøg</div></div>';
+      el.innerHTML='<div class="va-empty"><div class="va-empty-icon">🍽️</div><div class="va-empty-title">'+t("va_empty_title")+'</div><div class="va-empty-sub">'+t("va_empty_sub")+'</div></div>';
       return;
     }
     const list=document.createElement("div");list.className="va-list";
     visits.slice().reverse().forEach(visit=>{
       const card=document.createElement("div");card.className="va-card";
-      const dateStr=visit.date?new Date(visit.date+"T12:00:00").toLocaleDateString("da-DK",{day:"numeric",month:"long",year:"numeric"}):"";
+      const dateStr=visit.date?new Date(visit.date+"T12:00:00").toLocaleDateString(lang==="da"?"da-DK":"en-GB",{day:"numeric",month:"long",year:"numeric"}):"";
       const wines=visit.wines||[];const dishes=visit.dishes||[];
       const priceTxt=visit.priceLevel?'<span style="color:#8A6070;font-size:11px">'+"€".repeat(visit.priceLevel)+'</span>':"";
-
-      const chips=[(wines.length?wines.length+" vin"+(wines.length!==1?"e":""):""),(dishes.length?dishes.length+" ret"+(dishes.length!==1?"ter":""):"")].filter(Boolean).join(" · ");
-      card.innerHTML=(visit.cover?'<img class="va-card-img" src="'+esc(visit.cover)+'" alt="" loading="lazy">':(visit.name?'<div class="va-card-no-img"></div>':""))+'<div class="va-card-body"><div class="va-card-name">'+esc(visit.name||"Ukendt restaurant")+'</div><div class="va-card-meta"><span class="va-card-date">'+esc(dateStr)+'</span>'+(visit.rating?vaStarHtml(visit.rating):"")+(priceTxt?" "+priceTxt:"")+'</div>'+(chips?'<div class="va-card-chips">'+esc(chips)+'</div>':"")+(visit.comment?'<div class="va-card-comment">'+esc(visit.comment.slice(0,120))+'</div>':"")+'</div>';
+      const wChip=wines.length?(wines.length===1?t("va_wine_single",wines.length):t("va_wine_plural",wines.length)):"";
+      const dChip=dishes.length?(dishes.length===1?t("va_dish_single",dishes.length):t("va_dish_plural",dishes.length)):"";
+      const chips=[wChip,dChip].filter(Boolean).join(" · ");
+      card.innerHTML=(visit.cover?'<img class="va-card-img" src="'+esc(visit.cover)+'" alt="" loading="lazy">':(visit.name?'<div class="va-card-no-img"></div>':""))+'<div class="va-card-body"><div class="va-card-name">'+esc(visit.name||t("va_unknown"))+'</div><div class="va-card-meta"><span class="va-card-date">'+esc(dateStr)+'</span>'+(visit.rating?vaStarHtml(visit.rating):"")+(priceTxt?" "+priceTxt:"")+'</div>'+(chips?'<div class="va-card-chips">'+esc(chips)+'</div>':"")+(visit.comment?'<div class="va-card-comment">'+esc(visit.comment.slice(0,120))+'</div>':"")+'</div>';
       card.addEventListener("click",()=>vaOpenEdit(visit.id));
       list.appendChild(card);
     });
@@ -4604,8 +4703,8 @@
   async function vaShareToFeed(visitId){
     const visits=getVisits();const visit=visits.find(v=>v.id===visitId);if(!visit)return;
     const base=apiBase();const token=await getToken();
-    if(!base||!token){showToast("Log ind for at dele til feed");return;}
-    const shareBtn=$("#vaShareBtn");if(shareBtn)shareBtn.textContent="Deler...";
+    if(!base||!token){showToast(t("va_toast_login"));return;}
+    const shareBtn=$("#vaShareBtn");if(shareBtn)shareBtn.textContent=t("va_toast_sharing");
     let imageUrl=null;
     if(visit.cover){
       try{
@@ -4619,9 +4718,9 @@
     const summary=[visit.name,starsTxt,dishesTxt,winesTxt,visit.comment].filter(Boolean).join(" · ").slice(0,200);
     try{
       const r=await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({categoryLabel:"Restaurantbesøg",delta:1,imageUrl,summary})});
-      if(r.ok){showToast("Delt til feed!");if(shareBtn)shareBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>✓ Delt til feed';}
-      else showToast("Noget gik galt");
-    }catch(e){showToast("Noget gik galt");}
+      if(r.ok){showToast(t("va_toast_shared"));if(shareBtn)shareBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>✓ '+t("va_toast_shared");}
+      else showToast(t("va_toast_err"));
+    }catch(e){showToast(t("va_toast_err"));}
   }
 
   function setupVisits(){
@@ -4665,7 +4764,7 @@
       const wine={id:"wine_"+Date.now(),type:_vaWineType,name,producer:prodEl?prodEl.value.trim():"",vintage:vintEl?vintEl.value.trim():"",rating:_vaWineStarVal||0,comment:commentEl?commentEl.value.trim():""};
       const vs=getVisits();const v=vs.find(x=>x.id===_vaCurVisitId);
       if(v){if(!v.wines)v.wines=[];v.wines.push(wine);saveVisits(vs);}
-      vaHideWineForm();renderVaWines(_vaCurVisitId);showToast("Vin tilføjet");
+      vaHideWineForm();renderVaWines(_vaCurVisitId);showToast(t("va_toast_wine"));
     });
 
     const addDishBtn=$("#vaAddDishBtn");
@@ -4686,7 +4785,7 @@
       const dish={id:"dish_"+Date.now(),name,rating:_vaDishStarVal||0,comment:commentEl?commentEl.value.trim():"",photo:_vaPendingDishPhoto||""};
       const vs=getVisits();const v=vs.find(x=>x.id===_vaCurVisitId);
       if(v){if(!v.dishes)v.dishes=[];v.dishes.push(dish);saveVisits(vs);}
-      vaHideDishForm();renderVaDishes(_vaCurVisitId);showToast("Ret tilføjet");
+      vaHideDishForm();renderVaDishes(_vaCurVisitId);showToast(t("va_toast_dish"));
     });
 
     const coverInput=$("#vaCoverPhotoInput");
@@ -4716,7 +4815,7 @@
       const sc=$("#vaGemScrim");if(sc)sc.style.display="none";
     }
     function vaBackToList(){
-      renderVaList();vaShowPage("vaListPage");vaSetHdr("Craft Tracker","Restaurantbesøg",true);
+      renderVaList();vaShowPage("vaListPage");vaSetHdr("Craft Tracker",t("va_hdr_title"),true);
     }
 
     const gemBtn=$("#vaGemBtn");
@@ -4726,7 +4825,7 @@
     if(vaGemScrim)vaGemScrim.addEventListener("click",e=>{if(e.target===vaGemScrim)closeVaGemScrim();});
 
     const gemSaveBtn=$("#vaGemSave");
-    if(gemSaveBtn)gemSaveBtn.addEventListener("click",()=>{closeVaGemScrim();vaBackToList();showToast("Besøg gemt");});
+    if(gemSaveBtn)gemSaveBtn.addEventListener("click",()=>{closeVaGemScrim();vaBackToList();showToast(t("va_toast_saved"));});
 
     const gemFeedBtn=$("#vaGemFeed");
     if(gemFeedBtn)gemFeedBtn.addEventListener("click",async()=>{
@@ -4824,14 +4923,14 @@
       <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" rx="96" fill="#8A2E3F"/><text x="256" y="338" font-family="Georgia,serif" font-size="230" font-weight="700" text-anchor="middle" fill="#FFFFFF" opacity=".95" letter-spacing="-8">CT</text></svg>
     </div>
     <div class="onboard-title">Craft Tracker</div>
-    <div class="onboard-sub">Track din dag. Del med holdet.</div>
+    <div class="onboard-sub" id="onboardSub">Track din dag. Del med holdet.</div>
     <div class="onboard-feats">
-      <div class="onboard-feat"><div class="onboard-feat-ic">📊</div><div><div class="onboard-feat-title">Log hvad du laver</div><div class="onboard-feat-sub">Opsæt kategorier og tæl anretninger, kokteails eller hvad du nu tracker</div></div></div>
-      <div class="onboard-feat"><div class="onboard-feat-ic">⏱</div><div><div class="onboard-feat-title">Følg din vagt</div><div class="onboard-feat-sub">Start en vagt og se et overblik over hvad du nåede — del det til feedet</div></div></div>
-      <div class="onboard-feat"><div class="onboard-feat-ic">🏆</div><div><div class="onboard-feat-title">Mål dig med kollegerne</div><div class="onboard-feat-sub">Følg andre, se leaderboardet og byg din trackinghistorik</div></div></div>
+      <div class="onboard-feat"><div class="onboard-feat-ic">📊</div><div><div class="onboard-feat-title" id="onboardFeat1Title">Log hvad du laver</div><div class="onboard-feat-sub" id="onboardFeat1Sub">Opsæt kategorier og tæl anretninger, kokteails eller hvad du nu tracker</div></div></div>
+      <div class="onboard-feat"><div class="onboard-feat-ic">⏱</div><div><div class="onboard-feat-title" id="onboardFeat2Title">Følg din vagt</div><div class="onboard-feat-sub" id="onboardFeat2Sub">Start en vagt og se et overblik over hvad du nåede — del det til feedet</div></div></div>
+      <div class="onboard-feat"><div class="onboard-feat-ic">🏆</div><div><div class="onboard-feat-title" id="onboardFeat3Title">Mål dig med kollegerne</div><div class="onboard-feat-sub" id="onboardFeat3Sub">Følg andre, se leaderboardet og byg din trackinghistorik</div></div></div>
     </div>
     <button class="btn primary" id="onboardDone" style="width:100%;padding:15px;font-size:16px">Kom i gang</button>
-    <p class="onboard-legal">Ved at fortsætte accepterer du vores <a href="https://tracker-production-1a62.up.railway.app/terms.html">vilkår</a> og <a href="https://tracker-production-1a62.up.railway.app/privacy.html">privatlivspolitik</a></p>
+    <p class="onboard-legal" id="onboardLegal">Ved at fortsætte accepterer du vores <a href="https://tracker-production-1a62.up.railway.app/terms.html">vilkår</a> og <a href="https://tracker-production-1a62.up.railway.app/privacy.html">privatlivspolitik</a></p>
   </div>
 </div>
 
