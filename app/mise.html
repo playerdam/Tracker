@@ -466,9 +466,11 @@
   /* Dish editor — full-screen overlay */
   .dish-editor{position:fixed;inset:0;z-index:200;background:var(--bg);transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:env(safe-area-inset-bottom,0px)}
   .dish-editor.open{transform:translateX(0)}
-  .de-hdr{position:sticky;top:0;z-index:10;background:rgba(247,244,240,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 12px) 14px 12px;border-bottom:1px solid var(--border)}
+  .de-hdr{position:sticky;top:0;z-index:10;background:rgba(247,244,240,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 12px) 14px 12px;border-bottom:1px solid var(--border)}
   .de-back{appearance:none;background:none;border:none;color:var(--accent);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;padding:4px 0;flex-shrink:0;display:flex;align-items:center;gap:4px;-webkit-tap-highlight-color:transparent}
-  .de-name{font-family:"Fraunces",serif;font-size:17px;font-weight:600;flex:1;min-width:0;background:none;border:none;color:var(--text);padding:0;outline:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .de-name-wrap{padding:14px 16px 10px;background:var(--surface);border-bottom:1px solid var(--border)}
+  .de-name{width:100%;background:none;border:none;outline:none;font-family:"Fraunces",serif;font-size:23px;font-weight:700;color:var(--text);letter-spacing:-.025em;line-height:1.2;padding:0}
+  .de-name::placeholder{color:var(--faint)}
   .de-save{appearance:none;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:7px 14px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:.12s}
   .de-save.saved{background:var(--surface-2);color:var(--faint)}
   /* Status chips */
@@ -1065,10 +1067,10 @@
     </div>
     <div class="lab-filter-row" id="labFilterRow">
       <button class="lab-filter-chip active" data-filter="all" id="labFilterAll">Alle</button>
-      <button class="lab-filter-chip" data-filter="idea">Idé</button>
-      <button class="lab-filter-chip" data-filter="testing">Test</button>
-      <button class="lab-filter-chip" data-filter="ready">Klar</button>
-      <button class="lab-filter-chip" data-filter="menu">På menu</button>
+      <button class="lab-filter-chip" data-filter="idea" id="labFilterIdea">Idé</button>
+      <button class="lab-filter-chip" data-filter="testing" id="labFilterTesting">Test</button>
+      <button class="lab-filter-chip" data-filter="ready" id="labFilterReady">Klar</button>
+      <button class="lab-filter-chip" data-filter="menu" id="labFilterMenu">På menu</button>
     </div>
     <div class="lab-list" id="labList"></div>
   </section>
@@ -1081,8 +1083,10 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
       <span id="deBackLbl">The Lab</span>
     </button>
-    <input class="de-name" id="deName" placeholder="Navn på ret…" maxlength="80">
-    <button class="de-save" id="deSaveBtn" id="deSaveBtn"><span id="deSaveLbl">Gem</span></button>
+    <button class="de-save" id="deSaveBtn"><span id="deSaveLbl">Gem</span></button>
+  </div>
+  <div class="de-name-wrap">
+    <input class="de-name" id="deName" placeholder="Navn på retten…" maxlength="80">
   </div>
   <!-- Status -->
   <div class="de-status-bar" id="deStatusBar">
@@ -1120,16 +1124,16 @@
     <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitleIng">Ingredienser</span><span class="ds-count" id="dsIngCount"></span></div>
     <div class="ds-bd">
       <div style="display:grid;grid-template-columns:58px 58px 1fr auto;gap:6px;margin-bottom:5px">
-        <span style="font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;padding-left:2px">Mængde</span>
-        <span style="font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;padding-left:2px">Enhed</span>
-        <span style="font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;padding-left:2px">Ingrediens</span>
+        <span id="deIngColAmt" style="font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;padding-left:2px">Mængde</span>
+        <span id="deIngColUnit" style="font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;padding-left:2px">Enhed</span>
+        <span id="deIngColName" style="font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;padding-left:2px">Ingrediens</span>
         <span></span>
       </div>
       <div id="ingList"></div>
       <button class="ing-add-btn" id="ingAddBtn">+ Tilføj ingrediens</button>
       <button class="ing-ai-btn" id="ingAiBtn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
-        Analyser ingredienser med AI
+        <span id="ingAiBtnLbl">Analyser ingredienser med AI</span>
       </button>
     </div>
   </div>
@@ -1178,7 +1182,7 @@
       <textarea class="input" id="deWine" rows="3" placeholder="Vinforslag, ølparring, mocktail, sake…" style="resize:vertical;width:100%;margin-bottom:10px"></textarea>
       <button class="ing-ai-btn" id="wineAiBtn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
-        AI: Foreslå vine baseret på ingredienser
+        <span id="wineAiBtnLbl">AI: Foreslå vine baseret på ingredienser</span>
       </button>
     </div>
   </div>
@@ -1629,6 +1633,25 @@
       lab_close:"Luk",
       lab_empty_title:"Ingen eksperimenter endnu",
       lab_empty_sub:"Tag et billede af en ret og lad AI løfte den",
+      lab_new_dish:"Ny ret",lab_filter_all:"Alle",lab_filter_idea:"Idé",lab_filter_testing:"Test",lab_filter_ready:"Klar",lab_filter_menu:"På menu",
+      lab_name_ph:"Navn på retten…",lab_hero_add:"Tilføj forsidebillede",
+      lab_status_idea:"Idé",lab_status_testing:"Test",lab_status_ready:"Klar",lab_status_menu:"På menu",
+      lab_sec_grundinfo:"Grundinfo",lab_sec_ing:"Ingredienser",lab_sec_steps:"Fremgangsmåde",lab_sec_tech:"Teknik & Tid",lab_sec_plating:"Anretning",lab_sec_wine:"Vine & parring",lab_sec_tests:"Testnoter",lab_sec_photos:"Billeder",
+      lab_lbl_season:"Sæson",lab_lbl_portions:"Portioner",lab_lbl_concept:"Koncept & inspiration",
+      lab_ph_concept:"Hvad er idéen bag retten? Hvad er sæsonen, fortællingen, teksturen…",
+      lab_lbl_cooktime:"Tilberedning",lab_lbl_resttime:"Hvile / sous vide",lab_lbl_temp:"Temperatur",lab_lbl_platingtime:"Anretn. tid",
+      lab_lbl_technique:"Primær teknik",lab_ph_technique:"fx ovn, sous vide, dampning, fermentering…",
+      lab_lbl_plating_photo:"Tilføj anretningsbillede",lab_lbl_plating:"Beskrivelse af anretning",
+      lab_ph_plating:"Beskriv opbygning, teksturer, løb, garnering, temperatur på tallerkenen…",
+      lab_ph_wine:"Vinforslag, ølparring, mocktail, sake…",
+      lab_add_ing:"+ Tilføj ingrediens",lab_ai_ing:"Analyser ingredienser med AI",
+      lab_add_step:"+ Tilføj trin",lab_ph_step:"Beskriv trinnet…",
+      lab_ai_wine:"AI: Foreslå vine baseret på ingredienser",
+      lab_add_test:"+ Ny testrunde",lab_delete_dish:"Slet denne ret",
+      lab_ai_fab:"Spørg AI",lab_ai_title:"Spørg AI om denne ret",lab_ai_thinking:"Tænker…",lab_ai_ph:"Stil et spørgsmål…",
+      lab_ing_col_amt:"Mængde",lab_ing_col_unit:"Enhed",lab_ing_col_name:"Ingrediens",
+      lab_ph_ing_amt:"mæng.",lab_ph_ing_unit:"enhed",lab_ph_ing_name:"Ingrediens…",lab_ph_ing_prep:"Forbehandling (fx brunois, blancheret, fermenteret…)",
+      lab_empty_new:"Ingen retter endnu",lab_empty_new_sub:"Tryk på 'Ny ret' for at begynde",
       feed_follow:"Følg",feed_unfollow:"Følger",
       feed_like:"Synes godt om",feed_comment:"Kommentér",
       feed_comments:"Kommentarer",feed_comment_ph:"Skriv en kommentar…",
@@ -1727,6 +1750,25 @@
       lab_close:"Close",
       lab_empty_title:"No experiments yet",
       lab_empty_sub:"Take a photo of a dish and let AI elevate it",
+      lab_new_dish:"New dish",lab_filter_all:"All",lab_filter_idea:"Idea",lab_filter_testing:"Test",lab_filter_ready:"Ready",lab_filter_menu:"On menu",
+      lab_name_ph:"Dish name…",lab_hero_add:"Add hero photo",
+      lab_status_idea:"Idea",lab_status_testing:"Test",lab_status_ready:"Ready",lab_status_menu:"On menu",
+      lab_sec_grundinfo:"Overview",lab_sec_ing:"Ingredients",lab_sec_steps:"Method",lab_sec_tech:"Technique & Timing",lab_sec_plating:"Plating",lab_sec_wine:"Wine & Pairing",lab_sec_tests:"Test notes",lab_sec_photos:"Photos",
+      lab_lbl_season:"Season",lab_lbl_portions:"Portions",lab_lbl_concept:"Concept & inspiration",
+      lab_ph_concept:"What's the idea behind this dish? The season, story, texture…",
+      lab_lbl_cooktime:"Cook time",lab_lbl_resttime:"Rest / sous vide",lab_lbl_temp:"Temperature",lab_lbl_platingtime:"Plating time",
+      lab_lbl_technique:"Primary technique",lab_ph_technique:"e.g. oven, sous vide, steaming, fermentation…",
+      lab_lbl_plating_photo:"Add plating photo",lab_lbl_plating:"Plating description",
+      lab_ph_plating:"Describe the build, textures, sauces, garnish, plate temperature…",
+      lab_ph_wine:"Wine pairing, beer pairing, mocktail, sake…",
+      lab_add_ing:"+ Add ingredient",lab_ai_ing:"Analyze ingredients with AI",
+      lab_add_step:"+ Add step",lab_ph_step:"Describe the step…",
+      lab_ai_wine:"AI: Suggest wine based on ingredients",
+      lab_add_test:"+ New test round",lab_delete_dish:"Delete this dish",
+      lab_ai_fab:"Ask AI",lab_ai_title:"Ask AI about this dish",lab_ai_thinking:"Thinking…",lab_ai_ph:"Ask a question…",
+      lab_ing_col_amt:"Amount",lab_ing_col_unit:"Unit",lab_ing_col_name:"Ingredient",
+      lab_ph_ing_amt:"amt.",lab_ph_ing_unit:"unit",lab_ph_ing_name:"Ingredient…",lab_ph_ing_prep:"Prep (e.g. brunoise, blanched, fermented…)",
+      lab_empty_new:"No dishes yet",lab_empty_new_sub:"Tap 'New dish' to get started",
       feed_empty:"Follow someone to see their activity here",
       feed_empty_own:"You have not posted anything yet",
       feed_load_more:"Load more",
@@ -1834,6 +1876,53 @@
     const uSetupHint=$("#usernameSetupHint");if(uSetupHint)uSetupHint.textContent=t("username_setup_hint");
     const uSetupSave=$("#usernameSetupSave");if(uSetupSave)uSetupSave.textContent=t("username_setup_save");
     const uSetupSkip=$("#usernameSetupSkip");if(uSetupSkip)uSetupSkip.textContent=t("username_setup_skip");
+    // The Lab
+    const labNewLbl=$("#labNewBtnLbl");if(labNewLbl)labNewLbl.textContent=t("lab_new_dish");
+    const labFAll=$("#labFilterAll");if(labFAll)labFAll.textContent=t("lab_filter_all");
+    const labFIdea=$("#labFilterIdea");if(labFIdea)labFIdea.textContent=t("lab_filter_idea");
+    const labFTesting=$("#labFilterTesting");if(labFTesting)labFTesting.textContent=t("lab_filter_testing");
+    const labFReady=$("#labFilterReady");if(labFReady)labFReady.textContent=t("lab_filter_ready");
+    const labFMenu=$("#labFilterMenu");if(labFMenu)labFMenu.textContent=t("lab_filter_menu");
+    const deNameEl=$("#deName");if(deNameEl)deNameEl.placeholder=t("lab_name_ph");
+    const deHeroAddLbl=$("#deHeroAddLbl");if(deHeroAddLbl)deHeroAddLbl.textContent=t("lab_hero_add");
+    const dsChipIdea=$("#dsChipIdea");if(dsChipIdea)dsChipIdea.textContent=t("lab_status_idea");
+    const dsChipTesting=$("#dsChipTesting");if(dsChipTesting)dsChipTesting.textContent=t("lab_status_testing");
+    const dsChipReady=$("#dsChipReady");if(dsChipReady)dsChipReady.textContent=t("lab_status_ready");
+    const dsChipMenu=$("#dsChipMenu");if(dsChipMenu)dsChipMenu.textContent=t("lab_status_menu");
+    const dsTGrund=$("#dsTitleGrundinfo");if(dsTGrund)dsTGrund.textContent=t("lab_sec_grundinfo");
+    const dsTIng=$("#dsTitleIng");if(dsTIng)dsTIng.textContent=t("lab_sec_ing");
+    const dsTSteps=$("#dsTitleSteps");if(dsTSteps)dsTSteps.textContent=t("lab_sec_steps");
+    const dsTTech=$("#dsTitleTech");if(dsTTech)dsTTech.textContent=t("lab_sec_tech");
+    const dsTPlating=$("#dsTitlePlating");if(dsTPlating)dsTPlating.textContent=t("lab_sec_plating");
+    const dsTWine=$("#dsTitleWine");if(dsTWine)dsTWine.textContent=t("lab_sec_wine");
+    const dsTTest=$("#dsTitleTest");if(dsTTest)dsTTest.textContent=t("lab_sec_tests");
+    const dsTPhotos=$("#dsTitlePhotos");if(dsTPhotos)dsTPhotos.textContent=t("lab_sec_photos");
+    const deLblSeason=$("#deLblSeason");if(deLblSeason)deLblSeason.textContent=t("lab_lbl_season");
+    const deLblPortions=$("#deLblPortions");if(deLblPortions)deLblPortions.textContent=t("lab_lbl_portions");
+    const deLblConcept=$("#deLblConcept");if(deLblConcept)deLblConcept.textContent=t("lab_lbl_concept");
+    const deConceptEl=$("#deConcept");if(deConceptEl)deConceptEl.placeholder=t("lab_ph_concept");
+    const deLblCookTime=$("#deLblCookTime");if(deLblCookTime)deLblCookTime.textContent=t("lab_lbl_cooktime");
+    const deLblRestTime=$("#deLblRestTime");if(deLblRestTime)deLblRestTime.textContent=t("lab_lbl_resttime");
+    const deLblMainTemp=$("#deLblMainTemp");if(deLblMainTemp)deLblMainTemp.textContent=t("lab_lbl_temp");
+    const deLblPlatingTime=$("#deLblPlatingTime");if(deLblPlatingTime)deLblPlatingTime.textContent=t("lab_lbl_platingtime");
+    const deLblTech=$("#deLblTechnique");if(deLblTech)deLblTech.textContent=t("lab_lbl_technique");
+    const deTechEl=$("#deTechnique");if(deTechEl)deTechEl.placeholder=t("lab_ph_technique");
+    const deLblPlatingPhoto=$("#deLblPlatingPhoto");if(deLblPlatingPhoto)deLblPlatingPhoto.textContent=t("lab_lbl_plating_photo");
+    const deLblPlating=$("#deLblPlating");if(deLblPlating)deLblPlating.textContent=t("lab_lbl_plating");
+    const dePlatingEl=$("#dePlating");if(dePlatingEl)dePlatingEl.placeholder=t("lab_ph_plating");
+    const deWineEl=$("#deWine");if(deWineEl)deWineEl.placeholder=t("lab_ph_wine");
+    const ingAddBtn=$("#ingAddBtn");if(ingAddBtn)ingAddBtn.textContent=t("lab_add_ing");
+    const ingAiBtnLbl=$("#ingAiBtnLbl");if(ingAiBtnLbl)ingAiBtnLbl.textContent=t("lab_ai_ing");
+    const stepAddBtn=$("#stepAddBtn");if(stepAddBtn)stepAddBtn.textContent=t("lab_add_step");
+    const wineAiBtnLbl=$("#wineAiBtnLbl");if(wineAiBtnLbl)wineAiBtnLbl.textContent=t("lab_ai_wine");
+    const testAddBtn=$("#testAddBtn");if(testAddBtn)testAddBtn.textContent=t("lab_add_test");
+    const deIngColAmt=$("#deIngColAmt");if(deIngColAmt)deIngColAmt.textContent=t("lab_ing_col_amt");
+    const deIngColUnit=$("#deIngColUnit");if(deIngColUnit)deIngColUnit.textContent=t("lab_ing_col_unit");
+    const deIngColName=$("#deIngColName");if(deIngColName)deIngColName.textContent=t("lab_ing_col_name");
+    const aiFabLbl=$("#aiFabLbl");if(aiFabLbl)aiFabLbl.textContent=t("lab_ai_fab");
+    const aiSheetTitle=$("#aiSheetTitle");if(aiSheetTitle)aiSheetTitle.textContent=t("lab_ai_title");
+    const aiLoadingTxt=$("#aiLoadingTxt");if(aiLoadingTxt)aiLoadingTxt.textContent=t("lab_ai_thinking");
+    const aiInputEl=$("#aiInput");if(aiInputEl)aiInputEl.placeholder=t("lab_ai_ph");
   }
   function setLang(l){lang=l;localStorage.setItem("mise_lang",l);translateUI();renderCounters();renderWines();renderLogView();}
   $("#langBtn").addEventListener("click",()=>setLang(lang==="da"?"en":"da"));
@@ -3386,15 +3475,14 @@
     if(shift){
       bar.classList.add("active");startBtn.style.display="none";
       if(shiftTimerInterval)clearInterval(shiftTimerInterval);
+      function _fmtShift(ms){const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return h>0?h+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0"):m+":"+String(sec).padStart(2,"0");}
       shiftTimerInterval=setInterval(()=>{
         const ms=Date.now()-new Date(shift.startedAt).getTime();
-        const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
-        const timer=$("#shiftTimer");if(timer)timer.textContent=h+":"+String(m).padStart(2,"0");
-      },10000);
+        const timer=$("#shiftTimer");if(timer)timer.textContent=_fmtShift(ms);
+      },1000);
       // initial
       const ms=Date.now()-new Date(shift.startedAt).getTime();
-      const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
-      const timer=$("#shiftTimer");if(timer)timer.textContent=h+":"+String(m).padStart(2,"0");
+      const timer=$("#shiftTimer");if(timer)timer.textContent=_fmtShift(ms);
     }else{
       bar.classList.remove("active");startBtn.style.display="";
       if(shiftTimerInterval){clearInterval(shiftTimerInterval);shiftTimerInterval=null;}
@@ -3940,7 +4028,7 @@
     // Delete dish
     var deDeleteBtn=$("#deDeleteBtn");
     if(deDeleteBtn){
-      deDeleteBtn.textContent=lang==="da"?"Slet denne ret":"Delete dish";
+      deDeleteBtn.textContent=t("lab_delete_dish");
       deDeleteBtn.addEventListener("click",async function(){
         if(!_currentDish)return;
         if(!confirm(lang==="da"?"Slet denne ret permanent?":"Delete this dish permanently?"))return;
@@ -4101,13 +4189,13 @@
     var dsCount=$("#dsIngCount");if(dsCount)dsCount.textContent=ings.length?ings.length+"":"";
     list.innerHTML=ings.map(function(ing){
       return '<div class="ing-row" data-ing-id="'+esc(ing.id)+'">'
-        +'<input class="input ing-amt" value="'+esc(ing.amount||"")+'" placeholder="mæng." data-field="amount" data-ing-id="'+esc(ing.id)+'">'
-        +'<input class="input ing-unit" value="'+esc(ing.unit||"")+'" placeholder="enhed" data-field="unit" data-ing-id="'+esc(ing.id)+'" list="deUnitsList">'
-        +'<input class="input ing-name-field" value="'+esc(ing.name||"")+'" placeholder="Ingrediens…" data-field="name" data-ing-id="'+esc(ing.id)+'">'
-        +'<button class="ing-rm" data-rm-ing="'+esc(ing.id)+'" title="Slet">×</button>'
+        +'<input class="input ing-amt" value="'+esc(ing.amount||"")+'" placeholder="'+t("lab_ph_ing_amt")+'" data-field="amount" data-ing-id="'+esc(ing.id)+'">'
+        +'<input class="input ing-unit" value="'+esc(ing.unit||"")+'" placeholder="'+t("lab_ph_ing_unit")+'" data-field="unit" data-ing-id="'+esc(ing.id)+'" list="deUnitsList">'
+        +'<input class="input ing-name-field" value="'+esc(ing.name||"")+'" placeholder="'+t("lab_ph_ing_name")+'" data-field="name" data-ing-id="'+esc(ing.id)+'">'
+        +'<button class="ing-rm" data-rm-ing="'+esc(ing.id)+'" title="'+t("del")+'">×</button>'
         +'</div>'
         +'<div class="ing-prep-row">'
-        +'<input class="input" style="font-size:12px" value="'+esc(ing.prep||"")+'" placeholder="Forbehandling (fx brunois, blancheret, fermenteret…)" data-field="prep" data-ing-id="'+esc(ing.id)+'">'
+        +'<input class="input" style="font-size:12px" value="'+esc(ing.prep||"")+'" placeholder="'+t("lab_ph_ing_prep")+'" data-field="prep" data-ing-id="'+esc(ing.id)+'">'
         +'<span></span>'
         +'</div>';
     }).join("")+'<datalist id="deUnitsList"><option value="g"><option value="kg"><option value="ml"><option value="dl"><option value="L"><option value="tsk"><option value="spsk"><option value="stk"><option value="blade"><option value="kviste"><option value="fed"><option value="°C"><option value="timer"></datalist>';
@@ -4137,7 +4225,7 @@
       return '<div class="step-row" data-step-id="'+esc(s.id)+'">'
         +'<div class="step-num">'+(i+1)+'</div>'
         +'<div class="step-body">'
-        +'<textarea class="input step-txt" placeholder="Beskriv trinnet…" data-field="text" data-step-id="'+esc(s.id)+'">'+esc(s.text||"")+'</textarea>'
+        +'<textarea class="input step-txt" placeholder="'+t("lab_ph_step")+'" data-field="text" data-step-id="'+esc(s.id)+'">'+esc(s.text||"")+'</textarea>'
         +'<div class="step-meta">'
         +'<div style="position:relative"><input class="input" type="number" placeholder="°C" value="'+esc(s.temp||"")+'" data-field="temp" data-step-id="'+esc(s.id)+'" style="padding-right:26px"><span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--faint);pointer-events:none">°C</span></div>'
         +'<div style="position:relative"><input class="input" type="number" placeholder="tid" value="'+esc(s.time||"")+'" data-field="time" data-step-id="'+esc(s.id)+'" style="padding-right:26px"><span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--faint);pointer-events:none">min</span></div>'
