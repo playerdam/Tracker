@@ -318,11 +318,26 @@
   .challenge-mine{font-size:13px;color:var(--dim)}
 
   /* ---- Hold ---- */
-  .team-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px}
-  .team-name{font-family:"Fraunces",serif;font-size:19px;font-weight:600;margin-bottom:8px}
-  .team-code-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-  .team-code{font-family:"Fraunces",serif;font-size:19px;letter-spacing:.1em;color:var(--accent)}
-  .team-hint{font-size:14px;color:var(--dim);margin-bottom:10px}
+  .team-panel{border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden;background:var(--surface)}
+  .team-panel-hd{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+  .team-panel-hd:active{background:var(--surface-2)}
+  .team-panel-chev{color:var(--faint);transition:transform .2s;flex-shrink:0}
+  .team-panel.open .team-panel-chev,.team-add-panel.open .team-panel-chev{transform:rotate(90deg)}
+  .team-panel-title{font-family:"Fraunces",serif;font-size:16px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .team-panel-badge{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:20px;padding:3px 9px;flex-shrink:0;white-space:nowrap}
+  .team-panel-bd{display:none;padding:0 16px 14px}
+  .team-panel.open .team-panel-bd{display:block}
+  .team-inv-row{display:flex;align-items:center;gap:8px;padding:10px 0 0;border-top:1px solid var(--border);margin-top:8px}
+  .team-inv-lbl{font-size:11px;color:var(--faint);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .team-inv-code{font-family:monospace;font-size:15px;letter-spacing:.14em;color:var(--accent);font-weight:700;flex:1}
+  .team-leave-lnk{font-size:12px;color:var(--faint);background:none;border:none;cursor:pointer;padding:10px 0 0;display:block;text-align:left;font-family:inherit}
+  .team-leave-lnk:hover{color:var(--text)}
+  .team-add-panel{border:1px solid var(--border);border-radius:var(--r);margin-top:4px;overflow:hidden;background:var(--surface)}
+  .team-add-hd{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;color:var(--accent)}
+  .team-add-hd:active{background:var(--surface-2)}
+  .team-add-lbl{font-size:14px;font-weight:700;flex:1}
+  .team-add-bd{display:none;padding:0 16px 14px}
+  .team-add-panel.open .team-add-bd{display:block}
   .team-form{display:flex;gap:8px;align-items:center;margin-bottom:10px}
   .team-form .input{flex:1}
   .team-or{text-align:center;color:var(--faint);font-size:13px;margin:8px 0}
@@ -2930,32 +2945,47 @@
 
   async function renderTeam(){
     const el=$("#teamContent");if(!el)return;
-    const base=apiBase();if(!base){renderTeamForm(el,[]);return;}
-    const token=await getToken();if(!token){renderTeamForm(el,[]);return;}
+    const base=apiBase();if(!base){el.innerHTML="";renderTeamAddPanel(el,true);return;}
+    const token=await getToken();if(!token){el.innerHTML="";renderTeamAddPanel(el,true);return;}
     try{
       const res=await fetch(base+"/api/teams/mine",{headers:{"Authorization":"Bearer "+token}});
       const d=await res.json();
       const teams=d.teams||[];
       const myId=getJwtSub();
       let html="";
-      teams.forEach(({team,members})=>{
-        html+='<div class="team-card" data-team-id="'+esc(team.id)+'">'
-          +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">'
-          +'<div class="team-name" style="margin-bottom:0">'+esc(team.name||"")+'</div>'
-          +'<button class="btn ghost btn-sm team-leave-btn" data-team-id="'+esc(team.id)+'" style="color:var(--faint);flex-shrink:0">'+(lang==="da"?"Forlad":"Leave")+'</button>'
+      teams.forEach(({team,members},ti)=>{
+        const myIdx=members.findIndex(m=>m.userId===myId);
+        const myRank=myIdx>=0?myIdx+1:null;
+        const myTotal=myIdx>=0?(members[myIdx].total||0):0;
+        const badge=myRank?(lang==="da"?"Du: #"+myRank+" · "+myTotal+" pt":"You: #"+myRank+" · "+myTotal+" pts"):"";
+        html+='<div class="team-panel'+(ti===0?" open":"")+'" data-team-id="'+esc(team.id)+'">'
+          +'<div class="team-panel-hd">'
+          +'<svg class="team-panel-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>'
+          +'<span class="team-panel-title">'+esc(team.name||"")+'</span>'
+          +(badge?'<span class="team-panel-badge">'+esc(badge)+'</span>':'')
           +'</div>'
-          +'<div class="team-code-row"><span class="team-code-lbl">Kode:</span><span class="team-code team-code-val">'+esc(team.invite_code||"")+'</span><button class="btn ghost btn-sm team-copy-btn" data-code="'+esc(team.invite_code||"")+'">'+esc(t("team_copy"))+'</button></div>'
-          +'<div class="lb-section" style="margin-top:10px">'
+          +'<div class="team-panel-bd">'
+          +'<div class="lb-section">'
           +members.map((m,i)=>{
             const isMe=m.userId===myId;
             const nick=esc(m.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
             return '<div class="lb-row'+(isMe?" lb-me":"")+'">'+'<span class="lb-rank">'+(i+1)+'</span>'+'<span class="lb-name">'+nick+'</span>'+'<span class="lb-score">'+(m.total||0)+'</span></div>';
           }).join("")
           +'</div>'
+          +'<div class="team-inv-row">'
+          +'<span class="team-inv-lbl">'+(lang==="da"?"Kode":"Code")+'</span>'
+          +'<span class="team-inv-code">'+esc(team.invite_code||"")+'</span>'
+          +'<button class="btn ghost btn-sm team-copy-btn" data-code="'+esc(team.invite_code||"")+'">'+esc(t("team_copy"))+'</button>'
+          +'</div>'
+          +'<button class="team-leave-lnk team-leave-btn" data-team-id="'+esc(team.id)+'">'+(lang==="da"?"Forlad hold":"Leave team")+'</button>'
+          +'</div>'
           +'</div>';
       });
       el.innerHTML=html;
-      renderTeamForm(el,teams);
+      renderTeamAddPanel(el,teams.length===0);
+      el.querySelectorAll(".team-panel-hd").forEach(hd=>{
+        hd.addEventListener("click",()=>{hd.closest(".team-panel").classList.toggle("open");});
+      });
       el.querySelectorAll(".team-copy-btn").forEach(btn=>{
         btn.addEventListener("click",()=>{
           navigator.clipboard.writeText(btn.dataset.code||"").then(()=>{btn.textContent=t("team_copied");setTimeout(()=>btn.textContent=t("team_copy"),2000);});
@@ -2969,13 +2999,16 @@
           catch(e){}
         });
       });
-    }catch(e){renderTeamForm(el,[]);}
+    }catch(e){el.innerHTML="";renderTeamAddPanel(el,true);}
   }
-  function renderTeamForm(el,existingTeams){
-    const hint=existingTeams.length?'':(lang==="da"?'<p class="team-hint">'+esc(t("team_create_or_join"))+'</p>':'<p class="team-hint">'+esc(t("team_create_or_join"))+'</p>');
-    const formHtml='<div id="teamFormWrap" style="margin-top:'+(existingTeams.length?'14':'0')+'px">'
-      +hint
-      +'<div class="team-form">'
+  function renderTeamAddPanel(el,open){
+    const addHtml='<div class="team-add-panel'+(open?" open":"")+'">'
+      +'<div class="team-add-hd">'
+      +'<svg class="team-panel-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>'
+      +'<span class="team-add-lbl">'+(lang==="da"?"+ Tilføj hold":"+ Add team")+'</span>'
+      +'</div>'
+      +'<div class="team-add-bd">'
+      +'<div class="team-form" style="margin-top:4px">'
       +'<input id="teamNameInput" class="input" placeholder="'+esc(t("team_create_ph"))+'" maxlength="40">'
       +'<button class="btn primary btn-sm" id="teamCreateBtn">'+esc(t("team_create_btn"))+'</button>'
       +'</div>'
@@ -2984,8 +3017,10 @@
       +'<input id="teamCodeInput" class="input" placeholder="'+esc(t("team_join_ph"))+'" maxlength="6" style="text-transform:uppercase;font-family:monospace">'
       +'<button class="btn ghost btn-sm" id="teamJoinBtn">'+esc(t("team_join_btn"))+'</button>'
       +'</div>'
+      +'</div>'
       +'</div>';
-    el.insertAdjacentHTML("beforeend",formHtml);
+    el.insertAdjacentHTML("beforeend",addHtml);
+    el.querySelector(".team-add-hd").addEventListener("click",()=>{el.querySelector(".team-add-panel").classList.toggle("open");});
     const base=apiBase();
     document.getElementById("teamCreateBtn").addEventListener("click",async()=>{
       const name=(document.getElementById("teamNameInput").value||"").trim();if(!name)return;
