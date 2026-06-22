@@ -4,7 +4,7 @@
 //            GET  /api/users/check-username
 //            POST /api/log-entry     POST /api/upload-photo
 //            GET  /api/leaderboard   GET  /api/challenge/current
-//            POST /api/teams         POST /api/teams/join   GET /api/teams/mine
+//            POST /api/teams         POST /api/teams/join   GET /api/teams/mine   DELETE /api/teams/:id/leave
 //            GET  /api/feed          POST /api/follow        DELETE /api/follow/:targetId
 //            GET  /api/follow/requests  POST /api/follow/:followerId/accept  DELETE /api/follow/:followerId/reject
 //            POST /api/like/:id      DELETE /api/like/:id
@@ -345,34 +345,50 @@ app.post("/api/teams/join", async (req, res) => {
   }
 });
 
-// ---- Hold: hent mit hold + ugens stats ----
+// ---- Hold: hent alle mine hold + ugens stats ----
 app.get("/api/teams/mine", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
     const memberships = await sb(`team_members?user_id=eq.${userId}&select=team_id,teams(id,name,invite_code)`);
-    if (!memberships?.length) return res.json({ team: null });
-    const team = memberships[0].teams;
-    const members = await sb(`team_members?team_id=eq.${team.id}&select=user_id,users!user_id(nickname,profession)`) || [];
-    const memberIds = members.map(m => m.user_id);
+    if (!memberships?.length) return res.json({ teams: [] });
 
     const monday = mondayOfWeek();
-    let entries = [];
-    if (memberIds.length) {
-      entries = await sb(`log_entries?logged_at=gte.${monday.toISOString()}&user_id=in.(${memberIds.join(",")})&select=user_id,delta`) || [];
-    }
-    const stats = {};
-    for (const m of members) {
-      stats[m.user_id] = { userId: m.user_id, nickname: m.users?.nickname || null, profession: m.users?.profession || null, total: 0 };
-    }
-    for (const e of entries) {
-      if (stats[e.user_id] && e.delta > 0) stats[e.user_id].total += e.delta;
-    }
-    res.json({
-      team: { id: team.id, name: team.name, invite_code: team.invite_code },
-      members: Object.values(stats).sort((a, b) => b.total - a.total),
-    });
+    const results = await Promise.all(memberships.map(async (ms) => {
+      const team = ms.teams;
+      const members = await sb(`team_members?team_id=eq.${team.id}&select=user_id,users!user_id(nickname,profession)`) || [];
+      const memberIds = members.map(m => m.user_id);
+      let entries = [];
+      if (memberIds.length) {
+        entries = await sb(`log_entries?logged_at=gte.${monday.toISOString()}&user_id=in.(${memberIds.join(",")})&select=user_id,delta`) || [];
+      }
+      const stats = {};
+      for (const m of members) {
+        stats[m.user_id] = { userId: m.user_id, nickname: m.users?.nickname || null, profession: m.users?.profession || null, total: 0 };
+      }
+      for (const e of entries) {
+        if (stats[e.user_id] && e.delta > 0) stats[e.user_id].total += e.delta;
+      }
+      return {
+        team: { id: team.id, name: team.name, invite_code: team.invite_code },
+        members: Object.values(stats).sort((a, b) => b.total - a.total),
+      };
+    }));
+    res.json({ teams: results });
   } catch (err) {
     console.error("teams/mine:", err.message);
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Hold: forlad ----
+app.delete("/api/teams/:id/leave", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const teamId = req.params.id;
+    await sb(`team_members?user_id=eq.${userId}&team_id=eq.${teamId}`, { method: "DELETE" });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("teams/leave:", err.message);
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
