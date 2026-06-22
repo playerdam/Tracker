@@ -18,7 +18,7 @@
     --bg:#F7F4F0;--surface:#FFFFFF;--surface-2:#F0EDE8;
     --text:#1A1410;--dim:#6B5F58;--faint:#A89C94;
     --border:#E5DDD5;--border-2:#D0C6BC;
-    --accent:#8A2E3F;--accent-h:#6B1E2E;--accent-soft:#FFF5E6;--ring:rgba(217,119,6,.14);
+    --accent:#8A2E3F;--accent-h:#6B1E2E;--accent-soft:#F9EEF0;--ring:rgba(138,46,63,.15);
     --shadow:0 2px 8px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
     --shadow-lg:0 8px 32px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.05);
     --r:12px;--r-sm:8px;
@@ -225,7 +225,7 @@
   .wrow[data-wtype="rose"]{border-left-color:#E879A3}
   .wrow[data-wtype="mousserende"]{border-left-color:#0EA5E9}
   .wtype-picker{display:flex;gap:5px}
-  .wtype-btn{appearance:none;flex:1;padding:9px 4px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--dim);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.12s;text-align:center;-webkit-tap-highlight-color:transparent}
+  .wtype-btn{appearance:none;flex:1;padding:11px 4px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--dim);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.12s;text-align:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   .wtype-btn:hover{border-color:var(--border-2);color:var(--text)}
   .wtype-btn.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
   .wtype-btn:active{transform:scale(.92);transition:transform .06s}
@@ -302,7 +302,8 @@
   .sec-title{font-family:"Fraunces",serif;font-size:17px;font-weight:600}
   .sec-sub{font-size:12px;color:var(--faint);margin-left:8px}
   .lb-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:4px}
-  .lb-row.lb-me{background:var(--accent-soft);border-color:#FDE68A}
+  .lb-row.lb-me{background:var(--accent-soft);border-color:rgba(138,46,63,.25);border-left-width:3px;border-left-color:var(--accent)}
+  .lb-row.lb-me .lb-rank{color:var(--accent)}
   .lb-rank{font-family:"Fraunces",serif;font-size:15px;font-weight:600;width:24px;flex:none;text-align:center;color:var(--faint)}
   .lb-name{flex:1;min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .lb-you{font-size:11px;color:var(--accent);font-weight:400}
@@ -311,7 +312,7 @@
   .lb-section{margin-top:12px}
   .lb-empty{padding:28px 0;text-align:center;color:var(--faint);font-size:14px}
   .social-empty{padding:28px 0;text-align:center;color:var(--faint);font-size:14px}
-  .challenge-card{background:var(--accent-soft);border:1px solid #FDE68A;border-radius:var(--r);padding:16px 18px 14px;margin-bottom:6px}
+  .challenge-card{background:var(--accent-soft);border:1px solid rgba(138,46,63,.2);border-radius:var(--r);padding:16px 18px 14px;margin-bottom:6px}
   .challenge-cat{font-family:"Fraunces",serif;font-size:19px;font-weight:600;color:var(--accent);margin-bottom:2px}
   .challenge-sub{font-size:13px;color:var(--dim);margin-bottom:6px}
   .challenge-mine{font-size:13px;color:var(--dim)}
@@ -343,8 +344,9 @@
   .muted{font-size:13px;color:var(--faint)}
 
   /* ---- Foto ---- */
-  .qlog-cam{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;flex:none;padding:4px 8px;line-height:1;transition:.15s}
+  .qlog-cam{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;flex:none;padding:4px 8px;line-height:1;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:2px}
   .qlog-cam:hover,.qlog-cam.active{color:var(--accent)}
+  .qlog-cam-lbl{font-size:9px;font-weight:600;letter-spacing:.02em;line-height:1}
   /* Qlog focus overlay — large centered dark pill */
   #qlogOverlay{position:fixed;inset:0;z-index:200;background:rgba(180,170,160,.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;padding:0 14px}
   #qlogOverlay.open{display:flex}
@@ -483,8 +485,9 @@
   .shift-label{flex:1;font-size:13px;color:var(--dim)}
   .shift-end-btn{appearance:none;background:var(--accent);border:none;border-radius:7px;color:#fff;font-family:inherit;font-size:13px;font-weight:600;padding:7px 14px;cursor:pointer;transition:.12s}
   .shift-end-btn:hover{background:var(--accent-h)}
-  .shift-start-btn{appearance:none;background:none;border:1px solid var(--border);border-radius:7px;color:var(--dim);font-family:inherit;font-size:13px;font-weight:600;padding:8px 16px;cursor:pointer;transition:.12s;margin-bottom:8px;width:100%}
-  .shift-start-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .shift-start-btn{appearance:none;background:var(--accent);border:none;border-radius:var(--r-sm);color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:14px 16px;cursor:pointer;transition:.12s;margin-bottom:8px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:-.01em;-webkit-tap-highlight-color:transparent}
+  .shift-start-btn:hover{background:var(--accent-h)}
+  .shift-start-btn:active{transform:scale(.98);transition:transform .07s}
 
   .shift-modal .shift-totals{display:flex;flex-direction:column;gap:4px;margin:12px 0}
   .shift-total-row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--surface-2);border-radius:var(--r-sm)}
@@ -863,7 +866,7 @@
     <svg class="qlog-ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4"/><path d="M13 3 16 10l7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>
     <input id="qlogInput" autocomplete="off">
     <img id="photoThumb" class="photo-thumb" alt="">
-    <button id="photoBtn" class="qlog-cam" title="Tilføj billede"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
+    <button id="photoBtn" class="qlog-cam" title="Tilføj billede"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="qlog-cam-lbl">Foto</span></button>
     <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
     <span class="qlog-spin" id="qlogSpin" hidden><span class="spin"></span></span>
   </div>
@@ -1137,6 +1140,7 @@
     <div class="field"><label id="authEmailLbl"></label><input id="authEmail" type="email" autocomplete="email" inputmode="email"></div>
     <div class="field"><label id="authPwLbl"></label><input id="authPw" type="password" autocomplete="current-password"></div>
     <button class="btn primary" id="authSubmit" style="width:100%;margin-top:8px"></button>
+    <p style="text-align:center;margin:6px 0 0"><a id="authForgot" href="#" style="font-size:13px;color:var(--dim);text-decoration:none;display:none"></a></p>
     <p class="auth-toggle"><span id="authToggleText"></span> <a id="authToggleLink"></a></p>
     <p class="auth-legal">Ved at fortsætte accepterer du vores <a href="https://tracker-production-1a62.up.railway.app/privacy.html">privatlivspolitik</a> og <a href="https://tracker-production-1a62.up.railway.app/terms.html">vilkår</a></p>
   </div>
@@ -1377,6 +1381,7 @@
       auth_sub_login:"Velkommen tilbage",auth_sub_signup:"Opret din konto",
       auth_no_account:"Ingen konto?",auth_have_account:"Har du allerede en konto?",
       auth_create:"Opret konto",auth_to_login:"Log ind",
+      auth_forgot:"Glemt adgangskode?",auth_forgot_sent:"Tjek din email for et nulstillingslink",
       auth_signout:"Log ud",
       tab_social:"Leaderboard",
       challenge_title:"Ugens udfordring",challenge_days:"dage tilbage",challenge_ends:"{0} dage tilbage",
@@ -1478,6 +1483,7 @@
       auth_sub_login:"Welcome back",auth_sub_signup:"Create your account",
       auth_no_account:"No account?",auth_have_account:"Already have an account?",
       auth_create:"Create account",auth_to_login:"Log in",
+      auth_forgot:"Forgot password?",auth_forgot_sent:"Check your email for a reset link",
       auth_signout:"Sign out",
       tab_social:"Leaderboard",
       challenge_title:"Weekly challenge",challenge_days:"days left",challenge_ends:"{0} days left",
@@ -1835,7 +1841,7 @@
   }
 
   function setupAuthForm(){
-    const emailEl=$("#authEmail"),pwEl=$("#authPw"),submitBtn=$("#authSubmit"),errEl=$("#authErr"),toggleLink=$("#authToggleLink");
+    const emailEl=$("#authEmail"),pwEl=$("#authPw"),submitBtn=$("#authSubmit"),errEl=$("#authErr"),toggleLink=$("#authToggleLink"),forgotLink=$("#authForgot");
     function updateMode(){
       const isLogin=authMode==="login";
       $("#authSub").textContent=isLogin?t("auth_sub_login"):t("auth_sub_signup");
@@ -1844,7 +1850,19 @@
       toggleLink.textContent=isLogin?t("auth_create"):t("auth_to_login");
       pwEl.autocomplete=isLogin?"current-password":"new-password";
       errEl.style.display="none";$("#authInfo").style.display="none";
+      if(forgotLink)forgotLink.style.display=isLogin?"inline":"none";
+      if(forgotLink)forgotLink.textContent=t("auth_forgot");
     }
+    if(forgotLink)forgotLink.addEventListener("click",async(e)=>{
+      e.preventDefault();
+      const email=emailEl.value.trim();
+      if(!email){errEl.textContent=lang==="da"?"Indtast din email først":"Enter your email first";errEl.style.display="block";return;}
+      forgotLink.style.pointerEvents="none";forgotLink.style.opacity=".5";
+      try{await supabaseAuth("recover",{email,redirectTo:window.location.origin});}catch(e){}
+      forgotLink.style.pointerEvents="";forgotLink.style.opacity="";
+      const infoEl=$("#authInfo");if(infoEl){infoEl.textContent=t("auth_forgot_sent");infoEl.style.display="block";}
+      if(errEl)errEl.style.display="none";
+    });
     toggleLink.addEventListener("click",()=>{authMode=authMode==="login"?"signup":"login";updateMode();});
     submitBtn.addEventListener("click",async()=>{
       const email=emailEl.value.trim(),pw=pwEl.value;if(!email||!pw)return;
