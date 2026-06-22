@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Craft Tracker</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#8A2E3F">
@@ -215,7 +215,7 @@
   .wine-country-flag{font-size:19px;line-height:1;flex:none}
   .wine-country-name{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:var(--text);flex:1}
   .wine-country-count{font-size:12px;font-weight:700;color:var(--faint);background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:2px 8px}
-  .wrow{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;flex-wrap:wrap;border-left-width:3px;position:relative;z-index:1;transition:transform .22s cubic-bezier(.25,.46,.45,.94)}
+  .wrow{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;border-left-width:3px;position:relative;z-index:1;transition:transform .22s cubic-bezier(.25,.46,.45,.94)}
   .wrow.swiped{transform:translateX(-76px)}
   .wrow-wrap{position:relative;overflow:hidden;border-radius:var(--r)}
   .wrow-del{position:absolute;right:0;top:0;bottom:0;width:76px;background:#DC2626;border:none;color:#fff;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;-webkit-tap-highlight-color:transparent;letter-spacing:.04em;text-transform:uppercase}
@@ -229,19 +229,19 @@
   .wtype-btn:hover{border-color:var(--border-2);color:var(--text)}
   .wtype-btn.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
   .wtype-btn:active{transform:scale(.92);transition:transform .06s}
-  .winfo{flex:1 1 200px;min-width:0}
-  .wname{font-family:"Fraunces",serif;font-size:19px;font-weight:600;line-height:1.15}
-  .wmeta{font-size:13px;color:var(--dim);margin-top:4px}
+  .winfo{flex:1 1 0;min-width:0}
+  .wname{font-family:"Fraunces",serif;font-size:16px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wmeta{font-size:12px;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .wmeta .vint{color:var(--accent);font-weight:600}
   .wmeta .novint{color:var(--accent);font-weight:600;cursor:pointer}
-  .wmeta .sep{color:var(--border-2);margin:0 6px}
-  .wsteps{display:flex;align-items:center;gap:12px}
-  .stepblock{text-align:center}
-  .steplabel{font-size:10px;color:var(--faint);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
-  .stepctrl{display:flex;align-items:center;gap:6px}
-  .tnum{font-family:"Fraunces",serif;font-weight:600;font-size:19px;min-width:26px;text-align:center;font-variant-numeric:tabular-nums}
+  .wmeta .sep{color:var(--border-2);margin:0 4px}
+  .wsteps{display:flex;align-items:center;gap:6px;flex-shrink:0}
+  .stepblock{display:flex;flex-direction:column;align-items:center;gap:2px}
+  .steplabel{font-size:9px;color:var(--faint);font-weight:700;letter-spacing:.03em;text-transform:uppercase;line-height:1}
+  .stepctrl{display:flex;align-items:center;gap:4px}
+  .tnum{font-family:"Fraunces",serif;font-weight:600;font-size:16px;min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
   .tnum.tick{animation:pop .3s ease}
-  .wedit{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:4px 8px;border-radius:5px;transition:.12s}
+  .wedit{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:5px;transition:.12s;flex-shrink:0}
   .wedit:hover{color:var(--text);background:var(--surface-2)}
 
   .addwine{margin-top:14px;background:none;border:1.5px dashed var(--border-2);color:var(--faint);border-radius:var(--r);padding:14px;width:100%;cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
@@ -345,6 +345,19 @@
   /* ---- Foto ---- */
   .qlog-cam{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;flex:none;padding:4px 8px;line-height:1;transition:.15s}
   .qlog-cam:hover,.qlog-cam.active{color:var(--accent)}
+  /* Qlog focus overlay — large centered dark pill */
+  #qlogOverlay{position:fixed;inset:0;z-index:200;background:rgba(180,170,160,.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;padding:0 14px}
+  #qlogOverlay.open{display:flex}
+  #qlogOverlayCard{width:100%;animation:qlogIn .2s cubic-bezier(.34,1.2,.64,1) both}
+  @keyframes qlogIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+  .qlog-ov-bar{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:20px;padding:22px 20px;box-shadow:0 8px 32px rgba(0,0,0,.12),0 1px 0 rgba(255,255,255,.9) inset}
+  .qlog-ov-icon{color:var(--accent);flex:none}
+  #qlogOverlayInput{flex:1;border:none;background:none;color:var(--text);font-family:inherit;font-size:22px;padding:0;caret-color:var(--accent);-webkit-appearance:none;min-width:0;resize:none;overflow:hidden;line-height:1.4}
+  #qlogOverlayInput:focus{outline:none}
+  #qlogOverlayInput::placeholder{color:var(--faint)}
+  .qlog-ov-close{appearance:none;background:none;border:none;color:var(--faint);font-size:17px;line-height:1;cursor:pointer;padding:4px;-webkit-tap-highlight-color:transparent;flex:none}
+  .qlog-ov-close:active{opacity:.5}
+  .qlog-ov-hint{font-size:12px;color:var(--faint);margin-top:10px;text-align:center}
   .photo-thumb{width:34px;height:34px;border-radius:6px;object-fit:cover;flex:none;display:none;cursor:pointer}
   .photo-thumb.show{display:block}
   .logview-photo{display:block;max-width:100%;max-height:240px;border-radius:var(--r-sm);margin-top:8px;object-fit:cover}
@@ -356,7 +369,7 @@
   .wine-photo-remove{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;font-size:18px;padding:4px;transition:.12s;line-height:1;display:none}
   .wine-photo-remove.show{display:block}
   .wine-photo-remove:hover{color:#DC2626}
-  .wrow-photo{width:54px;height:70px;border-radius:var(--r-sm);object-fit:cover;flex:none;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .wrow-photo{width:44px;height:54px;border-radius:var(--r-sm);object-fit:cover;flex:none;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.08)}
 
   /* ---- Feed ---- */
   .feed-segtabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:3px;margin-bottom:14px}
@@ -464,7 +477,7 @@
   .feed-section-title{font-size:11px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.07em;margin:0 0 10px}
 
   /* ---- Shift-opsummering ---- */
-  .shift-bar{display:none;align-items:center;gap:10px;background:var(--accent-soft);border:1px solid #FDE68A;border-radius:var(--r-sm);padding:10px 14px;margin-bottom:10px}
+  .shift-bar{display:none;align-items:center;gap:10px;background:var(--accent-soft);border:1px solid rgba(138,46,63,.25);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:10px}
   .shift-bar.active{display:flex}
   .shift-timer{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
   .shift-label{flex:1;font-size:13px;color:var(--dim)}
@@ -533,6 +546,103 @@
   .log-drawer-close{appearance:none;background:none;border:none;padding:6px;cursor:pointer;color:var(--faint);border-radius:8px}
   .log-drawer-close:active{opacity:.6;transform:scale(.9);transition:.06s}
   .log-drawer-body{padding:16px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px)}
+  /* ---- Log drawer visit link ---- */
+  .va-drawer-link{appearance:none;background:#211C16;border:none;border-radius:12px;width:100%;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:opacity .12s}
+  .va-drawer-link:active{opacity:.75}
+  .va-drawer-link-icon{font-size:20px;line-height:1;flex:none}
+  .va-drawer-link-label{font-family:"Fraunces",serif;font-size:16px;font-weight:600;color:#EDE8E0;flex:1;text-align:left}
+  .va-drawer-link svg{color:#6B5F55;flex:none}
+
+  /* ---- Restaurant visits (full-screen, exclusive dark) ---- */
+  /* Palette: near-black bg, Craft Tracker red header, gold ratings, white text */
+  #visitApp{position:fixed;inset:0;background:#0C0710;color:#F0E8EC;z-index:300;transform:translateY(102%);transition:transform .38s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
+  #visitApp.open{transform:translateY(0)}
+  .va-hdr{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 14px;background:#8A2E3F;border-bottom:1px solid #7A2635;flex:none}
+  .va-back-btn{appearance:none;background:none;border:none;color:rgba(255,255,255,.9);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:6px 8px 6px 0;display:flex;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
+  .va-back-btn:active{opacity:.65;transition:opacity .06s}
+  .va-hdr-title{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:#FFFFFF;letter-spacing:-.01em}
+  .va-add-btn{appearance:none;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35);color:#FFFFFF;font-size:24px;font-weight:300;cursor:pointer;display:grid;place-items:center;line-height:1;-webkit-tap-highlight-color:transparent;transition:.12s}
+  .va-add-btn:active{transform:scale(.88);background:rgba(255,255,255,.28);transition:transform .07s}
+  .va-pages{flex:1;position:relative;overflow:hidden}
+  .va-page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(40px + env(safe-area-inset-bottom,0px));transition:transform .3s cubic-bezier(.4,0,.2,1)}
+  .va-page-offscreen{transform:translateX(105%)}
+  #vaListPage{padding:20px 16px calc(40px + env(safe-area-inset-bottom,0px))}
+  .va-list{display:flex;flex-direction:column;gap:14px}
+  .va-card{background:#1A0D14;border:1px solid #2C1520;border-radius:16px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:opacity .12s}
+  .va-card:active{opacity:.78}
+  .va-card-img{width:100%;height:160px;object-fit:cover;display:block}
+  .va-card-no-img{width:100%;height:40px;background:#2C1520}
+  .va-card-body{padding:14px 16px 16px}
+  .va-card-name{font-family:"Fraunces",serif;font-size:19px;font-weight:600;color:#F0E8EC;line-height:1.2}
+  .va-card-meta{display:flex;align-items:center;gap:10px;margin-top:5px}
+  .va-card-date{font-size:12px;color:#8A6070}
+  .va-card-comment{font-size:13px;color:#7A5060;margin-top:7px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .va-card-chips{font-size:11px;color:#8A6070;margin-top:5px}
+  .va-empty{padding:80px 20px;text-align:center}
+  .va-empty-icon{font-size:52px;margin-bottom:14px}
+  .va-empty-title{font-family:"Fraunces",serif;font-size:22px;font-weight:600;color:#F0E8EC;margin-bottom:8px}
+  .va-empty-sub{font-size:14px;color:#7A5060;line-height:1.6}
+  /* Half-star widget */
+  .va-stars{display:flex;gap:1px;align-items:center}
+  .va-star{appearance:none;border:none;font-size:28px;line-height:1;cursor:pointer;padding:3px 2px;-webkit-tap-highlight-color:transparent;background:none;position:relative}
+  .va-star[data-fill="full"]{color:#C9A465}
+  .va-star[data-fill="half"]{color:#2C1520}
+  .va-star[data-fill="empty"]{color:#2C1520}
+  .va-star:active{transform:scale(1.2);transition:transform .07s}
+  /* Cover */
+  .va-cover-wrap{margin:0;cursor:pointer;background:#1A0D14;position:relative;flex:none}
+  .va-cover-img{width:100%;max-height:260px;object-fit:cover;display:block}
+  .va-cover-placeholder{width:100%;height:90px;display:flex;align-items:center;justify-content:center;gap:8px;color:#5C3548;font-size:12px;font-weight:600}
+  /* Edit page */
+  .va-edit-inner{padding:0 16px calc(60px + env(safe-area-inset-bottom,0px))}
+  .va-detail-name{font-family:"Fraunces",serif;font-size:26px;font-weight:600;color:#F0E8EC;border:none;background:none;width:100%;outline:none;padding:0;margin:18px 0 6px;caret-color:#C9A465}
+  .va-detail-date{border:none;background:none;color:#8A6070;font-family:inherit;font-size:13px;padding:0;cursor:pointer;outline:none;-webkit-appearance:none;color-scheme:dark}
+  .va-sec-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5C3548;margin-bottom:8px;margin-top:24px;display:block}
+  .va-notes{width:100%;background:#1A0D14;border:1px solid #2C1520;border-radius:10px;color:#F0E8EC;font-family:inherit;font-size:14px;padding:12px;resize:none;min-height:76px;transition:.12s;caret-color:#C9A465;line-height:1.55}
+  .va-notes:focus{outline:none;border-color:rgba(255,255,255,.3);box-shadow:0 0 0 3px rgba(138,46,63,.2)}
+  /* Price strip */
+  .va-price-strip{display:flex;gap:6px;margin-top:10px}
+  .va-price-btn{flex:1;padding:9px 2px;background:#1A0D14;border:1.5px solid #2C1520;border-radius:9px;color:#8A6070;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:.12s;-webkit-tap-highlight-color:transparent}
+  .va-price-btn:active{opacity:.7}
+  .va-price-btn.on{background:#8A2E3F;border-color:#8A2E3F;color:#FFFFFF}
+  /* Inline forms */
+  .va-inline-form{background:#1A0D14;border:1px solid #2C1520;border-radius:14px;padding:16px;margin-bottom:10px}
+  .va-inline-input{width:100%;background:#0C0710;border:1px solid #2C1520;border-radius:9px;color:#F0E8EC;font-family:inherit;font-size:14px;padding:11px 13px;margin-bottom:8px;caret-color:#C9A465;-webkit-appearance:none;color-scheme:dark}
+  .va-inline-input:focus{outline:none;border-color:rgba(255,255,255,.3);box-shadow:0 0 0 2px rgba(138,46,63,.18)}
+  .va-inline-textarea{resize:none;min-height:68px;line-height:1.5}
+  .va-inline-add-btn{appearance:none;width:100%;padding:12px;background:#8A2E3F;border:none;border-radius:10px;color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;-webkit-tap-highlight-color:transparent}
+  .va-inline-add-btn:active{opacity:.8}
+  .va-wine-type-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+  .va-wine-type-strip::-webkit-scrollbar{display:none}
+  .va-wine-type-btn{flex-shrink:0;padding:8px 13px;background:#0C0710;border:1.5px solid #2C1520;border-radius:20px;color:#8A6070;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.12s;-webkit-tap-highlight-color:transparent}
+  .va-wine-type-btn.on{background:#8A2E3F;border-color:#8A2E3F;color:#FFFFFF}
+  /* Item cards */
+  .va-item-card{background:#1A0D14;border:1px solid #2C1520;border-radius:12px;overflow:hidden;position:relative;margin-bottom:10px}
+  .va-item-card-img{width:100%;height:110px;object-fit:cover;display:block}
+  .va-item-card-body{padding:11px 36px 11px 13px}
+  .va-item-name{font-size:15px;font-weight:600;color:#F0E8EC}
+  .va-item-meta{font-size:12px;color:#8A6070;margin-top:2px}
+  .va-item-comment{font-size:12px;color:#7A5060;margin-top:4px;line-height:1.4}
+  .va-item-del{position:absolute;top:10px;right:10px;appearance:none;background:rgba(0,0,0,.45);border:none;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:none}
+  .va-add-row{appearance:none;background:none;border:1.5px dashed #2C1520;border-radius:12px;width:100%;padding:13px;color:#C9A465;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;-webkit-tap-highlight-color:transparent;margin-bottom:8px}
+  .va-add-row:active{opacity:.7}
+  /* Photo */
+  .va-photo-upload-btn{appearance:none;width:100%;padding:12px;background:#0C0710;border:1.5px dashed #2C1520;border-radius:9px;color:#8A6070;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:8px;-webkit-tap-highlight-color:transparent}
+  .va-photo-upload-btn:active{opacity:.7}
+  .va-photo-preview{width:100%;border-radius:9px;max-height:180px;object-fit:cover;display:none;margin-bottom:8px;cursor:pointer}
+  /* Divider */
+  .va-divider{height:1px;background:#1E0F18;margin:22px 0}
+  /* Gem sheet */
+  .va-gem-opt{appearance:none;width:100%;padding:15px;background:none;border:none;border-radius:13px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;margin-bottom:8px}
+  .va-gem-opt:active{opacity:.75}
+  .va-gem-primary{background:#8A2E3F;color:#FFFFFF}
+  .va-gem-feed{border:1.5px solid #2C1520;color:#C9A465}
+  .va-gem-del{color:#C05060}
+  /* Modal fields (light-theme modals only) */
+  .modal-field-label{font-size:12px;font-weight:600;color:var(--dim);letter-spacing:.04em;margin-bottom:5px;margin-top:16px;display:block}
+  .modal-field-label:first-child{margin-top:0}
+  .modal-text-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:11px 12px}
+  .modal-text-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
 
   /* ---- Bottom nav (mobile) ---- */
   .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:96;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.08)}
@@ -597,30 +707,44 @@
   .cat-picker-new:hover{border-color:var(--accent);background:var(--accent-soft)}
   .cat-picker-new-icon{font-size:22px;line-height:1}
   .cat-picker-new-lbl{font-size:10px;font-weight:800;color:var(--faint);text-align:center;letter-spacing:.03em;text-transform:uppercase}
-  .cat-all-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;width:66px}
-  .cat-all-ring{width:58px;height:58px;border-radius:18px;border:2.5px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;transition:border-color .15s,background .15s}
-  .cat-all-chip:active .cat-all-ring{opacity:.7;transition:opacity .06s}
-  .cat-all-name{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);text-align:center}
-
-  /* Category chip strip (Stories-style) */
-  .cat-strip{display:flex;overflow-x:auto;gap:10px;padding:8px 16px 22px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  /* Category pill chips */
+  .cat-all-chip{flex-shrink:0;display:flex;flex-direction:row;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;padding:7px 13px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface)}
+  .cat-all-ring{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
+  .cat-all-chip:active{opacity:.7;transition:opacity .06s}
+  .cat-all-name{font-size:13px;font-weight:700;color:var(--dim);white-space:nowrap}
+  /* Category chip strip */
+  .cat-strip{display:flex;overflow-x:auto;gap:8px;padding:2px 16px 18px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .cat-strip::-webkit-scrollbar{display:none}
-  .cat-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;width:66px}
-  .cat-chip-ring{width:58px;height:58px;border-radius:18px;border:2.5px solid var(--border);background:var(--accent-soft);display:flex;align-items:center;justify-content:center;transition:border-color .15s,box-shadow .15s;overflow:hidden}
-  .cat-chip-ring svg{width:36px;height:36px;color:var(--accent);overflow:visible}
-  .cat-chip-ring .spin{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
-  .cat-chip.active .cat-chip-ring{background:var(--accent);border-color:var(--accent);border-width:0;box-shadow:0 4px 14px rgba(217,119,6,.38)}
+  .cat-chip{flex-shrink:0;display:flex;flex-direction:row;align-items:center;gap:7px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);transition:border-color .15s,background .15s,box-shadow .15s;width:auto}
+  .cat-chip-ring{width:18px;height:18px;border-radius:0;border:none;background:none;display:flex;align-items:center;justify-content:center;transition:none;overflow:visible}
+  .cat-chip-ring svg{width:18px;height:18px;color:var(--accent);overflow:visible}
+  .cat-chip-ring .spin{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+  .cat-chip.active{background:var(--accent);border-color:var(--accent);box-shadow:0 2px 10px rgba(138,46,63,.2)}
   .cat-chip.active .cat-chip-ring svg{color:#fff}
   .cat-chip.active .cat-chip-ring .spin{border-color:rgba(255,255,255,.3);border-top-color:#fff}
-  .cat-chip:active .cat-chip-ring{opacity:.75;transition:opacity .06s}
-  .cat-chip-name{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);text-align:center;line-height:1.2;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .cat-chip-total{font-family:"Fraunces",serif;font-size:20px;font-weight:600;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
-  .cat-chip.active .cat-chip-name,.cat-chip.active .cat-chip-total{color:var(--accent)}
-  /* Counter group (active category) */
+  .cat-chip:active{opacity:.75;transition:opacity .06s}
+  .cat-chip-name{font-size:13px;font-weight:700;letter-spacing:0;text-transform:none;color:var(--text);text-align:left;line-height:1;width:auto;overflow:visible;white-space:nowrap}
+  .cat-chip-total{font-family:"Fraunces",serif;font-size:13px;font-weight:600;line-height:1;color:var(--faint);background:var(--surface-2);border-radius:10px;padding:2px 7px;min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
+  .cat-chip.active .cat-chip-name{color:#fff}
+  .cat-chip.active .cat-chip-total{background:rgba(255,255,255,.22);color:rgba(255,255,255,.9)}
+  /* Counter rows */
   .cat-group{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-  .cat-group .ccard{border-radius:0;border:none;border-top:1px solid var(--border)}
+  .cat-group .ccard{border-radius:0;border:none;border-top:1px solid var(--border);flex-direction:row;align-items:center;padding:11px 14px 11px 16px;gap:10px;min-height:52px}
   .cat-group .ccard:first-child{border-top:none}
-  .cat-add{appearance:none;background:var(--bg);border:none;border-top:1px solid var(--border);width:100%;padding:13px 18px;text-align:left;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  .cat-group .clabel{flex:1;font-size:15px;font-weight:500;color:var(--text);padding-right:0;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cat-group .cbig{font-size:28px;margin:0;min-width:42px;text-align:right;line-height:1}
+  .cat-group .cstep{margin-top:0;gap:5px;flex:none}
+  .cat-group .step{height:36px}
+  .cat-group .step.minus{flex:0 0 38px}
+  .cat-group .step.plus{flex:0 0 50px;font-size:20px}
+  .cat-group .kebab{position:static;order:99}
+  .cat-group .ccard:not(.cat) .ccard-bar{display:none}
+  .cat-group .ccard:not(.cat) .addtype,.cat-group .ccard:not(.cat) .addtype-box{display:none}
+  .cat-group .ccard.cat{flex-direction:column;align-items:stretch;padding:12px 16px 6px}
+  .cat-group .ccard.cat .kebab{position:absolute;top:10px;right:10px;order:0}
+  .cat-group .ccard.cat .clabel{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);white-space:normal;padding-right:28px}
+  .cat-group .ccard.cat .cbig{font-size:32px;margin:3px 0 10px;min-width:unset;text-align:left}
+  .cat-add{appearance:none;background:var(--bg);border:none;border-top:1px solid var(--border);width:100%;padding:12px 18px;text-align:left;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   .cat-add:hover{background:var(--accent-soft)}
   .cat-add:active{transform:scale(.99);transition:transform .06s}
   .station-new-cat{appearance:none;background:none;border:1.5px dashed var(--border);border-radius:12px;width:100%;padding:13px;color:var(--dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:10px}
@@ -744,6 +868,17 @@
     <span class="qlog-spin" id="qlogSpin" hidden><span class="spin"></span></span>
   </div>
   <div class="upload-bar" id="uploadBar"><div class="upload-bar-fill" id="uploadBarFill"></div></div>
+
+<div id="qlogOverlay">
+  <div id="qlogOverlayCard">
+    <div class="qlog-ov-bar">
+      <svg class="qlog-ov-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4"/><path d="M13 3 16 10l7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>
+      <textarea id="qlogOverlayInput" rows="1" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+      <button class="qlog-ov-close" id="qlogOverlayClose">&#x2715;</button>
+    </div>
+    <div class="qlog-ov-hint" id="qlogOvHint">Enter for at logge</div>
+  </div>
+</div>
   <div id="logFeed" class="logfeed" hidden></div>
 
   <div class="shift-bar" id="shiftBar">
@@ -1051,8 +1186,97 @@
     <span class="log-drawer-title">Log</span>
     <button class="log-drawer-close" id="logDrawerClose" aria-label="Luk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
-  <div class="log-drawer-body"><div id="logView"></div></div>
+  <div class="log-drawer-body">
+    <button class="va-drawer-link" id="vaDrawerLink">
+      <span class="va-drawer-link-icon">🍽️</span>
+      <span class="va-drawer-link-label">Restaurantbesøg</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div id="logView"></div>
+  </div>
 </div>
+
+<div id="visitApp">
+  <div class="va-hdr">
+    <button class="va-back-btn" id="vaLeftBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span id="vaLeftLabel">Craft Tracker</span>
+    </button>
+    <span class="va-hdr-title" id="vaHdrTitle">Restaurantbesøg</span>
+    <button class="va-add-btn" id="vaRightBtn" aria-label="Nyt besøg">+</button>
+  </div>
+  <div class="va-pages">
+    <!-- Visit list -->
+    <div class="va-page" id="vaListPage"><div id="vaList"></div></div>
+    <!-- Single edit page: everything inline -->
+    <div class="va-page va-page-offscreen" id="vaEditPage">
+      <div class="va-cover-wrap" id="vaEditCover">
+        <div class="va-cover-placeholder" id="vaEditCoverPlaceholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Tilføj coverbillede</div>
+      </div>
+      <div class="va-edit-inner">
+        <input class="va-detail-name" id="vaEditName" placeholder="Restaurantens navn" maxlength="80" autocomplete="off">
+        <input type="date" class="va-detail-date" id="vaEditDate">
+        <div class="va-price-strip" id="vaEditPriceStrip">
+          <button class="va-price-btn" data-price="1">€</button>
+          <button class="va-price-btn" data-price="2">€€</button>
+          <button class="va-price-btn" data-price="3">€€€</button>
+          <button class="va-price-btn" data-price="4">€€€€</button>
+        </div>
+        <span class="va-sec-label">Vurdering</span>
+        <div id="vaEditStars"></div>
+        <span class="va-sec-label">Kommentar</span>
+        <textarea class="va-notes" id="vaEditComment" rows="3" placeholder="Helhedsindtryk, stemning, service..."></textarea>
+        <!-- Wines -->
+        <div class="va-divider"></div>
+        <span class="va-sec-label">Vine</span>
+        <div id="vaWineList"></div>
+        <div class="va-inline-form" id="vaWineForm" style="display:none">
+          <div class="va-wine-type-strip" id="vaWineTypeStrip">
+            <button class="va-wine-type-btn" data-wtype="rod">🍷 Rød</button>
+            <button class="va-wine-type-btn" data-wtype="hvid">🍋 Hvid</button>
+            <button class="va-wine-type-btn" data-wtype="rose">🌸 Rosé</button>
+            <button class="va-wine-type-btn" data-wtype="champagne">🍾 Champagne</button>
+            <button class="va-wine-type-btn" data-wtype="mousserende">✨ Mousserende</button>
+          </div>
+          <input class="va-inline-input" id="vaWineFormName" placeholder="Navn / betegnelse" maxlength="80" autocomplete="off">
+          <input class="va-inline-input" id="vaWineFormProducer" placeholder="Producent (valgfrit)" maxlength="60" autocomplete="off">
+          <input class="va-inline-input" id="vaWineFormVintage" placeholder="Årgang" inputmode="numeric" maxlength="4">
+          <div id="vaWineFormStars" style="margin:4px 0 10px"></div>
+          <textarea class="va-inline-input va-inline-textarea" id="vaWineFormComment" placeholder="Smag, balance, aroma..."></textarea>
+          <button class="va-inline-add-btn" id="vaWineFormSave">Tilføj vin</button>
+        </div>
+        <button class="va-add-row" id="vaAddWineBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tilføj vin</button>
+        <!-- Dishes -->
+        <div class="va-divider"></div>
+        <span class="va-sec-label">Retter</span>
+        <div id="vaDishList"></div>
+        <div class="va-inline-form" id="vaDishForm" style="display:none">
+          <input class="va-inline-input" id="vaDishFormName" placeholder="Rettens navn" maxlength="80" autocomplete="off">
+          <div id="vaDishFormStars" style="margin:4px 0 10px"></div>
+          <textarea class="va-inline-input va-inline-textarea" id="vaDishFormComment" placeholder="Smag, tilberedning, præsentation..."></textarea>
+          <button class="va-photo-upload-btn" id="vaDishPhotoBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Tilføj foto</button>
+          <img class="va-photo-preview" id="vaDishPhotoPreview" alt="">
+          <button class="va-inline-add-btn" id="vaDishFormSave">Tilføj ret</button>
+        </div>
+        <button class="va-add-row" id="vaAddDishBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tilføj ret</button>
+        <!-- Actions -->
+        <div class="va-divider"></div>
+        <button class="va-inline-add-btn" id="vaGemBtn">Gem</button>
+      </div>
+    </div>
+  </div>
+  <!-- Gem bottom sheet (inside visitApp so it stays in dark theme) -->
+  <div id="vaGemScrim" style="position:absolute;inset:0;background:rgba(5,2,8,.7);display:none;align-items:flex-end">
+    <div id="vaGemSheet" style="background:#1A0D14;border-top:1px solid #2C1520;border-radius:20px 20px 0 0;width:100%;padding:0 16px max(28px,env(safe-area-inset-bottom,16px))">
+      <div style="width:32px;height:4px;background:#2C1520;border-radius:2px;margin:12px auto 20px"></div>
+      <button class="va-gem-opt va-gem-primary" id="vaGemSave">Gem besøg</button>
+      <button class="va-gem-opt va-gem-feed" id="vaGemFeed"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Gem og del til feed</button>
+      <button class="va-gem-opt va-gem-del" id="vaGemDelete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Slet besøg</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="vaCoverPhotoInput" accept="image/*" style="display:none">
+<input type="file" id="vaDishPhotoInput" accept="image/*" style="display:none">
 
 <nav class="bottom-nav" id="bottomNav" aria-label="Navigation">
   <div class="bnav-inner">
@@ -1955,12 +2179,9 @@
     catAddBtn.innerHTML='+ '+(lang==="da"?"Tilføj tæller":"Add counter");
     grp.appendChild(catAddBtn);
     grid.appendChild(grp);
-    // New category + catalog buttons
+    // New category button
     const addCat=document.createElement("button");addCat.className="station-new-cat";addCat.id="addCatBtn";addCat.textContent=t("new_cat_btn");
     grid.appendChild(addCat);
-    const catBtn=document.createElement("button");catBtn.className="station-catalog-btn";catBtn.id="catalogBtn";
-    catBtn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'+(lang==="da"?" Vælg fra katalog":" Browse catalog");
-    grid.appendChild(catBtn);
     // Hidden addCounterBtn for backward-compat click handler
     const addH=document.createElement("button");addH.id="addCounterBtn";addH.style.display="none";grid.appendChild(addH);
   }
@@ -2503,7 +2724,46 @@
   }
   document.querySelectorAll('input[name="askmode"]').forEach(r=>r.addEventListener("change",()=>{$("#askParent").disabled=document.querySelector('input[name="askmode"]:checked').value!=="sub";}));
   $("#qlogInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runQuickLog();}});
-  $("#qlogInput").addEventListener("focus",()=>{setTimeout(()=>$("#qlogInput").scrollIntoView({behavior:"smooth",block:"center"}),300);});
+
+  // Qlog focus overlay
+  function openQlogOverlay(){
+    const ov=$("#qlogOverlay");if(!ov)return;
+    const inp=$("#qlogOverlayInput");
+    const hint=$("#qlogOvHint");if(hint)hint.textContent="Enter for at logge · Esc for at lukke";
+    if(inp){inp.placeholder=t("qlog_ph")||"";inp.value=$("#qlogInput").value||"";inp.style.height="auto";}
+    ov.classList.add("open");
+    setTimeout(()=>{if(inp){inp.focus();inp.style.height="auto";inp.style.height=inp.scrollHeight+"px";}},60);
+  }
+  function closeQlogOverlay(){
+    const ov=$("#qlogOverlay");if(ov)ov.classList.remove("open");
+    const inp=$("#qlogOverlayInput");if(inp)inp.value="";
+  }
+  function submitQlogOverlay(){
+    const inp=$("#qlogOverlayInput");if(!inp)return;
+    const val=inp.value.trim();if(!val)return;
+    const qi=$("#qlogInput");if(qi)qi.value=val;
+    closeQlogOverlay();
+    runQuickLog();
+  }
+  $("#qlogInput").addEventListener("focus",()=>{
+    $("#qlogInput").blur();
+    openQlogOverlay();
+  });
+  const qlogOvClose=$("#qlogOverlayClose");
+  if(qlogOvClose)qlogOvClose.addEventListener("click",closeQlogOverlay);
+  const qlogOvBg=$("#qlogOverlay");
+  if(qlogOvBg)qlogOvBg.addEventListener("click",e=>{if(e.target===qlogOvBg)closeQlogOverlay();});
+  const qlogOvInp=$("#qlogOverlayInput");
+  if(qlogOvInp){
+    qlogOvInp.addEventListener("keydown",e=>{
+      if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submitQlogOverlay();}
+      if(e.key==="Escape"){closeQlogOverlay();}
+    });
+    qlogOvInp.addEventListener("input",()=>{
+      qlogOvInp.style.height="auto";
+      qlogOvInp.style.height=qlogOvInp.scrollHeight+"px";
+    });
+  }
 
   document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s){if(s._askSkip)s._askSkip();else s.classList.remove("open");}}));
   document.addEventListener("keydown",e=>{
@@ -2632,31 +2892,51 @@
 
   async function renderTeam(){
     const el=$("#teamContent");if(!el)return;
-    const base=apiBase();if(!base){renderTeamCreate(el);return;}
-    const token=await getToken();if(!token){renderTeamCreate(el);return;}
+    const base=apiBase();if(!base){renderTeamForm(el,[]);return;}
+    const token=await getToken();if(!token){renderTeamForm(el,[]);return;}
     try{
       const res=await fetch(base+"/api/teams/mine",{headers:{"Authorization":"Bearer "+token}});
-      if(res.status===404){renderTeamCreate(el);return;}
       const d=await res.json();
-      const team=d.team||{};
-      const members=d.members||[];
-      el.innerHTML='<div class="team-card">'
-        +'<div class="team-name">'+esc(team.name||"")+'</div>'
-        +'<div class="team-code-row"><span class="team-code-lbl">'+esc(t("team_join_ph"))+':</span><span class="team-code" id="teamCodeDisplay">'+esc(team.invite_code||"")+'</span><button class="btn ghost btn-sm" id="copyCodeBtn">'+esc(t("team_copy"))+'</button></div>'
-        +'</div>'
-        +'<div class="lb-section">'
-        +members.map((m,i)=>{
-          const isMe=m.user_id===getJwtSub();
-          const nick=esc(m.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
-          return '<div class="lb-row'+(isMe?" lb-me":"")+'">'+'<span class="lb-rank">'+(i+1)+'</span>'+'<span class="lb-name">'+nick+'</span>'+'<span class="lb-score">'+(m.week_total||0)+'</span></div>';
-        }).join("")
-        +'</div>';
-      const copyBtn=$("#copyCodeBtn");
-      if(copyBtn)copyBtn.addEventListener("click",()=>{navigator.clipboard.writeText(team.invite_code||"").then(()=>{copyBtn.textContent=t("team_copied");setTimeout(()=>copyBtn.textContent=t("team_copy"),2000);});});
-    }catch(e){renderTeamCreate(el);}
+      const teams=d.teams||[];
+      const myId=getJwtSub();
+      let html="";
+      teams.forEach(({team,members})=>{
+        html+='<div class="team-card" data-team-id="'+esc(team.id)+'">'
+          +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">'
+          +'<div class="team-name" style="margin-bottom:0">'+esc(team.name||"")+'</div>'
+          +'<button class="btn ghost btn-sm team-leave-btn" data-team-id="'+esc(team.id)+'" style="color:var(--faint);flex-shrink:0">'+(lang==="da"?"Forlad":"Leave")+'</button>'
+          +'</div>'
+          +'<div class="team-code-row"><span class="team-code-lbl">Kode:</span><span class="team-code team-code-val">'+esc(team.invite_code||"")+'</span><button class="btn ghost btn-sm team-copy-btn" data-code="'+esc(team.invite_code||"")+'">'+esc(t("team_copy"))+'</button></div>'
+          +'<div class="lb-section" style="margin-top:10px">'
+          +members.map((m,i)=>{
+            const isMe=m.userId===myId;
+            const nick=esc(m.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
+            return '<div class="lb-row'+(isMe?" lb-me":"")+'">'+'<span class="lb-rank">'+(i+1)+'</span>'+'<span class="lb-name">'+nick+'</span>'+'<span class="lb-score">'+(m.total||0)+'</span></div>';
+          }).join("")
+          +'</div>'
+          +'</div>';
+      });
+      el.innerHTML=html;
+      renderTeamForm(el,teams);
+      el.querySelectorAll(".team-copy-btn").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          navigator.clipboard.writeText(btn.dataset.code||"").then(()=>{btn.textContent=t("team_copied");setTimeout(()=>btn.textContent=t("team_copy"),2000);});
+        });
+      });
+      el.querySelectorAll(".team-leave-btn").forEach(btn=>{
+        btn.addEventListener("click",async()=>{
+          if(!confirm(lang==="da"?"Forlad dette hold?":"Leave this team?"))return;
+          const tid=btn.dataset.teamId;
+          try{await fetch(base+"/api/teams/"+tid+"/leave",{method:"DELETE",headers:{"Authorization":"Bearer "+token}});renderTeam();}
+          catch(e){}
+        });
+      });
+    }catch(e){renderTeamForm(el,[]);}
   }
-  function renderTeamCreate(el){
-    el.innerHTML='<p class="team-hint">'+esc(t("team_create_or_join"))+'</p>'
+  function renderTeamForm(el,existingTeams){
+    const hint=existingTeams.length?'':(lang==="da"?'<p class="team-hint">'+esc(t("team_create_or_join"))+'</p>':'<p class="team-hint">'+esc(t("team_create_or_join"))+'</p>');
+    const formHtml='<div id="teamFormWrap" style="margin-top:'+(existingTeams.length?'14':'0')+'px">'
+      +hint
       +'<div class="team-form">'
       +'<input id="teamNameInput" class="input" placeholder="'+esc(t("team_create_ph"))+'" maxlength="40">'
       +'<button class="btn primary btn-sm" id="teamCreateBtn">'+esc(t("team_create_btn"))+'</button>'
@@ -2665,15 +2945,18 @@
       +'<div class="team-form">'
       +'<input id="teamCodeInput" class="input" placeholder="'+esc(t("team_join_ph"))+'" maxlength="6" style="text-transform:uppercase;font-family:monospace">'
       +'<button class="btn ghost btn-sm" id="teamJoinBtn">'+esc(t("team_join_btn"))+'</button>'
+      +'</div>'
       +'</div>';
+    el.insertAdjacentHTML("beforeend",formHtml);
+    const base=apiBase();
     document.getElementById("teamCreateBtn").addEventListener("click",async()=>{
       const name=(document.getElementById("teamNameInput").value||"").trim();if(!name)return;
-      const base=apiBase();const token=await getToken();if(!base||!token)return;
+      const token=await getToken();if(!base||!token)return;
       try{await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});renderTeam();}catch(e){}
     });
     document.getElementById("teamJoinBtn").addEventListener("click",async()=>{
       const code=(document.getElementById("teamCodeInput").value||"").trim().toUpperCase();if(!code)return;
-      const base=apiBase();const token=await getToken();if(!base||!token)return;
+      const token=await getToken();if(!base||!token)return;
       try{
         const res=await fetch(base+"/api/teams/join",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({code})});
         const d=await res.json();
@@ -3475,6 +3758,369 @@
     }catch(e){grid.innerHTML="";}
   }
 
+  // ---- Restaurant visits ----
+  function getVisits(){try{return JSON.parse(localStorage.getItem("mise_visits")||"[]");}catch(e){return [];}}
+  function saveVisits(v){localStorage.setItem("mise_visits",JSON.stringify(v));}
+
+  function compressPhoto(file){
+    return new Promise(resolve=>{
+      const reader=new FileReader();
+      reader.onload=e=>{
+        const img=new Image();
+        img.onload=()=>{
+          const MAX=900;let w=img.width,h=img.height;
+          if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+          const c=document.createElement("canvas");c.width=w;c.height=h;
+          c.getContext("2d").drawImage(img,0,0,w,h);
+          resolve(c.toDataURL("image/jpeg",0.72));
+        };
+        img.src=e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function makeVaStars(current,onChange){
+    const wrap=document.createElement("div");wrap.className="va-stars";
+    let val=typeof current==="number"?current:0;
+    function render(){
+      wrap.innerHTML="";
+      for(let i=1;i<=5;i++){
+        const b=document.createElement("button");b.type="button";b.className="va-star";
+        b.setAttribute("aria-label",i+" stjerner");
+        if(val>=i){
+          b.setAttribute("data-fill","full");b.textContent="★";
+        } else if(val>=i-0.5){
+          b.setAttribute("data-fill","half");
+          // Overlay: gold left half on top of dim full star
+          b.innerHTML='<span style="color:#2C1520;line-height:1;display:block">★</span>'
+            +'<span aria-hidden="true" style="position:absolute;left:2px;top:3px;width:calc(50% - 2px);overflow:hidden;color:#C9A465;line-height:1;pointer-events:none;white-space:nowrap">★</span>';
+        } else {
+          b.setAttribute("data-fill","empty");b.textContent="★";
+        }
+        b.addEventListener("click",e=>{
+          const rect=b.getBoundingClientRect();
+          const nv=(e.clientX-rect.left)<rect.width/2?i-0.5:i;
+          val=(val===nv)?0:nv;
+          if(onChange)onChange(val);
+          render();
+        });
+        wrap.appendChild(b);
+      }
+    }
+    render();return wrap;
+  }
+
+  function vaStarHtml(rating){
+    if(!rating)return "";
+    let h="";
+    for(let i=1;i<=5;i++){
+      if(rating>=i){
+        h+='<span style="display:inline-block;color:#C9A465;font-size:13px;line-height:1">★</span>';
+      } else if(rating>=i-0.5){
+        h+='<span style="display:inline-block;position:relative;color:#2C1520;font-size:13px;line-height:1">'
+          +'★<span style="position:absolute;left:0;top:0;width:50%;overflow:hidden;color:#C9A465;font-size:13px;line-height:1">★</span>'
+          +'</span>';
+      } else {
+        h+='<span style="display:inline-block;color:#2C1520;font-size:13px;line-height:1">★</span>';
+      }
+    }
+    return '<span style="display:inline-flex;line-height:1;vertical-align:middle">'+h+'</span>';
+  }
+
+  const VA_PAGES=["vaListPage","vaEditPage"];
+  let _vaCurPage="vaListPage",_vaCurVisitId=null;
+  let _vaWineStarVal=0,_vaDishStarVal=0,_vaEditPriceLevel=0,_vaWineType="";
+  let _vaPendingDishPhoto=null;
+
+  function vaSetHdr(leftLabel,title,rightVisible){
+    const ll=$("#vaLeftLabel");if(ll)ll.textContent=leftLabel||"";
+    const tl=$("#vaHdrTitle");if(tl)tl.textContent=title||"";
+    const rb=$("#vaRightBtn");if(rb)rb.style.visibility=rightVisible?"visible":"hidden";
+  }
+
+  function vaShowPage(pageId){
+    VA_PAGES.forEach(id=>{const el=$("#"+id);if(!el)return;if(id===pageId){el.classList.remove("va-page-offscreen");el.scrollTop=0;}else el.classList.add("va-page-offscreen");});
+    _vaCurPage=pageId;
+  }
+
+  function openVisitApp(){
+    closeLogDrawer();
+    renderVaList();
+    vaShowPage("vaListPage");
+    vaSetHdr("Craft Tracker","Restaurantbesøg",true);
+    const app=$("#visitApp");if(app)app.classList.add("open");
+  }
+
+  function closeVisitApp(){
+    const app=$("#visitApp");if(app)app.classList.remove("open");
+    _vaCurVisitId=null;
+  }
+
+  function vaGoBack(){
+    const sc=$("#vaGemScrim");if(sc&&sc.style.display!=="none"){sc.style.display="none";return;}
+    if(_vaCurPage==="vaEditPage"){
+      renderVaList();vaShowPage("vaListPage");vaSetHdr("Craft Tracker","Restaurantbesøg",true);
+    }else{closeVisitApp();}
+  }
+
+  function vaSaveField(visitId,field,value){
+    const vs=getVisits();const v=vs.find(x=>x.id===visitId);if(v){v[field]=value;saveVisits(vs);}
+  }
+
+  function vaHideWineForm(){
+    const wf=$("#vaWineForm");if(wf)wf.style.display="none";
+    const ab=$("#vaAddWineBtn");if(ab)ab.style.display="";
+    const n=$("#vaWineFormName");if(n)n.value="";
+    const p=$("#vaWineFormProducer");if(p)p.value="";
+    const vin=$("#vaWineFormVintage");if(vin)vin.value="";
+    const c=$("#vaWineFormComment");if(c)c.value="";
+    _vaWineStarVal=0;_vaWineType="";
+    const ws=$("#vaWineFormStars");if(ws){ws.innerHTML="";ws.appendChild(makeVaStars(0,nv=>{_vaWineStarVal=nv;}));}
+    document.querySelectorAll("#vaWineTypeStrip .va-wine-type-btn").forEach(b=>b.classList.remove("on"));
+  }
+
+  function vaHideDishForm(){
+    const df=$("#vaDishForm");if(df)df.style.display="none";
+    const ab=$("#vaAddDishBtn");if(ab)ab.style.display="";
+    const n=$("#vaDishFormName");if(n)n.value="";
+    const c=$("#vaDishFormComment");if(c)c.value="";
+    _vaDishStarVal=0;_vaPendingDishPhoto=null;
+    const ds=$("#vaDishFormStars");if(ds){ds.innerHTML="";ds.appendChild(makeVaStars(0,nv=>{_vaDishStarVal=nv;}));}
+    const prev=$("#vaDishPhotoPreview");if(prev){prev.src="";prev.style.display="none";}
+  }
+
+  const WINE_LABELS={rod:"🍷 Rød",hvid:"🍋 Hvid",rose:"🌸 Rosé",champagne:"🍾 Champagne",mousserende:"✨ Mousserende"};
+
+  function renderVaWines(visitId){
+    const el=$("#vaWineList");if(!el)return;
+    const visits=getVisits();const visit=visits.find(v=>v.id===visitId);if(!visit)return;
+    el.innerHTML="";
+    (visit.wines||[]).forEach(wine=>{
+      const wc=document.createElement("div");wc.className="va-item-card";
+      const typeLabel=WINE_LABELS[wine.type]||wine.type||"";
+      const meta=[wine.producer,wine.vintage].filter(Boolean).join(", ");
+      wc.innerHTML=(typeLabel?'<div class="va-item-meta" style="margin-bottom:2px">'+esc(typeLabel)+'</div>':'')+'<div class="va-item-card-body"><div class="va-item-name">'+esc(wine.name||"Vin")+'</div>'+(meta?'<div class="va-item-meta">'+esc(meta)+'</div>':"")+(wine.rating?vaStarHtml(wine.rating):"")+(wine.comment?'<div class="va-item-comment">'+esc(wine.comment)+'</div>':"")+'</div>';
+      const del=document.createElement("button");del.className="va-item-del";del.innerHTML="&#x2715;";del.setAttribute("aria-label","Slet vin");
+      del.addEventListener("click",e=>{e.stopPropagation();const vs=getVisits();const v=vs.find(x=>x.id===visitId);if(v){v.wines=(v.wines||[]).filter(w=>w.id!==wine.id);saveVisits(vs);renderVaWines(visitId);}});
+      wc.appendChild(del);el.appendChild(wc);
+    });
+  }
+
+  function renderVaDishes(visitId){
+    const el=$("#vaDishList");if(!el)return;
+    const visits=getVisits();const visit=visits.find(v=>v.id===visitId);if(!visit)return;
+    el.innerHTML="";
+    (visit.dishes||[]).forEach(dish=>{
+      const dc=document.createElement("div");dc.className="va-item-card";
+      dc.innerHTML=(dish.photo?'<img class="va-item-card-img" src="'+esc(dish.photo)+'" alt="" loading="lazy">':'')+'<div class="va-item-card-body"><div class="va-item-name">'+esc(dish.name||"Ret")+'</div>'+(dish.rating?vaStarHtml(dish.rating):"")+(dish.comment?'<div class="va-item-comment">'+esc(dish.comment)+'</div>':"")+'</div>';
+      const del=document.createElement("button");del.className="va-item-del";del.innerHTML="&#x2715;";del.setAttribute("aria-label","Slet ret");
+      del.addEventListener("click",e=>{e.stopPropagation();const vs=getVisits();const v=vs.find(x=>x.id===visitId);if(v){v.dishes=(v.dishes||[]).filter(d=>d.id!==dish.id);saveVisits(vs);renderVaDishes(visitId);}});
+      dc.appendChild(del);el.appendChild(dc);
+    });
+  }
+
+  function vaOpenEdit(visitId){
+    _vaCurVisitId=visitId;
+    const visits=getVisits();const visit=visits.find(v=>v.id===visitId);if(!visit)return;
+
+    const coverWrap=$("#vaEditCover");const coverPh=$("#vaEditCoverPlaceholder");
+    if(coverWrap){
+      const oldImg=coverWrap.querySelector("img.va-cover-img");if(oldImg)oldImg.remove();
+      if(visit.cover){
+        if(coverPh)coverPh.style.display="none";
+        const img=document.createElement("img");img.className="va-cover-img";img.src=visit.cover;img.alt="";
+        coverWrap.appendChild(img);
+      }else{if(coverPh)coverPh.style.display="";}
+      coverWrap.onclick=()=>{const ci=$("#vaCoverPhotoInput");if(ci)ci.click();};
+    }
+
+    const nameEl=$("#vaEditName");
+    if(nameEl){nameEl.value=visit.name||"";nameEl.onchange=()=>vaSaveField(visitId,"name",nameEl.value.trim());}
+    const dateEl=$("#vaEditDate");
+    if(dateEl){dateEl.value=visit.date||"";dateEl.onchange=()=>vaSaveField(visitId,"date",dateEl.value);}
+
+    _vaEditPriceLevel=visit.priceLevel||0;
+    const priceStrip=$("#vaEditPriceStrip");
+    if(priceStrip)priceStrip.querySelectorAll(".va-price-btn").forEach(b=>b.classList.toggle("on",parseInt(b.dataset.price)===_vaEditPriceLevel));
+
+    const starsEl=$("#vaEditStars");
+    if(starsEl){starsEl.innerHTML="";starsEl.appendChild(makeVaStars(visit.rating||0,nv=>vaSaveField(visitId,"rating",nv)));}
+
+    const commentEl=$("#vaEditComment");
+    if(commentEl){commentEl.value=visit.comment||"";commentEl.onchange=()=>vaSaveField(visitId,"comment",commentEl.value);}
+
+    vaHideWineForm();vaHideDishForm();
+    renderVaWines(visitId);renderVaDishes(visitId);
+    vaShowPage("vaEditPage");vaSetHdr("← Oversigt","Besøg",false);
+  }
+
+  function renderVaList(){
+    const el=$("#vaList");if(!el)return;
+    const visits=getVisits();
+    if(!visits.length){
+      el.innerHTML='<div class="va-empty"><div class="va-empty-icon">🍽️</div><div class="va-empty-title">Ingen besøg endnu</div><div class="va-empty-sub">Tryk + for at dokumentere dit første restaurantbesøg</div></div>';
+      return;
+    }
+    const list=document.createElement("div");list.className="va-list";
+    visits.slice().reverse().forEach(visit=>{
+      const card=document.createElement("div");card.className="va-card";
+      const dateStr=visit.date?new Date(visit.date+"T12:00:00").toLocaleDateString("da-DK",{day:"numeric",month:"long",year:"numeric"}):"";
+      const wines=visit.wines||[];const dishes=visit.dishes||[];
+      const priceTxt=visit.priceLevel?'<span style="color:#8A6070;font-size:11px">'+"€".repeat(visit.priceLevel)+'</span>':"";
+
+      const chips=[(wines.length?wines.length+" vin"+(wines.length!==1?"e":""):""),(dishes.length?dishes.length+" ret"+(dishes.length!==1?"ter":""):"")].filter(Boolean).join(" · ");
+      card.innerHTML=(visit.cover?'<img class="va-card-img" src="'+esc(visit.cover)+'" alt="" loading="lazy">':(visit.name?'<div class="va-card-no-img"></div>':""))+'<div class="va-card-body"><div class="va-card-name">'+esc(visit.name||"Ukendt restaurant")+'</div><div class="va-card-meta"><span class="va-card-date">'+esc(dateStr)+'</span>'+(visit.rating?vaStarHtml(visit.rating):"")+(priceTxt?" "+priceTxt:"")+'</div>'+(chips?'<div class="va-card-chips">'+esc(chips)+'</div>':"")+(visit.comment?'<div class="va-card-comment">'+esc(visit.comment.slice(0,120))+'</div>':"")+'</div>';
+      card.addEventListener("click",()=>vaOpenEdit(visit.id));
+      list.appendChild(card);
+    });
+    el.innerHTML="";el.appendChild(list);
+  }
+
+  async function vaShareToFeed(visitId){
+    const visits=getVisits();const visit=visits.find(v=>v.id===visitId);if(!visit)return;
+    const base=apiBase();const token=await getToken();
+    if(!base||!token){showToast("Log ind for at dele til feed");return;}
+    const shareBtn=$("#vaShareBtn");if(shareBtn)shareBtn.textContent="Deler...";
+    let imageUrl=null;
+    if(visit.cover){
+      try{
+        const r=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:visit.cover})});
+        if(r.ok){const d=await r.json();imageUrl=d.url||null;}
+      }catch(e){}
+    }
+    const starsTxt=visit.rating?"★".repeat(Math.floor(visit.rating))+(visit.rating%1?"½":""):"";
+    const dishesTxt=(visit.dishes||[]).map(d=>d.name).filter(Boolean).slice(0,3).join(", ");
+    const winesTxt=(visit.wines||[]).map(w=>w.name).filter(Boolean).slice(0,2).join(", ");
+    const summary=[visit.name,starsTxt,dishesTxt,winesTxt,visit.comment].filter(Boolean).join(" · ").slice(0,200);
+    try{
+      const r=await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({categoryLabel:"Restaurantbesøg",delta:1,imageUrl,summary})});
+      if(r.ok){showToast("Delt til feed!");if(shareBtn)shareBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>✓ Delt til feed';}
+      else showToast("Noget gik galt");
+    }catch(e){showToast("Noget gik galt");}
+  }
+
+  function setupVisits(){
+    const drawerLink=$("#vaDrawerLink");if(drawerLink)drawerLink.addEventListener("click",openVisitApp);
+    const leftBtn=$("#vaLeftBtn");if(leftBtn)leftBtn.addEventListener("click",vaGoBack);
+    const rightBtn=$("#vaRightBtn");if(rightBtn)rightBtn.addEventListener("click",()=>{
+      if(_vaCurPage!=="vaListPage")return;
+      const now=new Date();const visit={id:"visit_"+Date.now(),name:"",date:now.toISOString().slice(0,10),rating:0,priceLevel:0,comment:"",cover:"",dishes:[],wines:[]};
+      const vs=getVisits();vs.push(visit);saveVisits(vs);
+      vaOpenEdit(visit.id);
+    });
+
+    const editPriceStrip=$("#vaEditPriceStrip");
+    if(editPriceStrip)editPriceStrip.addEventListener("click",e=>{
+      const btn=e.target.closest(".va-price-btn");if(!btn||!_vaCurVisitId)return;
+      const p=parseInt(btn.dataset.price);
+      _vaEditPriceLevel=(_vaEditPriceLevel===p)?0:p;
+      editPriceStrip.querySelectorAll(".va-price-btn").forEach(b=>b.classList.toggle("on",parseInt(b.dataset.price)===_vaEditPriceLevel));
+      vaSaveField(_vaCurVisitId,"priceLevel",_vaEditPriceLevel);
+    });
+
+    const addWineBtn=$("#vaAddWineBtn");
+    if(addWineBtn)addWineBtn.addEventListener("click",()=>{
+      vaHideWineForm();
+      const wf=$("#vaWineForm");if(wf)wf.style.display="";
+      addWineBtn.style.display="none";
+      setTimeout(()=>{const n=$("#vaWineFormName");if(n)n.focus();},60);
+    });
+    const wineTypeStrip=$("#vaWineTypeStrip");
+    if(wineTypeStrip)wineTypeStrip.addEventListener("click",e=>{
+      const btn=e.target.closest(".va-wine-type-btn");if(!btn)return;
+      wineTypeStrip.querySelectorAll(".va-wine-type-btn").forEach(b=>b.classList.remove("on"));
+      btn.classList.add("on");_vaWineType=btn.dataset.wtype||"";
+    });
+    const wineFormSave=$("#vaWineFormSave");
+    if(wineFormSave)wineFormSave.addEventListener("click",()=>{
+      if(!_vaCurVisitId)return;
+      const nameEl=$("#vaWineFormName");const name=(nameEl?nameEl.value:"").trim();
+      if(!name){if(nameEl)nameEl.focus();return;}
+      const prodEl=$("#vaWineFormProducer");const vintEl=$("#vaWineFormVintage");const commentEl=$("#vaWineFormComment");
+      const wine={id:"wine_"+Date.now(),type:_vaWineType,name,producer:prodEl?prodEl.value.trim():"",vintage:vintEl?vintEl.value.trim():"",rating:_vaWineStarVal||0,comment:commentEl?commentEl.value.trim():""};
+      const vs=getVisits();const v=vs.find(x=>x.id===_vaCurVisitId);
+      if(v){if(!v.wines)v.wines=[];v.wines.push(wine);saveVisits(vs);}
+      vaHideWineForm();renderVaWines(_vaCurVisitId);showToast("Vin tilføjet");
+    });
+
+    const addDishBtn=$("#vaAddDishBtn");
+    if(addDishBtn)addDishBtn.addEventListener("click",()=>{
+      vaHideDishForm();
+      const df=$("#vaDishForm");if(df)df.style.display="";
+      addDishBtn.style.display="none";
+      setTimeout(()=>{const n=$("#vaDishFormName");if(n)n.focus();},60);
+    });
+    const dishPhotoBtn=$("#vaDishPhotoBtn");
+    if(dishPhotoBtn)dishPhotoBtn.addEventListener("click",()=>{const di=$("#vaDishPhotoInput");if(di)di.click();});
+    const dishFormSave=$("#vaDishFormSave");
+    if(dishFormSave)dishFormSave.addEventListener("click",()=>{
+      if(!_vaCurVisitId)return;
+      const nameEl=$("#vaDishFormName");const name=(nameEl?nameEl.value:"").trim();
+      if(!name){if(nameEl)nameEl.focus();return;}
+      const commentEl=$("#vaDishFormComment");
+      const dish={id:"dish_"+Date.now(),name,rating:_vaDishStarVal||0,comment:commentEl?commentEl.value.trim():"",photo:_vaPendingDishPhoto||""};
+      const vs=getVisits();const v=vs.find(x=>x.id===_vaCurVisitId);
+      if(v){if(!v.dishes)v.dishes=[];v.dishes.push(dish);saveVisits(vs);}
+      vaHideDishForm();renderVaDishes(_vaCurVisitId);showToast("Ret tilføjet");
+    });
+
+    const coverInput=$("#vaCoverPhotoInput");
+    if(coverInput)coverInput.addEventListener("change",async()=>{
+      if(!coverInput.files||!coverInput.files[0]||!_vaCurVisitId)return;
+      const b64=await compressPhoto(coverInput.files[0]);
+      const vs=getVisits();const v=vs.find(x=>x.id===_vaCurVisitId);
+      if(v){v.cover=b64;saveVisits(vs);}
+      const cw=$("#vaEditCover");const ph=$("#vaEditCoverPlaceholder");
+      if(cw){const old=cw.querySelector("img.va-cover-img");if(old)old.remove();if(ph)ph.style.display="none";const img=document.createElement("img");img.className="va-cover-img";img.src=b64;img.alt="";cw.appendChild(img);}
+      coverInput.value="";
+    });
+
+    const dishInput=$("#vaDishPhotoInput");
+    if(dishInput)dishInput.addEventListener("change",async()=>{
+      if(!dishInput.files||!dishInput.files[0])return;
+      const b64=await compressPhoto(dishInput.files[0]);
+      _vaPendingDishPhoto=b64;
+      const prev=$("#vaDishPhotoPreview");if(prev){prev.src=b64;prev.style.display="block";}
+      dishInput.value="";
+    });
+
+    function openVaGemScrim(){
+      const sc=$("#vaGemScrim");if(sc){sc.style.display="flex";}
+    }
+    function closeVaGemScrim(){
+      const sc=$("#vaGemScrim");if(sc)sc.style.display="none";
+    }
+    function vaBackToList(){
+      renderVaList();vaShowPage("vaListPage");vaSetHdr("Craft Tracker","Restaurantbesøg",true);
+    }
+
+    const gemBtn=$("#vaGemBtn");
+    if(gemBtn)gemBtn.addEventListener("click",openVaGemScrim);
+
+    const vaGemScrim=$("#vaGemScrim");
+    if(vaGemScrim)vaGemScrim.addEventListener("click",e=>{if(e.target===vaGemScrim)closeVaGemScrim();});
+
+    const gemSaveBtn=$("#vaGemSave");
+    if(gemSaveBtn)gemSaveBtn.addEventListener("click",()=>{closeVaGemScrim();vaBackToList();showToast("Besøg gemt");});
+
+    const gemFeedBtn=$("#vaGemFeed");
+    if(gemFeedBtn)gemFeedBtn.addEventListener("click",async()=>{
+      closeVaGemScrim();
+      if(_vaCurVisitId)await vaShareToFeed(_vaCurVisitId);
+      vaBackToList();
+    });
+
+    const gemDelBtn=$("#vaGemDelete");
+    if(gemDelBtn)gemDelBtn.addEventListener("click",()=>{
+      if(!_vaCurVisitId)return;
+      if(!confirm("Slet dette besøg?"))return;
+      saveVisits(getVisits().filter(x=>x.id!==_vaCurVisitId));
+      closeVaGemScrim();vaBackToList();
+    });
+  }
+  // ---- End restaurant visits ----
+
   function startApp(){
     console.log("CT:startApp");
     $("#mainWrap").style.display="";
@@ -3489,6 +4135,7 @@
     try{setupShift();}catch(e){console.error("setupShift",e);}
     try{setupFeed();}catch(e){console.error("setupFeed",e);}
     try{setupLab();}catch(e){console.error("setupLab",e);}
+    try{setupVisits();}catch(e){console.error("setupVisits",e);}
     try{updateOfflineDot();}catch(e){}
     $("#viewToggle").style.display="none";
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.style.display="";
