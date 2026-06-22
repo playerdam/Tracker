@@ -1401,7 +1401,7 @@
   <div class="log-drawer-body">
     <button class="va-drawer-link" id="vaDrawerLink">
       <span class="va-drawer-link-icon">🍽️</span>
-      <span class="va-drawer-link-label">Restaurantbesøg</span>
+      <span class="va-drawer-link-label" id="vaDrawerLinkLbl">Restaurantbesøg</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="va-drawer-link" id="teamDrawerLink">
@@ -1992,6 +1992,7 @@
     const qlogHintEl=$("#qlogOvHint");if(qlogHintEl)qlogHintEl.textContent=t("qlog_hint");
     // Visit App
     const vaHdrT=$("#vaHdrTitle");if(vaHdrT)vaHdrT.textContent=t("va_hdr_title");
+    const vaDrawerLbl=$("#vaDrawerLinkLbl");if(vaDrawerLbl)vaDrawerLbl.textContent=t("va_hdr_title");
     const vaRightB=$("#vaRightBtn");if(vaRightB)vaRightB.setAttribute("aria-label",t("va_new_visit"));
     const vaCoverLbl=$("#vaCoverPlaceholderLbl");if(vaCoverLbl)vaCoverLbl.textContent=t("va_cover_ph");
     const vaNameEl=$("#vaEditName");if(vaNameEl)vaNameEl.placeholder=t("va_name_ph");
