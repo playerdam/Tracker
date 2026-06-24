@@ -857,5 +857,49 @@ app.post("/api/shift/summary", async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.post("/api/lab/dishes/description", async (req, res) => {
+  try {
+    await verifyAuth(req);
+    const { dish, lang = "da" } = req.body || {};
+    if (!dish) return res.status(400).json({ error: "Mangler ret" });
+    const d = dish.data || {};
+    const ings = (d.ingredients || []).filter(i => i.name).map(i => `${i.amount||""}${i.unit||""} ${i.name}${i.prep ? " ("+i.prep+")" : ""}`.trim()).join(", ");
+    const steps = (d.steps || []).filter(s => s.text).map((s, i) => `${i+1}. ${s.text}`).join("; ");
+    const isDa = lang === "da";
+    const ctx = isDa
+      ? `Ret: ${dish.name||"?"}\nSæson: ${d.season||"–"}\nKoncept: ${d.concept||"–"}\nTeknik: ${d.technique||"–"}\nIngredienser: ${ings||"–"}\nFremgangsmåde: ${steps||"–"}`
+      : `Dish: ${dish.name||"?"}\nSeason: ${d.season||"–"}\nConcept: ${d.concept||"–"}\nTechnique: ${d.technique||"–"}\nIngredients: ${ings||"–"}\nMethod: ${steps||"–"}`;
+    const system = isDa
+      ? "Du er en erfaren michelinkok. Skriv en kort, professionel anretningsbeskrivelse (2-3 sætninger) klar til menukort eller staff briefing. Fang essensen — smag, teknik og præsentation. Ingen overskrift. Ingen bullet points. Direkte til sagen."
+      : "You are an experienced Michelin chef. Write a short, professional dish description (2-3 sentences) ready for a menu card or staff briefing. Capture the essence — taste, technique, and presentation. No heading. No bullet points. Get straight to the point.";
+    const prompt = isDa
+      ? `Retoplysninger:\n${ctx}\n\nSkriv en professionel anretningsbeskrivelse.`
+      : `Dish info:\n${ctx}\n\nWrite a professional dish description.`;
+    const description = await callClaude({ model: "claude-haiku-4-5-20251001", maxTokens: 150, system, content: prompt });
+    res.json({ description: description.trim() });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post("/api/visits/summary", async (req, res) => {
+  try {
+    await verifyAuth(req);
+    const { name, dishes = [], wines = [], rating = 0, lang = "da" } = req.body || {};
+    const isDa = lang === "da";
+    const dishList = dishes.map(d => `${d.name}${d.rating ? " ("+d.rating+"★)" : ""}${d.comment ? ": "+d.comment : ""}`).join("; ");
+    const wineList = wines.map(w => `${w.name||""}${w.type ? " ("+w.type+")" : ""}${w.comment ? ": "+w.comment : ""}`).join("; ");
+    const ctx = isDa
+      ? `Restaurant: ${name||"?"}\nVurdering: ${rating ? rating+"★" : "–"}\nRetter: ${dishList||"–"}\nVine: ${wineList||"–"}`
+      : `Restaurant: ${name||"?"}\nRating: ${rating ? rating+"★" : "–"}\nDishes: ${dishList||"–"}\nWines: ${wineList||"–"}`;
+    const system = isDa
+      ? "Du er en præcis kulinarisk skribent. Skriv 1-2 sætninger (max 200 tegn) der fanger essensen af restaurantbesøget — hvad der stod ud, stemningen, det vigtigste take-away. Ingen hashtags. Ingen emoji. Ingen overskrift."
+      : "You are a concise culinary writer. Write 1-2 sentences (max 200 chars) capturing the essence of the restaurant visit — what stood out, the atmosphere, the key take-away. No hashtags. No emoji. No heading.";
+    const prompt = isDa
+      ? `Besøgsoplysninger:\n${ctx}\n\nSkriv en kort opsummering.`
+      : `Visit details:\n${ctx}\n\nWrite a brief summary.`;
+    const summary = await callClaude({ model: "claude-haiku-4-5-20251001", maxTokens: 100, system, content: prompt });
+    res.json({ summary: summary.trim() });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Craft Tracker backend kører på port " + PORT));

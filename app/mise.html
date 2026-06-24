@@ -740,6 +740,8 @@
   .va-gem-primary{background:#8A2E3F;color:#FFFFFF}
   .va-gem-feed{border:1.5px solid #2C1520;color:#C9A465}
   .va-gem-del{color:#C05060}
+  .va-ai-btn{appearance:none;background:none;border:1.5px solid #2C1520;border-radius:10px;width:100%;padding:11px;color:#C9A465;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .va-ai-btn:active{background:#2C1520}
   /* Modal fields (light-theme modals only) */
   .modal-field-label{font-size:12px;font-weight:600;color:var(--dim);letter-spacing:.04em;margin-bottom:5px;margin-top:16px;display:block}
   .modal-field-label:first-child{margin-top:0}
@@ -1177,6 +1179,10 @@
       <input type="file" id="dePlatingInput" accept="image/*" style="display:none">
       <label style="font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px" id="deLblPlating">Beskrivelse af anretning</label>
       <textarea class="input" id="dePlating" rows="3" placeholder="Beskriv opbygning, teksturer, løb, garnering, temperatur på tallerkenen…" style="resize:vertical;width:100%"></textarea>
+      <button class="ing-ai-btn" id="dishDescAiBtn" style="margin-top:8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+        <span id="dishDescAiBtnLbl">Generer beskrivelse med AI</span>
+      </button>
     </div>
   </div>
   <!-- Vine -->
@@ -1239,10 +1245,6 @@
     <div class="shift-duration" id="shiftDuration"></div>
     <div class="shift-totals" id="shiftTotals"></div>
     <textarea id="shiftCaption" class="shift-caption" maxlength="220"></textarea>
-    <button class="shift-ai-btn" id="shiftAiBtn" type="button">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
-      <span id="shiftAiBtnLbl">Skriv med AI</span>
-    </button>
     <div class="field" style="margin-bottom:14px">
       <img id="shiftPhotoThumb" class="photo-thumb" alt="" style="width:56px;height:56px">
       <button class="btn ghost btn-sm" id="shiftPhotoBtn"></button>
@@ -1461,6 +1463,10 @@
         <div id="vaEditStars"></div>
         <span class="va-sec-label" id="vaLblComment">Kommentar</span>
         <textarea class="va-notes" id="vaEditComment" rows="3" placeholder="Helhedsindtryk, stemning, service..."></textarea>
+        <button class="va-ai-btn" id="vaAiBtn" type="button">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+          <span id="vaAiBtnLbl">Opsummer besøg med AI</span>
+        </button>
         <!-- Wines -->
         <div class="va-divider"></div>
         <span class="va-sec-label" id="vaLblWines">Vine</span>
@@ -1655,6 +1661,7 @@
       lab_add_ing:"+ Tilføj ingrediens",lab_ai_ing:"Analyser ingredienser med AI",
       lab_add_step:"+ Tilføj trin",lab_ph_step:"Beskriv trinnet…",
       lab_ai_wine:"AI: Foreslå vine baseret på ingredienser",
+      lab_ai_desc:"Generer beskrivelse med AI",lab_ai_desc_loading:"Genererer…",lab_ai_desc_err:"Kunne ikke generere — prøv igen",
       lab_add_test:"+ Ny testrunde",lab_delete_dish:"Slet denne ret",
       lab_ai_fab:"Spørg AI",lab_ai_title:"Spørg AI om denne ret",lab_ai_thinking:"Tænker…",lab_ai_ph:"Stil et spørgsmål…",
       lab_ing_col_amt:"Mængde",lab_ing_col_unit:"Enhed",lab_ing_col_name:"Ingrediens",
@@ -1695,6 +1702,7 @@
       va_toast_wine:"Vin tilføjet",va_toast_dish:"Ret tilføjet",va_toast_saved:"Besøg gemt",
       va_toast_shared:"Delt til feed!",va_toast_sharing:"Deler...",va_toast_login:"Log ind for at dele",va_toast_err:"Noget gik galt",
       va_del_wine:"Slet vin",va_del_dish:"Slet ret",
+      va_ai_btn:"Opsummer besøg med AI",va_ai_err:"Kunne ikke opsummere — prøv igen",
       va_empty_title:"Ingen besøg endnu",va_empty_sub:"Tryk + for at dokumentere dit første restaurantbesøg",
       va_unknown:"Ukendt restaurant",va_edit_hdr:"Besøg",va_edit_back:"← Oversigt",
       va_wine_single:"{0} vin",va_wine_plural:"{0} vine",va_dish_single:"{0} ret",va_dish_plural:"{0} retter",
@@ -1795,6 +1803,7 @@
       lab_add_ing:"+ Add ingredient",lab_ai_ing:"Analyze ingredients with AI",
       lab_add_step:"+ Add step",lab_ph_step:"Describe the step…",
       lab_ai_wine:"AI: Suggest wine based on ingredients",
+      lab_ai_desc:"Generate description with AI",lab_ai_desc_loading:"Generating…",lab_ai_desc_err:"Could not generate — try again",
       lab_add_test:"+ New test round",lab_delete_dish:"Delete this dish",
       lab_ai_fab:"Ask AI",lab_ai_title:"Ask AI about this dish",lab_ai_thinking:"Thinking…",lab_ai_ph:"Ask a question…",
       lab_ing_col_amt:"Amount",lab_ing_col_unit:"Unit",lab_ing_col_name:"Ingredient",
@@ -1839,6 +1848,7 @@
       va_toast_wine:"Wine added",va_toast_dish:"Dish added",va_toast_saved:"Visit saved",
       va_toast_shared:"Shared to feed!",va_toast_sharing:"Sharing...",va_toast_login:"Log in to share",va_toast_err:"Something went wrong",
       va_del_wine:"Delete wine",va_del_dish:"Delete dish",
+      va_ai_btn:"Summarise visit with AI",va_ai_err:"Could not summarise — try again",
       va_empty_title:"No visits yet",va_empty_sub:"Tap + to document your first restaurant visit",
       va_unknown:"Unknown restaurant",va_edit_hdr:"Visit",va_edit_back:"← Overview",
       va_wine_single:"{0} wine",va_wine_plural:"{0} wines",va_dish_single:"{0} dish",va_dish_plural:"{0} dishes",
@@ -1906,7 +1916,6 @@
     const ftDiscover=$("#feedTabDiscover");if(ftDiscover)ftDiscover.textContent=t("feed_tab_discover");
     const cSend=$("#commentSend");if(cSend)cSend.textContent=t("feed_comment_send");
     const cInput=$("#commentInput");if(cInput)cInput.placeholder=t("feed_comment_ph");
-    const shiftAiBtnLbl=$("#shiftAiBtnLbl");if(shiftAiBtnLbl)shiftAiBtnLbl.textContent=t("shift_ai_btn");
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.textContent=t("shift_start");
     const shiftEndBtn=$("#shiftEndBtn");if(shiftEndBtn)shiftEndBtn.textContent=t("shift_end");
     const shiftLabel=$("#shiftLabel");if(shiftLabel)shiftLabel.textContent=t("shift_active");
@@ -1970,6 +1979,7 @@
     const ingAiBtnLbl=$("#ingAiBtnLbl");if(ingAiBtnLbl)ingAiBtnLbl.textContent=t("lab_ai_ing");
     const stepAddBtn=$("#stepAddBtn");if(stepAddBtn)stepAddBtn.textContent=t("lab_add_step");
     const wineAiBtnLbl=$("#wineAiBtnLbl");if(wineAiBtnLbl)wineAiBtnLbl.textContent=t("lab_ai_wine");
+    const dishDescAiBtnLbl=$("#dishDescAiBtnLbl");if(dishDescAiBtnLbl)dishDescAiBtnLbl.textContent=t("lab_ai_desc");
     const testAddBtn=$("#testAddBtn");if(testAddBtn)testAddBtn.textContent=t("lab_add_test");
     const deIngColAmt=$("#deIngColAmt");if(deIngColAmt)deIngColAmt.textContent=t("lab_ing_col_amt");
     const deIngColUnit=$("#deIngColUnit");if(deIngColUnit)deIngColUnit.textContent=t("lab_ing_col_unit");
@@ -2010,6 +2020,7 @@
     const vaLblRat=$("#vaLblRating");if(vaLblRat)vaLblRat.textContent=t("va_lbl_rating");
     const vaLblCom=$("#vaLblComment");if(vaLblCom)vaLblCom.textContent=t("va_lbl_comment");
     const vaComEl=$("#vaEditComment");if(vaComEl)vaComEl.placeholder=t("va_comment_ph");
+    const vaAiBtnLbl=$("#vaAiBtnLbl");if(vaAiBtnLbl)vaAiBtnLbl.textContent=t("va_ai_btn");
     const vaLblWin=$("#vaLblWines");if(vaLblWin)vaLblWin.textContent=t("va_lbl_wines");
     const vaWTRod=$("#vaWineTypeRod");if(vaWTRod)vaWTRod.textContent=t("va_wine_rod");
     const vaWTHvid=$("#vaWineTypeHvid");if(vaWTHvid)vaWTHvid.textContent=t("va_wine_hvid");
@@ -3601,9 +3612,8 @@
   async function generateShiftSummary(){
     const shift=getShift();if(!shift)return;
     const base=apiBase();const token=await getToken();if(!base||!token)return;
-    const btn=$("#shiftAiBtn");const lbl=$("#shiftAiBtnLbl");
-    if(btn)btn.classList.add("loading");
-    if(lbl)lbl.textContent=t("shift_ai_loading");
+    const cap=$("#shiftCaption");
+    if(cap){cap.disabled=true;cap.placeholder=t("shift_ai_loading");}
     const durationMs=Date.now()-new Date(shift.startedAt).getTime();
     const snapMap={};(shift.snap||[]).forEach(c=>{snapMap[c.id]={count:c.count,subs:{}};(c.subs||[]).forEach(s=>{snapMap[c.id].subs[s.id]=s.count;});});
     const changes=[];
@@ -3616,12 +3626,48 @@
       const r=await fetch(base+"/api/shift/summary",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({changes,durationMs,lang})});
       const d=await r.json();
       if(!r.ok||!d.summary)throw new Error(d.error||"no summary");
-      const cap=$("#shiftCaption");if(cap){cap.value=d.summary;cap.focus();}
-    }catch(e){showToast(t("shift_ai_err"));}
-    finally{
-      if(btn)btn.classList.remove("loading");
-      if(lbl)lbl.textContent=t("shift_ai_btn");
+      if(cap){cap.disabled=false;cap.placeholder=t("shift_caption_ph");cap.value=d.summary;cap.focus();}
+    }catch(e){
+      if(cap){cap.disabled=false;cap.placeholder=t("shift_caption_ph");}
+      showToast(t("shift_ai_err"));
     }
+  }
+
+  async function generateDishDescription(){
+    if(!_currentDish)return;
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    const btn=$("#dishDescAiBtn");const lbl=$("#dishDescAiBtnLbl");
+    if(btn){btn.disabled=true;}if(lbl)lbl.textContent=t("lab_ai_desc_loading");
+    const dishSnap={
+      name:(document.getElementById("deName")||{}).value||_currentDish.name||"",
+      data:Object.assign({},_currentDish.data,{
+        concept:(document.getElementById("deConcept")||{}).value||_currentDish.data.concept||"",
+        technique:(document.getElementById("deTechnique")||{}).value||_currentDish.data.technique||"",
+        season:(document.getElementById("deSeason")||{}).value||_currentDish.data.season||""
+      })
+    };
+    try{
+      const r=await fetch(base+"/api/lab/dishes/description",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dish:dishSnap,lang})});
+      const d=await r.json();
+      if(!r.ok||!d.description)throw new Error(d.error||"no description");
+      const pl=document.getElementById("dePlating");if(pl){pl.value=d.description;pl.focus();if(_currentDish.data)_currentDish.data.plating=d.description;markDirty();}
+    }catch(e){showToast(t("lab_ai_desc_err"));}
+    finally{if(btn){btn.disabled=false;}if(lbl)lbl.textContent=t("lab_ai_desc");}
+  }
+
+  async function generateVisitSummary(){
+    if(!_vaCurVisitId)return;
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    const btn=$("#vaAiBtn");const lbl=$("#vaAiBtnLbl");
+    if(btn)btn.disabled=true;if(lbl)lbl.textContent=t("shift_ai_loading");
+    const visits=getVisits();const visit=visits.find(v=>v.id===_vaCurVisitId);if(!visit){if(btn)btn.disabled=false;if(lbl)lbl.textContent=t("va_ai_btn");return;}
+    try{
+      const r=await fetch(base+"/api/visits/summary",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name:visit.name||"",dishes:visit.dishes||[],wines:visit.wines||[],rating:visit.rating||0,lang})});
+      const d=await r.json();
+      if(!r.ok||!d.summary)throw new Error(d.error||"no summary");
+      const com=$("#vaEditComment");if(com){com.value=d.summary;vaSaveField(_vaCurVisitId,"comment",d.summary);com.focus();}
+    }catch(e){showToast(t("va_ai_err"));}
+    finally{if(btn)btn.disabled=false;if(lbl)lbl.textContent=t("va_ai_btn");}
   }
 
   function openShiftModal(){
@@ -3648,6 +3694,7 @@
     shiftPhotoDataUrl=null;
     const thumb=$("#shiftPhotoThumb");if(thumb){thumb.src="";thumb.style.display="none";}
     $("#shiftScrim").classList.add("open");
+    generateShiftSummary();
   }
 
   async function postShift(){
@@ -3715,7 +3762,6 @@
     renderShiftBar();
     const startBtn=$("#shiftStartBtn");if(startBtn)startBtn.addEventListener("click",startShift);
     const endBtn=$("#shiftEndBtn");if(endBtn)endBtn.addEventListener("click",openShiftModal);
-    const aiBtn=$("#shiftAiBtn");if(aiBtn)aiBtn.addEventListener("click",generateShiftSummary);
     const postBtn=$("#shiftPost");if(postBtn)postBtn.addEventListener("click",()=>{
       const sh=getShift();
       if(sh){
@@ -4143,6 +4189,9 @@
     // Wine AI
     var wineAiBtn=$("#wineAiBtn");
     if(wineAiBtn)wineAiBtn.addEventListener("click",function(){openAiSheet(lang==="da"?"Foreslå 2-3 specifikke vine (region, drue, stil) der passer perfekt til denne ret, og forklar kort hvorfor":"Suggest 2-3 specific wines (region, grape, style) that pair perfectly with this dish and briefly explain why");});
+    // Dish description AI
+    var dishDescAiBtn=$("#dishDescAiBtn");
+    if(dishDescAiBtn)dishDescAiBtn.addEventListener("click",generateDishDescription);
     // Steps add
     var stepAddBtn=$("#stepAddBtn");
     if(stepAddBtn)stepAddBtn.addEventListener("click",function(){
@@ -4856,6 +4905,9 @@
     function vaBackToList(){
       renderVaList();vaShowPage("vaListPage");vaSetHdr("Craft Tracker",t("va_hdr_title"),true);
     }
+
+    const vaAiBtn=$("#vaAiBtn");
+    if(vaAiBtn)vaAiBtn.addEventListener("click",generateVisitSummary);
 
     const gemBtn=$("#vaGemBtn");
     if(gemBtn)gemBtn.addEventListener("click",openVaGemScrim);
