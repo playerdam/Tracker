@@ -869,8 +869,8 @@ app.post("/api/visits/wine-from-label", async (req, res) => {
     const content = [
       { type: "image", source: { type: "base64", media_type: mediaType, data: b64 } },
       { type: "text", text: isDa
-        ? "Læs denne vins etiket og returner et JSON-objekt med disse felter: name (vinens navn/betegnelse), producer (producent/domaine), vintage (årstal som string, fx \"2021\"), type (én af: rod, hvid, rose, champagne, mousserende, andet), land (land), region (region/appellation), grape (druetype/blend). Returner kun JSON, ingen forklaring. Ukendte felter sættes til tom string."
-        : "Read this wine label and return a JSON object with these fields: name (wine name/designation), producer (producer/domaine), vintage (year as string, e.g. \"2021\"), type (one of: rod, hvid, rose, champagne, mousserende, andet), land (country), region (region/appellation), grape (grape variety/blend). Return only JSON, no explanation. Unknown fields as empty string."
+        ? "Læs denne vins etiket og returner et JSON-objekt med disse felter: name (vinens navn/betegnelse), producer (producent/domaine), vintage (årstal som string, fx \"2021\"), type (én af: rod, hvid, rose, champagne, mousserende, andet), land (land), region (region/appellation), grape (hvis blend: alle druer med procentfordeling fx \"Sangiovese 85%, Cabernet Sauvignon 15%\"; hvis enkeltdrue: bare druens navn). Returner kun JSON, ingen forklaring. Ukendte felter sættes til tom string."
+        : "Read this wine label and return a JSON object with these fields: name (wine name/designation), producer (producer/domaine), vintage (year as string, e.g. \"2021\"), type (one of: rod, hvid, rose, champagne, mousserende, andet), land (country), region (region/appellation), grape (if a blend: all varieties with percentages e.g. \"Sangiovese 85%, Cabernet Sauvignon 15%\"; if single variety: just the grape name). Return only JSON, no explanation. Unknown fields as empty string."
       }
     ];
     if (!API_KEY) throw new Error("ANTHROPIC_API_KEY mangler");
