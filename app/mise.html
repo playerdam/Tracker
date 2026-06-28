@@ -742,6 +742,9 @@
   .va-gem-del{color:#C05060}
   .va-ai-btn{appearance:none;background:none;border:1.5px solid #2C1520;border-radius:10px;width:100%;padding:11px;color:#C9A465;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;-webkit-tap-highlight-color:transparent;transition:.1s}
   .va-ai-btn:active{background:#2C1520}
+  .va-scan-btn{appearance:none;background:#1A0D14;border:1.5px dashed #3D1E2C;border-radius:10px;width:100%;padding:12px;color:#C9A465;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:12px;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .va-scan-btn:active{background:#2C1520}
+  .va-scan-btn.loading{opacity:.5;pointer-events:none}
   /* Modal fields (light-theme modals only) */
   .modal-field-label{font-size:12px;font-weight:600;color:var(--dim);letter-spacing:.04em;margin-bottom:5px;margin-top:16px;display:block}
   .modal-field-label:first-child{margin-top:0}
@@ -1472,6 +1475,11 @@
         <span class="va-sec-label" id="vaLblWines">Vine</span>
         <div id="vaWineList"></div>
         <div class="va-inline-form" id="vaWineForm" style="display:none">
+          <button class="va-scan-btn" id="vaScanLabelBtn" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span id="vaScanLabelLbl">Scan etiket</span>
+          </button>
+          <input type="file" id="vaScanLabelInput" accept="image/*" capture="environment" style="display:none">
           <div class="va-wine-type-strip" id="vaWineTypeStrip">
             <button class="va-wine-type-btn" data-wtype="rod" id="vaWineTypeRod">🍷 Rød</button>
             <button class="va-wine-type-btn" data-wtype="hvid" id="vaWineTypeHvid">🍋 Hvid</button>
@@ -1703,6 +1711,7 @@
       va_toast_shared:"Delt til feed!",va_toast_sharing:"Deler...",va_toast_login:"Log ind for at dele",va_toast_err:"Noget gik galt",
       va_del_wine:"Slet vin",va_del_dish:"Slet ret",
       va_ai_btn:"Opsummer besøg med AI",va_ai_err:"Kunne ikke opsummere — prøv igen",
+      va_scan_label:"Scan etiket",va_scan_loading:"Aflæser etiket…",va_scan_err:"Kunne ikke aflæse etiketten — prøv igen",
       va_empty_title:"Ingen besøg endnu",va_empty_sub:"Tryk + for at dokumentere dit første restaurantbesøg",
       va_unknown:"Ukendt restaurant",va_edit_hdr:"Besøg",va_edit_back:"← Oversigt",
       va_wine_single:"{0} vin",va_wine_plural:"{0} vine",va_dish_single:"{0} ret",va_dish_plural:"{0} retter",
@@ -1849,6 +1858,7 @@
       va_toast_shared:"Shared to feed!",va_toast_sharing:"Sharing...",va_toast_login:"Log in to share",va_toast_err:"Something went wrong",
       va_del_wine:"Delete wine",va_del_dish:"Delete dish",
       va_ai_btn:"Summarise visit with AI",va_ai_err:"Could not summarise — try again",
+      va_scan_label:"Scan label",va_scan_loading:"Reading label…",va_scan_err:"Could not read the label — try again",
       va_empty_title:"No visits yet",va_empty_sub:"Tap + to document your first restaurant visit",
       va_unknown:"Unknown restaurant",va_edit_hdr:"Visit",va_edit_back:"← Overview",
       va_wine_single:"{0} wine",va_wine_plural:"{0} wines",va_dish_single:"{0} dish",va_dish_plural:"{0} dishes",
@@ -2021,6 +2031,7 @@
     const vaLblCom=$("#vaLblComment");if(vaLblCom)vaLblCom.textContent=t("va_lbl_comment");
     const vaComEl=$("#vaEditComment");if(vaComEl)vaComEl.placeholder=t("va_comment_ph");
     const vaAiBtnLbl=$("#vaAiBtnLbl");if(vaAiBtnLbl)vaAiBtnLbl.textContent=t("va_ai_btn");
+    const vaScanLbl=$("#vaScanLabelLbl");if(vaScanLbl)vaScanLbl.textContent=t("va_scan_label");
     const vaLblWin=$("#vaLblWines");if(vaLblWin)vaLblWin.textContent=t("va_lbl_wines");
     const vaWTRod=$("#vaWineTypeRod");if(vaWTRod)vaWTRod.textContent=t("va_wine_rod");
     const vaWTHvid=$("#vaWineTypeHvid");if(vaWTHvid)vaWTHvid.textContent=t("va_wine_hvid");
@@ -3655,6 +3666,28 @@
     finally{if(btn){btn.disabled=false;}if(lbl)lbl.textContent=t("lab_ai_desc");}
   }
 
+  async function scanWineLabel(file){
+    if(!file)return;
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    const btn=$("#vaScanLabelBtn");const lbl=$("#vaScanLabelLbl");
+    if(btn)btn.classList.add("loading");if(lbl)lbl.textContent=t("va_scan_loading");
+    try{
+      const dataUrl=await resizeImage(file,1200);
+      const r=await fetch(base+"/api/visits/wine-from-label",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl,lang})});
+      const d=await r.json();
+      if(!r.ok||(!d.name&&!d.producer))throw new Error(d.error||"empty");
+      const nameEl=$("#vaWineFormName");if(nameEl)nameEl.value=d.name||"";
+      const prodEl=$("#vaWineFormProducer");if(prodEl)prodEl.value=d.producer||"";
+      const vintEl=$("#vaWineFormVintage");if(vintEl)vintEl.value=d.vintage||"";
+      if(d.type){
+        const strip=$("#vaWineTypeStrip");
+        if(strip){strip.querySelectorAll(".va-wine-type-btn").forEach(b=>b.classList.remove("on"));const tb=strip.querySelector('[data-wtype="'+d.type+'"]');if(tb){tb.classList.add("on");_vaWineType=d.type;}}
+      }
+      const nameEl2=$("#vaWineFormName");if(nameEl2)nameEl2.focus();
+    }catch(e){showToast(t("va_scan_err"));}
+    finally{if(btn)btn.classList.remove("loading");if(lbl)lbl.textContent=t("va_scan_label");}
+  }
+
   async function generateVisitSummary(){
     if(!_vaCurVisitId)return;
     const base=apiBase();const token=await getToken();if(!base||!token)return;
@@ -4837,6 +4870,11 @@
       addWineBtn.style.display="none";
       setTimeout(()=>{const n=$("#vaWineFormName");if(n)n.focus();},60);
     });
+    const scanLabelBtn=$("#vaScanLabelBtn");const scanLabelInput=$("#vaScanLabelInput");
+    if(scanLabelBtn&&scanLabelInput){
+      scanLabelBtn.addEventListener("click",()=>scanLabelInput.click());
+      scanLabelInput.addEventListener("change",()=>{const f=scanLabelInput.files[0];scanLabelInput.value="";if(f)scanWineLabel(f);});
+    }
     const wineTypeStrip=$("#vaWineTypeStrip");
     if(wineTypeStrip)wineTypeStrip.addEventListener("click",e=>{
       const btn=e.target.closest(".va-wine-type-btn");if(!btn)return;

@@ -857,6 +857,37 @@ app.post("/api/shift/summary", async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.post("/api/visits/wine-from-label", async (req, res) => {
+  try {
+    await verifyAuth(req);
+    const { dataUrl, lang = "da" } = req.body || {};
+    if (!dataUrl) return res.status(400).json({ error: "Mangler billede" });
+    const m = dataUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+    if (!m) return res.status(400).json({ error: "Ugyldigt billede" });
+    const [, mediaType, b64] = m;
+    const isDa = lang === "da";
+    const content = [
+      { type: "image", source: { type: "base64", media_type: mediaType, data: b64 } },
+      { type: "text", text: isDa
+        ? "Læs denne vins etiket og returner et JSON-objekt med disse felter: name (vinens navn/betegnelse), producer (producent/domaine), vintage (årstal som string, fx \"2021\"), type (én af: rod, hvid, rose, champagne, mousserende). Returner kun JSON, ingen forklaring. Ukendte felter sættes til tom string."
+        : "Read this wine label and return a JSON object with these fields: name (wine name/designation), producer (producer/domaine), vintage (year as string, e.g. \"2021\"), type (one of: rod, hvid, rose, champagne, mousserende). Return only JSON, no explanation. Unknown fields as empty string."
+      }
+    ];
+    if (!API_KEY) throw new Error("ANTHROPIC_API_KEY mangler");
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": API_KEY, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 200, messages: [{ role: "user", content }] }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error((data && data.error && data.error.message) || ("HTTP " + r.status));
+    const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
+    const wine = extractJSON(text);
+    if (!wine) throw new Error("Kunne ikke læse etiketten");
+    res.json({ name: wine.name || "", producer: wine.producer || "", vintage: wine.vintage || "", type: wine.type || "" });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.post("/api/lab/dishes/description", async (req, res) => {
   try {
     await verifyAuth(req);
