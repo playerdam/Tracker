@@ -45,5 +45,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Bruges til at scanne vietiketter</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Bruges til at vælge billeder af vietiketter og til retter</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Bruges til at gemme billeder</string>
 </dict>
 </plist>
