@@ -3063,6 +3063,7 @@
       if(d.region)$("#w_region").value=d.region;
       if(d.grape)$("#w_grape").value=d.grape;
       if(d.type){document.querySelectorAll(".wtype-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===d.type));}
+      winePhotoDataUrl=dataUrl;winePhotoExistingUrl=null;wPhotoSetPreview(dataUrl);
       setTimeout(()=>{const n=$("#w_name");if(n)n.focus();},60);
     }catch(e){showToast(t("wine_scan_err"));}
     finally{
