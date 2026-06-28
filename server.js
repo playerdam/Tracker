@@ -910,6 +910,59 @@ app.post("/api/visits/wine-from-label", async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.post("/api/visits/wine-lineup", async (req, res) => {
+  try {
+    await verifyAuth(req);
+    const { dataUrl, lang = "da" } = req.body || {};
+    if (!dataUrl) return res.status(400).json({ error: "Mangler billede" });
+    const m = dataUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+    if (!m) return res.status(400).json({ error: "Ugyldigt billede" });
+    const [, mediaType, b64] = m;
+    const isDa = lang === "da";
+
+    // Step 1: vision — identify all wine bottles in the photo
+    const visionContent = [
+      { type: "image", source: { type: "base64", media_type: mediaType, data: b64 } },
+      { type: "text", text: isDa
+        ? "Dette billede viser et lineup af vins. Identificer ALLE vinflasker du kan se. For hver flaske, returner et JSON-array hvor hvert element har: name (vinens navn), producer (producent), vintage (årstal som string), type (én af: rod, hvid, rose, champagne, mousserende, andet), land, region, readable (true hvis etiketten er læselig, false hvis den er uskarp/skjult/ulæselig). Returner KUN JSON-array. Usynlige felter som tom string."
+        : "This image shows a lineup of wines. Identify ALL wine bottles you can see. For each bottle return a JSON array where each element has: name (wine name), producer (producer), vintage (year as string), type (one of: rod, hvid, rose, champagne, mousserende, andet), land, region, readable (true if label is readable, false if blurry/hidden/unreadable). Return ONLY a JSON array. Unknown fields as empty string."
+      }
+    ];
+    if (!API_KEY) throw new Error("ANTHROPIC_API_KEY mangler");
+    const visionR = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": API_KEY, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 1200, messages: [{ role: "user", content: visionContent }] }),
+    });
+    const visionData = await visionR.json();
+    if (!visionR.ok) throw new Error((visionData && visionData.error && visionData.error.message) || ("HTTP " + visionR.status));
+    const visionText = (visionData.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
+    let wines = extractJSON(visionText);
+    if (!Array.isArray(wines)) throw new Error("Kunne ikke identificere vine");
+
+    // Step 2: enrich each readable wine with grape knowledge (parallel)
+    await Promise.all(wines.map(async (wine, i) => {
+      if (wine.readable === false) return;
+      const desc = [wine.name, wine.producer, wine.vintage, wine.region, wine.land].filter(Boolean).join(", ");
+      if (!desc) return;
+      const prompt = isDa
+        ? `Vin: ${desc}\nBrug din viden til at returnere JSON med: grape (druetype med procentfordeling fx "Sangiovese 85%, Cabernet Sauvignon 15%"; tom string hvis ukendt), region (korrekt region), land. Returner kun JSON.`
+        : `Wine: ${desc}\nUse your knowledge to return JSON with: grape (grape variety with blend % e.g. "Sangiovese 85%, Cabernet Sauvignon 15%"; empty string if unknown), region (correct region), land. Return only JSON.`;
+      try {
+        const enriched = await callClaude({ model: "claude-haiku-4-5-20251001", maxTokens: 120, content: prompt });
+        const enrichedData = extractJSON(enriched);
+        if (enrichedData) {
+          if (enrichedData.grape) wines[i].grape = enrichedData.grape;
+          if (enrichedData.region) wines[i].region = enrichedData.region;
+          if (enrichedData.land) wines[i].land = enrichedData.land;
+        }
+      } catch (_) {}
+    }));
+
+    res.json({ wines });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.post("/api/lab/dishes/description", async (req, res) => {
   try {
     await verifyAuth(req);
