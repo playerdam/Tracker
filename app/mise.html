@@ -881,40 +881,44 @@
   .station-catalog-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
   .station-catalog-btn:active{transform:scale(.98);transition:transform .06s}
 
-  /* ---- Station redesign ---- */
-  .st-list{display:flex;flex-direction:column;gap:14px;padding-bottom:90px}
-  .st-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
-  .st-sec-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px 10px 16px;border-bottom:1px solid var(--border);background:var(--bg)}
-  .st-sec-icon{width:22px;height:22px;color:var(--accent);flex:none;display:flex;align-items:center;justify-content:center}
-  .st-sec-icon svg{width:22px;height:22px}
-  .st-sec-name{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);flex:1}
-  .st-sec-total{font-family:"Fraunces",serif;font-size:24px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;min-width:28px;text-align:right}
-  .st-row{display:flex;align-items:center;gap:8px;padding:10px 12px 10px 16px;border-top:1px solid var(--border);min-height:58px;-webkit-tap-highlight-color:transparent}
-  .st-row.swipe-flash{animation:swipeFlash .35s ease}
-  @keyframes swipeFlash{0%{background:transparent}30%{background:var(--accent-soft)}100%{background:transparent}}
-  .st-label{flex:1;font-size:15px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-  .st-count{font-family:"Fraunces",serif;font-size:30px;font-weight:600;min-width:46px;text-align:right;line-height:1;font-variant-numeric:tabular-nums;color:var(--text);transition:color .15s;user-select:none;cursor:pointer;padding:0 2px}
-  .st-count.tick{animation:pop .3s ease}
-  .st-minus{appearance:none;width:38px;height:38px;border:1px solid var(--border);background:var(--surface);border-radius:10px;color:var(--dim);font-size:20px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent;user-select:none;transition:.12s}
-  .st-minus:active{transform:scale(.86);transition:transform .07s}
-  .st-plus{appearance:none;width:48px;height:48px;border:none;background:var(--accent);border-radius:13px;color:#fff;font-size:26px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
-  .st-plus:active{transform:scale(.88);transition:transform .07s;background:var(--accent-h)}
-  .st-plus.holding{opacity:.55;transform:scale(.97)}
-  .st-kebab{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;font-size:18px;padding:4px 6px;border-radius:6px;flex:none;line-height:1;-webkit-tap-highlight-color:transparent}
-  .st-kebab:active{color:var(--text);transform:scale(.84);transition:transform .05s}
-  .st-sub-rows{border-top:1px solid var(--border);background:var(--bg)}
-  .st-sub-row{display:flex;align-items:center;gap:8px;padding:8px 12px 8px 30px;border-top:1px solid var(--border);min-height:44px}
-  .st-sub-row:first-child{border-top:none}
-  .st-sub-name{flex:1;font-size:14px;color:var(--dim);font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .st-sub-count{font-family:"Fraunces",serif;font-size:20px;font-weight:600;min-width:32px;text-align:right;font-variant-numeric:tabular-nums;cursor:pointer;transition:color .15s;user-select:none;padding:0 2px}
-  .st-sub-count.tick{animation:pop .3s ease}
-  .st-sub-minus{appearance:none;width:30px;height:30px;border:1px solid var(--border);background:var(--surface);border-radius:7px;color:var(--dim);font-size:16px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.12s}
-  .st-sub-minus:active{transform:scale(.86);transition:transform .07s}
-  .st-sub-plus{appearance:none;width:36px;height:36px;border:none;background:var(--accent);border-radius:9px;color:#fff;font-size:18px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent}
-  .st-sub-plus:active{transform:scale(.86);transition:transform .07s;background:var(--accent-h)}
-  .st-sub-plus.holding{opacity:.55}
-  .st-add-row{appearance:none;background:none;border:none;border-top:1px solid var(--border);width:100%;padding:11px 16px;text-align:left;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-  .st-add-row:active{background:var(--accent-soft);transform:scale(.99);transition:transform .06s}
+  /* ---- Station tile grid ---- */
+  .st-grid{display:flex;flex-direction:column;gap:20px;padding-bottom:90px}
+  .st-cat-lbl{display:flex;align-items:center;gap:8px;margin-bottom:-8px}
+  .st-cat-lbl-icon{width:18px;height:18px;color:var(--accent);flex:none;display:flex;align-items:center;justify-content:center}
+  .st-cat-lbl-icon svg{width:18px;height:18px}
+  .st-cat-lbl-name{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);flex:1}
+  .st-cat-lbl-total{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--dim);font-variant-numeric:tabular-nums}
+  .st-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .st-tile{position:relative;background:var(--surface);border:1.5px solid var(--border);border-radius:22px;padding:44px 14px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;box-shadow:var(--shadow);transition:transform .07s,box-shadow .07s;min-height:140px}
+  .st-tile:active{transform:scale(.93);box-shadow:none;transition:transform .06s}
+  .st-tile-num{font-family:"Fraunces",serif;font-size:62px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--text);letter-spacing:-.02em;pointer-events:none}
+  @keyframes tilePop{0%{transform:scale(1)}35%{transform:scale(1.22);color:var(--accent)}100%{transform:scale(1)}}
+  .st-tile-num.tick{animation:tilePop .28s cubic-bezier(.34,1.4,.64,1)}
+  .st-tile-name{font-size:12px;font-weight:600;color:var(--dim);text-align:center;margin-top:8px;line-height:1.3;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;pointer-events:none}
+  .st-tile-corner{position:absolute;top:10px;appearance:none;background:none;border:none;width:30px;height:30px;border-radius:8px;color:var(--faint);font-size:16px;line-height:1;cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .st-tile-corner:active{background:var(--surface-2);color:var(--text);transform:scale(.78);transition:transform .06s}
+  .st-tile-edit{left:10px}
+  .st-tile-minus{right:10px;font-size:19px}
+  .st-add-tile{background:none;border:1.5px dashed var(--border-2);border-radius:22px;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--faint);font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.12s}
+  .st-add-tile:active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);transform:scale(.95);transition:transform .07s}
+  .st-sub-card{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);grid-column:1/-1}
+  .st-sub-card-hdr{display:flex;align-items:center;gap:10px;padding:14px 14px 12px 16px}
+  .st-sub-card-name{flex:1;font-size:15px;font-weight:600;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .st-sub-card-total{font-family:"Fraunces",serif;font-size:26px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;line-height:1}
+  .st-sub-card-total.tick{animation:pop .3s ease}
+  .st-sub-card-edit{appearance:none;background:none;border:none;color:var(--faint);font-size:16px;padding:4px 6px;cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:6px}
+  .st-sub-card-edit:active{color:var(--text);transform:scale(.84);transition:transform .05s}
+  .st-sub-rows{border-top:1px solid var(--border)}
+  .st-sub-item{display:flex;align-items:center;gap:8px;padding:11px 14px 11px 16px;border-bottom:1px solid var(--border)}
+  .st-sub-item:last-child{border-bottom:none}
+  .st-sub-item-name{flex:1;font-size:14px;font-weight:500;color:var(--dim);min-width:0}
+  .st-sub-item-cnt{font-family:"Fraunces",serif;font-size:24px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;min-width:40px;text-align:right;cursor:pointer;user-select:none}
+  .st-sub-item-cnt.tick{animation:pop .3s ease}
+  .st-sub-item-minus{appearance:none;width:34px;height:34px;border:1px solid var(--border);background:var(--surface);border-radius:9px;color:var(--dim);font-size:18px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.12s}
+  .st-sub-item-minus:active{transform:scale(.84);transition:transform .07s}
+  .st-sub-item-plus{appearance:none;width:42px;height:42px;border:none;background:var(--accent);border-radius:11px;color:#fff;font-size:22px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent}
+  .st-sub-item-plus:active{transform:scale(.84);transition:transform .07s;background:var(--accent-h)}
+  .st-sub-item-plus.holding{opacity:.55}
   .station-fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(138,46,63,.35),0 1px 4px rgba(0,0,0,.12);-webkit-tap-highlight-color:transparent;z-index:50;transition:.12s}
   .station-fab:active{transform:scale(.88);transition:transform .07s;background:var(--accent-h)}
   .catalog-modal{display:flex;flex-direction:column;max-height:90vh;padding:0;overflow:hidden}
@@ -2651,40 +2655,46 @@
   }
 
   // ---- counters ----
+  function makeTile(c){
+    const tile=document.createElement("div");tile.className="st-tile";tile.dataset.id=c.id;
+    const numEl=document.createElement("div");numEl.className="st-tile-num";numEl.textContent=counterTotal(c);
+    const nameEl=document.createElement("div");nameEl.className="st-tile-name";nameEl.textContent=tLabel(c.label);
+    const editBtn=document.createElement("button");editBtn.className="st-tile-corner st-tile-edit";editBtn.innerHTML="&#8943;";editBtn.title="Edit";
+    const minusBtn=document.createElement("button");minusBtn.className="st-tile-corner st-tile-minus";minusBtn.innerHTML="&#8722;";
+    tile.appendChild(editBtn);tile.appendChild(minusBtn);tile.appendChild(numEl);tile.appendChild(nameEl);
+    editBtn.addEventListener("click",e=>{e.stopPropagation();openCounterModal(c.id);});
+    minusBtn.addEventListener("click",e=>{e.stopPropagation();bumpStRow(c.id,-1);});
+    tile.addEventListener("click",()=>{if(tile._longPressed){tile._longPressed=false;return;}bumpStRow(c.id,1);});
+    bindLongPress(tile,()=>{openNumtray(t("numtray_add")+" "+c.label,"",val=>{if(val>0)bumpStRow(c.id,val);});});
+    return tile;
+  }
+  function makeSubCard(c){
+    const card=document.createElement("div");card.className="st-sub-card";card.dataset.id=c.id;
+    const hdr=document.createElement("div");hdr.className="st-sub-card-hdr";
+    const nameEl=document.createElement("div");nameEl.className="st-sub-card-name";nameEl.textContent=tLabel(c.label);
+    const totEl=document.createElement("div");totEl.className="st-sub-card-total";totEl.textContent=counterTotal(c);
+    const editBtn=document.createElement("button");editBtn.className="st-sub-card-edit";editBtn.innerHTML="&#8943;";
+    editBtn.addEventListener("click",()=>openCounterModal(c.id));
+    hdr.appendChild(nameEl);hdr.appendChild(totEl);hdr.appendChild(editBtn);card.appendChild(hdr);
+    const rows=document.createElement("div");rows.className="st-sub-rows";
+    c.subs.forEach(sub=>{
+      const item=document.createElement("div");item.className="st-sub-item";item.dataset.sid=sub.id;item.dataset.pid=c.id;
+      const sn=document.createElement("span");sn.className="st-sub-item-name";sn.textContent=tLabel(sub.name);
+      const sc=document.createElement("span");sc.className="st-sub-item-cnt";sc.textContent=sub.count;
+      const sm=document.createElement("button");sm.className="st-sub-item-minus";sm.innerHTML="&#8722;";
+      const sp=document.createElement("button");sp.className="st-sub-item-plus";sp.innerHTML="+";
+      item.appendChild(sn);item.appendChild(sc);item.appendChild(sm);item.appendChild(sp);
+      sm.addEventListener("click",()=>bumpStSub(c.id,sub.id,-1));
+      sp.addEventListener("click",()=>{if(sp._longPressed){sp._longPressed=false;return;}bumpStSub(c.id,sub.id,1);});
+      bindLongPress(sp,()=>{openNumtray(t("numtray_add")+" "+sub.name,"",val=>{if(val>0)bumpStSub(c.id,sub.id,val);});});
+      sc.addEventListener("click",()=>{openNumtray(t("numtray_set",sub.name),sub.count,val=>{if(val>=0){sub.count=val;save();renderCareer();sc.textContent=val;totEl.textContent=counterTotal(c);}});});
+      rows.appendChild(item);
+    });
+    card.appendChild(rows);return card;
+  }
   function makeCounterRow(c){
-    const hasSubs=c.subs.length>0;const total=counterTotal(c);
     const frag=document.createDocumentFragment();
-    const row=document.createElement("div");row.className="st-row";row.dataset.id=c.id;
-    const lbl=document.createElement("span");lbl.className="st-label";lbl.textContent=tLabel(c.label);
-    const cnt=document.createElement("span");cnt.className="st-count";cnt.textContent=total;
-    if(!hasSubs)cnt.dataset.act="st-editnum";
-    row.appendChild(lbl);row.appendChild(cnt);
-    if(!hasSubs){
-      const minus=document.createElement("button");minus.className="st-minus";minus.dataset.act="st-dec";minus.innerHTML="&#8722;";
-      const plus=document.createElement("button");plus.className="st-plus";plus.dataset.act="st-inc";plus.innerHTML="+";
-      row.appendChild(minus);row.appendChild(plus);
-      bindLongPress(plus,()=>{openNumtray(t("numtray_add")+" "+c.label,"",val=>{if(val>0)bumpStRow(c.id,val);});});
-      let _tx=0;
-      row.addEventListener("touchstart",e=>{_tx=e.touches[0].clientX;},{passive:true});
-      row.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-_tx;if(dx>52&&!e.target.closest("button")){bumpStRow(c.id,1);row.classList.add("swipe-flash");setTimeout(()=>row.classList.remove("swipe-flash"),350);}},{passive:true});
-    }
-    const kebab=document.createElement("button");kebab.className="st-kebab";kebab.dataset.act="st-edit";kebab.innerHTML="&#8943;";
-    row.appendChild(kebab);
-    frag.appendChild(row);
-    if(hasSubs){
-      const subCont=document.createElement("div");subCont.className="st-sub-rows";subCont.dataset.id=c.id;
-      c.subs.forEach(sub=>{
-        const sr=document.createElement("div");sr.className="st-sub-row";sr.dataset.sid=sub.id;sr.dataset.pid=c.id;
-        const sn=document.createElement("span");sn.className="st-sub-name";sn.textContent=tLabel(sub.name);
-        const sc=document.createElement("span");sc.className="st-sub-count";sc.dataset.act="st-subeditnum";sc.textContent=sub.count;
-        const sm=document.createElement("button");sm.className="st-sub-minus";sm.dataset.act="st-subdec";sm.innerHTML="&#8722;";
-        const sp=document.createElement("button");sp.className="st-sub-plus";sp.dataset.act="st-subinc";sp.innerHTML="+";
-        sr.appendChild(sn);sr.appendChild(sc);sr.appendChild(sm);sr.appendChild(sp);
-        bindLongPress(sp,()=>{openNumtray(t("numtray_add")+" "+sub.name,"",val=>{if(val>0)bumpStSub(c.id,sub.id,val);});});
-        subCont.appendChild(sr);
-      });
-      frag.appendChild(subCont);
-    }
+    frag.appendChild(c.subs.length?makeSubCard(c):makeTile(c));
     return frag;
   }
   function makeCounterCard(c,recs){
@@ -2723,7 +2733,7 @@
     return card;
   }
   function renderCounters(){
-    const grid=$("#counterGrid");grid.className="st-list";grid.innerHTML="";
+    const grid=$("#counterGrid");grid.className="st-grid";grid.innerHTML="";
     let migrated=false;
     state.counters.forEach(c=>{if(!c.cat){c.cat=guessCategory(c.label);migrated=true;}});
     if(migrated)save();
@@ -2742,19 +2752,19 @@
     activeCats.forEach(cat=>{
       const counters=groups[cat.id]||[];
       const total=counters.reduce((s,c)=>s+counterTotal(c),0);
-      const section=document.createElement("div");section.className="st-section";section.dataset.catSection=cat.id;
-      const hdr=document.createElement("div");hdr.className="st-sec-hdr";
-      const iconEl=document.createElement("div");iconEl.className="st-sec-icon";
-      iconEl.innerHTML=cat.iconPending?'<span class="spin" style="width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;display:inline-block;animation:spin .7s linear infinite"></span>':cat.icon;
-      const nameEl=document.createElement("div");nameEl.className="st-sec-name";nameEl.textContent=lang==="en"?cat.en:cat.da;
-      const totalEl=document.createElement("div");totalEl.className="st-sec-total";totalEl.id="cat-total-"+cat.id;totalEl.textContent=total;
-      hdr.appendChild(iconEl);hdr.appendChild(nameEl);hdr.appendChild(totalEl);
-      section.appendChild(hdr);
-      counters.forEach(c=>{section.appendChild(makeCounterRow(c));});
-      const addRow=document.createElement("button");addRow.className="st-add-row";addRow.dataset.catAdd=cat.id;
-      addRow.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'+(lang==="da"?" Tilføj tæller":" Add counter");
-      section.appendChild(addRow);
-      grid.appendChild(section);
+      const lbl=document.createElement("div");lbl.className="st-cat-lbl";
+      const iconEl=document.createElement("div");iconEl.className="st-cat-lbl-icon";
+      iconEl.innerHTML=cat.iconPending?'<span style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;display:inline-block;animation:spin .7s linear infinite"></span>':cat.icon;
+      const nameEl=document.createElement("span");nameEl.className="st-cat-lbl-name";nameEl.textContent=lang==="en"?cat.en:cat.da;
+      const totalEl=document.createElement("span");totalEl.className="st-cat-lbl-total";totalEl.id="cat-total-"+cat.id;totalEl.textContent=total;
+      lbl.appendChild(iconEl);lbl.appendChild(nameEl);lbl.appendChild(totalEl);
+      grid.appendChild(lbl);
+      const tilesGrid=document.createElement("div");tilesGrid.className="st-tiles";
+      counters.forEach(c=>{tilesGrid.appendChild(c.subs.length?makeSubCard(c):makeTile(c));});
+      const addTile=document.createElement("button");addTile.className="st-add-tile";addTile.dataset.catAdd=cat.id;
+      addTile.innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>'+(lang==="da"?"Ny tæller":"New counter")+'</span>';
+      tilesGrid.appendChild(addTile);
+      grid.appendChild(tilesGrid);
     });
     const addCat=document.createElement("button");addCat.className="station-new-cat";addCat.id="addCatBtn";addCat.textContent=t("new_cat_btn");
     grid.appendChild(addCat);
@@ -2790,18 +2800,18 @@
   function bumpStRow(cid,d){
     const c=state.counters.find(x=>x.id===cid);if(!c||c.subs.length)return;
     const prev=c.count;c.count=Math.max(0,c.count+d);
-    const row=document.querySelector('.st-row[data-id="'+cid+'"]');
-    if(row){const el=row.querySelector(".st-count");animateCount(el,prev,c.count);if(d>0){tickEl(el);haptic();}}
+    const tile=document.querySelector('.st-tile[data-id="'+cid+'"]');
+    if(tile){const el=tile.querySelector(".st-tile-num");animateCount(el,prev,c.count);if(d>0){tickEl(el);haptic();}}
     updateCatHeader(c.cat||"andet");renderCareer();save();
   }
   function bumpStSub(cid,sid,d){
     const c=state.counters.find(x=>x.id===cid);if(!c)return;
     const s=c.subs.find(x=>x.id===sid);if(!s)return;
     const prev=s.count;s.count=Math.max(0,s.count+d);
-    const sr=document.querySelector('.st-sub-row[data-sid="'+sid+'"]');
-    if(sr){const el=sr.querySelector(".st-sub-count");animateCount(el,prev,s.count);if(d>0){tickEl(el);haptic();}}
-    const row=document.querySelector('.st-row[data-id="'+cid+'"]');
-    if(row){const el=row.querySelector(".st-count");const prevT=counterTotal(c)-d;animateCount(el,Math.max(0,prevT),counterTotal(c));if(d>0)tickEl(el);}
+    const item=document.querySelector('.st-sub-item[data-sid="'+sid+'"]');
+    if(item){const el=item.querySelector(".st-sub-item-cnt");animateCount(el,prev,s.count);if(d>0){tickEl(el);haptic();}}
+    const card=document.querySelector('.st-sub-card[data-id="'+cid+'"]');
+    if(card){const el=card.querySelector(".st-sub-card-total");const prevT=counterTotal(c)-d;animateCount(el,Math.max(0,prevT),counterTotal(c));if(d>0)tickEl(el);}
     updateCatHeader(c.cat||"andet");renderCareer();save();
   }
   function addType(card,name){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c)return;name=name.trim();if(!name)return;const ex=c.subs.find(s=>s.name.toLowerCase()===name.toLowerCase());if(ex){ex.count++;}else{if(c.subs.length===0&&c.count>0){c.subs.push({id:id(),name:"Uden type",count:c.count});c.count=0;}c.subs.push({id:id(),name,count:0});if(!c.suggest.some(s=>s.toLowerCase()===name.toLowerCase()))c.suggest.push(name);}save();renderCounters();renderCareer();}
@@ -2811,16 +2821,6 @@
     if(e.target.closest("#addCatBtn")){openNewCatModal();return;}
     if(e.target.closest("#catalogBtn")){openCatalog();return;}
     const catAdd=e.target.closest("[data-cat-add]");if(catAdd){openCounterModal(null,catAdd.dataset.catAdd);return;}
-    const act=e.target.closest("[data-act]");if(!act)return;const a=act.dataset.act;
-    const row=act.closest(".st-row");const subRow=act.closest(".st-sub-row");
-    const cid=row?row.dataset.id:(subRow?subRow.dataset.pid:null);if(!cid)return;
-    if(a==="st-inc"){if(act._longPressed){act._longPressed=false;return;}bumpStRow(cid,1);}
-    else if(a==="st-dec")bumpStRow(cid,-1);
-    else if(a==="st-edit")openCounterModal(cid);
-    else if(a==="st-editnum"){const c=state.counters.find(x=>x.id===cid);if(!c||c.subs.length)return;openNumtray(t("numtray_set",c.label),c.count,val=>{if(val>=0){c.count=val;save();renderCounters();renderCareer();}});}
-    else if(a==="st-subinc"){if(act._longPressed){act._longPressed=false;return;}bumpStSub(cid,subRow.dataset.sid,1);}
-    else if(a==="st-subdec")bumpStSub(cid,subRow.dataset.sid,-1);
-    else if(a==="st-subeditnum"){const c=state.counters.find(x=>x.id===cid);const sid=subRow.dataset.sid;const s=c&&c.subs.find(x=>x.id===sid);if(!s)return;openNumtray(t("numtray_set",s.name),s.count,val=>{if(val>=0){s.count=val;save();renderCareer();act.textContent=val;const rw=document.querySelector('.st-row[data-id="'+cid+'"]');if(rw)rw.querySelector(".st-count").textContent=counterTotal(c);}});}
   });
   const stationFab=$("#stationFab");if(stationFab)stationFab.addEventListener("click",()=>openQlogOverlay());
 
