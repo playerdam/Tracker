@@ -271,6 +271,9 @@
   .btn.ghost:hover{color:var(--text);border-color:var(--border-2)}
   .btn.del{background:none;color:var(--faint);margin-left:auto;padding:11px 6px}
   .btn.del:hover{color:#DC2626}
+  .wine-scan-btn{appearance:none;width:100%;padding:13px;background:var(--accent-soft);border:1.5px dashed var(--accent);border-radius:var(--r);color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .wine-scan-btn:active{background:var(--ring)}
+  .wine-scan-btn.loading{opacity:.5;pointer-events:none}
   .loading{padding:80px 0;text-align:center;color:var(--faint);font-size:14px}
 
   .numtray{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:14px 20px max(28px,env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:10px;z-index:200;box-shadow:0 -4px 24px rgba(0,0,0,.08);transform:translateY(100%);transition:transform .2s ease}
@@ -1301,6 +1304,11 @@
 
 <div class="scrim" id="wineScrim"><div class="modal">
   <h2 id="wineModalTitle"></h2>
+  <button class="wine-scan-btn" id="wineScanBtn" type="button">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    <span id="wineScanLbl">Scan etiket</span>
+  </button>
+  <input type="file" id="wineScanInput" accept="image/*" capture="environment" style="display:none">
   <div class="field"><label id="wl_name"></label><input id="w_name" maxlength="60" autocomplete="off"></div>
   <div class="field"><label id="wl_producer"></label><input id="w_producer" maxlength="50" autocomplete="off"></div>
   <div class="row2">
@@ -1589,7 +1597,7 @@
       wine_no_country:"Uden land",
       counter_new:"Ny tæller",counter_edit:"Rediger tæller",
       counter_q:"Hvad tæller du?",counter_ph:"fx Østers åbnet",
-      wine_new:"Tilføj vin manuelt",wine_edit:"Rediger vin",
+      wine_new:"Tilføj vin",wine_edit:"Rediger vin",wine_scan:"Scan etiket",wine_scan_loading:"Aflæser etiket…",wine_scan_err:"Kunne ikke aflæse etiketten — prøv igen",
       w_name:"Navn",w_name_ph:"fx Tignanello",
       w_producer:"Producent",w_producer_ph:"fx Antinori",
       w_land:"Land",w_land_ph:"Italien",
@@ -1736,7 +1744,7 @@
       wine_no_country:"No country",
       counter_new:"New counter",counter_edit:"Edit counter",
       counter_q:"What are you counting?",counter_ph:"e.g. Oysters opened",
-      wine_new:"Add wine manually",wine_edit:"Edit wine",
+      wine_new:"Add wine",wine_edit:"Edit wine",wine_scan:"Scan label",wine_scan_loading:"Reading label…",wine_scan_err:"Could not read the label — try again",
       w_name:"Name",w_name_ph:"e.g. Tignanello",
       w_producer:"Producer",w_producer_ph:"e.g. Antinori",
       w_land:"Country",w_land_ph:"Italy",
@@ -1891,6 +1899,7 @@
     $("#counterSave").textContent=t("save");
     $("#counterCancel").textContent=t("cancel");
     $("#counterDelete").textContent=t("del");
+    const wineScanLbl=$("#wineScanLbl");if(wineScanLbl)wineScanLbl.textContent=t("wine_scan");
     $("#wl_name").textContent=t("w_name");$("#w_name").placeholder=t("w_name_ph");
     $("#wl_producer").textContent=t("w_producer");$("#w_producer").placeholder=t("w_producer_ph");
     $("#wl_land").textContent=t("w_land");$("#w_land").placeholder=t("w_land_ph");
@@ -3015,6 +3024,35 @@
     $("#wineScrim").classList.add("open");setTimeout(()=>(w?$("#w_vint"):$("#w_name")).focus(),30);
   }
   function closeWineModal(){$("#wineScrim").classList.remove("open");editW=null;winePhotoDataUrl=null;winePhotoExistingUrl=null;}
+
+  async function scanWineModalLabel(file){
+    if(!file)return;
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    const btn=$("#wineScanBtn");const lbl=$("#wineScanLbl");
+    if(btn)btn.classList.add("loading");if(lbl)lbl.textContent=t("wine_scan_loading");
+    try{
+      const dataUrl=await resizeImage(file,1200);
+      const r=await fetch(base+"/api/visits/wine-from-label",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl,lang})});
+      const d=await r.json();
+      if(!r.ok||(!d.name&&!d.producer))throw new Error(d.error||"empty");
+      if(d.name)$("#w_name").value=d.name;
+      if(d.producer)$("#w_producer").value=d.producer;
+      if(d.vintage)$("#w_vint").value=d.vintage;
+      if(d.land)$("#w_land").value=d.land;
+      if(d.region)$("#w_region").value=d.region;
+      if(d.grape)$("#w_grape").value=d.grape;
+      if(d.type){document.querySelectorAll(".wtype-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===d.type));}
+      $("#w_name").focus();
+    }catch(e){showToast(t("wine_scan_err"));}
+    finally{if(btn)btn.classList.remove("loading");if(lbl)lbl.textContent=t("wine_scan");}
+  }
+
+  const wineScanBtn=$("#wineScanBtn");const wineScanInput=$("#wineScanInput");
+  if(wineScanBtn&&wineScanInput){
+    wineScanBtn.addEventListener("click",()=>wineScanInput.click());
+    wineScanInput.addEventListener("change",()=>{const f=wineScanInput.files[0];wineScanInput.value="";if(f)scanWineModalLabel(f);});
+  }
+
   $("#wPhotoBtn").addEventListener("click",()=>$("#wPhotoInput").click());
   $("#wPhotoInput").addEventListener("change",async()=>{
     const file=$("#wPhotoInput").files[0];if(!file)return;
