@@ -866,25 +866,47 @@ app.post("/api/visits/wine-from-label", async (req, res) => {
     if (!m) return res.status(400).json({ error: "Ugyldigt billede" });
     const [, mediaType, b64] = m;
     const isDa = lang === "da";
-    const content = [
+
+    // Step 1: read the label visually
+    const visionContent = [
       { type: "image", source: { type: "base64", media_type: mediaType, data: b64 } },
       { type: "text", text: isDa
-        ? "Læs denne vins etiket og returner et JSON-objekt med disse felter: name (vinens navn/betegnelse), producer (producent/domaine), vintage (årstal som string, fx \"2021\"), type (én af: rod, hvid, rose, champagne, mousserende, andet), land (land), region (region/appellation), grape (hvis blend: alle druer med procentfordeling fx \"Sangiovese 85%, Cabernet Sauvignon 15%\"; hvis enkeltdrue: bare druens navn). Returner kun JSON, ingen forklaring. Ukendte felter sættes til tom string."
-        : "Read this wine label and return a JSON object with these fields: name (wine name/designation), producer (producer/domaine), vintage (year as string, e.g. \"2021\"), type (one of: rod, hvid, rose, champagne, mousserende, andet), land (country), region (region/appellation), grape (if a blend: all varieties with percentages e.g. \"Sangiovese 85%, Cabernet Sauvignon 15%\"; if single variety: just the grape name). Return only JSON, no explanation. Unknown fields as empty string."
+        ? "Læs denne vins etiket. Returner kun et JSON-objekt med felterne: name (vinens navn/betegnelse), producer (producent/domaine), vintage (årstal som string), type (én af: rod, hvid, rose, champagne, mousserende, andet), land (land hvis synligt), region (region/appellation hvis synligt). Returner kun JSON. Usynlige felter sættes til tom string."
+        : "Read this wine label. Return only a JSON object with fields: name (wine name/designation), producer (producer/domaine), vintage (year as string), type (one of: rod, hvid, rose, champagne, mousserende, andet), land (country if visible), region (region/appellation if visible). Return only JSON. Unknown fields as empty string."
       }
     ];
     if (!API_KEY) throw new Error("ANTHROPIC_API_KEY mangler");
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
+    const visionR = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": API_KEY, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 200, messages: [{ role: "user", content }] }),
+      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 250, messages: [{ role: "user", content: visionContent }] }),
     });
-    const data = await r.json();
-    if (!r.ok) throw new Error((data && data.error && data.error.message) || ("HTTP " + r.status));
-    const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
-    const wine = extractJSON(text);
-    if (!wine) throw new Error("Kunne ikke læse etiketten");
-    res.json({ name: wine.name || "", producer: wine.producer || "", vintage: wine.vintage || "", type: wine.type || "", land: wine.land || "", region: wine.region || "", grape: wine.grape || "" });
+    const visionData = await visionR.json();
+    if (!visionR.ok) throw new Error((visionData && visionData.error && visionData.error.message) || ("HTTP " + visionR.status));
+    const visionText = (visionData.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
+    const wine = extractJSON(visionText);
+    if (!wine || (!wine.name && !wine.producer)) throw new Error("Kunne ikke læse etiketten");
+
+    // Step 2: enrich with knowledge lookup (grapes, blend %, region correction)
+    const knownEnough = wine.name || wine.producer;
+    let grape = "", enrichedRegion = wine.region || "", enrichedLand = wine.land || "";
+    if (knownEnough) {
+      const wineDesc = [wine.name, wine.producer, wine.vintage, wine.region, wine.land].filter(Boolean).join(", ");
+      const enrichPrompt = isDa
+        ? `Vin: ${wineDesc}\nBrug din viden om denne vin til at returnere et JSON-objekt med: grape (druetype — hvis blend, skriv alle druer med procentfordeling fx "Sangiovese 85%, Cabernet Sauvignon 15%"; hvis ukendt, tom string), region (korrekt region/appellation), land (land). Returner kun JSON. Hvis du ikke kender vinen, sæt alle felter til tom string.`
+        : `Wine: ${wineDesc}\nUse your knowledge of this wine to return a JSON object with: grape (grape variety — if a blend, list all varieties with percentages e.g. "Sangiovese 85%, Cabernet Sauvignon 15%"; if unknown, empty string), region (correct region/appellation), land (country). Return only JSON. If you don't know the wine, set all fields to empty string.`;
+      try {
+        const enriched = await callClaude({ model: "claude-haiku-4-5-20251001", maxTokens: 150, content: enrichPrompt });
+        const enrichedData = extractJSON(enriched);
+        if (enrichedData) {
+          grape = enrichedData.grape || "";
+          enrichedRegion = enrichedData.region || enrichedRegion;
+          enrichedLand = enrichedData.land || enrichedLand;
+        }
+      } catch (_) {}
+    }
+
+    res.json({ name: wine.name || "", producer: wine.producer || "", vintage: wine.vintage || "", type: wine.type || "", land: enrichedLand, region: enrichedRegion, grape });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
