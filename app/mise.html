@@ -2920,7 +2920,8 @@
       (sc.subs||[]).forEach(ss=>snapMap[sc.id].subs[ss.id]=ss.count);
     });
 
-    state.counters.forEach(c=>{
+    const sorted=[...state.counters].sort((a,b)=>counterTotal(b)-counterTotal(a));
+    sorted.forEach(c=>{
       if(c.subs.length){
         const grp=document.createElement("div");grp.className="vr-grp";
         const gn=document.createElement("span");gn.className="vr-grp-name";gn.textContent=tLabel(c.label);
