@@ -1062,6 +1062,19 @@
   .vs-worktime{font-size:12px;color:var(--dim);margin-top:10px;padding:8px 12px;background:var(--surface-2);border-radius:10px;display:flex;align-items:center;justify-content:space-between}
   .vs-worktime-lbl{font-weight:600;color:var(--faint);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
   .vs-worktime-val{font-family:"Fraunces",serif;font-size:16px;font-weight:700;color:var(--text)}
+  .shift-log-head{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:8px;padding-top:4px}
+  .shift-log-item{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;text-align:left;transition:background .08s}
+  .shift-log-item:active{background:var(--surface-2)}
+  .shift-log-info{flex:1;min-width:0}
+  .shift-log-date{font-size:14px;font-weight:600;color:var(--text)}
+  .shift-log-dur{font-family:"Fraunces",serif;font-size:13px;color:var(--accent);font-weight:600;margin-top:1px}
+  .shift-log-summary{font-size:12px;color:var(--dim);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .shift-edit-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .shift-edit-row:last-child{border-bottom:none}
+  .shift-edit-label{flex:1;font-size:14px;font-weight:500;color:var(--text)}
+  .shift-edit-unit{font-size:11px;color:var(--faint);font-weight:600}
+  .shift-edit-input{width:72px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:"Fraunces",serif;font-size:18px;font-weight:700;padding:6px 8px;text-align:right;outline:none;-webkit-appearance:none}
+  .shift-edit-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .vr-grp{padding:18px 0 6px;display:flex;align-items:baseline;justify-content:space-between}
   .vr-grp-name{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
   .vr-grp-tot{font-family:"Fraunces",serif;font-size:20px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -1524,6 +1537,19 @@
   </div>
 </div></div>
 
+<div class="scrim" id="shiftEditScrim"><div class="modal" style="max-height:80vh;overflow-y:auto">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <h2 id="shiftEditTitle" style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin:0"></h2>
+    <button id="shiftEditDelete" style="appearance:none;background:none;border:none;color:var(--faint);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1">🗑</button>
+  </div>
+  <p id="shiftEditMeta" style="font-size:12px;color:var(--faint);margin:0 0 16px"></p>
+  <div id="shiftEditEntries"></div>
+  <div class="mactions" style="margin-top:16px">
+    <button class="btn primary" id="shiftEditSave"></button>
+    <button class="btn ghost" id="shiftEditCancel"></button>
+  </div>
+</div></div>
+
 <div class="scrim" id="wineDupScrim"><div class="modal">
   <h2 id="wineDupTitle" style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin:0 0 8px"></h2>
   <p id="wineDupBody" style="font-size:14px;color:var(--dim);margin:0 0 20px;line-height:1.5"></p>
@@ -1616,6 +1642,10 @@
       <span class="va-drawer-link-label" id="teamTitle"></span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
+    <div id="shiftLogSection" style="margin-bottom:20px">
+      <div class="shift-log-head" id="shiftLogHead"></div>
+      <div id="shiftLogList"></div>
+    </div>
     <div id="logView"></div>
   </div>
 </div>
@@ -3053,8 +3083,8 @@
     const shift=getShift();
     if(!shift&&vagtTimerInterval){clearInterval(vagtTimerInterval);vagtTimerInterval=null;}
 
-    const editable=isVagtEditable();
-    const totalMs=totalWorkMs()+(shift?Date.now()-new Date(shift.startedAt).getTime():0);
+    const editable=true;
+    const totalMs=totalWorkMs();
     const worktimeBar=totalMs>0?'<div class="vs-worktime"><span class="vs-worktime-lbl">'+(lang==="da"?"Total arbejdstid":"Total work time")+'</span><span class="vs-worktime-val">'+fmtWorkTime(totalMs)+'</span></div>':'';
     const pencilSvg='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
     const addBlock=editable?('<div class="vagt-add-row">'
@@ -3920,7 +3950,7 @@
   document.querySelectorAll(".tab").forEach(tb=>tb.addEventListener("click",()=>switchTab(tb.dataset.view)));
   document.querySelectorAll(".bnav-btn").forEach(btn=>btn.addEventListener("click",()=>switchTab(btn.dataset.tab)));
 
-  function openLogDrawer(){renderLogView();$("#logDrawer").classList.add("open");$("#logScrim").classList.add("open");}
+  function openLogDrawer(){renderLogView();renderShiftLog();$("#logDrawer").classList.add("open");$("#logScrim").classList.add("open");}
   function openTeamModal(){renderTeam();$("#teamScrim").classList.add("open");}
   function closeTeamModal(){$("#teamScrim").classList.remove("open");}
   var _teamDrawerLink=$("#teamDrawerLink");if(_teamDrawerLink)_teamDrawerLink.addEventListener("click",()=>{closeLogDrawer();openTeamModal();});
@@ -4263,22 +4293,94 @@
     if(!sh||!sh.startedAt)return;
     const endedAt=Date.now();
     const durationMs=endedAt-new Date(sh.startedAt).getTime();
+    const snapMap={};
+    (sh.snap||[]).forEach(sc=>{snapMap[sc.id]={count:sc.count,subs:{}};(sc.subs||[]).forEach(ss=>snapMap[sc.id].subs[ss.id]=ss.count);});
+    const entries=[];
+    state.counters.forEach(c=>{
+      const snap=snapMap[c.id]||{count:0,subs:{}};
+      if(c.subs.length){
+        c.subs.forEach(s=>{const sv=snap.subs[s.id]||0;entries.push({counterId:c.id,subId:s.id,label:tLabel(c.label)+" · "+tLabel(s.name),unit:c.unit||"stk",snapCount:sv,endCount:s.count,delta:s.count-sv});});
+      } else {
+        const sv=snap.count||0;entries.push({counterId:c.id,label:tLabel(c.label),unit:c.unit||"stk",snapCount:sv,endCount:c.count,delta:c.count-sv});
+      }
+    });
     if(!Array.isArray(state.shiftHistory))state.shiftHistory=[];
-    state.shiftHistory.push({startedAt:sh.startedAt,endedAt,durationMs});
-    if(state.shiftHistory.length>500)state.shiftHistory=state.shiftHistory.slice(-500);
+    state.shiftHistory.unshift({id:id(),startedAt:sh.startedAt,endedAt,durationMs,entries});
+    if(state.shiftHistory.length>365)state.shiftHistory=state.shiftHistory.slice(0,365);
     save();
   }
-  function isVagtEditable(){
-    if(getShift())return true;
-    const hist=state.shiftHistory||[];
-    if(!hist.length)return true;
-    return Date.now()-hist[hist.length-1].endedAt<24*3600*1000;
-  }
-  function totalWorkMs(){return(state.shiftHistory||[]).reduce((a,s)=>a+s.durationMs,0);}
+  function totalWorkMs(){return(state.shiftHistory||[]).reduce((a,s)=>a+s.durationMs,0)+(getShift()?Date.now()-new Date(getShift().startedAt).getTime():0);}
   function fmtWorkTime(ms){
     const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
     return h+"t "+m+"m";
   }
+  function renderShiftLog(){
+    const headEl=document.getElementById("shiftLogHead");
+    const el=document.getElementById("shiftLogList");if(!el)return;
+    const hist=state.shiftHistory||[];
+    if(headEl)headEl.textContent=lang==="da"?"Vagtlog":"Shift log";
+    if(!hist.length){el.innerHTML='<p style="font-size:13px;color:var(--faint);padding:4px 0 12px">'+(lang==="da"?"Ingen vagter endnu":"No shifts yet")+'</p>';return;}
+    el.innerHTML="";
+    hist.forEach((s,i)=>{
+      const d=new Date(s.startedAt);
+      const dateStr=d.toLocaleDateString(lang==="da"?"da-DK":"en-GB",{weekday:"short",day:"numeric",month:"short"});
+      const timeStr=d.toLocaleTimeString(lang==="da"?"da-DK":"en-GB",{hour:"2-digit",minute:"2-digit"});
+      const top=(s.entries||[]).filter(e=>e.delta>0).slice(0,3).map(e=>fmtCount(e.delta,e.unit)+" "+e.label).join(", ");
+      const btn=document.createElement("button");btn.className="shift-log-item";
+      btn.innerHTML='<div class="shift-log-info">'
+        +'<div class="shift-log-date">'+esc(dateStr+" · "+timeStr)+'</div>'
+        +'<div class="shift-log-dur">'+fmtWorkTime(s.durationMs)+'</div>'
+        +(top?'<div class="shift-log-summary">'+esc(top)+'</div>':"")
+        +'</div>'
+        +'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+      btn.addEventListener("click",()=>openShiftEdit(i));
+      el.appendChild(btn);
+    });
+  }
+  let _editShiftIdx=null;
+  function openShiftEdit(idx){
+    _editShiftIdx=idx;
+    const s=state.shiftHistory[idx];if(!s)return;
+    const d=new Date(s.startedAt);
+    const dateStr=d.toLocaleDateString(lang==="da"?"da-DK":"en-GB",{weekday:"long",day:"numeric",month:"long"});
+    document.getElementById("shiftEditTitle").textContent=dateStr;
+    document.getElementById("shiftEditMeta").textContent=fmtWorkTime(s.durationMs)+" · "+new Date(s.startedAt).toLocaleTimeString(lang==="da"?"da-DK":"en-GB",{hour:"2-digit",minute:"2-digit"})+"–"+new Date(s.endedAt).toLocaleTimeString(lang==="da"?"da-DK":"en-GB",{hour:"2-digit",minute:"2-digit"});
+    document.getElementById("shiftEditSave").textContent=lang==="da"?"Gem ændringer":"Save changes";
+    document.getElementById("shiftEditCancel").textContent=lang==="da"?"Annuller":"Cancel";
+    const entriesEl=document.getElementById("shiftEditEntries");entriesEl.innerHTML="";
+    (s.entries||[]).forEach((e,ei)=>{
+      const row=document.createElement("div");row.className="shift-edit-row";
+      const lbl=document.createElement("div");lbl.className="shift-edit-label";
+      lbl.innerHTML=esc(e.label)+'<div class="shift-edit-unit">'+esc(e.unit)+'</div>';
+      const inp=document.createElement("input");inp.className="shift-edit-input";inp.type="number";inp.min="0";inp.step=e.unit==="stk"?"1":"0.1";inp.value=e.delta;inp.dataset.ei=ei;
+      row.appendChild(lbl);row.appendChild(inp);entriesEl.appendChild(row);
+    });
+    document.getElementById("shiftEditScrim").classList.add("open");
+  }
+  function closeShiftEdit(){document.getElementById("shiftEditScrim").classList.remove("open");_editShiftIdx=null;}
+  document.getElementById("shiftEditSave").addEventListener("click",()=>{
+    if(_editShiftIdx===null)return;
+    const s=state.shiftHistory[_editShiftIdx];if(!s)return;
+    document.querySelectorAll("#shiftEditEntries .shift-edit-input").forEach(inp=>{
+      const ei=+inp.dataset.ei;const e=s.entries[ei];if(!e)return;
+      const newDelta=parseFloat(inp.value)||0;
+      const diff=newDelta-e.delta;
+      if(diff===0)return;
+      const c=state.counters.find(x=>x.id===e.counterId);if(!c)return;
+      if(e.subId){const sub=c.subs.find(x=>x.id===e.subId);if(sub)sub.count=parseFloat((sub.count+diff).toFixed(2));}
+      else{c.count=parseFloat((c.count+diff).toFixed(2));}
+      e.delta=newDelta;e.endCount=e.snapCount+newDelta;
+    });
+    save();renderVagt();renderCounters();renderCareer();renderShiftLog();closeShiftEdit();
+    showToast(lang==="da"?"Vagt opdateret":"Shift updated");
+  });
+  document.getElementById("shiftEditCancel").addEventListener("click",closeShiftEdit);
+  document.getElementById("shiftEditDelete").addEventListener("click",()=>{
+    if(_editShiftIdx===null)return;
+    state.shiftHistory.splice(_editShiftIdx,1);
+    save();renderShiftLog();closeShiftEdit();
+    showToast(lang==="da"?"Vagt slettet":"Shift deleted");
+  });
 
   function fmtDuration(ms){
     const totalMin=Math.floor(ms/60000);
