@@ -216,7 +216,7 @@
   .wine-country-flag{font-size:19px;line-height:1;flex:none}
   .wine-country-name{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:var(--text);flex:1}
   .wine-country-count{font-size:12px;font-weight:700;color:var(--faint);background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:2px 8px}
-  .wrow{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;border-left-width:3px;position:relative;z-index:1;transition:transform .22s cubic-bezier(.25,.46,.45,.94)}
+  .wrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;border-left-width:3px;position:relative;z-index:1;transition:transform .22s cubic-bezier(.25,.46,.45,.94)}
   .wrow.swiped{transform:translateX(-76px)}
   .wrow-wrap{position:relative;overflow:hidden;border-radius:var(--r)}
   .wrow-del{position:absolute;right:0;top:0;bottom:0;width:76px;background:#DC2626;border:none;color:#fff;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;-webkit-tap-highlight-color:transparent;letter-spacing:.04em;text-transform:uppercase}
@@ -231,7 +231,8 @@
   .w-grape-rm{width:28px;height:28px;border-radius:50%;border:none;background:var(--surface-2);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s}
   .w-grape-rm:active{background:var(--border-2)}
   .w-grape-add{appearance:none;border:none;background:none;color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;padding:2px 0;cursor:pointer;-webkit-tap-highlight-color:transparent}
-  .wabout-btn{appearance:none;border:1.5px solid var(--accent);background:none;color:var(--accent);font-family:inherit;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;letter-spacing:.01em;margin-top:5px;display:inline-block;touch-action:manipulation}
+  .wabout-strip{width:100%;padding:0 2px 4px;margin-top:-4px}
+  .wabout-btn{appearance:none;border:1.5px solid var(--accent);background:none;color:var(--accent);font-family:inherit;font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;letter-spacing:.01em;display:inline-block;touch-action:manipulation}
   .wabout-btn:active{background:var(--accent-soft)}
   .wabout-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
   .wabout-card{background:var(--surface);border-radius:18px;padding:22px 20px 18px;max-width:360px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,.22);position:relative;animation:wAboutIn .18s cubic-bezier(.34,1.3,.64,1) both}
@@ -3204,12 +3205,12 @@
     const row=document.createElement("div");row.className="wrow";row.dataset.id=w.id;
     if(w.type&&w.type!=="andet")row.dataset.wtype=w.type;
     const photoHtml=w.imageUrl?'<img class="wrow-photo" src="'+esc(w.imageUrl)+'" alt="" loading="lazy" data-act="photo">':'';
-    const aboutBtn=w.about?'<button class="wabout-btn" data-act="about">ℹ︎ '+esc(t("w_about_btn"))+'</button>':'';
-    row.innerHTML=photoHtml+'<div class="winfo"><div class="wname">'+esc(disp)+'</div><div class="wmeta">'+meta+'</div>'+aboutBtn+'</div>'+
+    const aboutStrip=w.about?'<div class="wabout-strip"><button class="wabout-btn" data-act="about">ℹ︎ '+esc(t("w_about_btn"))+'</button></div>':'';
+    row.innerHTML=photoHtml+'<div class="winfo"><div class="wname">'+esc(disp)+'</div><div class="wmeta">'+meta+'</div></div>'+
       '<div class="wsteps">'+
       '<div class="stepblock"><div class="steplabel">'+esc(t("glasses"))+'</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
       '<div class="stepblock"><div class="steplabel">'+esc(t("bottles"))+'</div><div class="stepctrl"><button class="sbtn" data-act="b-">−</button><span class="tnum" data-k="bottles">'+w.bottles+'</span><button class="sbtn plus" data-act="b+">+</button></div></div>'+
-      '<button class="wedit" data-act="edit">⋯</button></div>';
+      '<button class="wedit" data-act="edit">⋯</button></div>'+aboutStrip;
     const wrap=document.createElement("div");wrap.className="wrow-wrap";
     const del=document.createElement("button");del.className="wrow-del";del.dataset.delId=w.id;
     del.innerHTML='<span class="wrow-del-icon">🗑</span>'+(lang==="da"?"Slet":"Del");
