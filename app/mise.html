@@ -2524,7 +2524,7 @@
   async function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){console.error(e);}}
   function normalize(s){
     s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,unit:c.unit||"stk",subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
-    s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0}));
+    s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0,type:w.type||"andet",imageUrl:w.imageUrl||null,about:w.about||""}));
     s.log=Array.isArray(s.log)?s.log.filter(e=>e&&e.ts&&e.text):[];
     s.customCats=Array.isArray(s.customCats)?s.customCats.map(c=>({id:c.id||id(),name:c.name||"",icon:c.icon||"",iconPending:!!c.iconPending})):[];
     return s;
