@@ -1043,7 +1043,7 @@
   .vr-num.sub-num{font-size:22px;min-width:36px;color:var(--dim)}
   @keyframes vrPop{0%{transform:scale(1)}40%{transform:scale(1.3);color:var(--accent)}100%{transform:scale(1)}}
   .vr-num.tick{animation:vrPop .2s cubic-bezier(.34,1.4,.64,1)}
-  .vr-delta{display:inline-block;margin-left:7px;font-family:inherit;font-size:11px;font-weight:700;color:#16A34A;background:rgba(22,163,74,.1);border-radius:10px;padding:1px 6px;vertical-align:middle;letter-spacing:.01em;pointer-events:none}
+  .vr-total{font-family:"Fraunces",serif;font-size:16px;font-weight:600;color:var(--faint);font-variant-numeric:tabular-nums;min-width:32px;text-align:right;pointer-events:none;padding-left:4px}
   .vr-grp{padding:18px 0 6px;display:flex;align-items:baseline;justify-content:space-between}
   .vr-grp-name{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
   .vr-grp-tot{font-family:"Fraunces",serif;font-size:20px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -2914,18 +2914,11 @@
   }
 
   function _buildVagtRows(rows,snap){
-    // snap: {id, count, subs:[{id,count}]} array from shift start
     const snapMap={};
     if(snap)snap.forEach(sc=>{
       snapMap[sc.id]={count:sc.count,subs:{}};
       (sc.subs||[]).forEach(ss=>snapMap[sc.id].subs[ss.id]=ss.count);
     });
-
-    function makeDeltaBadge(delta){
-      if(!snap||delta<=0)return null;
-      const b=document.createElement("span");b.className="vr-delta";b.textContent="+"+delta;
-      return b;
-    }
 
     state.counters.forEach(c=>{
       if(c.subs.length){
@@ -2934,37 +2927,41 @@
         const gt=document.createElement("span");gt.className="vr-grp-tot";gt.id="vr-tot-"+c.id;gt.textContent=counterTotal(c);
         grp.appendChild(gn);grp.appendChild(gt);rows.appendChild(grp);
         c.subs.forEach(s=>{
-          const snapBase=snapMap[c.id]?snapMap[c.id].subs[s.id]||0:0;
-          const delta=s.count-snapBase;
+          const snapBase=snap?(snapMap[c.id]?snapMap[c.id].subs[s.id]||0:0):null;
+          const dispVal=snapBase!==null?Math.max(0,s.count-snapBase):s.count;
           const row=document.createElement("div");row.className="vr";row.dataset.cid=c.id;row.dataset.sid=s.id;
           const nm=document.createElement("span");nm.className="vr-name sub";nm.textContent=tLabel(s.name);
-          const badge=makeDeltaBadge(delta);if(badge)nm.appendChild(badge);
           const ctrl=document.createElement("div");ctrl.className="vr-ctrl";
           const minus=document.createElement("button");minus.className="vr-minus";minus.setAttribute("aria-label","minus");minus.innerHTML="&minus;";
-          const num=document.createElement("span");num.className="vr-num sub-num";num.textContent=s.count;
+          const num=document.createElement("span");num.className="vr-num sub-num";num.textContent=dispVal;
           const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
+          const tot=snapBase!==null?document.createElement("span"):null;
+          if(tot){tot.className="vr-total";tot.textContent=s.count;}
           minus.addEventListener("click",e=>{e.stopPropagation();bumpVagtSub(c.id,s.id,-1);});
           plus.addEventListener("click",e=>{e.stopPropagation();bumpVagtSub(c.id,s.id,1);});
-          num.addEventListener("click",e=>{e.stopPropagation();openNumtray(t("numtray_set",s.name),s.count,val=>{if(val>=0){s.count=val;save();renderCareer();num.textContent=val;const tt=document.getElementById("vr-tot-"+c.id);if(tt)tt.textContent=counterTotal(c);}});});
+          num.addEventListener("click",e=>{e.stopPropagation();const sb=snapBase||0;openNumtray(t("numtray_set",s.name),dispVal,val=>{if(val>=0){s.count=sb+val;save();renderCareer();num.textContent=val;if(tot)tot.textContent=s.count;const tt=document.getElementById("vr-tot-"+c.id);if(tt)tt.textContent=counterTotal(c);}});});
           ctrl.appendChild(minus);ctrl.appendChild(num);ctrl.appendChild(plus);
+          if(tot)ctrl.appendChild(tot);
           row.appendChild(nm);row.appendChild(ctrl);rows.appendChild(row);
         });
       } else {
-        const snapBase=snapMap[c.id]?snapMap[c.id].count||0:0;
-        const delta=c.count-snapBase;
+        const snapBase=snap?(snapMap[c.id]?snapMap[c.id].count||0:0):null;
+        const dispVal=snapBase!==null?Math.max(0,c.count-snapBase):c.count;
         const row=document.createElement("div");row.className="vr";row.dataset.cid=c.id;
         const nm=document.createElement("span");nm.className="vr-name";nm.textContent=tLabel(c.label);
-        const badge=makeDeltaBadge(delta);if(badge)nm.appendChild(badge);
         const ctrl=document.createElement("div");ctrl.className="vr-ctrl";
         const minus=document.createElement("button");minus.className="vr-minus";minus.setAttribute("aria-label","minus");minus.innerHTML="&minus;";
-        const num=document.createElement("span");num.className="vr-num";num.textContent=c.count;
+        const num=document.createElement("span");num.className="vr-num";num.textContent=dispVal;
         const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
+        const tot=snapBase!==null?document.createElement("span"):null;
+        if(tot){tot.className="vr-total";tot.textContent=c.count;}
         minus.addEventListener("click",e=>{e.stopPropagation();bumpVagtRow(c.id,-1);});
         plus.addEventListener("click",e=>{e.stopPropagation();bumpVagtRow(c.id,1);});
-        num.addEventListener("click",e=>{e.stopPropagation();openNumtray(t("numtray_set",c.label),c.count,val=>{if(val>=0){c.count=val;save();renderCareer();num.textContent=val;}});});
+        num.addEventListener("click",e=>{e.stopPropagation();const sb=snapBase||0;openNumtray(t("numtray_set",c.label),dispVal,val=>{if(val>=0){c.count=sb+val;save();renderCareer();num.textContent=val;if(tot)tot.textContent=c.count;}});});
         row.addEventListener("click",()=>{if(row._lp){row._lp=false;return;}bumpVagtRow(c.id,1);});
         bindLongPress(row,()=>openNumtray(t("numtray_add")+" "+tLabel(c.label),"",val=>{if(val>0)bumpVagtRow(c.id,val);}));
         ctrl.appendChild(minus);ctrl.appendChild(num);ctrl.appendChild(plus);
+        if(tot)ctrl.appendChild(tot);
         row.appendChild(nm);row.appendChild(ctrl);rows.appendChild(row);
       }
     });
@@ -3039,20 +3036,35 @@
 
   function bumpVagtRow(cid,d){
     const c=state.counters.find(x=>x.id===cid);if(!c||c.subs.length)return;
-    const prev=c.count;c.count=Math.max(0,c.count+d);
+    const shift=getShift();
+    const snapBase=shift?(shift.snap||[]).find(x=>x.id===cid):null;
+    const base=snapBase?snapBase.count||0:0;
+    const prevDisp=Math.max(0,c.count-base);
+    c.count=Math.max(base,c.count+d);
+    const dispVal=c.count-base;
     const el=document.querySelector('.vr[data-cid="'+cid+'"] .vr-num');
-    if(el){animateCount(el,prev,c.count);if(d>0){tickEl(el);haptic();}}
+    if(el){animateCount(el,prevDisp,dispVal);if(d>0){tickEl(el);haptic();}}
+    const totEl=document.querySelector('.vr[data-cid="'+cid+'"] .vr-total');
+    if(totEl)totEl.textContent=c.count;
     updateCatHeader(c.cat||"andet");renderCareer();save();
   }
 
   function bumpVagtSub(cid,sid,d){
     const c=state.counters.find(x=>x.id===cid);if(!c)return;
     const s=c.subs.find(x=>x.id===sid);if(!s)return;
-    const prev=s.count;s.count=Math.max(0,s.count+d);
+    const shift=getShift();
+    const snapC=shift?(shift.snap||[]).find(x=>x.id===cid):null;
+    const base=snapC?(snapC.subs||[]).find(x=>x.id===sid):null;
+    const baseVal=base?base.count||0:0;
+    const prevDisp=Math.max(0,s.count-baseVal);
+    s.count=Math.max(baseVal,s.count+d);
+    const dispVal=s.count-baseVal;
     const el=document.querySelector('.vr[data-cid="'+cid+'"][data-sid="'+sid+'"] .vr-num');
-    if(el){animateCount(el,prev,s.count);if(d>0){tickEl(el);haptic();}}
-    const tot=document.getElementById("vr-tot-"+cid);
-    if(tot){const prevT=counterTotal(c)-d;animateCount(tot,Math.max(0,prevT),counterTotal(c));if(d>0)tickEl(tot);}
+    if(el){animateCount(el,prevDisp,dispVal);if(d>0){tickEl(el);haptic();}}
+    const totEl=document.querySelector('.vr[data-cid="'+cid+'"][data-sid="'+sid+'"] .vr-total');
+    if(totEl)totEl.textContent=s.count;
+    const grpTot=document.getElementById("vr-tot-"+cid);
+    if(grpTot)grpTot.textContent=counterTotal(c);
     updateCatHeader(c.cat||"andet");renderCareer();save();
   }
 
