@@ -297,6 +297,12 @@
   .unit-seg-btn.active{background:var(--accent);color:#fff}
   .vr-unit{font-size:12px;font-weight:700;color:var(--dim);background:var(--surface-2);border:1.5px solid var(--border);border-radius:8px;padding:2px 7px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:.1s;margin-left:2px;letter-spacing:.01em}
   .vr-unit:active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .unit-dd{position:fixed;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.14);overflow:hidden;z-index:200;min-width:90px;animation:unitDdIn .12s cubic-bezier(.25,.46,.45,.94)}
+  @keyframes unitDdIn{from{opacity:0;transform:scale(.92) translateY(-4px)}to{opacity:1;transform:none}}
+  .unit-dd-opt{display:block;width:100%;background:none;border:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);padding:11px 16px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;transition:background .08s}
+  .unit-dd-opt:active,.unit-dd-opt:hover{background:var(--surface-2)}
+  .unit-dd-opt.selected{color:var(--accent)}
+  .unit-dd-opt+.unit-dd-opt{border-top:1px solid var(--border)}
   .field label{display:block;font-size:11px;font-weight:700;color:var(--faint);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
   .field input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:16px;padding:11px 12px}
   .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
@@ -2515,6 +2521,26 @@
     return s;
   }
   function counterTotal(c){return c.subs.length?c.subs.reduce((a,b)=>a+b.count,0):c.count;}
+  let _unitDd=null;
+  function closeUnitDropdown(){if(_unitDd){_unitDd.remove();_unitDd=null;document.removeEventListener("click",closeUnitDropdown,true);}}
+  function openUnitDropdown(anchor,current,onPick){
+    closeUnitDropdown();
+    const dd=document.createElement("div");dd.className="unit-dd";_unitDd=dd;
+    ["stk","kg","liter"].forEach(u=>{
+      const btn=document.createElement("button");btn.className="unit-dd-opt"+(u===current?" selected":"");
+      btn.textContent=u;
+      btn.addEventListener("click",e=>{e.stopPropagation();onPick(u);closeUnitDropdown();});
+      dd.appendChild(btn);
+    });
+    document.body.appendChild(dd);
+    const r=anchor.getBoundingClientRect();
+    const ddW=100,ddH=dd.offsetHeight||120;
+    let top=r.bottom+6,left=r.left;
+    if(top+ddH>window.innerHeight-20)top=r.top-ddH-6;
+    if(left+ddW>window.innerWidth-8)left=window.innerWidth-ddW-8;
+    dd.style.top=top+"px";dd.style.left=left+"px";
+    setTimeout(()=>document.addEventListener("click",closeUnitDropdown,true),0);
+  }
   function fmtCount(val,unit){
     if(!unit||unit==="stk")return Math.round(val)+"";
     const n=Math.round(val*10)/10;
@@ -2976,9 +3002,7 @@
         const unitLbl=document.createElement("button");unitLbl.type="button";unitLbl.className="vr-unit";unitLbl.textContent=unit;
         unitLbl.addEventListener("click",e=>{
           e.stopPropagation();
-          const units=["stk","kg","liter"];
-          const next=units[(units.indexOf(c.unit||"stk")+1)%units.length];
-          c.unit=next;unitLbl.textContent=next;save();
+          openUnitDropdown(unitLbl,c.unit||"stk",picked=>{c.unit=picked;unitLbl.textContent=picked;save();});
         });
         const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
         const tot=snapBase!==null?document.createElement("span"):null;
