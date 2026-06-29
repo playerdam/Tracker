@@ -3605,6 +3605,48 @@
   $("#wPhotoRemove").addEventListener("click",()=>{winePhotoDataUrl=null;winePhotoExistingUrl=null;wPhotoSetPreview(null);$("#wPhotoInput").value="";});
   $("#wineCancel").addEventListener("click",closeWineModal);
   $("#addWineBtn").addEventListener("click",()=>openWineModal(null));
+  function wineNorm(s){return (s||"").toLowerCase().replace(/[^a-z0-9æøå]/g," ").replace(/\s+/g," ").trim();}
+  function wineSimilar(a,b){
+    const na=wineNorm(a.name)+" "+wineNorm(a.producer);
+    const nb=wineNorm(b.name)+" "+wineNorm(b.producer);
+    if(!na.trim()||!nb.trim())return false;
+    const wa=new Set(na.split(" ").filter(x=>x.length>2));
+    const wb=new Set(nb.split(" ").filter(x=>x.length>2));
+    if(!wa.size||!wb.size)return false;
+    let shared=0;wa.forEach(w=>{if(wb.has(w))shared++;});
+    return shared/Math.min(wa.size,wb.size)>=0.6;
+  }
+
+  let _pendingWineData=null;
+  function doWineCommit(data,mergeInto){
+    const {name,producer,land,region,grape,vint,imageUrl,type,about}=data;
+    if(mergeInto){
+      mergeInto.glasses=(mergeInto.glasses||0)+data.glasses;
+      mergeInto.bottles=(mergeInto.bottles||0)+data.bottles;
+      if(!mergeInto.imageUrl&&imageUrl)mergeInto.imageUrl=imageUrl;
+      if(!mergeInto.about&&about)mergeInto.about=about;
+    } else if(editW){
+      const w=state.wines.find(x=>x.id===editW);
+      if(w)Object.assign(w,{name,producer,land,region,grape,vint,imageUrl,type,about});
+    } else {
+      state.wines.unshift({id:id(),name,producer,land,region,grape,vint,glasses:0,bottles:0,imageUrl,type,about});
+    }
+    save();renderWines();renderCareer();closeWineModal();
+  }
+
+  $("#wineDupMerge").addEventListener("click",()=>{
+    if(!_pendingWineData)return;
+    doWineCommit(_pendingWineData,_pendingWineData._match);
+    _pendingWineData=null;
+    $("#wineDupScrim").classList.remove("open");
+  });
+  $("#wineDupNew").addEventListener("click",()=>{
+    if(!_pendingWineData)return;
+    const d=_pendingWineData;_pendingWineData=null;
+    $("#wineDupScrim").classList.remove("open");
+    doWineCommit(d,null);
+  });
+
   $("#wineSave").addEventListener("click",async()=>{
     const name=$("#w_name").value.trim(),producer=$("#w_producer").value.trim(),land=$("#w_land").value.trim(),region=$("#w_region").value.trim(),grape=getGrapesFromModal(),vint=$("#w_vint").value.trim(),about=wineAbout||"";
     if(!name&&!producer&&!region&&!grape)return;
@@ -3614,9 +3656,21 @@
       if(base&&token){try{const r=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:winePhotoDataUrl})});const d=await r.json();if(d.url)imageUrl=d.url;}catch(e){}}
     }
     const type=(document.querySelector(".wtype-btn.active")||{}).dataset?.wtype||"andet";
-    if(editW){const w=state.wines.find(x=>x.id===editW);if(w)Object.assign(w,{name,producer,land,region,grape,vint,imageUrl,type,about});}
-    else state.wines.unshift({id:id(),name,producer,land,region,grape,vint,glasses:0,bottles:0,imageUrl,type,about});
-    save();renderWines();renderCareer();closeWineModal();
+    const data={name,producer,land,region,grape,vint,imageUrl,type,about,glasses:0,bottles:0};
+    if(!editW){
+      const match=state.wines.find(w=>wineSimilar({name,producer},w));
+      if(match){
+        _pendingWineData=Object.assign(data,{_match:match});
+        const dispName=match.name||(match.producer+(match.vint?" "+match.vint:""))||"ukendt vin";
+        $("#wineDupTitle").textContent=lang==="da"?"Kender vi den her?":"Know this one?";
+        $("#wineDupBody").textContent=(lang==="da"?"Ligner det ikke ":"Looks like ")+('"'+dispName+'"')+(lang==="da"?"? Du kan tilføje til den i stedet for at oprette en kopi.":" you already have? Add to it instead of creating a duplicate.");
+        $("#wineDupMerge").textContent=lang==="da"?"Ja, tilføj til den":"Yes, add to it";
+        $("#wineDupNew").textContent=lang==="da"?"Nej, opret ny":"No, create new";
+        $("#wineDupScrim").classList.add("open");
+        return;
+      }
+    }
+    doWineCommit(data,null);
   });
   $("#wineDelete").addEventListener("click",()=>{state.wines=state.wines.filter(x=>x.id!==editW);save();renderWines();renderCareer();closeWineModal();});
 
@@ -5661,6 +5715,17 @@
     </div>
     <button class="btn primary" id="onboardDone" style="width:100%;padding:15px;font-size:16px">Kom i gang</button>
     <p class="onboard-legal" id="onboardLegal">Ved at fortsætte accepterer du vores <a href="https://tracker-production-1a62.up.railway.app/terms.html">vilkår</a> og <a href="https://tracker-production-1a62.up.railway.app/privacy.html">privatlivspolitik</a></p>
+  </div>
+</div>
+
+<div class="scrim" id="wineDupScrim">
+  <div class="modal">
+    <h2 id="wineDupTitle" style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin:0 0 8px"></h2>
+    <p id="wineDupBody" style="font-size:14px;color:var(--dim);margin:0 0 20px;line-height:1.5"></p>
+    <div class="mactions">
+      <button class="btn primary" id="wineDupMerge"></button>
+      <button class="btn ghost" id="wineDupNew"></button>
+    </div>
   </div>
 </div>
 
