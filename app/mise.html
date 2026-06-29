@@ -1066,9 +1066,9 @@
   .vsug{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 6px;min-height:0}
   .vsug-chip{background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-family:inherit;font-size:13px;font-weight:500;color:var(--dim);padding:6px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.08s;touch-action:manipulation;white-space:nowrap}
   .vsug-chip:active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-  /* ── Log FAB ── */
-  .vagt-fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);width:54px;height:54px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(138,46,63,.38),0 2px 6px rgba(0,0,0,.1);-webkit-tap-highlight-color:transparent;z-index:50;transition:.1s}
-  .vagt-fab:active{transform:scale(.86);background:var(--accent-h);box-shadow:none}
+  /* ── Log knap (inline i add-rækken) ── */
+  .vagt-log-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border-2);background:var(--surface);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.08s;touch-action:manipulation}
+  .vagt-log-btn:active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);transform:scale(.88)}
 </style>
 </head>
 <body>
@@ -1124,9 +1124,6 @@
 
   <section class="view active" id="view-vagt">
     <div id="vagtContent"></div>
-    <button class="vagt-fab" id="vagtFab" aria-label="Log">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-    </button>
   </section>
 
   <section class="view" id="view-station">
@@ -2955,12 +2952,12 @@
 
   function renderVagt(){
     const el=document.getElementById("vagtContent");if(!el)return;
-    const fab=document.getElementById("vagtFab");
-    if(fab){fab.style.display="flex";fab.onclick=()=>openQlogOverlay();}
     const shift=getShift();
     if(!shift&&vagtTimerInterval){clearInterval(vagtTimerInterval);vagtTimerInterval=null;}
 
+    const pencilSvg='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
     const addBlock='<div class="vagt-add-row">'
+      +'<button class="vagt-log-btn" id="vagtLogBtn" aria-label="Log">'+pencilSvg+'</button>'
       +'<input class="vagt-add-in" id="vagtAddIn" placeholder="'
       +esc(lang==="da"?"Tilføj fx østers, 500 cocktails…":"Add e.g. oysters, 500 cocktails…")
       +'" maxlength="200" autocomplete="off" autocorrect="off" autocapitalize="off">'
@@ -2994,6 +2991,8 @@
       const sb=document.getElementById("vagtStartBtn");if(sb)sb.addEventListener("click",()=>{startShift();renderVagt();});
     }
 
+    const logBtn=document.getElementById("vagtLogBtn");
+    if(logBtn)logBtn.addEventListener("click",()=>openQlogOverlay());
     const inp=document.getElementById("vagtAddIn"),btn=document.getElementById("vagtAddBtn");
     if(inp){
       if(btn)btn.addEventListener("click",()=>runVagtAdd(inp.value));
@@ -3719,7 +3718,6 @@
   });
   function switchTab(v){
     if(v!=="vagt"&&vagtTimerInterval){clearInterval(vagtTimerInterval);vagtTimerInterval=null;}
-    const _vf=document.getElementById("vagtFab");if(_vf)_vf.style.display=v==="vagt"?"flex":"none";
     const _sb=document.getElementById("shiftBar"),_ss=document.getElementById("shiftStartBtn");
     if(_sb)_sb.style.display=v==="vagt"?"none":"";
     if(_ss)_ss.style.display=v==="vagt"?"none":"";
