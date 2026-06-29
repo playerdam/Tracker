@@ -291,6 +291,11 @@
   .modal{background:var(--surface);border-radius:14px;width:100%;max-width:420px;padding:32px 24px 24px;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg);border:1px solid var(--border)}
   .modal h2{font-family:"Fraunces",serif;font-weight:600;font-size:22px;margin-bottom:20px;color:var(--text)}
   .field{margin-bottom:14px;position:relative}
+  .unit-seg{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-top:6px}
+  .unit-seg-btn{flex:1;background:none;border:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--dim);padding:10px 4px;cursor:pointer;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  .unit-seg-btn+.unit-seg-btn{border-left:1.5px solid var(--border)}
+  .unit-seg-btn.active{background:var(--accent);color:#fff}
+  .vr-unit{font-size:13px;font-weight:600;color:var(--faint);pointer-events:none;margin-left:1px}
   .field label{display:block;font-size:11px;font-weight:700;color:var(--faint);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
   .field input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:16px;padding:11px 12px}
   .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
@@ -1403,6 +1408,14 @@
   <h2 id="counterModalTitle"></h2>
   <div class="field"><label id="counterQLabel"></label><input id="counterLabelInput" maxlength="40" autocomplete="off"></div>
   <div class="field"><label id="counterCatLbl"></label><select id="counterCat" class="ask-select"></select></div>
+  <div class="field">
+    <label id="counterUnitLbl"></label>
+    <div class="unit-seg" id="counterUnitSeg">
+      <button type="button" class="unit-seg-btn active" data-unit="stk">stk</button>
+      <button type="button" class="unit-seg-btn" data-unit="kg">kg</button>
+      <button type="button" class="unit-seg-btn" data-unit="liter">liter</button>
+    </div>
+  </div>
   <div class="mactions">
     <button class="btn primary" id="counterSave"></button>
     <button class="btn ghost" id="counterCancel"></button>
@@ -2494,13 +2507,18 @@
   async function load(){try{const v=localStorage.getItem(STORE_KEY);if(v)return normalize(JSON.parse(v));}catch(e){}return clone(DEFAULTS);}
   async function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){console.error(e);}}
   function normalize(s){
-    s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
+    s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,unit:c.unit||"stk",subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
     s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0}));
     s.log=Array.isArray(s.log)?s.log.filter(e=>e&&e.ts&&e.text):[];
     s.customCats=Array.isArray(s.customCats)?s.customCats.map(c=>({id:c.id||id(),name:c.name||"",icon:c.icon||"",iconPending:!!c.iconPending})):[];
     return s;
   }
   function counterTotal(c){return c.subs.length?c.subs.reduce((a,b)=>a+b.count,0):c.count;}
+  function fmtCount(val,unit){
+    if(!unit||unit==="stk")return Math.round(val)+"";
+    const n=Math.round(val*10)/10;
+    return Number.isInteger(n)?n+",0":String(n).replace(".",",");
+  }
   function career(){let t=0;state.counters.forEach(c=>t+=counterTotal(c));state.wines.forEach(w=>t+=(w.glasses||0)+(w.bottles||0));return t;}
   function renderCareer(){$("#careerNum").textContent=career().toLocaleString("da-DK");renderStreak();}
 
@@ -2948,20 +2966,32 @@
       } else {
         const snapBase=snap?(snapMap[c.id]?snapMap[c.id].count||0:0):null;
         const dispVal=snapBase!==null?Math.max(0,c.count-snapBase):c.count;
+        const unit=c.unit||"stk";const isWeight=unit!=="stk";
         const row=document.createElement("div");row.className="vr";row.dataset.cid=c.id;
         const nm=document.createElement("span");nm.className="vr-name";nm.textContent=tLabel(c.label);
         const ctrl=document.createElement("div");ctrl.className="vr-ctrl";
         const minus=document.createElement("button");minus.className="vr-minus";minus.setAttribute("aria-label","minus");minus.innerHTML="&minus;";
-        const num=document.createElement("span");num.className="vr-num";num.textContent=dispVal;
+        const num=document.createElement("span");num.className="vr-num";num.textContent=fmtCount(dispVal,unit);
+        const unitLbl=document.createElement("span");unitLbl.className="vr-unit";unitLbl.textContent=unit;
         const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
         const tot=snapBase!==null?document.createElement("span"):null;
-        if(tot){tot.className="vr-total";tot.textContent=c.count;}
-        minus.addEventListener("click",e=>{e.stopPropagation();bumpVagtRow(c.id,-1);});
-        plus.addEventListener("click",e=>{e.stopPropagation();bumpVagtRow(c.id,1);});
-        num.addEventListener("click",e=>{e.stopPropagation();const sb=snapBase||0;openNumtray(t("numtray_set",c.label),dispVal,val=>{if(val>=0){c.count=sb+val;save();renderCareer();num.textContent=val;if(tot)tot.textContent=c.count;}});});
-        row.addEventListener("click",()=>{if(row._lp){row._lp=false;return;}bumpVagtRow(c.id,1);});
-        bindLongPress(row,()=>openNumtray(t("numtray_add")+" "+tLabel(c.label),"",val=>{if(val>0)bumpVagtRow(c.id,val);}));
-        ctrl.appendChild(minus);ctrl.appendChild(num);ctrl.appendChild(plus);
+        if(tot){tot.className="vr-total";tot.textContent=fmtCount(c.count,unit);}
+        minus.addEventListener("click",e=>{e.stopPropagation();bumpVagtRow(c.id,isWeight?-1:-1);});
+        plus.addEventListener("click",e=>{
+          e.stopPropagation();
+          if(isWeight){
+            const sb=snapBase||0;
+            openNumtray((lang==="da"?"Tilføj ":"Add ")+unit,"",(val)=>{if(val>0){c.count=parseFloat((c.count+val).toFixed(2));save();renderCareer();num.textContent=fmtCount(c.count-(sb),unit);if(tot)tot.textContent=fmtCount(c.count,unit);}});
+          } else {
+            bumpVagtRow(c.id,1);
+          }
+        });
+        num.addEventListener("click",e=>{e.stopPropagation();const sb=snapBase||0;openNumtray(t("numtray_set",c.label),dispVal,val=>{if(val>=0){c.count=parseFloat((sb+val).toFixed(2));save();renderCareer();num.textContent=fmtCount(val,unit);if(tot)tot.textContent=fmtCount(c.count,unit);}});});
+        if(!isWeight){
+          row.addEventListener("click",()=>{if(row._lp){row._lp=false;return;}bumpVagtRow(c.id,1);});
+          bindLongPress(row,()=>openNumtray(t("numtray_add")+" "+tLabel(c.label),"",val=>{if(val>0)bumpVagtRow(c.id,val);}));
+        }
+        ctrl.appendChild(minus);ctrl.appendChild(num);ctrl.appendChild(unitLbl);ctrl.appendChild(plus);
         if(tot)ctrl.appendChild(tot);
         row.appendChild(nm);row.appendChild(ctrl);rows.appendChild(row);
       }
@@ -3040,13 +3070,14 @@
     const shift=getShift();
     const snapBase=shift?(shift.snap||[]).find(x=>x.id===cid):null;
     const base=snapBase?snapBase.count||0:0;
+    const unit=c.unit||"stk";
     const prevDisp=Math.max(0,c.count-base);
-    c.count=Math.max(base,c.count+d);
+    c.count=Math.max(base,parseFloat((c.count+d).toFixed(2)));
     const dispVal=c.count-base;
     const el=document.querySelector('.vr[data-cid="'+cid+'"] .vr-num');
-    if(el){animateCount(el,prevDisp,dispVal);if(d>0){tickEl(el);haptic();}}
+    if(el){if(unit==="stk"){animateCount(el,prevDisp,dispVal);}else{el.textContent=fmtCount(dispVal,unit);}if(d>0){tickEl(el);haptic();}}
     const totEl=document.querySelector('.vr[data-cid="'+cid+'"] .vr-total');
-    if(totEl)totEl.textContent=c.count;
+    if(totEl)totEl.textContent=fmtCount(c.count,unit);
     updateCatHeader(c.cat||"andet");renderCareer();save();
   }
 
@@ -3086,6 +3117,9 @@
     $("#counterModalTitle").textContent=c?t("counter_edit"):t("counter_new");
     $("#counterLabelInput").value=c?c.label:"";
     $("#counterDelete").style.display=c?"block":"none";
+    const activeUnit=c?c.unit||"stk":"stk";
+    document.querySelectorAll(".unit-seg-btn").forEach(b=>{b.classList.toggle("active",b.dataset.unit===activeUnit);});
+    $("#counterUnitLbl").textContent=lang==="da"?"Enhed":"Unit";
     const sel=$("#counterCat");sel.innerHTML="";
     // Build category list: user's custom cats + "Andet" fallback
     // If editing a counter with a built-in cat, include that cat too
@@ -3103,7 +3137,15 @@
   }
   function closeCounterModal(){$("#counterScrim").classList.remove("open");editC=null;}
   $("#counterCancel").addEventListener("click",closeCounterModal);
-  $("#counterSave").addEventListener("click",()=>{const v=$("#counterLabelInput").value.trim();if(!v)return;const cat=$("#counterCat").value||"andet";if(editC){const c=state.counters.find(x=>x.id===editC);if(c){c.label=v;c.cat=cat;}}else state.counters.push({id:id(),label:v,count:0,subs:[],suggest:seedFor(v),cat});save();renderCounters();closeCounterModal();});
+  document.querySelectorAll(".unit-seg-btn").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".unit-seg-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");}));
+  $("#counterSave").addEventListener("click",()=>{
+    const v=$("#counterLabelInput").value.trim();if(!v)return;
+    const cat=$("#counterCat").value||"andet";
+    const unit=document.querySelector(".unit-seg-btn.active")?.dataset.unit||"stk";
+    if(editC){const c=state.counters.find(x=>x.id===editC);if(c){c.label=v;c.cat=cat;c.unit=unit;}}
+    else state.counters.push({id:id(),label:v,count:0,unit,subs:[],suggest:seedFor(v),cat});
+    save();renderCounters();closeCounterModal();
+  });
   $("#counterDelete").addEventListener("click",()=>{state.counters=state.counters.filter(x=>x.id!==editC);save();renderCounters();renderCareer();closeCounterModal();});
   $("#counterLabelInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#counterSave").click();});
 
