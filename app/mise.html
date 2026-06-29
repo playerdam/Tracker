@@ -295,7 +295,8 @@
   .unit-seg-btn{flex:1;background:none;border:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--dim);padding:10px 4px;cursor:pointer;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   .unit-seg-btn+.unit-seg-btn{border-left:1.5px solid var(--border)}
   .unit-seg-btn.active{background:var(--accent);color:#fff}
-  .vr-unit{font-size:13px;font-weight:600;color:var(--faint);pointer-events:none;margin-left:1px}
+  .vr-unit{font-size:12px;font-weight:700;color:var(--dim);background:var(--surface-2);border:1.5px solid var(--border);border-radius:8px;padding:2px 7px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:.1s;margin-left:2px;letter-spacing:.01em}
+  .vr-unit:active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
   .field label{display:block;font-size:11px;font-weight:700;color:var(--faint);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
   .field input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:16px;padding:11px 12px}
   .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
@@ -2972,7 +2973,13 @@
         const ctrl=document.createElement("div");ctrl.className="vr-ctrl";
         const minus=document.createElement("button");minus.className="vr-minus";minus.setAttribute("aria-label","minus");minus.innerHTML="&minus;";
         const num=document.createElement("span");num.className="vr-num";num.textContent=fmtCount(dispVal,unit);
-        const unitLbl=document.createElement("span");unitLbl.className="vr-unit";unitLbl.textContent=unit;
+        const unitLbl=document.createElement("button");unitLbl.type="button";unitLbl.className="vr-unit";unitLbl.textContent=unit;
+        unitLbl.addEventListener("click",e=>{
+          e.stopPropagation();
+          const units=["stk","kg","liter"];
+          const next=units[(units.indexOf(c.unit||"stk")+1)%units.length];
+          c.unit=next;unitLbl.textContent=next;save();
+        });
         const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
         const tot=snapBase!==null?document.createElement("span"):null;
         if(tot){tot.className="vr-total";tot.textContent=fmtCount(c.count,unit);}
