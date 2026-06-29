@@ -1755,7 +1755,7 @@
       w_region:"Område",w_region_ph:"Toscana",
       w_grape:"Druetype",w_grape_ph:"Sangiovese",w_grape_add:"Tilføj drue",
       w_vint:"Årgang",w_vint_ph:"2019",
-      w_about:"Om producenten & vinen",w_about_ph:"Kort om stil, oprindelse eller hvad der gør denne vin speciel…",w_about_btn:"Om vinen",
+      w_about:"Om producenten & vinen",w_about_ph:"Kort om stil, oprindelse eller hvad der gør denne vin speciel…",w_about_btn:"Om vinen",w_about_unknown:"Vi kender ikke denne vin endnu.",
       w_photo:"Billede",wine_add_photo:"Tilføj billede",wine_change_photo:"Skift billede",wine_remove_photo:"Fjern",
       save:"Gem",cancel:"Annullér",del:"Slet",
       ask_title:"Ukendt ting",ask_name_lbl:"Navn",
@@ -1905,7 +1905,7 @@
       w_region:"Region",w_region_ph:"Tuscany",
       w_grape:"Grape",w_grape_ph:"Sangiovese",w_grape_add:"Add grape",
       w_vint:"Vintage",w_vint_ph:"2019",
-      w_about:"About producer & wine",w_about_ph:"A short note on style, origin, or what makes this wine special…",w_about_btn:"About the wine",
+      w_about:"About producer & wine",w_about_ph:"A short note on style, origin, or what makes this wine special…",w_about_btn:"About the wine",w_about_unknown:"We don't know this wine yet.",
       w_photo:"Photo",wine_add_photo:"Add photo",wine_change_photo:"Change photo",wine_remove_photo:"Remove",
       save:"Save",cancel:"Cancel",del:"Delete",
       ask_title:"Unknown item",ask_name_lbl:"Name",
@@ -3205,7 +3205,7 @@
     const row=document.createElement("div");row.className="wrow";row.dataset.id=w.id;
     if(w.type&&w.type!=="andet")row.dataset.wtype=w.type;
     const photoHtml=w.imageUrl?'<img class="wrow-photo" src="'+esc(w.imageUrl)+'" alt="" loading="lazy" data-act="photo">':'';
-    const aboutStrip=w.about?'<div class="wabout-strip"><button class="wabout-btn" data-act="about">ℹ︎ '+esc(t("w_about_btn"))+'</button></div>':'';
+    const aboutStrip='<div class="wabout-strip"><button class="wabout-btn" data-act="about">ℹ︎ '+esc(t("w_about_btn"))+'</button></div>';
     row.innerHTML=photoHtml+'<div class="winfo"><div class="wname">'+esc(disp)+'</div><div class="wmeta">'+meta+'</div></div>'+
       '<div class="wsteps">'+
       '<div class="stepblock"><div class="steplabel">'+esc(t("glasses"))+'</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
@@ -3622,7 +3622,7 @@
     const bodyEl=document.getElementById("wAboutBody");
     if(!modal||!titleEl||!bodyEl)return;
     titleEl.textContent=title||t("w_about_btn");
-    bodyEl.textContent=text||"";
+    bodyEl.textContent=text||t("w_about_unknown");
     modal.style.display="flex";
     document.getElementById("wAboutClose").onclick=closeWineAbout;
     modal.onclick=function(e){if(e.target===modal)closeWineAbout();};
