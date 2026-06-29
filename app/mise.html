@@ -225,6 +225,15 @@
   .wrow[data-wtype="hvid"]{border-left-color:#CA8A04}
   .wrow[data-wtype="rose"]{border-left-color:#E879A3}
   .wrow[data-wtype="mousserende"]{border-left-color:#0EA5E9}
+  .w-grape-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .w-grape-input{flex:1;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:inherit;font-size:14px;padding:8px 10px;outline:none;transition:border-color .15s;-webkit-appearance:none;min-width:0}
+  .w-grape-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .w-grape-rm{width:28px;height:28px;border-radius:50%;border:none;background:var(--surface-2);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .w-grape-rm:active{background:var(--border-2)}
+  .w-grape-add{appearance:none;border:none;background:none;color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;padding:2px 0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .wabout-btn{appearance:none;border:none;background:none;color:var(--accent);font-family:inherit;font-size:12px;font-weight:600;padding:4px 0 0;cursor:pointer;-webkit-tap-highlight-color:transparent;display:block;text-align:left}
+  .wabout-expand{font-size:12px;color:var(--dim);line-height:1.5;padding:6px 0 2px;display:none}
+  .wabout-expand.open{display:block}
   .wtype-picker{display:flex;gap:5px}
   .wtype-btn{appearance:none;flex:1;padding:11px 4px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--dim);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.12s;text-align:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   .wtype-btn:hover{border-color:var(--border-2);color:var(--text)}
@@ -1010,6 +1019,45 @@
   .wine-stat-val{font-family:"Fraunces",serif;font-size:22px;font-weight:600;color:var(--text);line-height:1.2;font-variant-numeric:tabular-nums}
   .wine-stat-val.sm{font-size:13px;font-weight:700;font-family:"Inter",system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .wine-stat-lbl{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+
+  /* === VAGT VIEW === */
+  /* Vagt counter rows */
+  .vr{display:flex;align-items:center;height:52px;border-bottom:1px solid var(--border);-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;transition:background .08s;cursor:pointer;gap:8px}
+  .vr:active{background:var(--accent-soft)}
+  .vr-name{flex:1;font-size:15px;font-weight:500;color:var(--text);pointer-events:none;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vr-name.sub{font-size:13px;color:var(--dim);padding-left:18px}
+  .vr-ctrl{display:flex;align-items:center;gap:6px;flex:none}
+  .vr-minus{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border-2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;-webkit-tap-highlight-color:transparent;flex:none;transition:.08s;pointer-events:auto;touch-action:manipulation;font-family:inherit;color:var(--dim)}
+  .vr-minus:active{background:var(--surface-2)}
+  .vr-plus{width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;-webkit-tap-highlight-color:transparent;flex:none;transition:.08s;pointer-events:auto;touch-action:manipulation;font-family:inherit;background:var(--accent);color:#fff;font-weight:400}
+  .vr-plus:active{background:var(--accent-h);transform:scale(.88)}
+  .vr-num{font-family:"Fraunces",serif;font-size:22px;font-weight:700;color:var(--text);min-width:40px;text-align:center;font-variant-numeric:tabular-nums;pointer-events:auto;line-height:1;cursor:pointer}
+  .vr-num.sub-num{font-size:18px;min-width:34px;color:var(--dim)}
+  @keyframes vrPop{0%{transform:scale(1)}35%{transform:scale(1.25);color:var(--accent)}100%{transform:scale(1)}}
+  .vr-num.tick{animation:vrPop .22s cubic-bezier(.34,1.4,.64,1)}
+  .vr-grp{padding:10px 0 2px;display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--border)}
+  .vr-grp-name{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+  .vr-grp-tot{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--dim);font-variant-numeric:tabular-nums}
+  /* Shift status bar */
+  .vs-bar{display:flex;align-items:center;gap:8px;padding:8px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px}
+  .vs-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;flex:none;animation:vsPulse 2s ease infinite}
+  @keyframes vsPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+  .vs-time{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--text);flex:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .vs-end{background:none;border:1.5px solid var(--border-2);color:var(--dim);border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;padding:5px 10px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.1s;touch-action:manipulation}
+  .vs-end:active{border-color:var(--accent);color:var(--accent)}
+  .vs-start{background:none;border:none;color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  /* Add row */
+  .vagt-add-row{display:flex;align-items:center;gap:8px;padding:12px 0 6px;border-top:1px solid var(--border);margin-top:6px}
+  .vagt-add-in{flex:1;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-family:inherit;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s;-webkit-appearance:none}
+  .vagt-add-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .vagt-add-in::placeholder{color:var(--faint);font-size:13px}
+  .vagt-add-btn{width:40px;height:40px;border-radius:50%;border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s;font-size:22px;font-weight:300;line-height:1;font-family:inherit}
+  .vagt-add-btn:active{background:var(--accent-h);transform:scale(.88);transition:transform .07s}
+  .vsug{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0 2px;min-height:0}
+  .vsug-chip{background:var(--surface-2);border:none;border-radius:16px;font-family:inherit;font-size:13px;color:var(--dim);padding:5px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.1s;touch-action:manipulation;white-space:nowrap}
+  .vsug-chip:active{background:var(--accent-soft);color:var(--accent)}
+  .vagt-fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(138,46,63,.35),0 1px 4px rgba(0,0,0,.12);-webkit-tap-highlight-color:transparent;z-index:50;transition:.12s}
+  .vagt-fab:active{transform:scale(.88);background:var(--accent-h)}
 </style>
 </head>
 <body>
@@ -1062,6 +1110,13 @@
   </div>
 
   <div id="loading" class="loading"></div>
+
+  <section class="view active" id="view-vagt">
+    <div id="vagtContent"></div>
+    <button class="vagt-fab" id="vagtFab" aria-label="Log">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </button>
+  </section>
 
   <section class="view" id="view-station">
     <!-- Hidden for JS compat -->
@@ -1400,7 +1455,11 @@
     <div class="field"><label id="wl_region"></label><input id="w_region" maxlength="40" autocomplete="off"></div>
   </div>
   <div class="row2">
-    <div class="field"><label id="wl_grape"></label><input id="w_grape" maxlength="40" autocomplete="off"></div>
+    <div class="field">
+      <label id="wl_grape"></label>
+      <div id="w_grapes_wrap"></div>
+      <button type="button" class="w-grape-add" id="w_grape_add_btn">+ <span id="w_grape_add_lbl"></span></button>
+    </div>
     <div class="field"><label id="wl_vint"></label><input id="w_vint" maxlength="8" autocomplete="off"></div>
   </div>
   <div class="field">
@@ -1423,6 +1482,10 @@
       </div>
     </div>
     <input id="wPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
+  </div>
+  <div class="field">
+    <label id="wl_about"></label>
+    <textarea id="w_about" rows="3" maxlength="600" autocomplete="off" style="width:100%;box-sizing:border-box;resize:none;font-family:inherit;font-size:14px;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text);line-height:1.5;outline:none;-webkit-appearance:none"></textarea>
   </div>
   <div class="mactions">
     <button class="btn primary" id="wineSave"></button>
@@ -1621,9 +1684,9 @@
 
 <nav class="bottom-nav" id="bottomNav" aria-label="Navigation">
   <div class="bnav-inner">
-    <button class="bnav-btn active" data-tab="station" id="bnav-station">
-      <svg class="bnav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-      <span class="bnav-label" id="bnav-lbl-station">Station</span>
+    <button class="bnav-btn active" data-tab="vagt" id="bnav-vagt">
+      <svg class="bnav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 15.5"/></svg>
+      <span class="bnav-label" id="bnav-lbl-vagt">Vagt</span>
     </button>
     <button class="bnav-btn" data-tab="vin" id="bnav-vin">
       <svg class="bnav-icon" viewBox="0 0 24 24"><path d="M8 3h8l-2 9a5 5 0 0 1-4 0L8 3z"/><line x1="12" y1="12" x2="12" y2="20"/><line x1="9" y1="20" x2="15" y2="20"/></svg>
@@ -1688,8 +1751,9 @@
       w_producer:"Producent",w_producer_ph:"fx Antinori",
       w_land:"Land",w_land_ph:"Italien",
       w_region:"Område",w_region_ph:"Toscana",
-      w_grape:"Druetype",w_grape_ph:"Sangiovese",
+      w_grape:"Druetype",w_grape_ph:"Sangiovese",w_grape_add:"Tilføj drue",
       w_vint:"Årgang",w_vint_ph:"2019",
+      w_about:"Om producenten & vinen",w_about_ph:"Kort om stil, oprindelse eller hvad der gør denne vin speciel…",w_about_btn:"Om producenten",
       w_photo:"Billede",wine_add_photo:"Tilføj billede",wine_change_photo:"Skift billede",wine_remove_photo:"Fjern",
       save:"Gem",cancel:"Annullér",del:"Slet",
       ask_title:"Ukendt ting",ask_name_lbl:"Navn",
@@ -1837,8 +1901,9 @@
       w_producer:"Producer",w_producer_ph:"e.g. Antinori",
       w_land:"Country",w_land_ph:"Italy",
       w_region:"Region",w_region_ph:"Tuscany",
-      w_grape:"Grape",w_grape_ph:"Sangiovese",
+      w_grape:"Grape",w_grape_ph:"Sangiovese",w_grape_add:"Add grape",
       w_vint:"Vintage",w_vint_ph:"2019",
+      w_about:"About producer & wine",w_about_ph:"A short note on style, origin, or what makes this wine special…",w_about_btn:"About producer",
       w_photo:"Photo",wine_add_photo:"Add photo",wine_change_photo:"Change photo",wine_remove_photo:"Remove",
       save:"Save",cancel:"Cancel",del:"Delete",
       ask_title:"Unknown item",ask_name_lbl:"Name",
@@ -1995,8 +2060,11 @@
     const wlPhoto=$("#wl_photo");if(wlPhoto)wlPhoto.textContent=t("w_photo");
     const wPhotoRemoveLbl=$("#wPhotoRemoveLbl");if(wPhotoRemoveLbl)wPhotoRemoveLbl.textContent=t("wine_remove_photo");
     $("#wl_region").textContent=t("w_region");$("#w_region").placeholder=t("w_region_ph");
-    $("#wl_grape").textContent=t("w_grape");$("#w_grape").placeholder=t("w_grape_ph");
+    $("#wl_grape").textContent=t("w_grape");
+    const _gadd=$("#w_grape_add_lbl");if(_gadd)_gadd.textContent=t("w_grape_add");
     $("#wl_vint").textContent=t("w_vint");$("#w_vint").placeholder=t("w_vint_ph");
+    const _wabl=$("#wl_about");if(_wabl)_wabl.textContent=t("w_about");
+    const _wab=$("#w_about");if(_wab)_wab.placeholder=t("w_about_ph");
     const wlType=$("#wl_type");if(wlType)wlType.textContent=t("w_type");
     document.querySelectorAll(".wtype-btn").forEach(b=>{b.textContent=t("wine_type_"+b.dataset.wtype);});
     $("#wineSave").textContent=t("save");
@@ -2195,15 +2263,7 @@
      icon:'<svg viewBox="0 0 64 64" fill="currentColor" stroke="none"><circle cx="32" cy="12" r="7"/><circle cx="32" cy="32" r="7"/><circle cx="32" cy="52" r="7"/></svg>'},
   ];
   function guessCategory(label){
-    const l=label.toLowerCase();
-    const m={
-      "aabnet-mad":["oyster","øster","musling","skaldyr","rejer","kaviar","laks","sild","tun","ål","hummer","krabbe","jomfruhummer","pighvar","torsk","blæk","squid"],
-      "aabnet-drikke":["flaske","vin","øl","champagne","prosecco","cava","spirits","whisky","vodka","rum","gin","aperitif","digestif","sodavand","vand","dåse","port","sherry","sake","cider"],
-      "snittet":["snit","hak","skær","julienne","brunoise","chiffonade","løg","gulerod","selleri","kartoffel","squash","peber","tomat","svamp","urt","purre","fennikel","aubergine","kål","salat","spinat","bønne","ærte","artiskok","rødbede"],
-      "tilberedt":["fond","sauce","sky","bouillon","marinade","vinaigrette","mayo","creme","mousse","sorbet","is","gelé","confit","emulsion","suppe","grød","risotto","polenta","brød","bolle","kage","dej","pasta","kogt","stegt","bagt","pocheret"],
-      "serveret":["couvert","gæst","bord","ret","menu","tasting","dessert","snack","amuse","forret","hoved","oste","kaffe","te","serveret"],
-    };
-    for(const[cat,words] of Object.entries(m)){if(words.some(w=>l.includes(w)))return cat;}
+    if(state.customCats&&state.customCats.length)return state.customCats[0].id;
     return "andet";
   }
   let expandedCats=new Set((()=>{try{return JSON.parse(localStorage.getItem("mise_expanded_cats")||"null");}catch(e){return null;}})()|| CATS.map(c=>c.id));
@@ -2261,16 +2321,7 @@
   function clone(o){return JSON.parse(JSON.stringify(o));}
   function seedFor(label){const l=(label||"").toLowerCase();if(/østers|oyster/.test(l))return OYSTER_TYPES.slice();if(/løg/.test(l))return LOEG_TYPER.slice();if(/vin|flaske/.test(l))return VIN_TYPER.slice();return [];}
 
-  const DEFAULTS={
-    counters:[
-      {id:id(),label:"Østers åbnet",count:0,subs:[],suggest:seedFor("Østers åbnet")},
-      {id:id(),label:"Løg snittet",count:0,subs:[],suggest:seedFor("Løg snittet")},
-      {id:id(),label:"Flasker åbnet",count:0,subs:[],suggest:seedFor("Flasker åbnet")},
-      {id:id(),label:"Couverter serveret",count:0,subs:[],suggest:[]}
-    ],
-    wines:[{id:id(),name:"Tignanello",producer:"Antinori",land:"Italien",region:"Toscana",grape:"Sangiovese",vint:"2019",glasses:0,bottles:0}],
-    log:[]
-  };
+  const DEFAULTS={counters:[],wines:[],log:[]};
 
   let state={counters:[],wines:[],log:[],customCats:[]},mem=null,wineFilter="";
   let listView=localStorage.getItem("mise_listview")==="1";
@@ -2827,6 +2878,161 @@
   }
   function addType(card,name){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c)return;name=name.trim();if(!name)return;const ex=c.subs.find(s=>s.name.toLowerCase()===name.toLowerCase());if(ex){ex.count++;}else{if(c.subs.length===0&&c.count>0){c.subs.push({id:id(),name:"Uden type",count:c.count});c.count=0;}c.subs.push({id:id(),name,count:0});if(!c.suggest.some(s=>s.toLowerCase()===name.toLowerCase()))c.suggest.push(name);}save();renderCounters();renderCareer();}
 
+  // === VAGT VIEW ===
+  let vagtTimerInterval=null;
+
+  function startVagtTimer(shift){
+    if(vagtTimerInterval)clearInterval(vagtTimerInterval);
+    function _fmt(ms){const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),se=s%60;return h>0?h+":"+String(m).padStart(2,"0")+":"+String(se).padStart(2,"0"):m+":"+String(se).padStart(2,"0");}
+    function _tick(){const el=document.getElementById("vagtTimer");if(el)el.textContent=_fmt(Date.now()-new Date(shift.startedAt).getTime());}
+    _tick();vagtTimerInterval=setInterval(_tick,1000);
+  }
+
+  function runVagtAdd(text){
+    text=(text||"").trim();if(!text)return;
+    const actions=localParse(text);
+    if(!actions.length){showToast(lang==="da"?"Forstod ikke teksten — prøv igen":"Could not parse — try again");return;}
+    undoSnapshot=clone(state);
+    const defaultCat=(state.customCats&&state.customCats.length)?state.customCats[0].id:"andet";
+    const created=[],bumped=[];
+    actions.forEach(a=>{
+      if(a.kind!=="counter")return;
+      const delta=parseInt(a.delta,10)||0;
+      let c=findCounter(a.counter);
+      if(!c){
+        c={id:id(),label:a.counter||"Ny tæller",count:0,subs:[],suggest:seedFor(a.counter),cat:defaultCat};
+        state.counters.push(c);created.push(c.label);
+      }
+      if(delta>0){c.count=Math.max(0,c.count+delta);bumped.push("+"+delta+" "+c.label);}
+    });
+    const inp=document.getElementById("vagtAddIn");if(inp)inp.value="";
+    save();renderVagt();renderCounters();renderCareer();
+    const msgs=[...bumped,...created.filter(l=>!bumped.some(b=>b.includes(l))).map(l=>'"'+l+'" '+(lang==="da"?"tilføjet":"added"))];
+    if(msgs.length)showToast(msgs.join(" · "));
+  }
+
+  function _buildVagtRows(rows){
+    state.counters.forEach(c=>{
+      if(c.subs.length){
+        const grp=document.createElement("div");grp.className="vr-grp";
+        const gn=document.createElement("span");gn.className="vr-grp-name";gn.textContent=tLabel(c.label);
+        const gt=document.createElement("span");gt.className="vr-grp-tot";gt.id="vr-tot-"+c.id;gt.textContent=counterTotal(c);
+        grp.appendChild(gn);grp.appendChild(gt);rows.appendChild(grp);
+        c.subs.forEach(s=>{
+          const row=document.createElement("div");row.className="vr";row.dataset.cid=c.id;row.dataset.sid=s.id;
+          const nm=document.createElement("span");nm.className="vr-name sub";nm.textContent=tLabel(s.name);
+          const ctrl=document.createElement("div");ctrl.className="vr-ctrl";
+          const minus=document.createElement("button");minus.className="vr-minus";minus.setAttribute("aria-label","minus");minus.innerHTML="&minus;";
+          const num=document.createElement("span");num.className="vr-num sub-num";num.textContent=s.count;
+          const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
+          minus.addEventListener("click",e=>{e.stopPropagation();bumpVagtSub(c.id,s.id,-1);});
+          plus.addEventListener("click",e=>{e.stopPropagation();bumpVagtSub(c.id,s.id,1);});
+          num.addEventListener("click",e=>{e.stopPropagation();openNumtray(t("numtray_set",s.name),s.count,val=>{if(val>=0){s.count=val;save();renderCareer();num.textContent=val;const tt=document.getElementById("vr-tot-"+c.id);if(tt)tt.textContent=counterTotal(c);}});});
+          ctrl.appendChild(minus);ctrl.appendChild(num);ctrl.appendChild(plus);
+          row.appendChild(nm);row.appendChild(ctrl);rows.appendChild(row);
+        });
+      } else {
+        const row=document.createElement("div");row.className="vr";row.dataset.cid=c.id;
+        const nm=document.createElement("span");nm.className="vr-name";nm.textContent=tLabel(c.label);
+        const ctrl=document.createElement("div");ctrl.className="vr-ctrl";
+        const minus=document.createElement("button");minus.className="vr-minus";minus.setAttribute("aria-label","minus");minus.innerHTML="&minus;";
+        const num=document.createElement("span");num.className="vr-num";num.textContent=c.count;
+        const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
+        minus.addEventListener("click",e=>{e.stopPropagation();bumpVagtRow(c.id,-1);});
+        plus.addEventListener("click",e=>{e.stopPropagation();bumpVagtRow(c.id,1);});
+        num.addEventListener("click",e=>{e.stopPropagation();openNumtray(t("numtray_set",c.label),c.count,val=>{if(val>=0){c.count=val;save();renderCareer();num.textContent=val;}});});
+        row.addEventListener("click",()=>{if(row._lp){row._lp=false;return;}bumpVagtRow(c.id,1);});
+        bindLongPress(row,()=>openNumtray(t("numtray_add")+" "+tLabel(c.label),"",val=>{if(val>0)bumpVagtRow(c.id,val);}));
+        ctrl.appendChild(minus);ctrl.appendChild(num);ctrl.appendChild(plus);
+        row.appendChild(nm);row.appendChild(ctrl);rows.appendChild(row);
+      }
+    });
+  }
+
+  function renderVagt(){
+    const el=document.getElementById("vagtContent");if(!el)return;
+    const fab=document.getElementById("vagtFab");
+    if(fab){fab.style.display="flex";fab.onclick=()=>openQlogOverlay();}
+    const shift=getShift();
+    if(!shift&&vagtTimerInterval){clearInterval(vagtTimerInterval);vagtTimerInterval=null;}
+
+    const addBlock='<div class="vagt-add-row">'
+      +'<input class="vagt-add-in" id="vagtAddIn" placeholder="'
+      +esc(lang==="da"?"Tilføj fx østers, 500 cocktails…":"Add e.g. oysters, 500 cocktails…")
+      +'" maxlength="200" autocomplete="off" autocorrect="off" autocapitalize="off">'
+      +'<button class="vagt-add-btn" id="vagtAddBtn" aria-label="Tilføj">+</button>'
+      +'</div>'
+      +'<div class="vsug" id="vagtSuggest"></div>';
+
+    let shiftBar='';
+    if(shift){
+      shiftBar='<div class="vs-bar"><div class="vs-dot"></div>'
+        +'<div class="vs-time" id="vagtTimer">0:00</div>'
+        +'<button class="vs-end" id="vagtEndBtn">'+(lang==="da"?"Afslut vagt":"End shift")+'</button>'
+        +'</div>';
+    } else {
+      shiftBar='<div class="vs-bar" style="justify-content:flex-end">'
+        +'<button class="vs-start" id="vagtStartBtn">'+(lang==="da"?"Start vagt":"Start shift")+'</button>'
+        +'</div>';
+    }
+
+    if(!state.counters.length){
+      el.innerHTML=shiftBar+addBlock;
+    } else {
+      el.innerHTML=shiftBar+'<div id="vagtRows"></div>'+addBlock;
+      _buildVagtRows(document.getElementById("vagtRows"));
+    }
+
+    if(shift){
+      const eb=document.getElementById("vagtEndBtn");if(eb)eb.addEventListener("click",openShiftModal);
+      startVagtTimer(shift);
+    } else {
+      const sb=document.getElementById("vagtStartBtn");if(sb)sb.addEventListener("click",()=>{startShift();renderVagt();});
+    }
+
+    const inp=document.getElementById("vagtAddIn"),btn=document.getElementById("vagtAddBtn");
+    if(inp){
+      if(btn)btn.addEventListener("click",()=>runVagtAdd(inp.value));
+      inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runVagtAdd(inp.value);}});
+      function _updateSuggest(){
+        const sug=document.getElementById("vagtSuggest");if(!sug)return;
+        const q=(inp.value||"").toLowerCase().trim();
+        const matches=state.counters.filter(c=>!q||tLabel(c.label).toLowerCase().includes(q)).slice(0,6);
+        sug.innerHTML=matches.map(c=>'<button class="vsug-chip" data-cid="'+esc(c.id)+'">'+esc(tLabel(c.label))+'</button>').join("");
+        sug.querySelectorAll(".vsug-chip").forEach(chip=>{
+          chip.addEventListener("click",e=>{
+            e.preventDefault();
+            const cid=chip.dataset.cid;
+            if(inp.value.trim()){runVagtAdd(inp.value);return;}
+            bumpVagtRow(cid,1);
+            inp.value="";_updateSuggest();
+          });
+        });
+      }
+      inp.addEventListener("focus",_updateSuggest);
+      inp.addEventListener("input",_updateSuggest);
+    }
+  }
+
+  function bumpVagtRow(cid,d){
+    const c=state.counters.find(x=>x.id===cid);if(!c||c.subs.length)return;
+    const prev=c.count;c.count=Math.max(0,c.count+d);
+    const el=document.querySelector('.vr[data-cid="'+cid+'"] .vr-num');
+    if(el){animateCount(el,prev,c.count);if(d>0){tickEl(el);haptic();}}
+    updateCatHeader(c.cat||"andet");renderCareer();save();
+  }
+
+  function bumpVagtSub(cid,sid,d){
+    const c=state.counters.find(x=>x.id===cid);if(!c)return;
+    const s=c.subs.find(x=>x.id===sid);if(!s)return;
+    const prev=s.count;s.count=Math.max(0,s.count+d);
+    const el=document.querySelector('.vr[data-cid="'+cid+'"][data-sid="'+sid+'"] .vr-num');
+    if(el){animateCount(el,prev,s.count);if(d>0){tickEl(el);haptic();}}
+    const tot=document.getElementById("vr-tot-"+cid);
+    if(tot){const prevT=counterTotal(c)-d;animateCount(tot,Math.max(0,prevT),counterTotal(c));if(d>0)tickEl(tot);}
+    updateCatHeader(c.cat||"andet");renderCareer();save();
+  }
+
   $("#counterGrid").addEventListener("click",e=>{
     if(e.target.closest("#addCounterBtn")){openCounterModal(null);return;}
     if(e.target.closest("#addCatBtn")){openNewCatModal();return;}
@@ -2845,8 +3051,18 @@
     $("#counterLabelInput").value=c?c.label:"";
     $("#counterDelete").style.display=c?"block":"none";
     const sel=$("#counterCat");sel.innerHTML="";
-    allCats().forEach(cat=>{const o=document.createElement("option");o.value=cat.id;o.textContent=lang==="en"?cat.en:cat.da;sel.appendChild(o);});
-    sel.value=c?(c.cat||"andet"):(defaultCat||"andet");
+    // Build category list: user's custom cats + "Andet" fallback
+    // If editing a counter with a built-in cat, include that cat too
+    const cats=[];
+    (state.customCats||[]).forEach(cc=>cats.push({id:cc.id,da:cc.name,en:cc.name}));
+    const existingCat=c?(c.cat||"andet"):null;
+    if(existingCat&&existingCat!=="andet"&&!cats.some(cc=>cc.id===existingCat)){
+      const bi=CATS.find(cat=>cat.id===existingCat);if(bi)cats.push({id:bi.id,da:bi.da,en:bi.en});
+    }
+    cats.push({id:"andet",da:"Andet",en:"Other"});
+    cats.forEach(cat=>{const o=document.createElement("option");o.value=cat.id;o.textContent=lang==="en"?cat.en:cat.da;sel.appendChild(o);});
+    const preferred=existingCat||(defaultCat||(state.customCats&&state.customCats.length?state.customCats[0].id:"andet"));
+    sel.value=preferred;
     $("#counterScrim").classList.add("open");setTimeout(()=>$("#counterLabelInput").focus(),30);
   }
   function closeCounterModal(){$("#counterScrim").classList.remove("open");editC=null;}
@@ -2989,7 +3205,8 @@
     const row=document.createElement("div");row.className="wrow";row.dataset.id=w.id;
     if(w.type&&w.type!=="andet")row.dataset.wtype=w.type;
     const photoHtml=w.imageUrl?'<img class="wrow-photo" src="'+esc(w.imageUrl)+'" alt="" loading="lazy" data-act="photo">':'';
-    row.innerHTML=photoHtml+'<div class="winfo"><div class="wname">'+esc(disp)+'</div><div class="wmeta">'+meta+'</div></div>'+
+    const aboutBtn=w.about?'<button class="wabout-btn" data-act="about">'+esc(t("w_about_btn"))+'</button><div class="wabout-expand">'+esc(w.about)+'</div>':'';
+    row.innerHTML=photoHtml+'<div class="winfo"><div class="wname">'+esc(disp)+'</div><div class="wmeta">'+meta+'</div>'+aboutBtn+'</div>'+
       '<div class="wsteps">'+
       '<div class="stepblock"><div class="steplabel">'+esc(t("glasses"))+'</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
       '<div class="stepblock"><div class="steplabel">'+esc(t("bottles"))+'</div><div class="stepctrl"><button class="sbtn" data-act="b-">−</button><span class="tnum" data-k="bottles">'+w.bottles+'</span><button class="sbtn plus" data-act="b+">+</button></div></div>'+
@@ -3089,6 +3306,7 @@
     const act=e.target.closest("[data-act]");if(!act)return;
     const w=state.wines.find(x=>x.id===row.dataset.id);if(!w)return;
     const a=act.dataset.act;
+    if(a==="about"){const exp=act.nextElementSibling;if(exp)exp.classList.toggle("open");return;}
     if(a==="edit"||a==="photo"){openWineModal(w.id);return;}
     let key,d;if(a==="g+"){key="glasses";d=1;}else if(a==="g-"){key="glasses";d=-1;}else if(a==="b+"){key="bottles";d=1;}else if(a==="b-"){key="bottles";d=-1;}else return;
     w[key]=Math.max(0,(w[key]||0)+d);
@@ -3139,6 +3357,27 @@
   ddEl.addEventListener("mousedown",e=>{const ri=e.target.closest(".ri[data-i]");if(!ri)return;e.preventDefault();const w=wlCands[+ri.dataset.i];if(!w)return;const guessed=guessWineType({grape:w.grape||"",name:w.name||"",region:w.region||""});state.wines.unshift({id:id(),name:w.name||"",producer:w.producer||"",land:w.country||"",region:w.region||"",grape:w.grape||"",vint:"",glasses:0,bottles:0,type:guessed});save();wlCands=[];wineFilter="";$("#wineSearch").value="";ddClose();renderWines();renderCareer();});
 
   let editW=null,winePhotoDataUrl=null,winePhotoExistingUrl=null;
+
+  function renderGrapeInputs(grapes){
+    const wrap=document.getElementById("w_grapes_wrap");if(!wrap)return;
+    wrap.innerHTML="";
+    const vals=grapes&&grapes.length?grapes:[""];
+    function addRow(val){
+      const row=document.createElement("div");row.className="w-grape-row";
+      const inp=document.createElement("input");inp.className="w-grape-input";inp.maxLength=40;inp.autocomplete="off";inp.value=val||"";inp.placeholder=t("w_grape_ph");
+      const rm=document.createElement("button");rm.type="button";rm.className="w-grape-rm";rm.textContent="×";
+      rm.addEventListener("click",()=>{if(wrap.querySelectorAll(".w-grape-row").length>1){row.remove();}else{inp.value="";}});
+      attachAC(inp,()=>wineSuggest("grape"));
+      row.appendChild(inp);row.appendChild(rm);wrap.appendChild(row);
+    }
+    vals.forEach(v=>addRow(v));
+    const addBtn=document.getElementById("w_grape_add_btn");
+    if(addBtn){addBtn.onclick=()=>addRow("");}
+  }
+  function getGrapesFromModal(){
+    const wrap=document.getElementById("w_grapes_wrap");if(!wrap)return"";
+    return Array.from(wrap.querySelectorAll(".w-grape-input")).map(i=>i.value.trim()).filter(Boolean).join(", ");
+  }
   function wPhotoSetPreview(src){
     const prev=$("#wPhotoPreview"),rem=$("#wPhotoRemove"),btn=$("#wPhotoBtn");
     if(src){prev.src=src;prev.classList.add("show");rem.classList.add("show");btn.textContent=t("wine_change_photo");}
@@ -3149,7 +3388,10 @@
     $("#wineModalTitle").textContent=w?t("wine_edit"):t("wine_new");
     $("#w_name").value=w?w.name:"";$("#w_producer").value=w?w.producer:"";
     $("#w_land").value=w?w.land:"";$("#w_region").value=w?w.region:"";
-    $("#w_grape").value=w?w.grape:"";$("#w_vint").value=w?w.vint:"";
+    const _wgrapes=w&&w.grape?(w.grape.split(/[,\/]/).map(s=>s.trim()).filter(Boolean)):[""];
+    renderGrapeInputs(_wgrapes);
+    $("#w_vint").value=w?w.vint:"";
+    const _wab=$("#w_about");if(_wab)_wab.value=w?w.about||"":"";
     const wtype=(w&&w.type)||guessWineType(w||{})||"andet";
     document.querySelectorAll(".wtype-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===wtype));
     winePhotoDataUrl=null;winePhotoExistingUrl=(w&&w.imageUrl)||null;
@@ -3179,7 +3421,8 @@
       if(d.vintage)$("#w_vint").value=d.vintage;
       if(d.land)$("#w_land").value=d.land;
       if(d.region)$("#w_region").value=d.region;
-      if(d.grape)$("#w_grape").value=d.grape;
+      if(d.grape){const _gs=d.grape.split(/[,\/]/).map(s=>s.trim()).filter(Boolean);renderGrapeInputs(_gs);}
+      if(d.about){const _wab=$("#w_about");if(_wab)_wab.value=d.about;}
       if(d.type){document.querySelectorAll(".wtype-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===d.type));}
       winePhotoDataUrl=dataUrl;winePhotoExistingUrl=null;wPhotoSetPreview(dataUrl);
       setTimeout(()=>{const n=$("#w_name");if(n)n.focus();},60);
@@ -3273,7 +3516,7 @@
   $("#wineCancel").addEventListener("click",closeWineModal);
   $("#addWineBtn").addEventListener("click",()=>openWineModal(null));
   $("#wineSave").addEventListener("click",async()=>{
-    const name=$("#w_name").value.trim(),producer=$("#w_producer").value.trim(),land=$("#w_land").value.trim(),region=$("#w_region").value.trim(),grape=$("#w_grape").value.trim(),vint=$("#w_vint").value.trim();
+    const name=$("#w_name").value.trim(),producer=$("#w_producer").value.trim(),land=$("#w_land").value.trim(),region=$("#w_region").value.trim(),grape=getGrapesFromModal(),vint=$("#w_vint").value.trim(),about=($("#w_about")||{}).value?.trim()||"";
     if(!name&&!producer&&!region&&!grape)return;
     let imageUrl=winePhotoExistingUrl||null;
     if(winePhotoDataUrl){
@@ -3281,8 +3524,8 @@
       if(base&&token){try{const r=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:winePhotoDataUrl})});const d=await r.json();if(d.url)imageUrl=d.url;}catch(e){}}
     }
     const type=(document.querySelector(".wtype-btn.active")||{}).dataset?.wtype||"andet";
-    if(editW){const w=state.wines.find(x=>x.id===editW);if(w)Object.assign(w,{name,producer,land,region,grape,vint,imageUrl,type});}
-    else state.wines.unshift({id:id(),name,producer,land,region,grape,vint,glasses:0,bottles:0,imageUrl,type});
+    if(editW){const w=state.wines.find(x=>x.id===editW);if(w)Object.assign(w,{name,producer,land,region,grape,vint,imageUrl,type,about});}
+    else state.wines.unshift({id:id(),name,producer,land,region,grape,vint,glasses:0,bottles:0,imageUrl,type,about});
     save();renderWines();renderCareer();closeWineModal();
   });
   $("#wineDelete").addEventListener("click",()=>{state.wines=state.wines.filter(x=>x.id!==editW);save();renderWines();renderCareer();closeWineModal();});
@@ -3290,7 +3533,7 @@
   attachAC($("#w_producer"),()=>wineSuggest("producer"));
   attachAC($("#w_land"),()=>wineSuggest("land"));
   attachAC($("#w_region"),()=>wineSuggest("region"));
-  attachAC($("#w_grape"),()=>wineSuggest("grape"));
+  // grape AC is attached per-input in renderGrapeInputs
 
   // ---- quick log ----
   async function parseLog(text){
@@ -3476,11 +3719,17 @@
     }
   });
   function switchTab(v){
+    if(v!=="vagt"&&vagtTimerInterval){clearInterval(vagtTimerInterval);vagtTimerInterval=null;}
+    const _vf=document.getElementById("vagtFab");if(_vf)_vf.style.display=v==="vagt"?"flex":"none";
+    const _sb=document.getElementById("shiftBar"),_ss=document.getElementById("shiftStartBtn");
+    if(_sb)_sb.style.display=v==="vagt"?"none":"";
+    if(_ss)_ss.style.display=v==="vagt"?"none":"";
     function doSwitch(){
       document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.view===v));
       document.querySelectorAll(".bnav-btn").forEach(x=>x.classList.toggle("active",x.dataset.tab===v));
-      ["station","vin","social","feed","lab"].forEach(n=>$("#view-"+n).classList.toggle("active",v===n));
+      ["station","vin","social","feed","lab","vagt"].forEach(n=>{const ve=document.getElementById("view-"+n);if(ve)ve.classList.toggle("active",v===n);});
       $("#viewToggle").style.display="none";
+      if(v==="vagt")renderVagt();
       if(v==="social")loadSocial();
       if(v==="feed"){loadFeed(false,window._activeFeedTab?window._activeFeedTab()==="mine":true);loadFollowRequests();}
       if(v==="lab")loadLabDishes();
@@ -3847,6 +4096,8 @@
     const shift=getShift();
     const bar=$("#shiftBar"),startBtn=$("#shiftStartBtn");
     if(!bar||!startBtn)return;
+    const onVagt=document.getElementById("view-vagt")&&document.getElementById("view-vagt").classList.contains("active");
+    if(onVagt){bar.style.display="none";startBtn.style.display="none";return;}
     if(shift){
       bar.classList.add("active");startBtn.style.display="none";
       if(shiftTimerInterval)clearInterval(shiftTimerInterval);
@@ -4058,11 +4309,11 @@
         if(state.log.length>2000)state.log.length=2000;
         save();renderLogView();
       }
-      saveShift(null);renderShiftBar();$("#shiftScrim").classList.remove("open");showToast(lang==="da"?"Vagt afsluttet":"Shift ended");
+      saveShift(null);renderShiftBar();renderVagt();$("#shiftScrim").classList.remove("open");showToast(lang==="da"?"Vagt afsluttet":"Shift ended");
     });
     const feedPostBtn=$("#shiftFeedPost");if(feedPostBtn)feedPostBtn.addEventListener("click",postShift);
     const discardBtn=$("#shiftDiscard");
-    if(discardBtn)discardBtn.addEventListener("click",()=>{saveShift(null);renderShiftBar();$("#shiftScrim").classList.remove("open");});
+    if(discardBtn)discardBtn.addEventListener("click",()=>{saveShift(null);renderShiftBar();renderVagt();$("#shiftScrim").classList.remove("open");});
     // shift photo picker
     const shiftPhotoBtn=$("#shiftPhotoBtn"),shiftPhotoInput=$("#shiftPhotoInput"),shiftThumb=$("#shiftPhotoThumb");
     if(shiftPhotoBtn&&shiftPhotoInput){
@@ -5231,7 +5482,10 @@
     console.log("CT:startApp");
     $("#mainWrap").style.display="";
     try{fixScrollPadding();}catch(e){}
-    $("#view-station").classList.add("active");
+    document.getElementById("view-vagt").classList.add("active");
+    const _sb2=document.getElementById("shiftBar"),_ss2=document.getElementById("shiftStartBtn");
+    if(_sb2)_sb2.style.display="none";if(_ss2)_ss2.style.display="none";
+    try{renderVagt();}catch(e){console.error("renderVagt",e);}
     try{renderCounters();}catch(e){console.error("renderCounters",e);}
     try{renderWines();}catch(e){console.error("renderWines",e);}
     try{renderCareer();}catch(e){console.error("renderCareer",e);}
@@ -5245,7 +5499,6 @@
     try{setupVisits();}catch(e){console.error("setupVisits",e);}
     try{updateOfflineDot();}catch(e){}
     $("#viewToggle").style.display="none";
-    const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.style.display="";
     const profileBtn=$("#profileBtn");if(profileBtn)profileBtn.style.display="";
     try{attachAC($("#qlogInput"),()=>{
       const phrases=recentLogPhrases();
