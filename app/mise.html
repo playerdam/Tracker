@@ -231,9 +231,14 @@
   .w-grape-rm{width:28px;height:28px;border-radius:50%;border:none;background:var(--surface-2);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s}
   .w-grape-rm:active{background:var(--border-2)}
   .w-grape-add{appearance:none;border:none;background:none;color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;padding:2px 0;cursor:pointer;-webkit-tap-highlight-color:transparent}
-  .wabout-btn{appearance:none;border:none;background:none;color:var(--accent);font-family:inherit;font-size:12px;font-weight:600;padding:4px 0 0;cursor:pointer;-webkit-tap-highlight-color:transparent;display:block;text-align:left}
-  .wabout-expand{font-size:12px;color:var(--dim);line-height:1.5;padding:6px 0 2px;display:none}
-  .wabout-expand.open{display:block}
+  .wabout-btn{appearance:none;border:1.5px solid var(--accent);background:none;color:var(--accent);font-family:inherit;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;letter-spacing:.01em;margin-top:5px;display:inline-block;touch-action:manipulation}
+  .wabout-btn:active{background:var(--accent-soft)}
+  .wabout-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .wabout-card{background:var(--surface);border-radius:18px;padding:22px 20px 18px;max-width:360px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,.22);position:relative;animation:wAboutIn .18s cubic-bezier(.34,1.3,.64,1) both}
+  @keyframes wAboutIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+  .wabout-card-title{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--text);margin-bottom:10px;padding-right:28px}
+  .wabout-card-body{font-size:14px;color:var(--dim);line-height:1.65}
+  .wabout-card-close{position:absolute;top:14px;right:14px;appearance:none;border:none;background:var(--surface-2);color:var(--dim);width:28px;height:28px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
   .wtype-picker{display:flex;gap:5px}
   .wtype-btn{appearance:none;flex:1;padding:11px 4px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--dim);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.12s;text-align:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   .wtype-btn:hover{border-color:var(--border-2);color:var(--text)}
@@ -1483,10 +1488,6 @@
     </div>
     <input id="wPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
   </div>
-  <div class="field">
-    <label id="wl_about"></label>
-    <textarea id="w_about" rows="3" maxlength="600" autocomplete="off" style="width:100%;box-sizing:border-box;resize:none;font-family:inherit;font-size:14px;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text);line-height:1.5;outline:none;-webkit-appearance:none"></textarea>
-  </div>
   <div class="mactions">
     <button class="btn primary" id="wineSave"></button>
     <button class="btn ghost" id="wineCancel"></button>
@@ -1753,7 +1754,7 @@
       w_region:"Område",w_region_ph:"Toscana",
       w_grape:"Druetype",w_grape_ph:"Sangiovese",w_grape_add:"Tilføj drue",
       w_vint:"Årgang",w_vint_ph:"2019",
-      w_about:"Om producenten & vinen",w_about_ph:"Kort om stil, oprindelse eller hvad der gør denne vin speciel…",w_about_btn:"Om producenten",
+      w_about:"Om producenten & vinen",w_about_ph:"Kort om stil, oprindelse eller hvad der gør denne vin speciel…",w_about_btn:"Om vinen",
       w_photo:"Billede",wine_add_photo:"Tilføj billede",wine_change_photo:"Skift billede",wine_remove_photo:"Fjern",
       save:"Gem",cancel:"Annullér",del:"Slet",
       ask_title:"Ukendt ting",ask_name_lbl:"Navn",
@@ -1903,7 +1904,7 @@
       w_region:"Region",w_region_ph:"Tuscany",
       w_grape:"Grape",w_grape_ph:"Sangiovese",w_grape_add:"Add grape",
       w_vint:"Vintage",w_vint_ph:"2019",
-      w_about:"About producer & wine",w_about_ph:"A short note on style, origin, or what makes this wine special…",w_about_btn:"About producer",
+      w_about:"About producer & wine",w_about_ph:"A short note on style, origin, or what makes this wine special…",w_about_btn:"About the wine",
       w_photo:"Photo",wine_add_photo:"Add photo",wine_change_photo:"Change photo",wine_remove_photo:"Remove",
       save:"Save",cancel:"Cancel",del:"Delete",
       ask_title:"Unknown item",ask_name_lbl:"Name",
@@ -2063,8 +2064,6 @@
     $("#wl_grape").textContent=t("w_grape");
     const _gadd=$("#w_grape_add_lbl");if(_gadd)_gadd.textContent=t("w_grape_add");
     $("#wl_vint").textContent=t("w_vint");$("#w_vint").placeholder=t("w_vint_ph");
-    const _wabl=$("#wl_about");if(_wabl)_wabl.textContent=t("w_about");
-    const _wab=$("#w_about");if(_wab)_wab.placeholder=t("w_about_ph");
     const wlType=$("#wl_type");if(wlType)wlType.textContent=t("w_type");
     document.querySelectorAll(".wtype-btn").forEach(b=>{b.textContent=t("wine_type_"+b.dataset.wtype);});
     $("#wineSave").textContent=t("save");
@@ -3205,7 +3204,7 @@
     const row=document.createElement("div");row.className="wrow";row.dataset.id=w.id;
     if(w.type&&w.type!=="andet")row.dataset.wtype=w.type;
     const photoHtml=w.imageUrl?'<img class="wrow-photo" src="'+esc(w.imageUrl)+'" alt="" loading="lazy" data-act="photo">':'';
-    const aboutBtn=w.about?'<button class="wabout-btn" data-act="about">'+esc(t("w_about_btn"))+'</button><div class="wabout-expand">'+esc(w.about)+'</div>':'';
+    const aboutBtn=w.about?'<button class="wabout-btn" data-act="about">ℹ︎ '+esc(t("w_about_btn"))+'</button>':'';
     row.innerHTML=photoHtml+'<div class="winfo"><div class="wname">'+esc(disp)+'</div><div class="wmeta">'+meta+'</div>'+aboutBtn+'</div>'+
       '<div class="wsteps">'+
       '<div class="stepblock"><div class="steplabel">'+esc(t("glasses"))+'</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
@@ -3306,7 +3305,7 @@
     const act=e.target.closest("[data-act]");if(!act)return;
     const w=state.wines.find(x=>x.id===row.dataset.id);if(!w)return;
     const a=act.dataset.act;
-    if(a==="about"){const exp=act.nextElementSibling;if(exp)exp.classList.toggle("open");return;}
+    if(a==="about"){showWineAbout(w.about,w.name||w.producer||"");return;}
     if(a==="edit"||a==="photo"){openWineModal(w.id);return;}
     let key,d;if(a==="g+"){key="glasses";d=1;}else if(a==="g-"){key="glasses";d=-1;}else if(a==="b+"){key="bottles";d=1;}else if(a==="b-"){key="bottles";d=-1;}else return;
     w[key]=Math.max(0,(w[key]||0)+d);
@@ -3356,7 +3355,7 @@
   $("#wineSearch").addEventListener("blur",()=>setTimeout(ddClose,180));
   ddEl.addEventListener("mousedown",e=>{const ri=e.target.closest(".ri[data-i]");if(!ri)return;e.preventDefault();const w=wlCands[+ri.dataset.i];if(!w)return;const guessed=guessWineType({grape:w.grape||"",name:w.name||"",region:w.region||""});state.wines.unshift({id:id(),name:w.name||"",producer:w.producer||"",land:w.country||"",region:w.region||"",grape:w.grape||"",vint:"",glasses:0,bottles:0,type:guessed});save();wlCands=[];wineFilter="";$("#wineSearch").value="";ddClose();renderWines();renderCareer();});
 
-  let editW=null,winePhotoDataUrl=null,winePhotoExistingUrl=null;
+  let editW=null,winePhotoDataUrl=null,winePhotoExistingUrl=null,wineAbout="";
 
   function renderGrapeInputs(grapes){
     const wrap=document.getElementById("w_grapes_wrap");if(!wrap)return;
@@ -3367,8 +3366,8 @@
       const inp=document.createElement("input");inp.className="w-grape-input";inp.maxLength=40;inp.autocomplete="off";inp.value=val||"";inp.placeholder=t("w_grape_ph");
       const rm=document.createElement("button");rm.type="button";rm.className="w-grape-rm";rm.textContent="×";
       rm.addEventListener("click",()=>{if(wrap.querySelectorAll(".w-grape-row").length>1){row.remove();}else{inp.value="";}});
-      attachAC(inp,()=>wineSuggest("grape"));
       row.appendChild(inp);row.appendChild(rm);wrap.appendChild(row);
+      attachAC(inp,()=>wineSuggest("grape"));
     }
     vals.forEach(v=>addRow(v));
     const addBtn=document.getElementById("w_grape_add_btn");
@@ -3391,7 +3390,7 @@
     const _wgrapes=w&&w.grape?(w.grape.split(/[,\/]/).map(s=>s.trim()).filter(Boolean)):[""];
     renderGrapeInputs(_wgrapes);
     $("#w_vint").value=w?w.vint:"";
-    const _wab=$("#w_about");if(_wab)_wab.value=w?w.about||"":"";
+    wineAbout=w?w.about||"":"";
     const wtype=(w&&w.type)||guessWineType(w||{})||"andet";
     document.querySelectorAll(".wtype-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===wtype));
     winePhotoDataUrl=null;winePhotoExistingUrl=(w&&w.imageUrl)||null;
@@ -3422,7 +3421,7 @@
       if(d.land)$("#w_land").value=d.land;
       if(d.region)$("#w_region").value=d.region;
       if(d.grape){const _gs=d.grape.split(/[,\/]/).map(s=>s.trim()).filter(Boolean);renderGrapeInputs(_gs);}
-      if(d.about){const _wab=$("#w_about");if(_wab)_wab.value=d.about;}
+      if(d.about)wineAbout=d.about;
       if(d.type){document.querySelectorAll(".wtype-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===d.type));}
       winePhotoDataUrl=dataUrl;winePhotoExistingUrl=null;wPhotoSetPreview(dataUrl);
       setTimeout(()=>{const n=$("#w_name");if(n)n.focus();},60);
@@ -3516,7 +3515,7 @@
   $("#wineCancel").addEventListener("click",closeWineModal);
   $("#addWineBtn").addEventListener("click",()=>openWineModal(null));
   $("#wineSave").addEventListener("click",async()=>{
-    const name=$("#w_name").value.trim(),producer=$("#w_producer").value.trim(),land=$("#w_land").value.trim(),region=$("#w_region").value.trim(),grape=getGrapesFromModal(),vint=$("#w_vint").value.trim(),about=($("#w_about")||{}).value?.trim()||"";
+    const name=$("#w_name").value.trim(),producer=$("#w_producer").value.trim(),land=$("#w_land").value.trim(),region=$("#w_region").value.trim(),grape=getGrapesFromModal(),vint=$("#w_vint").value.trim(),about=wineAbout||"";
     if(!name&&!producer&&!region&&!grape)return;
     let imageUrl=winePhotoExistingUrl||null;
     if(winePhotoDataUrl){
@@ -3616,6 +3615,20 @@
     return actions;
   }
   let toastTimer=null,undoSnapshot=null;
+  function showWineAbout(text,title){
+    const modal=document.getElementById("wAboutModal");
+    const titleEl=document.getElementById("wAboutTitle");
+    const bodyEl=document.getElementById("wAboutBody");
+    if(!modal||!titleEl||!bodyEl)return;
+    titleEl.textContent=title||t("w_about_btn");
+    bodyEl.textContent=text||"";
+    modal.style.display="flex";
+    document.getElementById("wAboutClose").onclick=closeWineAbout;
+    modal.onclick=function(e){if(e.target===modal)closeWineAbout();};
+  }
+  function closeWineAbout(){
+    const modal=document.getElementById("wAboutModal");if(modal)modal.style.display="none";
+  }
   function showToast(msg){
     clearTimeout(toastTimer);$("#toastMsg").textContent=msg;
     const toast=$("#toast");toast.classList.add("show");
@@ -5558,6 +5571,14 @@
     </div>
     <button class="btn primary" id="onboardDone" style="width:100%;padding:15px;font-size:16px">Kom i gang</button>
     <p class="onboard-legal" id="onboardLegal">Ved at fortsætte accepterer du vores <a href="https://tracker-production-1a62.up.railway.app/terms.html">vilkår</a> og <a href="https://tracker-production-1a62.up.railway.app/privacy.html">privatlivspolitik</a></p>
+  </div>
+</div>
+
+<div class="wabout-modal" id="wAboutModal" style="display:none" role="dialog" aria-modal="true">
+  <div class="wabout-card">
+    <div class="wabout-card-title" id="wAboutTitle"></div>
+    <div class="wabout-card-body" id="wAboutBody"></div>
+    <button class="wabout-card-close" id="wAboutClose" aria-label="Luk">×</button>
   </div>
 </div>
 
