@@ -1029,42 +1029,46 @@
 
   /* === VAGT VIEW === */
   /* Vagt counter rows */
-  .vr{display:flex;align-items:center;height:52px;border-bottom:1px solid var(--border);-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;transition:background .08s;cursor:pointer;gap:8px}
+  /* ── Vagt counter rows ── */
+  .vr{display:flex;align-items:center;min-height:68px;border-bottom:1px solid var(--border);-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;transition:background .08s;cursor:pointer;gap:12px;padding:4px 0}
   .vr:active{background:var(--accent-soft)}
-  .vr-name{flex:1;font-size:15px;font-weight:500;color:var(--text);pointer-events:none;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .vr-name.sub{font-size:13px;color:var(--dim);padding-left:18px}
-  .vr-ctrl{display:flex;align-items:center;gap:6px;flex:none}
-  .vr-minus{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border-2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;-webkit-tap-highlight-color:transparent;flex:none;transition:.08s;pointer-events:auto;touch-action:manipulation;font-family:inherit;color:var(--dim)}
+  .vr-name{flex:1;font-size:16px;font-weight:600;color:var(--text);pointer-events:none;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vr-name.sub{font-size:14px;font-weight:500;color:var(--dim);padding-left:22px}
+  .vr-ctrl{display:flex;align-items:center;gap:10px;flex:none}
+  .vr-minus{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border-2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;-webkit-tap-highlight-color:transparent;flex:none;transition:.08s;pointer-events:auto;touch-action:manipulation;font-family:inherit;color:var(--dim)}
   .vr-minus:active{background:var(--surface-2)}
-  .vr-plus{width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;-webkit-tap-highlight-color:transparent;flex:none;transition:.08s;pointer-events:auto;touch-action:manipulation;font-family:inherit;background:var(--accent);color:#fff;font-weight:400}
-  .vr-plus:active{background:var(--accent-h);transform:scale(.88)}
-  .vr-num{font-family:"Fraunces",serif;font-size:22px;font-weight:700;color:var(--text);min-width:40px;text-align:center;font-variant-numeric:tabular-nums;pointer-events:auto;line-height:1;cursor:pointer}
-  .vr-num.sub-num{font-size:18px;min-width:34px;color:var(--dim)}
-  @keyframes vrPop{0%{transform:scale(1)}35%{transform:scale(1.25);color:var(--accent)}100%{transform:scale(1)}}
-  .vr-num.tick{animation:vrPop .22s cubic-bezier(.34,1.4,.64,1)}
-  .vr-grp{padding:10px 0 2px;display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--border)}
-  .vr-grp-name{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
-  .vr-grp-tot{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--dim);font-variant-numeric:tabular-nums}
-  /* Shift status bar */
-  .vs-bar{display:flex;align-items:center;gap:8px;padding:8px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px}
-  .vs-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;flex:none;animation:vsPulse 2s ease infinite}
-  @keyframes vsPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
-  .vs-time{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--text);flex:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-  .vs-end{background:none;border:1.5px solid var(--border-2);color:var(--dim);border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;padding:5px 10px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.1s;touch-action:manipulation}
+  .vr-plus{width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1;-webkit-tap-highlight-color:transparent;flex:none;transition:.08s;pointer-events:auto;touch-action:manipulation;font-family:inherit;background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(138,46,63,.28)}
+  .vr-plus:active{background:var(--accent-h);transform:scale(.86);box-shadow:none}
+  .vr-num{font-family:"Fraunces",serif;font-size:30px;font-weight:700;color:var(--text);min-width:46px;text-align:center;font-variant-numeric:tabular-nums;pointer-events:auto;line-height:1;cursor:pointer;letter-spacing:-.02em}
+  .vr-num.sub-num{font-size:22px;min-width:36px;color:var(--dim)}
+  @keyframes vrPop{0%{transform:scale(1)}40%{transform:scale(1.3);color:var(--accent)}100%{transform:scale(1)}}
+  .vr-num.tick{animation:vrPop .2s cubic-bezier(.34,1.4,.64,1)}
+  .vr-grp{padding:18px 0 6px;display:flex;align-items:baseline;justify-content:space-between}
+  .vr-grp-name{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .vr-grp-tot{font-family:"Fraunces",serif;font-size:20px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  /* ── Shift status bar ── */
+  .vs-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:16px}
+  .vs-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;flex:none;box-shadow:0 0 0 3px rgba(34,197,94,.2);animation:vsPulse 2s ease infinite}
+  @keyframes vsPulse{0%,100%{opacity:1;box-shadow:0 0 0 3px rgba(34,197,94,.2)}50%{opacity:.6;box-shadow:0 0 0 6px rgba(34,197,94,.06)}}
+  .vs-time{font-family:"Fraunces",serif;font-size:26px;font-weight:700;color:var(--text);flex:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1}
+  .vs-end{background:none;border:1.5px solid var(--border-2);color:var(--dim);border-radius:20px;font-family:inherit;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.1s;touch-action:manipulation;letter-spacing:.01em}
   .vs-end:active{border-color:var(--accent);color:var(--accent)}
-  .vs-start{background:none;border:none;color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-  /* Add row */
-  .vagt-add-row{display:flex;align-items:center;gap:8px;padding:12px 0 6px;border-top:1px solid var(--border);margin-top:6px}
-  .vagt-add-in{flex:1;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-family:inherit;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s;-webkit-appearance:none}
+  .vs-noshift{padding:12px 0 18px;display:flex;justify-content:center}
+  .vs-start{background:var(--accent);border:none;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:13px 32px;border-radius:24px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;letter-spacing:.01em;box-shadow:0 3px 12px rgba(138,46,63,.3)}
+  .vs-start:active{background:var(--accent-h);transform:scale(.96)}
+  /* ── Add row ── */
+  .vagt-add-row{display:flex;align-items:center;gap:10px;padding:14px 0 8px;border-top:1px solid var(--border);margin-top:10px}
+  .vagt-add-in{flex:1;border:1.5px solid var(--border);border-radius:24px;background:var(--surface);color:var(--text);font-family:inherit;font-size:14px;padding:11px 16px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
   .vagt-add-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
-  .vagt-add-in::placeholder{color:var(--faint);font-size:13px}
-  .vagt-add-btn{width:40px;height:40px;border-radius:50%;border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s;font-size:22px;font-weight:300;line-height:1;font-family:inherit}
-  .vagt-add-btn:active{background:var(--accent-h);transform:scale(.88);transition:transform .07s}
-  .vsug{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0 2px;min-height:0}
-  .vsug-chip{background:var(--surface-2);border:none;border-radius:16px;font-family:inherit;font-size:13px;color:var(--dim);padding:5px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.1s;touch-action:manipulation;white-space:nowrap}
-  .vsug-chip:active{background:var(--accent-soft);color:var(--accent)}
-  .vagt-fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(138,46,63,.35),0 1px 4px rgba(0,0,0,.12);-webkit-tap-highlight-color:transparent;z-index:50;transition:.12s}
-  .vagt-fab:active{transform:scale(.88);background:var(--accent-h)}
+  .vagt-add-in::placeholder{color:var(--faint)}
+  .vagt-add-btn{width:44px;height:44px;border-radius:50%;border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.08s;font-size:24px;font-weight:300;line-height:1;font-family:inherit;box-shadow:0 2px 8px rgba(138,46,63,.25)}
+  .vagt-add-btn:active{background:var(--accent-h);transform:scale(.86);box-shadow:none}
+  .vsug{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 6px;min-height:0}
+  .vsug-chip{background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-family:inherit;font-size:13px;font-weight:500;color:var(--dim);padding:6px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.08s;touch-action:manipulation;white-space:nowrap}
+  .vsug-chip:active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  /* ── Log FAB ── */
+  .vagt-fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);width:54px;height:54px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(138,46,63,.38),0 2px 6px rgba(0,0,0,.1);-webkit-tap-highlight-color:transparent;z-index:50;transition:.1s}
+  .vagt-fab:active{transform:scale(.86);background:var(--accent-h);box-shadow:none}
 </style>
 </head>
 <body>
@@ -2971,7 +2975,7 @@
         +'<button class="vs-end" id="vagtEndBtn">'+(lang==="da"?"Afslut vagt":"End shift")+'</button>'
         +'</div>';
     } else {
-      shiftBar='<div class="vs-bar" style="justify-content:flex-end">'
+      shiftBar='<div class="vs-noshift">'
         +'<button class="vs-start" id="vagtStartBtn">'+(lang==="da"?"Start vagt":"Start shift")+'</button>'
         +'</div>';
     }
