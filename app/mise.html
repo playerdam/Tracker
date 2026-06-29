@@ -1179,7 +1179,6 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="wineSearch" autocomplete="off">
       </div>
-      <div class="dd" id="wineDD"></div>
     </div>
     <div id="wineStats" class="wine-stats" style="display:none"></div>
     <div id="wineTypeStrip" class="wine-type-strip"></div>
@@ -1735,7 +1734,7 @@
       qlog_ph:"Skriv hvad du har lavet — fx åbnet 500 Gillardeau østers",
       loading:"Indlæser…",
       add_counter:"+ Ny tæller",add_sub:"+ underkategori",sub_ph:"Skriv en type…",
-      add_wine:"+ Tilføj vin manuelt",wine_search_ph:"Søg efter vin — fx Flaccianello",
+      add_wine:"+ Tilføj vin manuelt",wine_search_ph:"Søg i dine vine…",
       wine_db_head:"Fra vindatabasen",wine_searching:"Søger i databasen…",
       wine_no_match:"Ingen match i databasen",wine_no_backend:"Tilknyt backend for at søge",
       wine_fail:"Kunne ikke søge — prøv igen",
@@ -1885,7 +1884,7 @@
       qlog_ph:"Log what you've done — e.g. opened 500 Gillardeau oysters",
       loading:"Loading…",
       add_counter:"+ New counter",add_sub:"+ subcategory",sub_ph:"Type a variety…",
-      add_wine:"+ Add wine manually",wine_search_ph:"Search for wine — e.g. Flaccianello",
+      add_wine:"+ Add wine manually",wine_search_ph:"Search your wines…",
       wine_db_head:"From the wine database",wine_searching:"Searching database…",
       wine_no_match:"No matches in database",wine_no_backend:"Connect backend to search",
       wine_fail:"Search failed — try again",
@@ -3336,28 +3335,7 @@
     _swRow=null;
   },{passive:true});
 
-  async function lookupWines(query){
-    const base=apiBase();if(!base)throw new Error("no-backend");
-    const res=await fetch(base+"/api/wine-search",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query})});
-    if(!res.ok)throw new Error("Backend "+res.status);
-    const data=await res.json();return Array.isArray(data.wines)?data.wines:[];
-  }
-  const ddEl=$("#wineDD");
-  let wlSeq=0,wlTimer=null,wlCands=[];
-  function ddClose(){ddEl.classList.remove("open");ddEl.innerHTML="";}
-  function ddOpen(html){ddEl.innerHTML=html;ddEl.classList.add("open");}
-  function ddResults(){ddOpen('<div class="dd-head">'+esc(t("wine_db_head"))+'</div>'+wlCands.map((w,i)=>{const meta=[w.producer,w.region,w.country,w.grape].filter(Boolean).join(" · ");return '<div class="ri" data-i="'+i+'"><div class="ri-main"><div class="ri-name">'+esc(w.name||"?")+'</div>'+(meta?'<div class="ri-meta">'+esc(meta)+'</div>':'')+'</div><span class="ri-add">'+esc(t("wine_add"))+'</span></div>';}).join(""));}
-  async function wlRun(q){const seq=++wlSeq;try{const arr=await lookupWines(q);if(seq!==wlSeq)return;wlCands=arr;wlCands.length?ddResults():ddOpen('<div class="ri-status">'+esc(t("wine_no_match"))+'</div>');}catch(e){if(seq!==wlSeq)return;ddOpen('<div class="ri-status">'+(e&&e.message==="no-backend"?esc(t("wine_no_backend")):esc(t("wine_fail")))+'</div>');}}
-  $("#wineSearch").addEventListener("input",e=>{
-    wineFilter=e.target.value;renderWines();
-    const q=e.target.value.trim();clearTimeout(wlTimer);
-    if(q.length<2){wlCands=[];ddClose();return;}
-    ddOpen('<div class="ri-status"><span class="spin"></span>'+esc(t("wine_searching"))+'</div>');
-    wlTimer=setTimeout(()=>wlRun(q),400);
-  });
-  $("#wineSearch").addEventListener("focus",()=>{if(wlCands.length)ddResults();});
-  $("#wineSearch").addEventListener("blur",()=>setTimeout(ddClose,180));
-  ddEl.addEventListener("mousedown",e=>{const ri=e.target.closest(".ri[data-i]");if(!ri)return;e.preventDefault();const w=wlCands[+ri.dataset.i];if(!w)return;const guessed=guessWineType({grape:w.grape||"",name:w.name||"",region:w.region||""});state.wines.unshift({id:id(),name:w.name||"",producer:w.producer||"",land:w.country||"",region:w.region||"",grape:w.grape||"",vint:"",glasses:0,bottles:0,type:guessed});save();wlCands=[];wineFilter="";$("#wineSearch").value="";ddClose();renderWines();renderCareer();});
+  $("#wineSearch").addEventListener("input",e=>{wineFilter=e.target.value;renderWines();});
 
   let editW=null,winePhotoDataUrl=null,winePhotoExistingUrl=null,wineAbout="";
 
