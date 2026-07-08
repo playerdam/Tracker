@@ -1044,6 +1044,7 @@
   .catov-row:last-child{border-bottom:none}
   .catov-ico{width:36px;height:36px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center}
   .catov-ico svg{width:17px;height:17px}
+  .catov-initial{font-family:"Fraunces",serif;font-size:16px;font-weight:700;line-height:1}
   .catov-mid{flex:1;min-width:0}
   .catov-name{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .catov-bar{height:5px;background:var(--surface-2);border-radius:3px;overflow:hidden}
@@ -3413,25 +3414,21 @@
   function _vagtRingPct(grand,shift){if(shift){const best=_bestShiftTotal();return best>0?Math.min(1,grand/best):(grand>0?.65:0);}return grand>0?1:0;}
   function _vagtGrand(sm){return state.counters.reduce((s,c)=>s+_vagtDispVal(c,sm),0);}
 
-  function _vagtCatTotals(sm){
-    const cats=allCats();const groups={};cats.forEach(ct=>{groups[ct.id]=[];});
-    state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
-    return cats.filter(ct=>(groups[ct.id]||[]).length>0)
-      .map((ct,i)=>({cat:ct,color:VD_COLORS[i%VD_COLORS.length][0],soft:VD_COLORS[i%VD_COLORS.length][1],tot:Math.round((groups[ct.id]||[]).reduce((s,c)=>s+_vagtDispVal(c,sm),0))}));
+  // Each tracked counter is a "category" in the hero rings and overview
+  function _vagtCounterTotals(sm){
+    return state.counters.map((c,i)=>({id:c.id,label:tLabel(c.label),color:VD_COLORS[i%VD_COLORS.length][0],soft:VD_COLORS[i%VD_COLORS.length][1],tot:Math.round(_vagtDispVal(c,sm))}));
   }
-  // "andet" is a junk drawer — keep it out of the hero rings when real categories exist
-  function _vagtRingPool(catTotals){const real=catTotals.filter(x=>x.cat.id!=="andet");return real.length?real:catTotals;}
 
   function _updateVagtDashboard(){
     const shift=getShift();const sm=_vagtSnapMap(shift);
-    const catTotals=_vagtCatTotals(sm);
-    const grand=catTotals.reduce((s,x)=>s+x.tot,0);
-    const maxTot=Math.max(1,..._vagtRingPool(catTotals).map(x=>x.tot));
+    const totals=_vagtCounterTotals(sm);
+    const grand=totals.reduce((s,x)=>s+x.tot,0);
+    const maxTot=Math.max(1,...totals.map(x=>x.tot));
     const mc=+(2*Math.PI*25).toFixed(2);
-    catTotals.forEach(x=>{
-      const sv=document.getElementById("vdstat-"+x.cat.id);
+    totals.forEach(x=>{
+      const sv=document.getElementById("vdstat-"+x.id);
       if(sv){const prev=parseInt(sv.textContent)||0;if(prev!==x.tot){animateCount(sv,prev,x.tot);tickEl(sv);}}
-      const marc=document.getElementById("vdmini-arc-"+x.cat.id);
+      const marc=document.getElementById("vdmini-arc-"+x.id);
       if(marc)marc.setAttribute("stroke-dasharray",+(mc*Math.min(1,x.tot/maxTot)).toFixed(2)+" "+mc);
     });
     const rn=document.getElementById("vd-ring-num");
@@ -3448,11 +3445,10 @@
     const arcLen=+(circ*_vagtRingPct(grandTotal,shift)).toFixed(2);
     const best=_bestShiftTotal();
     const goalLine=shift&&best>0?'<span class="vd-ring-goal">'+(lang==="da"?"Rekord: ":"Best: ")+best+'</span>':'';
-    const catTotals=_vagtCatTotals(sm);
-    const pool=_vagtRingPool(catTotals);
-    const topCats=[...pool].sort((a,b)=>b.tot-a.tot).slice(0,5);
-    const hiddenN=catTotals.length-topCats.length;
-    const maxTot=Math.max(1,...pool.map(x=>x.tot));
+    const totals=_vagtCounterTotals(sm);
+    const topCats=[...totals].sort((a,b)=>b.tot-a.tot).slice(0,5);
+    const hiddenN=totals.length-topCats.length;
+    const maxTot=Math.max(1,...totals.map(x=>x.tot));
     const mr=25,mc=+(2*Math.PI*mr).toFixed(2);
     const allSlot='<button class="vd2-mini vd2-mini-all" id="vagtAllCats" aria-label="'+(lang==="da"?"Alle kategorier":"All categories")+'">'
       +'<div class="vd2-mini-ringwrap">'
@@ -3467,11 +3463,11 @@
         +'<div class="vd2-mini-ringwrap">'
           +'<svg class="vd2-mini-svg" viewBox="0 0 60 60">'
             +'<circle class="vd2-mini-track" cx="30" cy="30" r="'+mr+'"/>'
-            +'<circle class="vd2-mini-arc" id="vdmini-arc-'+x.cat.id+'" cx="30" cy="30" r="'+mr+'" stroke="'+x.color+'" stroke-dasharray="'+len+' '+mc+'"/>'
+            +'<circle class="vd2-mini-arc" id="vdmini-arc-'+x.id+'" cx="30" cy="30" r="'+mr+'" stroke="'+x.color+'" stroke-dasharray="'+len+' '+mc+'"/>'
           +'</svg>'
-          +'<span class="vd2-mini-num" id="vdstat-'+x.cat.id+'">'+x.tot+'</span>'
+          +'<span class="vd2-mini-num" id="vdstat-'+x.id+'">'+x.tot+'</span>'
         +'</div>'
-        +'<span class="vd2-mini-lbl">'+esc(lang==="en"?x.cat.en:x.cat.da)+'</span>'
+        +'<span class="vd2-mini-lbl">'+esc(x.label)+'</span>'
       +'</div>';
     }).join("")+allSlot+'</div>':'';
     const clockSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>';
@@ -3504,18 +3500,18 @@
   function openCatOverview(){
     const scrim=document.getElementById("catOvScrim");if(!scrim)return;
     const shift=getShift();const sm=_vagtSnapMap(shift);
-    const cats=[..._vagtCatTotals(sm)].sort((a,b)=>b.tot-a.tot);
+    const totals=[..._vagtCounterTotals(sm)].sort((a,b)=>b.tot-a.tot);
     const title=document.getElementById("catOvTitle");if(title)title.textContent=lang==="da"?"Alle kategorier":"All categories";
     const sub=document.getElementById("catOvSub");if(sub)sub.textContent=shift?(lang==="da"?"Denne vagt":"This shift"):(lang==="da"?"Total":"Total");
     const list=document.getElementById("catOvList");if(!list)return;
-    const max=Math.max(1,...cats.map(x=>x.tot));
-    const grand=cats.reduce((s,x)=>s+x.tot,0);
+    const max=Math.max(1,...totals.map(x=>x.tot));
+    const grand=totals.reduce((s,x)=>s+x.tot,0);
     list.innerHTML="";
-    cats.forEach(x=>{
+    totals.forEach(x=>{
       const row=document.createElement("div");row.className="catov-row";
-      row.innerHTML='<div class="catov-ico" style="background:'+x.soft+';color:'+x.color+'">'+x.cat.icon+'</div>'
+      row.innerHTML='<div class="catov-ico" style="background:'+x.soft+';color:'+x.color+'"><span class="catov-initial">'+esc((x.label||"?").charAt(0).toUpperCase())+'</span></div>'
         +'<div class="catov-mid">'
-          +'<div class="catov-name">'+esc(lang==="en"?x.cat.en:x.cat.da)+'</div>'
+          +'<div class="catov-name">'+esc(x.label)+'</div>'
           +'<div class="catov-bar"><div class="catov-fill" style="width:'+Math.round(100*x.tot/max)+'%;background:'+x.color+'"></div></div>'
         +'</div>'
         +'<div class="catov-val">'+x.tot+'</div>';
