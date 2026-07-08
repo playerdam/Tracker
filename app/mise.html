@@ -1035,6 +1035,22 @@
   .vd2-mini-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-size:13px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
   .vd2-mini-num.tick{animation:numPop .22s cubic-bezier(.34,1.4,.64,1)}
   .vd2-mini-lbl{font-size:7.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .vd2-mini-all{appearance:none;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform .1s}
+  .vd2-mini-all:active{transform:scale(.92)}
+  .vd2-mini-track.dashed{stroke-dasharray:3.5 4.5;stroke:rgba(255,255,255,.28)}
+  .vd2-mini-all .vd2-mini-num{font-size:12px;color:rgba(255,255,255,.75)}
+  /* Category overview sheet */
+  .catov-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .catov-row:last-child{border-bottom:none}
+  .catov-ico{width:36px;height:36px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center}
+  .catov-ico svg{width:17px;height:17px}
+  .catov-mid{flex:1;min-width:0}
+  .catov-name{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .catov-bar{height:5px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+  .catov-fill{height:100%;border-radius:3px;transition:width .35s ease}
+  .catov-val{font-family:"Fraunces",serif;font-size:16px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;flex:none;min-width:36px;text-align:right}
+  .catov-total{display:flex;justify-content:space-between;align-items:center;padding:12px 2px 2px;margin-top:4px;border-top:1.5px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .catov-total-val{font-family:"Fraunces",serif;font-size:18px;font-weight:700;color:var(--accent);letter-spacing:0;font-variant-numeric:tabular-nums}
   /* Action cards */
   .vd2-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
   .vd2-act{appearance:none;border:none;font-family:inherit;text-align:left;border-radius:20px;padding:14px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:9px;min-height:100px;-webkit-tap-highlight-color:transparent;transition:transform .12s;position:relative;overflow:hidden;touch-action:manipulation}
@@ -1738,6 +1754,13 @@
   </div>
 </div>
 
+
+<div class="scrim" id="catOvScrim"><div class="modal">
+  <h2 id="catOvTitle" style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin:0"></h2>
+  <p id="catOvSub" style="font-size:12px;color:var(--faint);margin:2px 0 12px"></p>
+  <div id="catOvList" style="max-height:56vh;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+  <div class="catov-total" id="catOvTotal"></div>
+</div></div>
 
 <div class="scrim" id="shiftEditScrim"><div class="modal" style="max-height:80vh;overflow-y:auto">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
@@ -2685,6 +2708,8 @@
     {id:"preset_temp",da:"Temperatur tjekket",en:"Temperature checked",cat:"andet",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="28" y="10" width="8" height="30" rx="4"/><circle cx="32" cy="46" r="8"/><line x1="32" y1="34" x2="32" y2="40" stroke-width="3" opacity=".5"/><line x1="36" y1="18" x2="42" y2="18" opacity=".5"/><line x1="36" y1="24" x2="40" y2="24" opacity=".4"/></svg>'},
   ];
 
+  const CAT_BY_LABEL={};CATALOG.forEach(p=>{CAT_BY_LABEL[p.da.toLowerCase()]=p.cat;CAT_BY_LABEL[p.en.toLowerCase()]=p.cat;});
+
   const OYSTER_TYPES=["Gillardeau","Fine de Claire","Spéciale de Claire","Marennes-Oléron","Belon","Tsarskaya","Limfjordsøsters","Kumamoto","Blue Point","Utah Beach","Pied de Cheval"];
   const LANDE=["Frankrig","Italien","Spanien","Tyskland","Portugal","Østrig","USA","Argentina","Chile","Australien","New Zealand","Sydafrika","Danmark","Ungarn","Grækenland","Libanon","Georgien"];
   const OMRAADER=["Bourgogne","Bordeaux","Champagne","Rhône","Loire","Alsace","Beaujolais","Jura","Languedoc","Provence","Toscana","Piemonte","Veneto","Lombardiet","Sicilien","Rioja","Ribera del Duero","Priorat","Rías Baixas","Mosel","Rheingau","Pfalz","Nahe","Douro","Dão","Wachau","Napa Valley","Sonoma","Willamette Valley","Barossa Valley","Marlborough","Mendoza","Stellenbosch"];
@@ -2870,7 +2895,7 @@
   async function load(){try{const v=localStorage.getItem(STORE_KEY);if(v)return normalize(JSON.parse(v));}catch(e){}return clone(DEFAULTS);}
   async function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){console.error(e);}}
   function normalize(s){
-    s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,unit:c.unit||"stk",cat:c.cat||"andet",subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
+    s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,unit:c.unit||"stk",cat:(c.cat&&c.cat!=="andet")?c.cat:(CAT_BY_LABEL[(c.label||"").toLowerCase()]||c.cat||"andet"),subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
     s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0,type:w.type||"andet",imageUrl:w.imageUrl||null,about:w.about||"",fromLineup:w.fromLineup||false}));
     s.log=Array.isArray(s.log)?s.log.filter(e=>e&&e.ts&&e.text):[];
     s.customCats=Array.isArray(s.customCats)?s.customCats.map(c=>({id:c.id||id(),name:c.name||"",icon:c.icon||"",iconPending:!!c.iconPending})):[];
@@ -3371,16 +3396,12 @@
     if(spin)spin.classList.remove("on");if(btn)btn.disabled=false;if(inp){inp.disabled=false;}
     if(!actions.length){showToast(lang==="da"?"Forstod ikke — prøv igen":"Couldn't parse — try again");if(inp)inp.focus();return;}
     undoSnapshot=clone(state);
-    const summary=[],ask=[],syncItems=[];
-    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems);});
+    const summary=[],syncItems=[];
+    actions.forEach(a=>applyOne(a,summary,syncItems));
     if(inp)inp.value="";
     save();renderVagt();renderCounters();renderCareer();
-    if(!ask.length){
-      if(summary.length){showToast(t("toast_logged")+summary.join(", "));addLogEntry(summary.join(" · "),null);haptic(40);syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta,null,false,summary.join(" · ")));}
-      checkBadges();checkRecords();
-    } else {
-      processAsk(ask,0,summary,syncItems,null);
-    }
+    if(summary.length){showToast(t("toast_logged")+summary.join(", "));addLogEntry(summary.join(" · "),null);haptic(40);syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta,null,false,summary.join(" · ")));}
+    checkBadges();checkRecords();
   }
 
   function _vagtSnapMap(shift){const m={};if(shift&&shift.snap)shift.snap.forEach(sc=>{m[sc.id]={count:sc.count||0,subs:{}};(sc.subs||[]).forEach(ss=>m[sc.id].subs[ss.id]=ss.count||0);});return m;}
@@ -3396,14 +3417,16 @@
     const cats=allCats();const groups={};cats.forEach(ct=>{groups[ct.id]=[];});
     state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
     return cats.filter(ct=>(groups[ct.id]||[]).length>0)
-      .map((ct,i)=>({cat:ct,color:VD_COLORS[i%VD_COLORS.length][0],tot:Math.round((groups[ct.id]||[]).reduce((s,c)=>s+_vagtDispVal(c,sm),0))}));
+      .map((ct,i)=>({cat:ct,color:VD_COLORS[i%VD_COLORS.length][0],soft:VD_COLORS[i%VD_COLORS.length][1],tot:Math.round((groups[ct.id]||[]).reduce((s,c)=>s+_vagtDispVal(c,sm),0))}));
   }
+  // "andet" is a junk drawer — keep it out of the hero rings when real categories exist
+  function _vagtRingPool(catTotals){const real=catTotals.filter(x=>x.cat.id!=="andet");return real.length?real:catTotals;}
 
   function _updateVagtDashboard(){
     const shift=getShift();const sm=_vagtSnapMap(shift);
     const catTotals=_vagtCatTotals(sm);
     const grand=catTotals.reduce((s,x)=>s+x.tot,0);
-    const maxTot=Math.max(1,...catTotals.map(x=>x.tot));
+    const maxTot=Math.max(1,..._vagtRingPool(catTotals).map(x=>x.tot));
     const mc=+(2*Math.PI*25).toFixed(2);
     catTotals.forEach(x=>{
       const sv=document.getElementById("vdstat-"+x.cat.id);
@@ -3426,9 +3449,18 @@
     const best=_bestShiftTotal();
     const goalLine=shift&&best>0?'<span class="vd-ring-goal">'+(lang==="da"?"Rekord: ":"Best: ")+best+'</span>':'';
     const catTotals=_vagtCatTotals(sm);
-    const topCats=[...catTotals].sort((a,b)=>b.tot-a.tot).slice(0,5);
-    const maxTot=Math.max(1,...catTotals.map(x=>x.tot));
+    const pool=_vagtRingPool(catTotals);
+    const topCats=[...pool].sort((a,b)=>b.tot-a.tot).slice(0,5);
+    const hiddenN=catTotals.length-topCats.length;
+    const maxTot=Math.max(1,...pool.map(x=>x.tot));
     const mr=25,mc=+(2*Math.PI*mr).toFixed(2);
+    const allSlot='<button class="vd2-mini vd2-mini-all" id="vagtAllCats" aria-label="'+(lang==="da"?"Alle kategorier":"All categories")+'">'
+      +'<div class="vd2-mini-ringwrap">'
+        +'<svg class="vd2-mini-svg" viewBox="0 0 60 60"><circle class="vd2-mini-track dashed" cx="30" cy="30" r="'+mr+'"/></svg>'
+        +'<span class="vd2-mini-num">'+(hiddenN>0?"+"+hiddenN:"···")+'</span>'
+      +'</div>'
+      +'<span class="vd2-mini-lbl">'+(lang==="da"?"Alle":"All")+'</span>'
+    +'</button>';
     const minisHtml=topCats.length?'<div class="vd2-minis">'+topCats.map(x=>{
       const len=+(mc*Math.min(1,x.tot/maxTot)).toFixed(2);
       return '<div class="vd2-mini">'
@@ -3441,7 +3473,7 @@
         +'</div>'
         +'<span class="vd2-mini-lbl">'+esc(lang==="en"?x.cat.en:x.cat.da)+'</span>'
       +'</div>';
-    }).join("")+'</div>':'';
+    }).join("")+allSlot+'</div>':'';
     const clockSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>';
     const calSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>';
     container.innerHTML='<div class="vd2-hero">'
@@ -3465,6 +3497,33 @@
       +'</div>'
       +minisHtml
     +'</div>';
+    const allBtn=document.getElementById("vagtAllCats");
+    if(allBtn)allBtn.addEventListener("click",openCatOverview);
+  }
+
+  function openCatOverview(){
+    const scrim=document.getElementById("catOvScrim");if(!scrim)return;
+    const shift=getShift();const sm=_vagtSnapMap(shift);
+    const cats=[..._vagtCatTotals(sm)].sort((a,b)=>b.tot-a.tot);
+    const title=document.getElementById("catOvTitle");if(title)title.textContent=lang==="da"?"Alle kategorier":"All categories";
+    const sub=document.getElementById("catOvSub");if(sub)sub.textContent=shift?(lang==="da"?"Denne vagt":"This shift"):(lang==="da"?"Total":"Total");
+    const list=document.getElementById("catOvList");if(!list)return;
+    const max=Math.max(1,...cats.map(x=>x.tot));
+    const grand=cats.reduce((s,x)=>s+x.tot,0);
+    list.innerHTML="";
+    cats.forEach(x=>{
+      const row=document.createElement("div");row.className="catov-row";
+      row.innerHTML='<div class="catov-ico" style="background:'+x.soft+';color:'+x.color+'">'+x.cat.icon+'</div>'
+        +'<div class="catov-mid">'
+          +'<div class="catov-name">'+esc(lang==="en"?x.cat.en:x.cat.da)+'</div>'
+          +'<div class="catov-bar"><div class="catov-fill" style="width:'+Math.round(100*x.tot/max)+'%;background:'+x.color+'"></div></div>'
+        +'</div>'
+        +'<div class="catov-val">'+x.tot+'</div>';
+      list.appendChild(row);
+    });
+    const tot=document.getElementById("catOvTotal");
+    if(tot)tot.innerHTML='<span>'+(lang==="da"?"I alt":"Total")+'</span><span class="catov-total-val">'+grand+'</span>';
+    scrim.classList.add("open");
   }
 
   let _vagtShowAllShifts=false;
@@ -3592,17 +3651,15 @@
     const shift=getShift();
     if(!shift&&vagtTimerInterval){clearInterval(vagtTimerInterval);vagtTimerInterval=null;}
 
-    // ── Add row + quick +1 chips ──
+    // ── Add row ──
     const sendSvg='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
-    const quick=state.counters.filter(c=>!c.subs.length&&(!c.unit||c.unit==="stk")).sort((a,b)=>counterTotal(b)-counterTotal(a)).slice(0,4);
-    const chipsHtml=quick.length?'<div class="vsug">'+quick.map(c=>'<button class="vsug-chip" data-qc="'+c.id+'">+1 '+esc(tLabel(c.label))+'</button>').join("")+'</div>':'';
     const addBlock='<div class="vagt-add-row">'
       +'<input class="vagt-add-in" id="vagtAddIn" placeholder="'
       +esc(lang==="da"?"Skriv hvad du lavede…":"Write what you did…")
       +'" maxlength="200" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">'
       +'<div class="vagt-ai-spin" id="vagtAiSpin"></div>'
       +'<button class="vagt-add-btn" id="vagtAddBtn" aria-label="Log">'+sendSvg+'</button>'
-      +'</div>'+chipsHtml;
+      +'</div>';
 
     // ── Action cards ──
     const playSvg='<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="7 4 20 12 7 20 7 4"/></svg>';
@@ -3656,7 +3713,6 @@
     if(sc)sc.addEventListener("click",()=>{if(getShift())openShiftModal();else{startShift();renderVagt();haptic(30);}});
     const lc=document.getElementById("vagtLogCard");
     if(lc)lc.addEventListener("click",()=>{const ai=document.getElementById("vagtAddIn");if(ai){ai.scrollIntoView({block:"center",behavior:"smooth"});ai.focus();}});
-    el.querySelectorAll("[data-qc]").forEach(ch=>ch.addEventListener("click",()=>bumpVagtRow(ch.dataset.qc,1)));
     if(shift)startVagtTimer(shift);
 
     const inp=document.getElementById("vagtAddIn"),btn=document.getElementById("vagtAddBtn");
@@ -4480,11 +4536,16 @@
     s.count=Math.max(0,s.count+delta);
     summary.push((delta>0?"+":"")+delta+" "+canon+" ("+c.label+")");
   }
+  const VALID_CAT_IDS=new Set(["aabnet-mad","aabnet-drikke","snittet","tilberedt","serveret","andet"]);
+  function _guessCat(a){
+    if(a.cat&&(VALID_CAT_IDS.has(a.cat)||(state.customCats||[]).some(cc=>cc.id===a.cat)))return a.cat;
+    return CAT_BY_LABEL[(a.counter||"").toLowerCase()]||"andet";
+  }
   function applyOne(a,summary,syncItems){
     if(a.kind==="counter"){
       const delta=parseInt(a.delta,10)||0;if(delta===0)return;
       let c=findCounter(a.counter);
-      if(!c){c={id:id(),label:a.counter||"Ny tæller",count:0,subs:[],suggest:seedFor(a.counter)};state.counters.push(c);}
+      if(!c){c={id:id(),label:a.counter||"Ny tæller",count:0,unit:"stk",cat:_guessCat(a),subs:[],suggest:seedFor(a.counter)};state.counters.push(c);}
       const subName=(a.sub||"").trim();
       if(subName){addToSub(c,subName,delta,summary);}
       else if(c.subs.length){let s=c.subs.find(x=>x.name==="Uden type");if(!s){s={id:id(),name:"Uden type",count:0};c.subs.push(s);}s.count=Math.max(0,s.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
@@ -4503,6 +4564,14 @@
   const STOPVERBS=new Set(["jeg","har","i","dag","idag","åbnet","åbnede","åbent","snittet","skåret","skar","hakkede","hakket","serveret","serverede","stegt","stegte","grillet","grillede","lavet","lavede","poleret","polerede","drukket","smagt","smagte","tilberedt","tilberedte","til","en","et","af","med","og","stk","styk","styks","portioner","portion","glas","stykker","have","has","opened","open","cut","chopped","served","grilled","made","polished","drank","tasted","prepared","to","a","an","of","with","and","pcs","pieces","portions","glasses","i","ca","ca.","cirka","approximately","about","nogle","some","approximately"]);
   const DA_VERB_STEM={"åbnede":"åbnet","hakkede":"hakket","serverede":"serveret","stegte":"stegt","grillede":"grillet","lavede":"lavet","polerede":"poleret","smagte":"smagt","tilberedte":"tilberedt","snittet":"snit","skåret":"skær","drak":"drukket"};
   function normWord(w){return DA_VERB_STEM[w]||w;}
+  function _clauseCat(low){
+    const drink=/vin\b|øl|flask|champagne|sodavand|juice|drink|cocktail|kaffe|\bte\b|vand\b|bobler/.test(low);
+    if(/åbn|\bopen/.test(low))return drink?"aabnet-drikke":"aabnet-mad";
+    if(/snit|skar|skær|hak|chop|\bcut/.test(low))return "snittet";
+    if(/lavede|lavet|tilbered|stegte|stegt|grill|bagte|bagt|kogte|kogt|mixede|mixet|\bmade|\bprepared|\bcooked|\bbaked|\bmixed/.test(low))return "tilberedt";
+    if(/server|\bserved/.test(low))return "serveret";
+    return "andet";
+  }
   function localParse(text){
     const clauses=text.split(/\s+og\s+|\s+and\s+|,/i);const actions=[];
     clauses.forEach(cl=>{
@@ -4539,7 +4608,7 @@
       const numStart=low.search(/\d/);
       const nameStr=numStart>=0?low.slice(numStart).replace(/^\d+[\s,.]*(?:stk|styk|styks|pcs|pieces|x)?\s*/i,""):low;
       const nouns=nameStr.split(/\s+/).map(normWord).filter(w=>w.length>=2&&!STOPVERBS.has(w));
-      if(nouns.length){const raw=nouns.join(" ");actions.push({kind:"counter",counter:raw.charAt(0).toUpperCase()+raw.slice(1),sub:"",delta});}
+      if(nouns.length){const raw=nouns.join(" ");actions.push({kind:"counter",counter:raw.charAt(0).toUpperCase()+raw.slice(1),sub:"",delta,cat:_clauseCat(low)});}
     });
     return actions;
   }

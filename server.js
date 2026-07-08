@@ -252,18 +252,27 @@ app.post("/api/upload-photo", async (req, res) => {
   }
 });
 
-// ---- Ugentlig rangliste ----
+// ---- Rangliste (uge / måned / altid) ----
 app.get("/api/leaderboard", async (req, res) => {
   try {
-    const monday = mondayOfWeek();
-    const rows = await sb(`log_entries?logged_at=gte.${monday.toISOString()}&select=user_id,delta,users!user_id(nickname,profession)`) || [];
+    const { period = "week" } = req.query;
+    let fromDate = null;
+    if (period === "week") {
+      fromDate = mondayOfWeek();
+    } else if (period === "month") {
+      fromDate = new Date();
+      fromDate.setDate(1);
+      fromDate.setHours(0, 0, 0, 0);
+    }
+    const filter = fromDate ? `&logged_at=gte.${fromDate.toISOString()}` : "";
+    const rows = await sb(`log_entries?select=user_id,delta,users!user_id(nickname,profession)${filter}`) || [];
     const agg = {};
     for (const r of rows) {
       if (!agg[r.user_id]) agg[r.user_id] = { userId: r.user_id, total: 0, nickname: r.users?.nickname || null, profession: r.users?.profession || null };
       if (r.delta > 0) agg[r.user_id].total += r.delta;
     }
-    const leaderboard = Object.values(agg).sort((a, b) => b.total - a.total).slice(0, 25);
-    res.json({ leaderboard, weekStart: monday.toISOString() });
+    const leaderboard = Object.values(agg).sort((a, b) => b.total - a.total).slice(0, 50);
+    res.json({ leaderboard, period, periodStart: fromDate ? fromDate.toISOString() : null });
   } catch (err) {
     console.error("leaderboard:", err.message);
     res.status(500).json({ error: err.message });
@@ -405,8 +414,9 @@ app.post("/api/parse-log", async (req, res) => {
       'Eksisterende vine: ' + JSON.stringify(wines) + '\n' +
       'Brugerens tekst: "' + text + '"\n\n' +
       'Returnér {"actions":[...]}. Hver handling er én af:\n' +
-      '{"kind":"counter","counter":"<tæller-navn>","sub":"<underkategori eller tom streng>","delta":<heltal>}\n' +
+      '{"kind":"counter","counter":"<tæller-navn>","sub":"<underkategori eller tom streng>","delta":<heltal>,"cat":"<kategori-id>"}\n' +
       '{"kind":"wine","wine":"<vinnavn>","measure":"glasses"|"bottles","delta":<heltal>,"producer":"","country":"","region":"","grape":""}\n\n' +
+      'Feltet "cat" SKAL være præcis ét af disse id\'er: "aabnet-mad" (åbnet mad/råvarer: østers, dåser, konserves), "aabnet-drikke" (åbnet drikkevarer: vin, øl, flasker, champagne), "snittet" (snittet/skåret/hakket råvarer), "tilberedt" (lavet/tilberedt mad & drikke: retter, pizzaer, kaffe, cocktails, saucer), "serveret" (serveret/leveret til gæster: couverter, retter, borde), "andet" (alt der ikke passer). Vælg ud fra hvad brugeren GJORDE ved objektet.\n' +
       'VIGTIGT: Nævner brugeren en bestemt type/sort/variant af det der tælles, SKAL den i feltet "sub". Brug stavemåden fra "muligeTyper" hvis typen står der.\n' +
       'Match KUN til en eksisterende tæller hvis OBJEKTET/PRODUKTET passer til tællerens emne. Verbets lighed er IKKE nok — "snittet 500 dumle" må IKKE matche "Løg snittet". delta kan være negativt.\n' +
       'Er objektet nyt, returner det ALLIGEVEL som en counter-handling med et kortfattet dansk navn. Returnér kun {"actions":[]} for rent ikke-trackbare sætninger.';
@@ -952,24 +962,32 @@ app.post("/api/visits/wine-lineup", async (req, res) => {
     let wines = extractJSON(visionText);
     if (!Array.isArray(wines)) throw new Error("Kunne ikke identificere vine");
 
-    // Step 2: enrich each readable wine with grape knowledge (parallel)
-    await Promise.all(wines.map(async (wine, i) => {
-      if (wine.readable === false) return;
-      const desc = [wine.name, wine.producer, wine.vintage, wine.region, wine.land].filter(Boolean).join(", ");
-      if (!desc) return;
-      const prompt = isDa
-        ? `Vin: ${desc}\nBrug din viden til at returnere JSON med: grape (druetype med procentfordeling fx "Sangiovese 85%, Cabernet Sauvignon 15%"; tom string hvis ukendt), region (korrekt region), land. Returner kun JSON.`
-        : `Wine: ${desc}\nUse your knowledge to return JSON with: grape (grape variety with blend % e.g. "Sangiovese 85%, Cabernet Sauvignon 15%"; empty string if unknown), region (correct region), land. Return only JSON.`;
+    // Step 2: enrich all readable wines in one batch call
+    const readableIdxs = wines.map((w, i) => i).filter(i => wines[i].readable !== false && [wines[i].name, wines[i].producer, wines[i].vintage, wines[i].region, wines[i].land].some(Boolean));
+    if (readableIdxs.length) {
+      const wineList = readableIdxs.map((i, n) => {
+        const w = wines[i];
+        return `${n + 1}. ${[w.name, w.producer, w.vintage, w.region, w.land].filter(Boolean).join(", ")}`;
+      }).join("\n");
+      const batchPrompt = isDa
+        ? `Her er ${readableIdxs.length} vine fra et lineup. Brug din viden til at returnere et JSON-array med præcis ${readableIdxs.length} elementer i SAMME RÆKKEFØLGE. Hvert element: { "grape": "druetype med % hvis blend, tom string hvis ukendt", "region": "korrekt region/appellation", "land": "land", "about": "2-3 sætninger om producent og vin på dansk, tom string hvis ukendt" }. Returner KUN JSON-array.\n\nVine:\n${wineList}`
+        : `Here are ${readableIdxs.length} wines from a lineup. Use your knowledge to return a JSON array with exactly ${readableIdxs.length} elements in THE SAME ORDER. Each element: { "grape": "grape variety with % if blend, empty string if unknown", "region": "correct region/appellation", "land": "country", "about": "2-3 sentences about producer and wine, empty string if unknown" }. Return ONLY a JSON array.\n\nWines:\n${wineList}`;
       try {
-        const enriched = await callClaude({ model: "claude-haiku-4-5-20251001", maxTokens: 120, content: prompt });
-        const enrichedData = extractJSON(enriched);
-        if (enrichedData) {
-          if (enrichedData.grape) wines[i].grape = enrichedData.grape;
-          if (enrichedData.region) wines[i].region = enrichedData.region;
-          if (enrichedData.land) wines[i].land = enrichedData.land;
+        const enriched = await callClaude({ model: "claude-haiku-4-5-20251001", maxTokens: 350 * readableIdxs.length, content: batchPrompt });
+        const enrichedArr = extractJSON(enriched);
+        if (Array.isArray(enrichedArr)) {
+          enrichedArr.forEach((data, n) => {
+            if (!data) return;
+            const i = readableIdxs[n];
+            if (i == null) return;
+            if (data.grape) wines[i].grape = data.grape;
+            if (data.region) wines[i].region = data.region;
+            if (data.land) wines[i].land = data.land;
+            if (data.about) wines[i].about = data.about;
+          });
         }
       } catch (_) {}
-    }));
+    }
 
     res.json({ wines });
   } catch (err) { res.status(500).json({ error: err.message }); }
