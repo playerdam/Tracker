@@ -1025,7 +1025,17 @@
   .vd2-tile-txt{min-width:0;flex:1}
   .vd2-tile-val{font-family:"Fraunces",serif;font-size:17px;font-weight:700;color:#fff;line-height:1.15;letter-spacing:-.01em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .vd2-tile-lbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.07em;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .vd2-quote{margin-top:14px;position:relative;z-index:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:9px 14px;font-size:12px;font-style:italic;color:rgba(255,255,255,.72);text-align:center;line-height:1.45}
+  .vd2-quote{margin-top:12px;position:relative;z-index:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:9px 14px;font-size:12px;font-style:italic;color:rgba(255,255,255,.72);text-align:center;line-height:1.45}
+  /* Top-3 category mini rings */
+  .vd2-minis{display:flex;gap:10px;margin-top:14px;position:relative;z-index:1}
+  .vd2-mini{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:11px 6px 9px;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0}
+  .vd2-mini-ringwrap{position:relative;width:58px;height:58px}
+  .vd2-mini-svg{width:58px;height:58px;transform:rotate(-90deg)}
+  .vd2-mini-track{fill:none;stroke:rgba(255,255,255,.12);stroke-width:5.5}
+  .vd2-mini-arc{fill:none;stroke-width:5.5;stroke-linecap:round;transition:stroke-dasharray .5s cubic-bezier(.34,1.3,.64,1)}
+  .vd2-mini-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-size:15px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .vd2-mini-num.tick{animation:numPop .22s cubic-bezier(.34,1.4,.64,1)}
+  .vd2-mini-lbl{font-size:8.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
   /* Action cards */
   .vd2-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
   .vd2-act{appearance:none;border:none;font-family:inherit;text-align:left;border-radius:20px;padding:14px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:9px;min-height:100px;-webkit-tap-highlight-color:transparent;transition:transform .12s;position:relative;overflow:hidden;touch-action:manipulation}
@@ -1042,16 +1052,6 @@
   .vd2-live-row{display:flex;align-items:center;gap:8px}
   .vd2-live-dot{width:8px;height:8px;border-radius:50%;background:#4ADE80;flex:none;box-shadow:0 0 0 3px rgba(74,222,128,.25);animation:vsPulse 2s ease infinite}
   .vd2-timer{font-family:"Fraunces",serif;font-size:25px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.02em;color:#fff}
-  /* Category scroll tiles */
-  .vd2-cats{display:flex;gap:9px;overflow-x:auto;margin:0 -14px 16px;padding:2px 14px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .vd2-cats::-webkit-scrollbar{display:none}
-  .vd2-cat{flex:none;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:9px 15px 9px 10px}
-  .vd2-cat-ico{width:32px;height:32px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
-  .vd2-cat-ico svg{width:15px;height:15px}
-  .vd2-cat-txt{display:flex;flex-direction:column}
-  .vd-stat-val{font-family:"Fraunces",serif;font-size:18px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1}
-  .vd-stat-val.tick{animation:numPop .22s cubic-bezier(.34,1.4,.64,1)}
-  .vd2-cat-lbl{font-size:9px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
   /* Section headers */
   .vd2-sec{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px}
   .vd2-sec-title{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.01em}
@@ -1256,25 +1256,29 @@
   .wstat-bar{height:100%;background:var(--accent);border-radius:3px;transition:width .3s ease}
 
   /* === VAGT VIEW === */
-  /* Vagt counter rows */
-  /* ── Vagt counter rows ── */
-  .vr{display:flex;align-items:center;min-height:68px;border-bottom:1px solid var(--border);-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;transition:background .08s;cursor:pointer;gap:12px;padding:4px 0}
+  /* ── Vagt counter rows (streamlined) ── */
+  .vrows{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:0 12px;margin-bottom:16px}
+  .vrows.stdb-h{display:none}
+  .vr{display:flex;align-items:center;min-height:46px;border-bottom:1px solid var(--border);-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;transition:background .08s;cursor:pointer;gap:8px;padding:3px 0}
+  .vrows>.vr:last-child{border-bottom:none}
   .vr:active{background:var(--accent-soft)}
-  .vr-name{flex:1;font-size:16px;font-weight:600;color:var(--text);pointer-events:none;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .vr-name.sub{font-size:14px;font-weight:500;color:var(--dim);padding-left:22px}
-  .vr-ctrl{display:flex;align-items:center;gap:10px;flex:none}
-  .vr-minus{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border-2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;-webkit-tap-highlight-color:transparent;flex:none;transition:.08s;pointer-events:auto;touch-action:manipulation;font-family:inherit;color:var(--dim)}
-  .vr-minus:active{background:var(--surface-2)}
-  .vr-plus{width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1;-webkit-tap-highlight-color:transparent;flex:none;transition:.08s;pointer-events:auto;touch-action:manipulation;font-family:inherit;background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(138,46,63,.28)}
-  .vr-plus:active{background:var(--accent-h);transform:scale(.86);box-shadow:none}
-  .vr-num{font-family:"Fraunces",serif;font-size:30px;font-weight:700;color:var(--text);min-width:46px;text-align:center;font-variant-numeric:tabular-nums;pointer-events:auto;line-height:1;cursor:pointer;letter-spacing:-.02em}
-  .vr-num.sub-num{font-size:22px;min-width:36px;color:var(--dim)}
-  @keyframes vrPop{0%{transform:scale(1)}40%{transform:scale(1.3);color:var(--accent)}100%{transform:scale(1)}}
+  .vr-name{flex:1;font-size:13.5px;font-weight:600;color:var(--text);pointer-events:none;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .vr-name.sub{font-size:12.5px;font-weight:500;color:var(--dim);padding-left:14px}
+  .vr-ctrl{display:flex;align-items:center;gap:3px;flex:none}
+  .vr-minus,.vr-plus{width:28px;height:28px;border-radius:9px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;-webkit-tap-highlight-color:transparent;flex:none;transition:.1s;pointer-events:auto;touch-action:manipulation;font-family:inherit;padding:0}
+  .vr-minus{background:var(--surface-2);color:var(--dim)}
+  .vr-minus:active{background:var(--border);transform:scale(.9);transition:transform .06s}
+  .vr-plus{background:var(--accent-soft);color:var(--accent);font-weight:700}
+  .vr-plus:active{background:var(--accent);color:#fff;transform:scale(.9);transition:transform .06s}
+  .vr-num{font-family:"Fraunces",serif;font-size:16px;font-weight:700;color:var(--text);min-width:38px;text-align:center;font-variant-numeric:tabular-nums;pointer-events:auto;line-height:1;cursor:pointer;letter-spacing:-.01em}
+  .vr-num.sub-num{font-size:14px;min-width:32px;color:var(--dim)}
+  @keyframes vrPop{0%{transform:scale(1)}40%{transform:scale(1.25);color:var(--accent)}100%{transform:scale(1)}}
   .vr-num.tick{animation:vrPop .2s cubic-bezier(.34,1.4,.64,1)}
-  .vr-total{font-family:"Fraunces",serif;font-size:16px;font-weight:600;color:var(--faint);font-variant-numeric:tabular-nums;min-width:32px;text-align:right;pointer-events:none;padding-left:4px}
+  .vr-unit{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);background:none;border:none;padding:2px 3px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;flex:none}
+  .vr-total{font-size:10.5px;font-weight:600;color:var(--faint);font-variant-numeric:tabular-nums;min-width:24px;text-align:right;pointer-events:none;padding-left:2px}
   .vr.locked{cursor:default}
   .vr.locked:active{background:none}
-  .vr-lock{font-size:13px;color:var(--faint);pointer-events:none;flex:none}
+  .vr-lock{font-size:11px;color:var(--faint);pointer-events:none;flex:none}
   .vs-worktime{font-size:12px;color:var(--dim);margin-top:10px;padding:8px 12px;background:var(--surface-2);border-radius:10px;display:flex;align-items:center;justify-content:space-between}
   .vs-worktime-lbl{font-weight:600;color:var(--faint);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
   .vs-worktime-val{font-family:"Fraunces",serif;font-size:16px;font-weight:700;color:var(--text)}
@@ -1291,9 +1295,9 @@
   .shift-edit-unit{font-size:11px;color:var(--faint);font-weight:600}
   .shift-edit-input{width:72px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:"Fraunces",serif;font-size:18px;font-weight:700;padding:6px 8px;text-align:right;outline:none;-webkit-appearance:none}
   .shift-edit-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
-  .vr-grp{padding:18px 0 6px;display:flex;align-items:baseline;justify-content:space-between}
-  .vr-grp-name{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
-  .vr-grp-tot{font-family:"Fraunces",serif;font-size:20px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  .vr-grp{padding:12px 0 4px;display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--border)}
+  .vr-grp-name{font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+  .vr-grp-tot{font-family:"Fraunces",serif;font-size:14px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
   /* ── Shift status bar ── */
   .vs-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:16px}
   .vs-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;flex:none;box-shadow:0 0 0 3px rgba(34,197,94,.2);animation:vsPulse 2s ease infinite}
@@ -3394,14 +3398,24 @@
   function _vagtRingPct(grand,shift){if(shift){const best=_bestShiftTotal();return best>0?Math.min(1,grand/best):(grand>0?.65:0);}return grand>0?1:0;}
   function _vagtGrand(sm){return state.counters.reduce((s,c)=>s+_vagtDispVal(c,sm),0);}
 
+  function _vagtCatTotals(sm){
+    const cats=allCats();const groups={};cats.forEach(ct=>{groups[ct.id]=[];});
+    state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
+    return cats.filter(ct=>(groups[ct.id]||[]).length>0)
+      .map((ct,i)=>({cat:ct,color:VD_COLORS[i%VD_COLORS.length][0],tot:Math.round((groups[ct.id]||[]).reduce((s,c)=>s+_vagtDispVal(c,sm),0))}));
+  }
+
   function _updateVagtDashboard(){
     const shift=getShift();const sm=_vagtSnapMap(shift);
-    const cats=allCats();const groups={};cats.forEach(cat=>{groups[cat.id]=[];});
-    state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
-    let grand=0;
-    cats.forEach(cat=>{
-      const tot=(groups[cat.id]||[]).reduce((s,c)=>s+_vagtDispVal(c,sm),0);grand+=tot;
-      const sv=document.getElementById("vdstat-"+cat.id);if(sv){const prev=parseInt(sv.textContent)||0;if(prev!==tot){animateCount(sv,prev,tot);tickEl(sv);}}
+    const catTotals=_vagtCatTotals(sm);
+    const grand=catTotals.reduce((s,x)=>s+x.tot,0);
+    const maxTot=Math.max(1,...catTotals.map(x=>x.tot));
+    const mc=+(2*Math.PI*25).toFixed(2);
+    catTotals.forEach(x=>{
+      const sv=document.getElementById("vdstat-"+x.cat.id);
+      if(sv){const prev=parseInt(sv.textContent)||0;if(prev!==x.tot){animateCount(sv,prev,x.tot);tickEl(sv);}}
+      const marc=document.getElementById("vdmini-arc-"+x.cat.id);
+      if(marc)marc.setAttribute("stroke-dasharray",+(mc*Math.min(1,x.tot/maxTot)).toFixed(2)+" "+mc);
     });
     const rn=document.getElementById("vd-ring-num");
     if(rn){const prev=parseInt(rn.textContent)||0;if(prev!==grand){animateCount(rn,prev,grand);tickEl(rn);}}
@@ -3417,6 +3431,23 @@
     const arcLen=+(circ*_vagtRingPct(grandTotal,shift)).toFixed(2);
     const best=_bestShiftTotal();
     const goalLine=shift&&best>0?'<span class="vd-ring-goal">'+(lang==="da"?"Rekord: ":"Best: ")+best+'</span>':'';
+    const catTotals=_vagtCatTotals(sm);
+    const top3=[...catTotals].sort((a,b)=>b.tot-a.tot).slice(0,3);
+    const maxTot=Math.max(1,...catTotals.map(x=>x.tot));
+    const mr=25,mc=+(2*Math.PI*mr).toFixed(2);
+    const minisHtml=top3.length?'<div class="vd2-minis">'+top3.map(x=>{
+      const len=+(mc*Math.min(1,x.tot/maxTot)).toFixed(2);
+      return '<div class="vd2-mini">'
+        +'<div class="vd2-mini-ringwrap">'
+          +'<svg class="vd2-mini-svg" viewBox="0 0 60 60">'
+            +'<circle class="vd2-mini-track" cx="30" cy="30" r="'+mr+'"/>'
+            +'<circle class="vd2-mini-arc" id="vdmini-arc-'+x.cat.id+'" cx="30" cy="30" r="'+mr+'" stroke="'+x.color+'" stroke-dasharray="'+len+' '+mc+'"/>'
+          +'</svg>'
+          +'<span class="vd2-mini-num" id="vdstat-'+x.cat.id+'">'+x.tot+'</span>'
+        +'</div>'
+        +'<span class="vd2-mini-lbl">'+esc(lang==="en"?x.cat.en:x.cat.da)+'</span>'
+      +'</div>';
+    }).join("")+'</div>':'';
     const clockSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>';
     const calSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>';
     container.innerHTML='<div class="vd2-hero">'
@@ -3438,29 +3469,9 @@
           +'<div class="vd2-tile"><div class="vd2-tile-ico" style="background:rgba(92,184,167,.16);color:#5CB8A7">'+calSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+_shiftsThisWeek()+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Vagter denne uge":"Shifts this week")+'</div></div></div>'
         +'</div>'
       +'</div>'
+      +minisHtml
       +'<div class="vd2-quote">“'+esc(_vagtQuote())+'”</div>'
     +'</div>';
-  }
-
-  function _buildVagtCats(container,shift){
-    if(!container)return;
-    container.innerHTML="";
-    if(!state.counters.length)return;
-    const sm=_vagtSnapMap(shift);
-    const cats=allCats();const groups={};cats.forEach(cat=>{groups[cat.id]=[];});
-    state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
-    const activeCats=cats.filter(cat=>(groups[cat.id]||[]).length>0);
-    if(!activeCats.length)return;
-    const row=document.createElement("div");row.className="vd2-cats";
-    activeCats.forEach((cat,i)=>{
-      const tot=Math.round((groups[cat.id]||[]).reduce((s,c)=>s+_vagtDispVal(c,sm),0));
-      const col=VD_COLORS[i%VD_COLORS.length];
-      const tile=document.createElement("div");tile.className="vd2-cat";
-      tile.innerHTML='<div class="vd2-cat-ico" style="background:'+col[1]+';color:'+col[0]+'">'+cat.icon+'</div>'
-        +'<div class="vd2-cat-txt"><span class="vd-stat-val" id="vdstat-'+cat.id+'">'+tot+'</span><span class="vd2-cat-lbl">'+esc(lang==="en"?cat.en:cat.da)+'</span></div>';
-      row.appendChild(tile);
-    });
-    container.appendChild(row);
   }
 
   let _vagtShowAllShifts=false;
@@ -3554,8 +3565,11 @@
         const tot=snapBase!==null?document.createElement("span"):null;
         if(tot){tot.className="vr-total";tot.textContent=fmtCount(c.count,unit);}
         if(editable){
-          const unitLbl=document.createElement("button");unitLbl.type="button";unitLbl.className="vr-unit";unitLbl.textContent=unit;
-          unitLbl.addEventListener("click",e=>{e.stopPropagation();openUnitDropdown(unitLbl,c.unit||"stk",picked=>{c.unit=picked;unitLbl.textContent=picked;save();});});
+          let unitLbl=null;
+          if(isWeight){
+            unitLbl=document.createElement("button");unitLbl.type="button";unitLbl.className="vr-unit";unitLbl.textContent=unit;
+            unitLbl.addEventListener("click",e=>{e.stopPropagation();openUnitDropdown(unitLbl,c.unit||"stk",picked=>{c.unit=picked;unitLbl.textContent=picked;save();});});
+          }
           const minus=document.createElement("button");minus.className="vr-minus";minus.setAttribute("aria-label","minus");minus.innerHTML="&minus;";
           const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
           minus.addEventListener("click",e=>{e.stopPropagation();bumpVagtRow(c.id,-1);});
@@ -3569,7 +3583,7 @@
             row.addEventListener("click",()=>{if(row._lp){row._lp=false;return;}bumpVagtRow(c.id,1);});
             bindLongPress(row,()=>openNumtray(t("numtray_add")+" "+tLabel(c.label),"",val=>{if(val>0)bumpVagtRow(c.id,val);}));
           }
-          ctrl.appendChild(minus);ctrl.appendChild(num);ctrl.appendChild(unitLbl);ctrl.appendChild(plus);
+          ctrl.appendChild(minus);ctrl.appendChild(num);if(unitLbl)ctrl.appendChild(unitLbl);ctrl.appendChild(plus);
         } else {
           const lockIcon=document.createElement("span");lockIcon.className="vr-lock";lockIcon.textContent="🔒";
           ctrl.appendChild(num);ctrl.appendChild(lockIcon);
@@ -3625,12 +3639,10 @@
     el.innerHTML='<div id="vagtDash"></div>'
       +'<div class="vd2-actions">'+shiftCard+logCard+'</div>'
       +addBlock
-      +'<div id="vagtCats"></div>'
       +'<div id="vagtActivity"></div>'
-      +(state.counters.length?'<div id="vagtDetWrap"></div><div id="vagtRows" class="stdb-h"></div>':'');
+      +(state.counters.length?'<div id="vagtDetWrap"></div><div id="vagtRows" class="stdb-h vrows"></div>':'');
 
     _buildVagtDashboard(document.getElementById("vagtDash"),shift);
-    _buildVagtCats(document.getElementById("vagtCats"),shift);
     _buildVagtActivity(document.getElementById("vagtActivity"));
 
     // ── Details toggle + counter rows ──
@@ -5401,7 +5413,7 @@
     if(state.log.length>2000)state.log.length=2000;
     save();renderLogView();
     $("#shiftScrim").classList.remove("open");
-    saveShift(null);renderShiftBar();
+    recordShiftEnd(getShift());saveShift(null);renderShiftBar();renderVagt();
     showToast(lang==="da"?"Vagt postet til feed!":"Shift posted to feed!");
     feedCursor=null;
     const feedView=$("#view-feed");if(feedView&&feedView.classList.contains("active"))loadFeed(false,true);
