@@ -211,8 +211,12 @@
   .wtype-count{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--faint)}
   .wtype-dot{width:8px;height:8px;border-radius:50%;flex:none}
   .wtype-dot-rod{background:#DC2626}.wtype-dot-hvid{background:#CA8A04}.wtype-dot-rose{background:#E879A3}.wtype-dot-mousserende{background:#0EA5E9}.wtype-dot-andet{background:var(--border-2)}
-  .wine-country-head{display:flex;align-items:center;gap:9px;padding:18px 2px 8px}
+  .wine-country-head{display:flex;align-items:center;gap:9px;padding:18px 2px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
   .wine-country-head:first-child{padding-top:0}
+  .wine-country-chev{margin-left:auto;color:var(--faint);font-size:13px;transition:transform .18s;flex:none}
+  .wine-country-head.wch-open .wine-country-chev{transform:rotate(90deg)}
+  .winelist-group{transition:none}
+  .winelist-group.wch-hidden{display:none}
   .wine-country-flag{font-size:19px;line-height:1;flex:none}
   .wine-country-name{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:var(--text);flex:1}
   .wine-country-count{font-size:12px;font-weight:700;color:var(--faint);background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:2px 8px}
@@ -225,6 +229,38 @@
   .wrow[data-wtype="hvid"]{border-left-color:#CA8A04}
   .wrow[data-wtype="rose"]{border-left-color:#E879A3}
   .wrow[data-wtype="mousserende"]{border-left-color:#0EA5E9}
+  .wrow-lineup-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:middle;line-height:1.6}
+  .wlevel-bar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.12s}
+  .wlevel-bar:active{opacity:.7;transform:scale(.98)}
+  .wlevel-rank{font-size:13px;font-weight:700;color:var(--text);flex:none}
+  .wlevel-xp-wrap{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+  .wlevel-xp-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .5s ease}
+  .wlevel-xp-lbl{font-size:11px;color:var(--faint);flex:none;font-variant-numeric:tabular-nums}
+  .wach-modal{position:fixed;inset:0;z-index:400;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .wach-card{background:var(--bg);border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.18);padding:0 0 calc(env(safe-area-inset-bottom,0px)+24px);animation:wAboutIn .22s cubic-bezier(.25,.46,.45,.94) both}
+  .wach-handle{width:36px;height:4px;background:var(--border-2);border-radius:2px;margin:10px auto 0;flex:none}
+  .wach-hdr{display:flex;align-items:center;padding:12px 16px 0;gap:10px}
+  .wach-hdr-title{font-family:"Fraunces",serif;font-size:16px;font-weight:700;color:var(--text);flex:1}
+  .wach-close{appearance:none;border:none;background:var(--surface-2);color:var(--dim);width:30px;height:30px;border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+  .wach-level-card{margin:16px;background:var(--accent);border-radius:16px;padding:20px 20px 18px;color:#fff;position:relative;overflow:hidden}
+  .wach-level-name{font-family:"Fraunces",serif;font-size:26px;font-weight:700;line-height:1;margin-bottom:2px}
+  .wach-level-xp{font-size:13px;opacity:.75;margin-bottom:12px}
+  .wach-level-xp-wrap{height:6px;background:rgba(255,255,255,.25);border-radius:3px;overflow:hidden;margin-bottom:6px}
+  .wach-level-xp-fill{height:100%;background:#fff;border-radius:3px;transition:width .5s ease}
+  .wach-level-next{font-size:11px;opacity:.6}
+  .wach-level-icon{position:absolute;right:14px;top:14px;font-size:48px;opacity:.18;line-height:1}
+  .wach-section{padding:0 16px;margin-top:20px}
+  .wach-section-ttl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:10px;display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+  .wach-section-chev{margin-left:auto;font-size:12px;color:var(--faint);transition:transform .18s;flex:none}
+  .wach-section-ttl.wach-open .wach-section-chev{transform:rotate(90deg)}
+  .wach-grid.wach-hidden{display:none}
+  .wach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .wach-badge{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
+  .wach-badge.on{border-color:var(--accent);background:var(--accent-soft)}
+  .wach-badge-icon{font-size:22px;line-height:1;filter:grayscale(1);opacity:.3}
+  .wach-badge.on .wach-badge-icon{filter:none;opacity:1}
+  .wach-badge-name{font-size:10px;font-weight:700;color:var(--faint);line-height:1.3;letter-spacing:.01em}
+  .wach-badge.on .wach-badge-name{color:var(--accent)}
   .w-grape-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
   .w-grape-input{flex:1;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:inherit;font-size:14px;padding:8px 10px;outline:none;transition:border-color .15s;-webkit-appearance:none;min-width:0}
   .w-grape-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
@@ -235,12 +271,44 @@
   .wabout-btn{appearance:none;border:1.5px solid var(--accent);background:none;color:var(--accent);font-family:inherit;font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;letter-spacing:.01em;display:inline-block;touch-action:manipulation}
   .wabout-btn:active{background:var(--accent-soft)}
   .wabout-btn.unknown{border-color:var(--border-2);color:var(--dim);font-weight:500}
-  .wabout-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-  .wabout-card{background:var(--surface);border-radius:18px;padding:22px 20px 18px;max-width:360px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,.22);position:relative;animation:wAboutIn .18s cubic-bezier(.34,1.3,.64,1) both}
-  @keyframes wAboutIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
-  .wabout-card-title{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--text);margin-bottom:10px;padding-right:28px}
-  .wabout-card-body{font-size:14px;color:var(--dim);line-height:1.65}
-  .wabout-card-close{position:absolute;top:14px;right:14px;appearance:none;border:none;background:var(--surface-2);color:var(--dim);width:28px;height:28px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+  .wabout-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .wabout-card{background:var(--bg);border-radius:24px 24px 0 0;padding:0 0 calc(env(safe-area-inset-bottom,0px) + 16px);width:100%;max-width:480px;max-height:88vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.18);position:relative;animation:wAboutIn .22s cubic-bezier(.25,.46,.45,.94) both}
+  @keyframes wAboutIn{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+  .wabout-card-close{appearance:none;border:none;background:var(--surface-2);color:var(--dim);width:30px;height:30px;border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;flex:none}
+  .wabout-card-title{font-family:"Fraunces",serif;font-size:22px;font-weight:700;color:var(--text);padding:20px 16px 2px;line-height:1.2}
+  .wabout-card-producer{font-size:13px;color:var(--dim);padding:0 16px 16px;font-weight:500}
+  .wabout-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 4px}
+  .wabout-cell{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+  .wabout-cell-photo{padding:0;overflow:hidden;cursor:zoom-in}
+  .wabout-photo-img{width:100%;height:100%;min-height:110px;object-fit:cover;display:block}
+  #wPhotoLightbox{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.93);display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top,20px) 16px env(safe-area-inset-bottom,20px);box-sizing:border-box;animation:wLbIn .15s ease both}
+  @keyframes wLbIn{from{opacity:0}to{opacity:1}}
+  #wPhotoLbImg{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;user-select:none}
+  #wPhotoLbClose{position:absolute;top:calc(env(safe-area-inset-top,0px) + 16px);right:16px;appearance:none;border:none;background:rgba(255,255,255,.18);color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;z-index:1}
+  .wabout-cell-icon{width:22px;height:22px;color:var(--accent);flex:none}
+  .wabout-cell-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-top:2px}
+  .wabout-cell-value{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+  .wabout-divider{height:1px;background:var(--border);margin:12px 16px}
+  .wabout-card-body{font-size:14px;color:var(--dim);line-height:1.7;padding:0 16px 8px}
+  .wabout-handle{width:36px;height:4px;background:var(--border-2);border-radius:2px;margin:10px auto 0;flex:none}
+  .wabout-header{display:flex;align-items:center;padding:10px 16px 0;gap:10px}
+  .wabout-header-title{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wabout-edit-btn{appearance:none;border:1.5px solid var(--border-2);background:transparent;color:var(--dim);font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:none;white-space:nowrap}
+  .wa-form{padding:0 16px 8px;display:flex;flex-direction:column;gap:8px}
+  .wa-input{width:100%;box-sizing:border-box;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;background:var(--surface);color:var(--text)}
+  .wa-input:focus{outline:none;border-color:var(--accent)}
+  .wa-textarea{min-height:72px;resize:none;line-height:1.55}
+  .wa-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .wa-type-picker{display:flex;gap:5px}
+  .wa-type-btn{appearance:none;flex:1;padding:9px 3px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--dim);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  .wa-type-btn.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  .wa-grape-row{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+  .wa-grape-row .wa-input{flex:1;margin:0}
+  .wa-grape-rm{appearance:none;border:none;background:var(--surface-2);color:var(--dim);width:30px;height:38px;border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;-webkit-tap-highlight-color:transparent}
+  .wa-grape-add{appearance:none;border:1.5px dashed var(--border-2);background:none;color:var(--dim);font-family:inherit;font-size:12px;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer;width:100%;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  .wa-photo-wrap{display:flex;align-items:center;gap:10px}
+  .wa-photo-prev{width:56px;height:56px;border-radius:8px;object-fit:cover;flex:none}
+  .wa-photo-rm{appearance:none;border:none;background:none;color:var(--dim);font-size:13px;cursor:pointer;padding:0}
   .wtype-picker{display:flex;gap:5px}
   .wtype-btn{appearance:none;flex:1;padding:11px 4px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--dim);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.12s;text-align:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   .wtype-btn:hover{border-color:var(--border-2);color:var(--text)}
@@ -262,22 +330,22 @@
   .wedit:hover{color:var(--text);background:var(--surface-2)}
 
   .wine-add-row{display:flex;flex-direction:column;gap:8px;margin-top:14px}
-  .wine-scan-page-btn{appearance:none;background:var(--accent);border:none;border-radius:var(--r);padding:14px;width:100%;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:.12s;-webkit-tap-highlight-color:transparent}
-  .wine-scan-page-btn:active{background:var(--accent-h)}
-  .wine-scan-page-btn.loading{opacity:.55;pointer-events:none}
-  .wine-lineup-btn{appearance:none;background:var(--accent-soft);border:1.5px solid var(--accent);border-radius:var(--r);padding:12px;width:100%;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--accent);display:flex;align-items:center;justify-content:center;gap:8px;transition:.12s;-webkit-tap-highlight-color:transparent}
-  .wine-lineup-btn:active{background:var(--ring)}
-  .wine-lineup-btn.loading{opacity:.55;pointer-events:none}
-  .lineup-modal{max-height:80vh;overflow-y:auto}
-  .lineup-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .wine-scan-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .wine-scan-bar-btn{appearance:none;background:var(--accent);border:none;border-radius:var(--r);padding:11px 8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;-webkit-tap-highlight-color:transparent;transition:.12s}
+  .wine-scan-bar-btn.outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+  .wine-scan-bar-btn:active{opacity:.7;transform:scale(.97)}
+  .wine-scan-bar-btn.loading{opacity:.5;pointer-events:none}
+  .lineup-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent}
   .lineup-item:last-child{border-bottom:none}
-  .lineup-item-dot{width:10px;height:10px;border-radius:50%;flex:none;margin-top:5px}
+  .lineup-item:active{opacity:.7}
+  .lineup-item-dot{width:10px;height:10px;border-radius:50%;flex:none}
   .lineup-item-body{flex:1;min-width:0}
   .lineup-item-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.3}
   .lineup-item-meta{font-size:12px;color:var(--dim);margin-top:2px;line-height:1.4}
   .lineup-item-grape{font-size:11px;color:var(--faint);margin-top:2px}
   .lineup-item.unreadable .lineup-item-name{color:var(--faint)}
   .lineup-item-warn{font-size:11px;color:#D97706;font-weight:600;margin-top:2px}
+  .lineup-item-arrow{color:var(--faint);font-size:18px;flex:none;margin-left:4px}
   .addwine{background:none;border:1.5px dashed var(--border-2);color:var(--faint);border-radius:var(--r);padding:12px;width:100%;cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
   .addwine:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
   .empty{padding:40px 20px;text-align:center;color:var(--faint);font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
@@ -354,6 +422,7 @@
   .lb-row.lb-me{background:var(--accent-soft);border-color:rgba(138,46,63,.25);border-left-width:3px;border-left-color:var(--accent)}
   .lb-row.lb-me .lb-rank{color:var(--accent)}
   .lb-rank{font-family:"Fraunces",serif;font-size:15px;font-weight:600;width:24px;flex:none;text-align:center;color:var(--faint)}
+  .lb-medal{width:26px;flex:none;text-align:center;font-size:15px;line-height:1}
   .lb-name{flex:1;min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .lb-you{font-size:11px;color:var(--accent);font-weight:400}
   .lb-prof{display:block;font-size:12px;color:var(--faint);font-weight:400}
@@ -392,6 +461,19 @@
   .team-or{text-align:center;color:var(--faint);font-size:13px;margin:8px 0}
   .btn-sm{font-size:13px;padding:8px 14px}
 
+  /* ---- Social tabs + leaderboard ---- */
+  .social-tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:3px;margin-bottom:16px}
+  .social-tab{flex:1;appearance:none;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--dim);padding:7px 6px;border-radius:6px;transition:.12s;-webkit-tap-highlight-color:transparent;white-space:nowrap}
+  .social-tab:active{transform:scale(.94);transition:transform .06s}
+  .social-tab.active{background:var(--accent);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .lb-period-row{display:flex;gap:4px;margin-bottom:14px}
+  .lb-period-btn{flex:1;appearance:none;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:12px;font-weight:700;color:var(--dim);padding:6px 4px;cursor:pointer;transition:.1s;-webkit-tap-highlight-color:transparent}
+  .lb-period-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .lb-medal{font-size:15px;width:24px;text-align:center;flex:none}
+  .lb-row-top{background:var(--surface)!important}
+  .lb-team-head{font-family:"Fraunces",serif;font-size:17px;font-weight:700;color:var(--text);margin:0 0 4px}
+  .lb-team-sub{font-size:12px;color:var(--faint);margin-bottom:12px}
+  .social-sec-gap{height:20px}
   /* ---- Profil modal ---- */
   .prof-select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:11px 12px}
   .prof-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
@@ -910,23 +992,147 @@
   .station-catalog-btn:active{transform:scale(.98);transition:transform .06s}
 
   /* ---- Station v3: grouped list ---- */
-  .st-v3{display:flex;flex-direction:column;gap:24px;padding-bottom:90px}
-  .st-group-lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:7px;margin-bottom:6px;padding:0 2px}
-  .st-group-lbl-icon{width:15px;height:15px;color:var(--accent);flex:none;display:flex;align-items:center;justify-content:center}
-  .st-group-lbl-icon svg{width:15px;height:15px}
-  .st-group-body{background:var(--surface);border-radius:18px;overflow:hidden;border:1px solid var(--border)}
-  /* Simple counter row — entire row is +1 */
-  .st-r{display:flex;align-items:center;padding:0 14px 0 18px;min-height:72px;border-bottom:1px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;transition:background .08s}
+  .st-v3{display:flex;flex-direction:column;gap:20px;padding-bottom:130px}
+  .st-group-lbl{display:flex;align-items:center;gap:9px;margin-bottom:10px;padding:0 4px}
+  .st-group-lbl-icon{width:28px;height:28px;background:var(--accent-soft);border-radius:8px;color:var(--accent);flex:none;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .st-group-lbl-icon svg{width:14px;height:14px}
+  .st-group-lbl-name{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);flex:1}
+  .st-group-lbl-tot{font-family:"Fraunces",serif;font-size:22px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;transition:color .2s}
+  .st-group-lbl-tot.has-count{color:var(--accent)}
+  .st-group-body{background:var(--surface);border-radius:20px;overflow:hidden;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .st-group-body.stg-hidden{display:none}
+  .st-group-lbl{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+  .st-group-chev{color:var(--faint);font-size:13px;transition:transform .18s;flex:none}
+  .st-group-lbl.stg-open .st-group-chev{transform:rotate(90deg)}
+  /* ── Vagt dashboard 2.0 ── */
+  .vd2-hero{position:relative;background:linear-gradient(150deg,#2E0E15 0%,#54202E 52%,#7A2A3C 100%);border-radius:24px;padding:20px 18px 16px;margin-bottom:14px;overflow:hidden;box-shadow:0 10px 28px rgba(74,22,34,.28)}
+  .vd2-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,190,140,.16),transparent 70%);pointer-events:none}
+  .vd2-hero::after{content:'';position:absolute;bottom:-60px;left:-40px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(232,106,139,.12),transparent 70%);pointer-events:none}
+  .vd2-top{display:flex;align-items:center;gap:18px;position:relative;z-index:1}
+  .vd-ring-wrap{position:relative;flex:none;width:126px;height:126px}
+  .vd-ring-svg{width:126px;height:126px;transform:rotate(-90deg)}
+  .vd-ring-track{fill:none;stroke:rgba(255,255,255,.13);stroke-width:9}
+  .vd-ring-arc{fill:none;stroke:url(#vdGrad);stroke-width:9;stroke-linecap:round;transition:stroke-dasharray .6s cubic-bezier(.34,1.3,.64,1)}
+  .vd-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .vd-ring-num{font-family:"Fraunces",serif;font-size:33px;font-weight:700;color:#fff;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .vd-ring-num.tick{animation:numPop .24s cubic-bezier(.34,1.4,.64,1)}
+  .vd-ring-lbl{font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.62)}
+  .vd-ring-goal{font-size:10px;font-weight:600;color:rgba(255,255,255,.45);margin-top:1px}
+  .vd2-tiles{flex:1;display:flex;flex-direction:column;gap:9px;min-width:0}
+  .vd2-tile{display:flex;align-items:center;gap:11px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:10px 12px;min-width:0}
+  .vd2-tile-ico{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
+  .vd2-tile-ico svg{width:16px;height:16px}
+  .vd2-tile-txt{min-width:0;flex:1}
+  .vd2-tile-val{font-family:"Fraunces",serif;font-size:17px;font-weight:700;color:#fff;line-height:1.15;letter-spacing:-.01em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vd2-tile-lbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.07em;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vd2-quote{margin-top:14px;position:relative;z-index:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:9px 14px;font-size:12px;font-style:italic;color:rgba(255,255,255,.72);text-align:center;line-height:1.45}
+  /* Action cards */
+  .vd2-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .vd2-act{appearance:none;border:none;font-family:inherit;text-align:left;border-radius:20px;padding:14px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:9px;min-height:100px;-webkit-tap-highlight-color:transparent;transition:transform .12s;position:relative;overflow:hidden;touch-action:manipulation}
+  .vd2-act:active{transform:scale(.96)}
+  .vd2-act-shift{background:linear-gradient(140deg,#9A3548 0%,#6B1E2E 100%);color:#fff;box-shadow:0 6px 18px rgba(138,46,63,.32)}
+  .vd2-act-shift.live{background:linear-gradient(140deg,#1C6B45 0%,#14532D 100%);box-shadow:0 6px 18px rgba(22,101,52,.32)}
+  .vd2-act-log{background:var(--surface);border:1.5px solid var(--border);color:var(--text)}
+  .vd2-act-ico{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;flex:none}
+  .vd2-act-ico svg{width:16px;height:16px}
+  .vd2-act-log .vd2-act-ico{background:var(--accent-soft);color:var(--accent)}
+  .vd2-act-title{font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1.15}
+  .vd2-act-sub{font-size:11px;font-weight:500;opacity:.68;line-height:1.3;margin-top:2px}
+  .vd2-act-go{position:absolute;top:12px;right:12px;font-size:9px;font-weight:800;letter-spacing:.1em;background:rgba(255,255,255,.2);border-radius:8px;padding:3px 8px}
+  .vd2-live-row{display:flex;align-items:center;gap:8px}
+  .vd2-live-dot{width:8px;height:8px;border-radius:50%;background:#4ADE80;flex:none;box-shadow:0 0 0 3px rgba(74,222,128,.25);animation:vsPulse 2s ease infinite}
+  .vd2-timer{font-family:"Fraunces",serif;font-size:25px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.02em;color:#fff}
+  /* Category scroll tiles */
+  .vd2-cats{display:flex;gap:9px;overflow-x:auto;margin:0 -14px 16px;padding:2px 14px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .vd2-cats::-webkit-scrollbar{display:none}
+  .vd2-cat{flex:none;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:9px 15px 9px 10px}
+  .vd2-cat-ico{width:32px;height:32px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
+  .vd2-cat-ico svg{width:15px;height:15px}
+  .vd2-cat-txt{display:flex;flex-direction:column}
+  .vd-stat-val{font-family:"Fraunces",serif;font-size:18px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1}
+  .vd-stat-val.tick{animation:numPop .22s cubic-bezier(.34,1.4,.64,1)}
+  .vd2-cat-lbl{font-size:9px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+  /* Section headers */
+  .vd2-sec{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px}
+  .vd2-sec-title{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+  .vd2-sec-btn{appearance:none;background:none;border:none;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;padding:4px 2px;-webkit-tap-highlight-color:transparent}
+  /* Activity cards */
+  .vd2-shift{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:12px 13px;margin-bottom:9px;display:flex;gap:12px;align-items:center;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;font-family:inherit;touch-action:manipulation;transition:background .08s}
+  .vd2-shift:active{background:var(--surface-2)}
+  .vd2-shift-ico{width:42px;height:42px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+  .vd2-shift-ico svg{width:19px;height:19px}
+  .vd2-shift-body{flex:1;min-width:0}
+  .vd2-shift-date{font-size:13.5px;font-weight:700;color:var(--text)}
+  .vd2-shift-time{font-size:11px;font-weight:500;color:var(--faint);margin-top:1px}
+  .vd2-shift-chips{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+  .vd2-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;border-radius:7px;padding:3px 8px;background:var(--surface-2);color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .vd2-chip svg{width:10px;height:10px;flex:none}
+  .vd2-chip.hl{background:var(--accent-soft);color:var(--accent)}
+  .vd2-empty{background:var(--surface);border:1.5px dashed var(--border-2);border-radius:18px;padding:22px 16px;text-align:center;font-size:13px;color:var(--faint);line-height:1.5;margin-bottom:9px}
+  /* ── Station Dashboard ── */
+  .st-dash-hero{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:16px 18px;margin-bottom:14px}
+  .st-donut-wrap{position:relative;flex:none;width:88px;height:88px}
+  .st-donut-svg{width:88px;height:88px;transform:rotate(-90deg)}
+  .st-donut-track{fill:none;stroke:var(--border);stroke-width:7}
+  .st-donut-arc{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round;transition:stroke-dasharray .5s cubic-bezier(.34,1.3,.64,1)}
+  .st-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .st-donut-num{font-family:"Fraunces",serif;font-size:24px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-.02em}
+  .st-donut-lbl{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-top:2px}
+  .st-dash-cats{flex:1;display:flex;flex-direction:column;gap:7px;min-width:0}
+  .st-dash-cat{display:flex;align-items:center;gap:7px;min-width:0}
+  .st-dash-cat-ico{width:20px;height:20px;background:var(--accent-soft);border-radius:6px;color:var(--accent);flex:none;display:flex;align-items:center;justify-content:center}
+  .st-dash-cat-ico svg{width:10px;height:10px}
+  .st-dash-cat-nm{flex:1;font-size:12px;font-weight:600;color:var(--dim);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .st-dash-cat-v{font-family:"Fraunces",serif;font-size:16px;font-weight:700;color:var(--dim);font-variant-numeric:tabular-nums;flex:none}
+  .st-dash-cat-v.on{color:var(--accent)}
+  /* Category mini-cards */
+  .st-cat-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .st-cat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;padding:14px 14px 12px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:border-color .15s}
+  .st-cat-card.scc-on{border-color:var(--accent)}
+  .st-cat-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+  .st-cat-card-ico{width:28px;height:28px;background:var(--accent-soft);border-radius:8px;color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+  .st-cat-card-ico svg{width:13px;height:13px}
+  .st-cat-card-btn{appearance:none;background:var(--surface-2,#f0f0f0);border:1.5px solid var(--border);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--dim);cursor:pointer;flex:none;-webkit-tap-highlight-color:transparent;font-size:18px;line-height:1;transition:.1s}
+  .st-cat-card-btn:active{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(.82);transition:transform .06s}
+  .st-cat-card-num{font-family:"Fraunces",serif;font-size:32px;font-weight:700;color:var(--dim);line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .st-cat-card-num.on{color:var(--accent)}
+  .st-cat-card-num.tick{animation:numPop .22s cubic-bezier(.34,1.4,.64,1)}
+  .st-cat-card-nm{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);margin-top:2px}
+  .st-cat-card.scc-on .st-cat-card-nm,.st-cat-card.scc-on .st-cat-card-num{color:var(--accent)}
+  /* Details section */
+  .st-detail-hdr{display:flex;align-items:center;gap:10px;margin:4px 0 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+  .st-detail-line{flex:1;height:1px;background:var(--border)}
+  .st-detail-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .st-detail-chev{color:var(--faint);font-size:12px;transition:transform .2s;flex:none}
+  .st-detail-hdr.stdo .st-detail-chev{transform:rotate(90deg)}
+  .st-detail-body{display:flex;flex-direction:column;gap:20px}
+  .st-detail-body.stdb-h{display:none}
+  /* AI log bar */
+  .st-ai-bar{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 58px);left:0;right:0;padding:7px 12px;background:var(--bg);border-top:1px solid var(--border);z-index:40;display:none;align-items:center;gap:8px}
+  .st-ai-bar.on{display:flex}
+  .st-ai-inner{flex:1;display:flex;align-items:center;background:var(--surface);border:1.5px solid var(--border);border-radius:24px;padding:0 6px 0 14px;gap:6px;transition:border-color .15s}
+  .st-ai-inner:focus-within{border-color:var(--accent)}
+  .st-ai-inp{flex:1;border:none;background:none;font-size:15px;color:var(--text);padding:10px 0;font-family:inherit;outline:none;min-width:0}
+  .st-ai-inp::placeholder{color:var(--faint)}
+  .st-ai-sendbtn{appearance:none;border:none;background:var(--accent);width:36px;height:36px;border-radius:50%;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.12s}
+  .st-ai-sendbtn:active{transform:scale(.82);transition:transform .07s;background:var(--accent-h)}
+  .st-ai-sendbtn:disabled{background:var(--border)}
+  .st-ai-spin2{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:none;margin:0 9px;flex:none}
+  .st-ai-spin2.on{display:block}
+  /* Simple counter row */
+  .st-r{display:flex;align-items:center;padding:0 12px 0 20px;min-height:74px;border-bottom:1px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;transition:background .08s;gap:8px}
   .st-r:last-of-type,.st-r:only-of-type{border-bottom:none}
   .st-r:active{background:var(--accent-soft)}
-  .st-r-name{flex:1;font-size:16px;font-weight:500;color:var(--text);pointer-events:none;min-width:0;padding-right:6px;line-height:1.25}
-  .st-r-edit{appearance:none;background:none;border:none;width:32px;height:32px;border-radius:8px;color:var(--faint);font-size:15px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .st-r-name{flex:1;font-size:16px;font-weight:600;color:var(--text);pointer-events:none;min-width:0;line-height:1.25}
+  .st-r-edit{appearance:none;background:none;border:none;width:30px;height:30px;border-radius:8px;color:var(--faint);font-size:15px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s}
   .st-r-edit:active{color:var(--text);background:var(--surface-2);transform:scale(.78);transition:transform .06s}
-  .st-r-minus{appearance:none;background:none;border:none;width:36px;height:36px;border-radius:50%;color:var(--faint);font-size:22px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s}
-  .st-r-minus:active{background:var(--surface-2);color:var(--text);transform:scale(.8);transition:transform .06s}
-  .st-r-num{font-family:"Fraunces",serif;font-size:48px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text);line-height:1;min-width:52px;text-align:right;letter-spacing:-.02em;cursor:pointer}
-  @keyframes numPop{0%{transform:scale(1)}32%{transform:scale(1.2);color:var(--accent)}100%{transform:scale(1)}}
-  .st-r-num.tick{animation:numPop .24s cubic-bezier(.34,1.4,.64,1)}
+  .st-r-minus{appearance:none;background:var(--surface-2);border:1.5px solid var(--border);width:36px;height:36px;border-radius:10px;color:var(--dim);font-size:20px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s}
+  .st-r-minus:active{background:var(--border);transform:scale(.82);transition:transform .06s}
+  .st-r-num{font-family:"Fraunces",serif;font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--dim);line-height:1;width:88px;flex:none;text-align:right;letter-spacing:-.02em;cursor:pointer;transition:color .2s;overflow:hidden}
+  .st-r.has-count .st-r-num{color:var(--accent)}
+  .st-r.has-count .st-r-name{color:var(--text)}
+  @keyframes numPop{0%{transform:scale(1)}35%{transform:scale(1.18)}100%{transform:scale(1)}}
+  .st-r-num.tick{animation:numPop .22s cubic-bezier(.34,1.4,.64,1)}
   /* Sub-type group */
   .st-sub-hdr{display:flex;align-items:center;padding:14px 14px 12px 18px;border-bottom:1px solid var(--border)}
   .st-sub-hdr-name{flex:1;font-size:16px;font-weight:500;color:var(--text);min-width:0}
@@ -1034,10 +1240,20 @@
 
   /* ---- Wine stats card ---- */
   .wine-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
-  .wine-stat-tile{background:var(--surface);text-align:center;padding:12px 6px}
-  .wine-stat-val{font-family:"Fraunces",serif;font-size:22px;font-weight:600;color:var(--text);line-height:1.2;font-variant-numeric:tabular-nums}
-  .wine-stat-val.sm{font-size:13px;font-weight:700;font-family:"Inter",system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .wine-stat-lbl{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+  .wine-stat-tile{background:var(--surface);text-align:center;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:72px;box-sizing:border-box}
+  .wine-stat-tile.clickable{cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .wine-stat-tile.clickable:active{background:var(--surface-2)}
+  .wine-stat-lbl{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+  .wine-stat-val{font-family:"Fraunces",serif;font-size:22px;font-weight:600;color:var(--text);line-height:1.2;font-variant-numeric:tabular-nums;flex:1;display:flex;align-items:center;justify-content:center}
+  .wine-stat-val.sm{font-size:12px;font-weight:700;font-family:"Inter",system-ui,sans-serif;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:1.3;max-width:100%;word-break:break-word}
+  /* Stats popup */
+  .wstat-row{display:flex;flex-direction:column;gap:4px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .wstat-row:last-child{border-bottom:none}
+  .wstat-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .wstat-name{font-size:14px;font-weight:700;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wstat-nums{font-size:12px;color:var(--dim);white-space:nowrap;flex:none}
+  .wstat-bar-wrap{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+  .wstat-bar{height:100%;background:var(--accent);border-radius:3px;transition:width .3s ease}
 
   /* === VAGT VIEW === */
   /* Vagt counter rows */
@@ -1089,13 +1305,16 @@
   .vs-start{background:var(--accent);border:none;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:13px 32px;border-radius:24px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;letter-spacing:.01em;box-shadow:0 3px 12px rgba(138,46,63,.3)}
   .vs-start:active{background:var(--accent-h);transform:scale(.96)}
   /* ── Add row ── */
-  .vagt-add-row{display:flex;align-items:center;gap:10px;padding:14px 0 8px;border-top:1px solid var(--border);margin-top:10px}
-  .vagt-add-in{flex:1;border:1.5px solid var(--border);border-radius:24px;background:var(--surface);color:var(--text);font-family:inherit;font-size:14px;padding:11px 16px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
+  .vagt-add-row{display:flex;align-items:center;gap:8px;padding:0;margin:0 0 8px;background:var(--bg)}
+  .vagt-add-in{flex:1;border:1.5px solid var(--border);border-radius:24px;background:var(--surface);color:var(--text);font-family:inherit;font-size:15px;padding:12px 18px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
   .vagt-add-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .vagt-add-in::placeholder{color:var(--faint)}
-  .vagt-add-btn{width:44px;height:44px;border-radius:50%;border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.08s;font-size:24px;font-weight:300;line-height:1;font-family:inherit;box-shadow:0 2px 8px rgba(138,46,63,.25)}
-  .vagt-add-btn:active{background:var(--accent-h);transform:scale(.86);box-shadow:none}
-  .vsug{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 6px;min-height:0}
+  .vagt-add-btn{width:44px;height:44px;border-radius:50%;border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s;box-shadow:0 2px 8px rgba(138,46,63,.25)}
+  .vagt-add-btn:active{background:var(--accent-h);transform:scale(.86);box-shadow:none;transition:transform .06s}
+  .vagt-add-btn:disabled{background:var(--border);box-shadow:none}
+  .vagt-ai-spin{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:none;flex:none}
+  .vagt-ai-spin.on{display:block}
+  .vsug{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 16px;min-height:0}
   .vsug-chip{background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-family:inherit;font-size:13px;font-weight:500;color:var(--dim);padding:6px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.08s;touch-action:manipulation;white-space:nowrap}
   .vsug-chip:active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
   /* ── Log knap (inline i add-rækken) ── */
@@ -1175,8 +1394,25 @@
   <section class="view" id="view-log"></section>
 
   <section class="view" id="view-social">
-    <div class="sec-head"><span class="sec-title" id="lbTitle"></span><span class="sec-sub" id="lbMeta"></span></div>
-    <div id="lbContent" class="social-empty">…</div>
+    <div class="social-tabs">
+      <button class="social-tab active" data-stab="global" id="stab-global">🌍 Global</button>
+      <button class="social-tab" data-stab="team" id="stab-team">👥 Hold</button>
+      <button class="social-tab" data-stab="challenge" id="stab-challenge">🏆 Ugens</button>
+    </div>
+    <div id="social-global">
+      <div class="lb-period-row">
+        <button class="lb-period-btn active" data-period="week" id="lbPeriodWeek"></button>
+        <button class="lb-period-btn" data-period="month" id="lbPeriodMonth"></button>
+        <button class="lb-period-btn" data-period="all" id="lbPeriodAll"></button>
+      </div>
+      <div id="lbContent"></div>
+    </div>
+    <div id="social-team" style="display:none">
+      <div id="socialTeamContent"></div>
+    </div>
+    <div id="social-challenge" style="display:none">
+      <div id="challengeContent"></div>
+    </div>
   </section>
 
   <section class="view" id="view-feed">
@@ -1213,21 +1449,29 @@
         <input id="wineSearch" autocomplete="off">
       </div>
     </div>
+    <div id="wineLevelBar" class="wlevel-bar" style="display:none">
+      <span id="wineLevelRank" class="wlevel-rank"></span>
+      <div class="wlevel-xp-wrap"><div class="wlevel-xp-fill" id="wineLevelXpFill"></div></div>
+      <span id="wineLevelXpLbl" class="wlevel-xp-lbl"></span>
+      <span style="font-size:16px;flex:none">🏆</span>
+    </div>
     <div id="wineStats" class="wine-stats" style="display:none"></div>
+    <div class="wine-scan-bar">
+      <button class="wine-scan-bar-btn" id="winePageScanBtn" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span id="winePageScanLbl">Scan etiket</span>
+      </button>
+      <button class="wine-scan-bar-btn outline" id="wineLineupBtn" type="button">
+        <svg width="24" height="20" viewBox="0 0 58 21" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1,21 L9,21 L9,11 Q9,5 7,4 L7,1 L3,1 L3,4 Q1,5 1,11 Z"/><rect x="1.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M13,21 L21,21 L21,11 Q21,5 19,4 L19,1 L15,1 L15,4 Q13,5 13,11 Z"/><rect x="13.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M25,21 L33,21 L33,11 Q33,5 31,4 L31,1 L27,1 L27,4 Q25,5 25,11 Z"/><rect x="25.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M37,21 L45,21 L45,11 Q45,5 43,4 L43,1 L39,1 L39,4 Q37,5 37,11 Z"/><rect x="37.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M49,21 L57,21 L57,11 Q57,5 55,4 L55,1 L51,1 L51,4 Q49,5 49,11 Z"/><rect x="49.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/></svg>
+        <span id="wineLineupLbl">Scan lineup</span>
+      </button>
+    </div>
+    <input type="file" id="winePageScanInput" accept="image/*" style="display:none">
+    <input type="file" id="wineLineupInput" accept="image/*" style="display:none">
     <div id="wineTypeStrip" class="wine-type-strip"></div>
     <div class="wsum" id="wineSum"></div>
     <div id="wineList"></div>
     <div class="wine-add-row">
-      <button class="wine-scan-page-btn" id="winePageScanBtn" type="button">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <span id="winePageScanLbl">Scan etiket</span>
-      </button>
-      <input type="file" id="winePageScanInput" accept="image/*" style="display:none">
-      <button class="wine-lineup-btn" id="wineLineupBtn" type="button">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <span id="wineLineupLbl">Scan lineup</span>
-      </button>
-      <input type="file" id="wineLineupInput" accept="image/*" style="display:none">
       <button class="addwine" id="addWineBtn"></button>
     </div>
   </section>
@@ -1476,66 +1720,21 @@
   </div>
 </div></div>
 
-<div class="scrim" id="lineupScrim">
-  <div class="modal lineup-modal">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-      <h2 id="lineupTitle" style="font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin:0"></h2>
-      <button class="btn ghost btn-sm" id="lineupClose"></button>
+<div class="wabout-modal" id="lineupScrim" style="display:none" role="dialog" aria-modal="true">
+  <div class="wabout-card" style="max-height:90vh">
+    <div class="wabout-handle"></div>
+    <div class="wabout-header">
+      <button class="wabout-card-close" id="lineupClose" aria-label="Luk">×</button>
+      <span id="lineupTitle" class="wabout-header-title"></span>
     </div>
-    <p id="lineupSub" style="font-size:13px;color:var(--faint);margin-bottom:14px"></p>
-    <div id="lineupList"></div>
-    <button class="btn primary" id="lineupAddAll" style="width:100%;margin-top:12px"></button>
+    <p id="lineupSub" style="font-size:12px;color:var(--faint);margin:2px 16px 8px;line-height:1.4"></p>
+    <div id="lineupList" style="padding:0 16px"></div>
+    <div style="padding:12px 16px 8px">
+      <button class="btn primary" id="lineupAddAll" style="width:100%"></button>
+    </div>
   </div>
 </div>
 
-<div class="scrim" id="wineScrim"><div class="modal">
-  <h2 id="wineModalTitle"></h2>
-  <button class="wine-scan-btn" id="wineScanBtn" type="button">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-    <span id="wineScanLbl">Scan etiket</span>
-  </button>
-  <input type="file" id="wineScanInput" accept="image/*" style="display:none">
-  <div class="field"><label id="wl_name"></label><input id="w_name" maxlength="60" autocomplete="off"></div>
-  <div class="field"><label id="wl_producer"></label><input id="w_producer" maxlength="50" autocomplete="off"></div>
-  <div class="row2">
-    <div class="field"><label id="wl_land"></label><input id="w_land" maxlength="30" autocomplete="off"></div>
-    <div class="field"><label id="wl_region"></label><input id="w_region" maxlength="40" autocomplete="off"></div>
-  </div>
-  <div class="row2">
-    <div class="field">
-      <label id="wl_grape"></label>
-      <div id="w_grapes_wrap"></div>
-      <button type="button" class="w-grape-add" id="w_grape_add_btn">+ <span id="w_grape_add_lbl"></span></button>
-    </div>
-    <div class="field"><label id="wl_vint"></label><input id="w_vint" maxlength="8" autocomplete="off"></div>
-  </div>
-  <div class="field">
-    <label id="wl_type"></label>
-    <div class="wtype-picker">
-      <button type="button" class="wtype-btn" data-wtype="rod"></button>
-      <button type="button" class="wtype-btn" data-wtype="hvid"></button>
-      <button type="button" class="wtype-btn" data-wtype="rose"></button>
-      <button type="button" class="wtype-btn" data-wtype="mousserende"></button>
-      <button type="button" class="wtype-btn" data-wtype="andet"></button>
-    </div>
-  </div>
-  <div class="field">
-    <label id="wl_photo"></label>
-    <div class="wine-photo-wrap">
-      <img id="wPhotoPreview" class="wine-photo-preview" alt="">
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <button type="button" class="btn ghost btn-sm" id="wPhotoBtn"></button>
-        <button type="button" class="wine-photo-remove" id="wPhotoRemove">✕ <span id="wPhotoRemoveLbl"></span></button>
-      </div>
-    </div>
-    <input id="wPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
-  </div>
-  <div class="mactions">
-    <button class="btn primary" id="wineSave"></button>
-    <button class="btn ghost" id="wineCancel"></button>
-    <button class="btn del" id="wineDelete" style="display:none"></button>
-  </div>
-</div></div>
 
 <div class="scrim" id="shiftEditScrim"><div class="modal" style="max-height:80vh;overflow-y:auto">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
@@ -1783,6 +1982,109 @@
   <button class="numtray-ok" id="numtrayOk">OK</button>
 </div>
 
+<div class="wabout-modal" id="wAboutModal" style="display:none" role="dialog" aria-modal="true">
+  <div class="wabout-card">
+    <div class="wabout-handle"></div>
+    <div class="wabout-header">
+      <button class="wabout-card-close" id="wAboutBackBtn" aria-label="Tilbage" style="display:none;font-size:20px;line-height:1">‹</button>
+      <button class="wabout-card-close" id="wAboutClose" aria-label="Luk">×</button>
+      <span id="wAboutHeaderTitle" class="wabout-header-title"></span>
+      <button class="wabout-edit-btn" id="wAboutShareBtn" type="button" style="display:none">Post to feed</button>
+      <button class="wabout-edit-btn" id="wAboutEditBtn" type="button">✏ Rediger</button>
+    </div>
+    <div id="wAboutView">
+      <div class="wabout-card-title" id="wAboutTitle"></div>
+      <div class="wabout-card-producer" id="wAboutProducer"></div>
+      <div class="wabout-grid" id="wAboutGrid"></div>
+      <div class="wabout-divider" id="wAboutDivider"></div>
+      <div class="wabout-card-body" id="wAboutBody"></div>
+    </div>
+    <div id="wAboutEdit" style="display:none">
+      <div class="wa-form">
+        <input id="waName" class="wa-input" maxlength="60" autocomplete="off">
+        <input id="waProducer" class="wa-input" maxlength="50" autocomplete="off">
+        <div class="wa-row2">
+          <input id="waLand" class="wa-input" maxlength="30" autocomplete="off">
+          <input id="waRegion" class="wa-input" maxlength="40" autocomplete="off">
+        </div>
+        <div class="wa-row2">
+          <input id="waVint" class="wa-input" maxlength="8" autocomplete="off">
+        </div>
+        <div id="waGrapeList"></div>
+        <button type="button" class="wa-grape-add" id="waGrapeAdd">+ Drue</button>
+        <div class="wa-type-picker">
+          <button type="button" class="wa-type-btn" data-wtype="rod"></button>
+          <button type="button" class="wa-type-btn" data-wtype="hvid"></button>
+          <button type="button" class="wa-type-btn" data-wtype="rose"></button>
+          <button type="button" class="wa-type-btn" data-wtype="mousserende"></button>
+          <button type="button" class="wa-type-btn" data-wtype="andet"></button>
+        </div>
+        <input type="hidden" id="waAbout">
+        <div class="wa-photo-wrap">
+          <img id="waPhotoPreview" class="wa-photo-prev" alt="" style="display:none">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <button type="button" class="btn ghost btn-sm" id="waPhotoBtn"></button>
+            <button type="button" class="wa-photo-rm" id="waPhotoRemove" style="display:none"></button>
+          </div>
+        </div>
+        <input id="waPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
+        <button type="button" class="wine-scan-btn" id="waScanBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span id="waScanLbl">Scan etiket</span>
+        </button>
+        <input type="file" id="waScanInput" accept="image/*" style="display:none">
+        <div class="mactions" style="margin-top:4px">
+          <button class="btn primary" id="waSave">Gem</button>
+          <button class="btn ghost" id="waCancel">Annuller</button>
+          <button class="btn del" id="waDelete" style="display:none">Slet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wabout-modal" id="wPostModal" style="display:none" role="dialog" aria-modal="true">
+  <div class="wabout-card">
+    <div class="wabout-handle"></div>
+    <div class="wabout-header">
+      <button class="wabout-card-close" id="wPostClose" aria-label="Luk">×</button>
+      <span class="wabout-header-title" id="wPostTitle"></span>
+    </div>
+    <div style="padding:12px 16px 24px;display:flex;flex-direction:column;gap:12px">
+      <textarea id="wPostCaption" class="wa-input wa-textarea" maxlength="300" placeholder="Skriv noget om vinen... (valgfrit)"></textarea>
+      <button class="btn primary" id="wPostConfirm">Post to feed</button>
+      <button class="btn ghost" id="wPostCancel">Annuller</button>
+    </div>
+  </div>
+</div>
+
+<div class="wabout-modal" id="wStatsModal" style="display:none" role="dialog" aria-modal="true">
+  <div class="wabout-card">
+    <div class="wabout-handle"></div>
+    <div class="wabout-header">
+      <button class="wabout-card-close" id="wStatsClose" aria-label="Luk">×</button>
+      <span id="wStatsTitle" class="wabout-header-title"></span>
+    </div>
+    <div id="wStatsList" style="padding:4px 16px 24px"></div>
+  </div>
+</div>
+
+<div class="wach-modal" id="wAchievModal" style="display:none" role="dialog" aria-modal="true">
+  <div class="wach-card">
+    <div class="wach-handle"></div>
+    <div class="wach-hdr">
+      <span class="wach-hdr-title" id="wAchievTitle">Achievements</span>
+      <button class="wach-close" id="wAchievClose" aria-label="Luk">×</button>
+    </div>
+    <div id="wAchievContent"></div>
+  </div>
+</div>
+
+<div id="wPhotoLightbox" style="display:none" role="dialog" aria-modal="true">
+  <button id="wPhotoLbClose" aria-label="Luk">×</button>
+  <img id="wPhotoLbImg" alt="">
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -1815,7 +2117,7 @@
       counter_q:"Hvad tæller du?",counter_ph:"fx Østers åbnet",
       wine_new:"Tilføj vin",wine_edit:"Rediger vin",wine_scan:"Scan etiket",wine_scan_loading:"Aflæser etiket…",wine_scan_err:"Kunne ikke aflæse etiketten — prøv igen",wine_add_manual:"+ Tilføj manuelt",
       wine_lineup:"Scan lineup",wine_lineup_loading:"Analyserer lineup…",wine_lineup_err:"Kunne ikke analysere billedet — prøv igen",
-      lineup_title:"Fundet i lineup",lineup_sub_fn:"{0} vine identificeret · {1} kunne ikke læses",lineup_add_all:"Tilføj alle til kælderen",lineup_unreadable:"Etiket ikke tydelig",
+      lineup_title:"Fundet i lineup",lineup_sub_fn:"{0} vine identificeret · {1} kunne ikke læses",lineup_add_all:"Stash dem alle",lineup_unreadable:"Etiket ikke tydelig",
       w_name:"Navn",w_name_ph:"fx Tignanello",
       w_producer:"Producent",w_producer_ph:"fx Antinori",
       w_land:"Land",w_land_ph:"Italien",
@@ -1845,6 +2147,9 @@
       tab_social:"Leaderboard",
       challenge_title:"Ugens udfordring",challenge_days:"dage tilbage",challenge_ends:"{0} dage tilbage",
       lb_title:"Ugentlig rangliste",lb_week:"uge fra",lb_anon:"Anonym",lb_you:"dig",lb_empty:"Ingen data endnu",
+      stab_global:"🌍 Global",stab_team:"👥 Hold",stab_challenge:"🏆 Ugens",
+      lb_period_week:"Uge",lb_period_month:"Måned",lb_period_all:"Altid",
+      lb_total_pts:"pt i alt",team_lb_title:"Dit hold",team_no_team:"Ikke på et hold endnu",
       team_title:"Hold",team_create_ph:"fx Noma Kitchen",team_create_btn:"Opret hold",
       team_join_ph:"XXXXXX",team_join_btn:"Tilslut",team_or:"eller",
       team_create_or_join:"Opret et hold eller tilslut dig ét med en invite-kode.",
@@ -1965,7 +2270,7 @@
       counter_q:"What are you counting?",counter_ph:"e.g. Oysters opened",
       wine_new:"Add wine",wine_edit:"Edit wine",wine_scan:"Scan label",wine_scan_loading:"Reading label…",wine_scan_err:"Could not read the label — try again",wine_add_manual:"+ Add manually",
       wine_lineup:"Scan lineup",wine_lineup_loading:"Analysing lineup…",wine_lineup_err:"Could not analyse the image — try again",
-      lineup_title:"Found in lineup",lineup_sub_fn:"{0} wines identified · {1} could not be read",lineup_add_all:"Add all to cellar",lineup_unreadable:"Label not clear",
+      lineup_title:"Found in lineup",lineup_sub_fn:"{0} wines identified · {1} could not be read",lineup_add_all:"Stash it all",lineup_unreadable:"Label not clear",
       w_name:"Name",w_name_ph:"e.g. Tignanello",
       w_producer:"Producer",w_producer_ph:"e.g. Antinori",
       w_land:"Country",w_land_ph:"Italy",
@@ -1995,6 +2300,9 @@
       tab_social:"Leaderboard",
       challenge_title:"Weekly challenge",challenge_days:"days left",challenge_ends:"{0} days left",
       lb_title:"Weekly leaderboard",lb_week:"week from",lb_anon:"Anonymous",lb_you:"you",lb_empty:"No data yet",
+      stab_global:"🌍 Global",stab_team:"👥 Teams",stab_challenge:"🏆 Weekly",
+      lb_period_week:"Week",lb_period_month:"Month",lb_period_all:"All time",
+      lb_total_pts:"pts total",team_lb_title:"Your team",team_no_team:"Not on a team yet",
       team_title:"Team",team_create_ph:"e.g. Noma Kitchen",team_create_btn:"Create team",
       team_join_ph:"XXXXXX",team_join_btn:"Join",team_or:"or",
       team_create_or_join:"Create a team or join one with an invite code.",
@@ -2106,6 +2414,7 @@
     $("#tab-vin").textContent=t("tab_wine");
     $("#loading").textContent=t("loading");
     $("#qlogInput").placeholder=t("qlog_ph");
+    const _stAiI=document.getElementById("stAiInp");if(_stAiI)_stAiI.placeholder=lang==="da"?"Log hvad du lavede…":"Log what you did…";
     $("#btnGrid").title=t("view_grid");
     $("#btnList").title=t("view_list");
     $("#wineSearch").placeholder=t("wine_search_ph");
@@ -2120,23 +2429,20 @@
     $("#counterSave").textContent=t("save");
     $("#counterCancel").textContent=t("cancel");
     $("#counterDelete").textContent=t("del");
-    const wineScanLbl=$("#wineScanLbl");if(wineScanLbl)wineScanLbl.textContent=t("wine_scan");
     const winePageScanLbl=$("#winePageScanLbl");if(winePageScanLbl)winePageScanLbl.textContent=t("wine_scan");
     const addWineBtnEl=$("#addWineBtn");if(addWineBtnEl)addWineBtnEl.textContent=t("wine_add_manual");
-    $("#wl_name").textContent=t("w_name");$("#w_name").placeholder=t("w_name_ph");
-    $("#wl_producer").textContent=t("w_producer");$("#w_producer").placeholder=t("w_producer_ph");
-    $("#wl_land").textContent=t("w_land");$("#w_land").placeholder=t("w_land_ph");
-    const wlPhoto=$("#wl_photo");if(wlPhoto)wlPhoto.textContent=t("w_photo");
-    const wPhotoRemoveLbl=$("#wPhotoRemoveLbl");if(wPhotoRemoveLbl)wPhotoRemoveLbl.textContent=t("wine_remove_photo");
-    $("#wl_region").textContent=t("w_region");$("#w_region").placeholder=t("w_region_ph");
-    $("#wl_grape").textContent=t("w_grape");
-    const _gadd=$("#w_grape_add_lbl");if(_gadd)_gadd.textContent=t("w_grape_add");
-    $("#wl_vint").textContent=t("w_vint");$("#w_vint").placeholder=t("w_vint_ph");
-    const wlType=$("#wl_type");if(wlType)wlType.textContent=t("w_type");
-    document.querySelectorAll(".wtype-btn").forEach(b=>{b.textContent=t("wine_type_"+b.dataset.wtype);});
-    $("#wineSave").textContent=t("save");
-    $("#wineCancel").textContent=t("cancel");
-    $("#wineDelete").textContent=t("del");
+    const waScanLbl=document.getElementById("waScanLbl");if(waScanLbl)waScanLbl.textContent=t("wine_scan");
+    const waEditBtn=document.getElementById("wAboutEditBtn");if(waEditBtn&&waEditBtn.style.display!=="none")waEditBtn.textContent=lang==="da"?"✏ Rediger":"✏ Edit";
+    document.querySelectorAll(".wa-type-btn").forEach(b=>{b.textContent=t("wine_type_"+b.dataset.wtype);});
+    const waName=document.getElementById("waName");if(waName)waName.placeholder=t("w_name_ph");
+    const waProducer=document.getElementById("waProducer");if(waProducer)waProducer.placeholder=t("w_producer_ph");
+    const waLand=document.getElementById("waLand");if(waLand)waLand.placeholder=t("w_land_ph");
+    const waRegion=document.getElementById("waRegion");if(waRegion)waRegion.placeholder=t("w_region_ph");
+    const waVint=document.getElementById("waVint");if(waVint)waVint.placeholder=t("w_vint_ph");
+    const waSave=document.getElementById("waSave");if(waSave)waSave.textContent=t("save");
+    const waCancel=document.getElementById("waCancel");if(waCancel)waCancel.textContent=t("cancel");
+    const waDelete=document.getElementById("waDelete");if(waDelete)waDelete.textContent=t("del");
+    const waPhotoBtn=document.getElementById("waPhotoBtn");if(waPhotoBtn&&document.getElementById("waPhotoPreview")&&document.getElementById("waPhotoPreview").style.display==="none")waPhotoBtn.textContent=lang==="da"?"+ Billede":"+ Photo";
     $("#askTitle").textContent=t("ask_title");
     $("#askNameLbl").textContent=t("ask_name_lbl");
     $("#askOptCounter").textContent=t("ask_as_counter");
@@ -2396,6 +2702,8 @@
   let activeWineType=localStorage.getItem("mise_wine_type")||"alle";
 
   const WINE_FLAGS={"Frankrig":"🇫🇷","France":"🇫🇷","Italien":"🇮🇹","Italy":"🇮🇹","Spanien":"🇪🇸","Spain":"🇪🇸","Portugal":"🇵🇹","Tyskland":"🇩🇪","Germany":"🇩🇪","Østrig":"🇦🇹","Austria":"🇦🇹","USA":"🇺🇸","Australien":"🇦🇺","Australia":"🇦🇺","New Zealand":"🇳🇿","Sydafrika":"🇿🇦","South Africa":"🇿🇦","Chile":"🇨🇱","Argentina":"🇦🇷","Grækenland":"🇬🇷","Greece":"🇬🇷","Ungarn":"🇭🇺","Hungary":"🇭🇺","Georgien":"🇬🇪","Georgia":"🇬🇪","Libanon":"🇱🇧","Lebanon":"🇱🇧","Danmark":"🇩🇰","Denmark":"🇩🇰","Slovenien":"🇸🇮","Kroatien":"🇭🇷"};
+  const REGION_TO_LAND={"toscana":"Italien","tuscany":"Italien","piemonte":"Italien","piedmont":"Italien","veneto":"Italien","sicilia":"Italien","sicily":"Italien","lombardia":"Italien","lombardy":"Italien","emilia-romagna":"Italien","emilia romagna":"Italien","friuli":"Italien","puglia":"Italien","campania":"Italien","abruzzo":"Italien","umbria":"Italien","lazio":"Italien","marche":"Italien","brunello":"Italien","chianti":"Italien","barolo":"Italien","amarone":"Italien","bordeaux":"Frankrig","bourgogne":"Frankrig","burgundy":"Frankrig","champagne":"Frankrig","alsace":"Frankrig","loire":"Frankrig","rhône":"Frankrig","rhone":"Frankrig","provence":"Frankrig","languedoc":"Frankrig","roussillon":"Frankrig","côtes du rhône":"Frankrig","cotes du rhone":"Frankrig","médoc":"Frankrig","medoc":"Frankrig","saint-émilion":"Frankrig","pomerol":"Frankrig","rioja":"Spanien","ribera del duero":"Spanien","priorat":"Spanien","penedès":"Spanien","penedes":"Spanien","rias baixas":"Spanien","catalonia":"Spanien","catalunya":"Spanien","rueda":"Spanien","jumilla":"Spanien","douro":"Portugal","alentejo":"Portugal","vinho verde":"Portugal","dão":"Portugal","dao":"Portugal","setúbal":"Portugal","setubal":"Portugal","mosel":"Tyskland","rheingau":"Tyskland","pfalz":"Tyskland","nahe":"Tyskland","rheinhessen":"Tyskland","franken":"Tyskland","wachau":"Østrig","kamptal":"Østrig","burgenland":"Østrig","steiermark":"Østrig","napa valley":"USA","napa":"USA","sonoma":"USA","willamette valley":"USA","columbia valley":"USA","barossa valley":"Australien","barossa":"Australien","yarra valley":"Australien","mclaren vale":"Australien","coonawarra":"Australien","margaret river":"Australien","marlborough":"New Zealand","central otago":"New Zealand","hawke's bay":"New Zealand","stellenbosch":"Sydafrika","swartland":"Sydafrika","constantia":"Sydafrika","mendoza":"Argentina","patagonia":"Argentina","salta":"Argentina","maipo":"Chile","colchagua":"Chile","casablanca":"Chile","aconcagua":"Chile","nemea":"Grækenland","naoussa":"Grækenland","tokaj":"Ungarn","eger":"Ungarn","kakheti":"Georgien","bekaa valley":"Libanon"};
+  function wLand(w){const l=(w.land||"").trim();return REGION_TO_LAND[l.toLowerCase()]||l;}
 
   function guessWineType(wine){
     const g=(wine.grape||"").toLowerCase();
@@ -2559,8 +2867,8 @@
   async function load(){try{const v=localStorage.getItem(STORE_KEY);if(v)return normalize(JSON.parse(v));}catch(e){}return clone(DEFAULTS);}
   async function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){console.error(e);}}
   function normalize(s){
-    s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,unit:c.unit||"stk",subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
-    s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0,type:w.type||"andet",imageUrl:w.imageUrl||null,about:w.about||""}));
+    s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,unit:c.unit||"stk",cat:c.cat||"andet",subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
+    s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0,type:w.type||"andet",imageUrl:w.imageUrl||null,about:w.about||"",fromLineup:w.fromLineup||false}));
     s.log=Array.isArray(s.log)?s.log.filter(e=>e&&e.ts&&e.text):[];
     s.customCats=Array.isArray(s.customCats)?s.customCats.map(c=>({id:c.id||id(),name:c.name||"",icon:c.icon||"",iconPending:!!c.iconPending})):[];
     s.shiftHistory=Array.isArray(s.shiftHistory)?s.shiftHistory:[];
@@ -2784,7 +3092,10 @@
     dd.addEventListener("mousedown",e=>{const it=e.target.closest(".ac-item");if(it){e.preventDefault();pick(items[+it.dataset.i]);}});
   }
   function uniq(arr){const seen=new Set(),out=[];arr.forEach(v=>{v=(v||"").trim();const k=v.toLowerCase();if(v&&!seen.has(k)){seen.add(k);out.push(v);}});return out;}
-  function wineSuggest(field){return uniq([...({land:LANDE,region:OMRAADER,grape:DRUER}[field]||[]),...state.wines.map(w=>w[field])]);}
+  function wineSuggest(field){
+    if(field==="grape")return uniq([...DRUER,...state.wines.flatMap(w=>(w.grape||"").split(",").map(s=>s.trim()).filter(Boolean))]);
+    return uniq([...({land:LANDE,region:OMRAADER}[field]||[]),...state.wines.map(w=>w[field])]);
+  }
 
   // ---- long press ----
   function bindLongPress(btn,onLong){
@@ -2801,7 +3112,7 @@
 
   // ---- counters ----
   function makeSimpleRow(c){
-    const row=document.createElement("div");row.className="st-r";row.dataset.id=c.id;
+    const row=document.createElement("div");row.className="st-r"+(counterTotal(c)>0?" has-count":"");row.dataset.id=c.id;
     const name=document.createElement("span");name.className="st-r-name";name.textContent=tLabel(c.label);
     const edit=document.createElement("button");edit.className="st-r-edit";edit.innerHTML="&#8943;";
     const minus=document.createElement("button");minus.className="st-r-minus";minus.innerHTML="&#8722;";
@@ -2896,38 +3207,103 @@
     const cats=allCats();const groups={};cats.forEach(cat=>{groups[cat.id]=[];});
     state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
     const activeCats=cats.filter(cat=>(groups[cat.id]||[]).length>0);
+
+    // ── HERO: donut + category breakdown ──
+    const grandTotal=state.counters.reduce((s,c)=>s+counterTotal(c),0);
+    const catTotals=activeCats.map(cat=>({cat,total:(groups[cat.id]||[]).reduce((s,c)=>s+counterTotal(c),0)})).sort((a,b)=>b.total-a.total);
+    const r=38,circ=+(2*Math.PI*r).toFixed(2);
+    const recs=getRecords();const bestRec=Math.max(grandTotal,...state.counters.map(c=>recs[c.label]||0));
+    const arcPct=bestRec>0?Math.min(1,grandTotal/bestRec):grandTotal>0?0.6:0;
+    const arcLen=+(circ*arcPct).toFixed(2);
+    const hero=document.createElement("div");hero.className="st-dash-hero";
+    hero.innerHTML='<div class="st-donut-wrap"><svg class="st-donut-svg" viewBox="0 0 88 88"><circle class="st-donut-track" cx="44" cy="44" r="'+r+'"/><circle class="st-donut-arc" id="stDonutArc" cx="44" cy="44" r="'+r+'" stroke-dasharray="'+arcLen+' '+circ+'"/></svg><div class="st-donut-center"><span class="st-donut-num" id="stDonutNum">'+grandTotal+'</span><span class="st-donut-lbl">'+(lang==="da"?"Total":"Total")+'</span></div></div>';
+    const catsDiv=document.createElement("div");catsDiv.className="st-dash-cats";
+    catTotals.slice(0,4).forEach(({cat,total})=>{
+      const row=document.createElement("div");row.className="st-dash-cat";
+      const ico=document.createElement("div");ico.className="st-dash-cat-ico";ico.innerHTML=cat.icon;
+      const nm=document.createElement("span");nm.className="st-dash-cat-nm";nm.textContent=lang==="en"?cat.en:cat.da;
+      const val=document.createElement("span");val.className="st-dash-cat-v"+(total>0?" on":"");val.id="scd-v-"+cat.id;val.textContent=total;
+      row.appendChild(ico);row.appendChild(nm);row.appendChild(val);
+      catsDiv.appendChild(row);
+    });
+    hero.appendChild(catsDiv);
+    grid.appendChild(hero);
+
+    // ── CATEGORY MINI-CARDS ──
+    const cardsGrid=document.createElement("div");cardsGrid.className="st-cat-cards";
     activeCats.forEach(cat=>{
       const counters=groups[cat.id]||[];
       const total=counters.reduce((s,c)=>s+counterTotal(c),0);
-      // Category label
-      const lbl=document.createElement("div");lbl.className="st-group-lbl";
+      const card=document.createElement("div");card.className="st-cat-card"+(total>0?" scc-on":"");
+      const top=document.createElement("div");top.className="st-cat-card-top";
+      const ico=document.createElement("div");ico.className="st-cat-card-ico";
+      ico.innerHTML=cat.iconPending?'<span style="width:10px;height:10px;border:1.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;display:inline-block;animation:spin .7s linear infinite"></span>':cat.icon;
+      const plusBtn=document.createElement("button");plusBtn.className="st-cat-card-btn";plusBtn.textContent="+";
+      top.appendChild(ico);top.appendChild(plusBtn);
+      const numEl=document.createElement("div");numEl.className="st-cat-card-num"+(total>0?" on":"");numEl.id="scc-num-"+cat.id;numEl.textContent=total;
+      const nmEl=document.createElement("div");nmEl.className="st-cat-card-nm";nmEl.textContent=lang==="en"?cat.en:cat.da;
+      card.appendChild(top);card.appendChild(numEl);card.appendChild(nmEl);
+      plusBtn.addEventListener("click",e=>{
+        e.stopPropagation();
+        const c=counters[0];if(!c)return;
+        if(c.subs.length){const best=c.subs.reduce((a,b)=>b.count>a.count?b:a,c.subs[0]);bumpStSub(c.id,best.id,1,null);}
+        else{bumpSt(c.id,1);}
+        const newTotal=counters.reduce((s,c)=>s+counterTotal(c),0);
+        const prev=parseInt(numEl.textContent)||0;
+        animateCount(numEl,prev,newTotal);numEl.classList.toggle("on",newTotal>0);card.classList.toggle("scc-on",newTotal>0);tickEl(numEl);
+        const gt=state.counters.reduce((s,c)=>s+counterTotal(c),0);
+        const dn=document.getElementById("stDonutNum");if(dn)dn.textContent=gt;
+        const sdv=document.getElementById("scd-v-"+cat.id);if(sdv){sdv.textContent=newTotal;sdv.classList.toggle("on",newTotal>0);}
+      });
+      cardsGrid.appendChild(card);
+    });
+    grid.appendChild(cardsGrid);
+
+    // ── DETAILS SECTION ──
+    const detOpen=localStorage.getItem("mise_detail_open")!=="0";
+    const detHdr=document.createElement("div");detHdr.className="st-detail-hdr"+(detOpen?" stdo":"");
+    detHdr.innerHTML='<div class="st-detail-line"></div><span class="st-detail-lbl">'+(lang==="da"?"Detaljer":"Details")+'</span><span class="st-detail-chev">›</span><div class="st-detail-line"></div>';
+    grid.appendChild(detHdr);
+    const detBody=document.createElement("div");detBody.className="st-detail-body"+(detOpen?"":" stdb-h");
+    grid.appendChild(detBody);
+    detHdr.addEventListener("click",()=>{const o=detHdr.classList.toggle("stdo");detBody.classList.toggle("stdb-h",!o);localStorage.setItem("mise_detail_open",o?"1":"0");});
+
+    activeCats.forEach(cat=>{
+      const counters=groups[cat.id]||[];
+      const total=counters.reduce((s,c)=>s+counterTotal(c),0);
+      const isOpen=total>0;
+      const lbl=document.createElement("div");lbl.className="st-group-lbl"+(isOpen?" stg-open":"");
       const iconEl=document.createElement("div");iconEl.className="st-group-lbl-icon";
       iconEl.innerHTML=cat.iconPending?'<span style="width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;display:inline-block;animation:spin .7s linear infinite"></span>':cat.icon;
-      const nameEl=document.createElement("span");nameEl.textContent=lang==="en"?cat.en:cat.da;
-      const totEl=document.createElement("span");totEl.style.cssText="font-family:'Fraunces',serif;font-size:16px;font-weight:600;color:var(--dim);font-variant-numeric:tabular-nums;margin-left:auto";
+      const nameEl=document.createElement("span");nameEl.className="st-group-lbl-name";nameEl.textContent=lang==="en"?cat.en:cat.da;
+      const totEl=document.createElement("span");totEl.className="st-group-lbl-tot"+(total>0?" has-count":"");
       totEl.id="cat-total-"+cat.id;totEl.textContent=total;
-      lbl.appendChild(iconEl);lbl.appendChild(nameEl);lbl.appendChild(totEl);
-      grid.appendChild(lbl);
-      // Group body
-      const body=document.createElement("div");body.className="st-group-body";
+      const chevEl=document.createElement("span");chevEl.className="st-group-chev";chevEl.textContent="›";
+      lbl.appendChild(iconEl);lbl.appendChild(nameEl);lbl.appendChild(totEl);lbl.appendChild(chevEl);
+      detBody.appendChild(lbl);
+      const body=document.createElement("div");body.className="st-group-body"+(isOpen?"":" stg-hidden");
       counters.forEach(c=>{
         if(c.subs.length){body.appendChild(makeSubGroup(c));}
         else{body.appendChild(makeSimpleRow(c));}
       });
-      // Add row at bottom
       const addR=document.createElement("button");addR.className="st-add-r";addR.dataset.catAdd=cat.id;
       addR.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'+(lang==="da"?" Tilføj tæller":" Add counter");
       body.appendChild(addR);
-      grid.appendChild(body);
+      detBody.appendChild(body);
+      lbl.addEventListener("click",()=>{const open=lbl.classList.toggle("stg-open");body.classList.toggle("stg-hidden",!open);});
     });
     const addCat=document.createElement("button");addCat.className="station-new-cat";addCat.id="addCatBtn";addCat.textContent=t("new_cat_btn");
-    grid.appendChild(addCat);
-    const addH=document.createElement("button");addH.id="addCounterBtn";addH.style.display="none";grid.appendChild(addH);
+    detBody.appendChild(addCat);
+    const addH=document.createElement("button");addH.id="addCounterBtn";addH.style.display="none";detBody.appendChild(addH);
   }
   function updateCatHeader(catId){
     const el=document.getElementById("cat-total-"+catId);if(!el)return;
     const tot=state.counters.filter(c=>(c.cat||"andet")===catId).reduce((s,c)=>s+counterTotal(c),0);
-    el.textContent=tot;
+    el.textContent=tot;el.classList.toggle("has-count",tot>0);
+    const sccEl=document.getElementById("scc-num-"+catId);if(sccEl){sccEl.textContent=tot;sccEl.classList.toggle("on",tot>0);}
+    const scdEl=document.getElementById("scd-v-"+catId);if(scdEl){scdEl.textContent=tot;scdEl.classList.toggle("on",tot>0);}
+    const gt=state.counters.reduce((s,c)=>s+counterTotal(c),0);
+    const dn=document.getElementById("stDonutNum");if(dn)dn.textContent=gt;
   }
   function haptic(ms){if(navigator.vibrate)navigator.vibrate(ms||30);}
   function tickEl(el){if(!el)return;el.classList.remove("tick");void el.offsetWidth;el.classList.add("tick");}
@@ -2955,7 +3331,7 @@
     const c=state.counters.find(x=>x.id===cid);if(!c||c.subs.length)return;
     const prev=c.count;c.count=Math.max(0,c.count+d);
     const row=document.querySelector('.st-r[data-id="'+cid+'"]');
-    if(row){const el=row.querySelector(".st-r-num");animateCount(el,prev,c.count);if(d>0){tickEl(el);haptic();}}
+    if(row){const el=row.querySelector(".st-r-num");animateCount(el,prev,c.count);if(d>0){tickEl(el);haptic();}row.classList.toggle("has-count",c.count>0);}
     updateCatHeader(c.cat||"andet");renderCareer();save();
   }
   function bumpStRow(cid,d){bumpSt(cid,d);}
@@ -2981,27 +3357,153 @@
     _tick();vagtTimerInterval=setInterval(_tick,1000);
   }
 
-  function runVagtAdd(text){
+  async function runVagtAdd(text){
     text=(text||"").trim();if(!text)return;
-    const actions=localParse(text);
-    if(!actions.length){showToast(lang==="da"?"Forstod ikke teksten — prøv igen":"Could not parse — try again");return;}
+    const inp=document.getElementById("vagtAddIn");
+    const spin=document.getElementById("vagtAiSpin");const btn=document.getElementById("vagtAddBtn");
+    if(spin)spin.classList.add("on");if(btn)btn.disabled=true;if(inp)inp.disabled=true;
+    let actions=[];
+    try{actions=await parseLog(text);}catch(e){console.warn("vagt AI parse failed:",e);}
+    if(!actions.length)actions=localParse(text);
+    if(spin)spin.classList.remove("on");if(btn)btn.disabled=false;if(inp){inp.disabled=false;}
+    if(!actions.length){showToast(lang==="da"?"Forstod ikke — prøv igen":"Couldn't parse — try again");if(inp)inp.focus();return;}
     undoSnapshot=clone(state);
-    const defaultCat=(state.customCats&&state.customCats.length)?state.customCats[0].id:"andet";
-    const created=[],bumped=[];
-    actions.forEach(a=>{
-      if(a.kind!=="counter")return;
-      const delta=parseInt(a.delta,10)||0;
-      let c=findCounter(a.counter);
-      if(!c){
-        c={id:id(),label:a.counter||"Ny tæller",count:0,subs:[],suggest:seedFor(a.counter),cat:defaultCat};
-        state.counters.push(c);created.push(c.label);
-      }
-      if(delta>0){c.count=Math.max(0,c.count+delta);bumped.push("+"+delta+" "+c.label);}
-    });
-    const inp=document.getElementById("vagtAddIn");if(inp)inp.value="";
+    const summary=[],ask=[],syncItems=[];
+    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems);});
+    if(inp)inp.value="";
     save();renderVagt();renderCounters();renderCareer();
-    const msgs=[...bumped,...created.filter(l=>!bumped.some(b=>b.includes(l))).map(l=>'"'+l+'" '+(lang==="da"?"tilføjet":"added"))];
-    if(msgs.length)showToast(msgs.join(" · "));
+    if(!ask.length){
+      if(summary.length){showToast(t("toast_logged")+summary.join(", "));addLogEntry(summary.join(" · "),null);haptic(40);syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta,null,false,summary.join(" · ")));}
+      checkBadges();checkRecords();
+    } else {
+      processAsk(ask,0,summary,syncItems,null);
+    }
+  }
+
+  function _vagtSnapMap(shift){const m={};if(shift&&shift.snap)shift.snap.forEach(sc=>{m[sc.id]={count:sc.count||0,subs:{}};(sc.subs||[]).forEach(ss=>m[sc.id].subs[ss.id]=ss.count||0);});return m;}
+  function _vagtDispVal(c,snapMap){const sb=snapMap[c.id]?snapMap[c.id].count||0:0;return Math.max(0,counterTotal(c)-sb);}
+
+  const VD_QUOTES={
+    da:["Man behøver ikke være hurtig — man skal være klar.","Mise en place er halvdelen af sejren.","God service er tusind små ting gjort rigtigt.","En vagt ad gangen — et håndværk for livet.","Detaljerne er ikke detaljer. De er retten.","Skarpe knive, skarpt fokus.","Gæsterne husker, hvordan du fik dem til at føle sig.","Øvelse gør mester — én optælling ad gangen."],
+    en:["You don't have to be fast — you have to be ready.","Mise en place is half the battle.","Great service is a thousand small things done right.","One shift at a time — a craft for life.","The details aren't details. They are the dish.","Sharp knives, sharp focus.","Guests remember how you made them feel.","Practice makes perfect — one count at a time."]
+  };
+  function _vagtQuote(){const qs=VD_QUOTES[lang==="da"?"da":"en"];const doy=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0).getTime())/864e5);return qs[doy%qs.length];}
+  const VD_COLORS=[["#E8875C","rgba(232,135,92,.14)"],["#5CB8A7","rgba(92,184,167,.14)"],["#9B7EDE","rgba(155,126,222,.15)"],["#E86A8B","rgba(232,106,139,.14)"],["#5C9BD8","rgba(92,155,216,.14)"],["#D4A94E","rgba(212,169,78,.15)"]];
+  function _bestShiftTotal(){let best=0;(state.shiftHistory||[]).forEach(s=>{const tot=(s.entries||[]).reduce((a,e)=>a+(e.delta>0?e.delta:0),0);if(tot>best)best=tot;});return Math.round(best);}
+  function _shiftsThisWeek(){const now=new Date();const monday=new Date(now.getFullYear(),now.getMonth(),now.getDate()-((now.getDay()+6)%7));return(state.shiftHistory||[]).filter(s=>new Date(s.startedAt)>=monday).length+(getShift()?1:0);}
+  function _vagtRingPct(grand,shift){if(shift){const best=_bestShiftTotal();return best>0?Math.min(1,grand/best):(grand>0?.65:0);}return grand>0?1:0;}
+  function _vagtGrand(sm){return state.counters.reduce((s,c)=>s+_vagtDispVal(c,sm),0);}
+
+  function _updateVagtDashboard(){
+    const shift=getShift();const sm=_vagtSnapMap(shift);
+    const cats=allCats();const groups={};cats.forEach(cat=>{groups[cat.id]=[];});
+    state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
+    let grand=0;
+    cats.forEach(cat=>{
+      const tot=(groups[cat.id]||[]).reduce((s,c)=>s+_vagtDispVal(c,sm),0);grand+=tot;
+      const sv=document.getElementById("vdstat-"+cat.id);if(sv){const prev=parseInt(sv.textContent)||0;if(prev!==tot){animateCount(sv,prev,tot);tickEl(sv);}}
+    });
+    const rn=document.getElementById("vd-ring-num");
+    if(rn){const prev=parseInt(rn.textContent)||0;if(prev!==grand){animateCount(rn,prev,grand);tickEl(rn);}}
+    const arc=document.getElementById("vd-ring-arc");
+    if(arc){const r=52,circ=+(2*Math.PI*r).toFixed(2);arc.setAttribute("stroke-dasharray",+(circ*_vagtRingPct(grand,shift)).toFixed(2)+" "+circ);}
+  }
+
+  function _buildVagtDashboard(container,shift){
+    if(!container)return;
+    const sm=_vagtSnapMap(shift);
+    const grandTotal=Math.round(_vagtGrand(sm));
+    const r=52,circ=+(2*Math.PI*r).toFixed(2);
+    const arcLen=+(circ*_vagtRingPct(grandTotal,shift)).toFixed(2);
+    const best=_bestShiftTotal();
+    const goalLine=shift&&best>0?'<span class="vd-ring-goal">'+(lang==="da"?"Rekord: ":"Best: ")+best+'</span>':'';
+    const clockSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>';
+    const calSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>';
+    container.innerHTML='<div class="vd2-hero">'
+      +'<div class="vd2-top">'
+        +'<div class="vd-ring-wrap">'
+          +'<svg class="vd-ring-svg" viewBox="0 0 120 120">'
+            +'<defs><linearGradient id="vdGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFB36B"/><stop offset="100%" stop-color="#FF6B8A"/></linearGradient></defs>'
+            +'<circle class="vd-ring-track" cx="60" cy="60" r="'+r+'"/>'
+            +'<circle class="vd-ring-arc" id="vd-ring-arc" cx="60" cy="60" r="'+r+'" stroke-dasharray="'+arcLen+' '+circ+'"/>'
+          +'</svg>'
+          +'<div class="vd-ring-center">'
+            +'<span class="vd-ring-num" id="vd-ring-num">'+grandTotal+'</span>'
+            +'<span class="vd-ring-lbl">'+(shift?(lang==="da"?"denne vagt":"this shift"):(lang==="da"?"i alt":"total"))+'</span>'
+            +goalLine
+          +'</div>'
+        +'</div>'
+        +'<div class="vd2-tiles">'
+          +'<div class="vd2-tile"><div class="vd2-tile-ico" style="background:rgba(255,179,107,.16);color:#FFB36B">'+clockSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+fmtWorkTime(totalWorkMs())+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Arbejdstid":"Work time")+'</div></div></div>'
+          +'<div class="vd2-tile"><div class="vd2-tile-ico" style="background:rgba(92,184,167,.16);color:#5CB8A7">'+calSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+_shiftsThisWeek()+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Vagter denne uge":"Shifts this week")+'</div></div></div>'
+        +'</div>'
+      +'</div>'
+      +'<div class="vd2-quote">“'+esc(_vagtQuote())+'”</div>'
+    +'</div>';
+  }
+
+  function _buildVagtCats(container,shift){
+    if(!container)return;
+    container.innerHTML="";
+    if(!state.counters.length)return;
+    const sm=_vagtSnapMap(shift);
+    const cats=allCats();const groups={};cats.forEach(cat=>{groups[cat.id]=[];});
+    state.counters.forEach(c=>{const cid=c.cat||"andet";(groups[cid]||(groups[cid]=[])).push(c);});
+    const activeCats=cats.filter(cat=>(groups[cat.id]||[]).length>0);
+    if(!activeCats.length)return;
+    const row=document.createElement("div");row.className="vd2-cats";
+    activeCats.forEach((cat,i)=>{
+      const tot=Math.round((groups[cat.id]||[]).reduce((s,c)=>s+_vagtDispVal(c,sm),0));
+      const col=VD_COLORS[i%VD_COLORS.length];
+      const tile=document.createElement("div");tile.className="vd2-cat";
+      tile.innerHTML='<div class="vd2-cat-ico" style="background:'+col[1]+';color:'+col[0]+'">'+cat.icon+'</div>'
+        +'<div class="vd2-cat-txt"><span class="vd-stat-val" id="vdstat-'+cat.id+'">'+tot+'</span><span class="vd2-cat-lbl">'+esc(lang==="en"?cat.en:cat.da)+'</span></div>';
+      row.appendChild(tile);
+    });
+    container.appendChild(row);
+  }
+
+  let _vagtShowAllShifts=false;
+  function _buildVagtActivity(container){
+    if(!container)return;
+    const hist=state.shiftHistory||[];
+    const seeAllLbl=_vagtShowAllShifts?(lang==="da"?"Vis færre":"Show less"):(lang==="da"?"Vis alle":"View all")+" ("+hist.length+")";
+    container.innerHTML='<div class="vd2-sec"><span class="vd2-sec-title">'+(lang==="da"?"Aktivitet":"Activity")+'</span>'
+      +(hist.length>3?'<button class="vd2-sec-btn" id="vagtSeeAll">'+seeAllLbl+'</button>':'')
+      +'</div>';
+    if(!hist.length){
+      const empty=document.createElement("div");empty.className="vd2-empty";
+      empty.textContent=lang==="da"?"Ingen vagter endnu — start din første vagt og byg din historik":"No shifts yet — start your first shift and build your history";
+      container.appendChild(empty);return;
+    }
+    const briefSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2"/><path d="M3 13h18"/></svg>';
+    const clockMini='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>';
+    const loc=lang==="da"?"da-DK":"en-GB";
+    const shown=_vagtShowAllShifts?hist:hist.slice(0,3);
+    shown.forEach((s,i)=>{
+      const d=new Date(s.startedAt);
+      const dateStr=d.toLocaleDateString(loc,{weekday:"short",day:"numeric",month:"short"});
+      const t1=d.toLocaleTimeString(loc,{hour:"2-digit",minute:"2-digit"});
+      const t2=s.endedAt?new Date(s.endedAt).toLocaleTimeString(loc,{hour:"2-digit",minute:"2-digit"}):"";
+      const totItems=Math.round((s.entries||[]).reduce((a,e)=>a+(e.delta>0&&(!e.unit||e.unit==="stk")?e.delta:0),0));
+      const top=(s.entries||[]).filter(e=>e.delta>0).sort((a,b)=>b.delta-a.delta).slice(0,2);
+      const card=document.createElement("button");card.className="vd2-shift";
+      card.innerHTML='<div class="vd2-shift-ico">'+briefSvg+'</div>'
+        +'<div class="vd2-shift-body">'
+          +'<div class="vd2-shift-date">'+esc(dateStr)+'</div>'
+          +'<div class="vd2-shift-time">'+esc(t1+(t2?"–"+t2:""))+'</div>'
+          +'<div class="vd2-shift-chips">'
+            +'<span class="vd2-chip hl">'+clockMini+fmtWorkTime(s.durationMs)+'</span>'
+            +(totItems>0?'<span class="vd2-chip">'+totItems+(lang==="da"?" stk":" items")+'</span>':'')
+            +top.map(e=>'<span class="vd2-chip">'+esc(fmtCount(e.delta,e.unit)+" "+e.label)+'</span>').join("")
+          +'</div>'
+        +'</div>'
+        +'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><polyline points="9 18 15 12 9 6"/></svg>';
+      card.addEventListener("click",()=>openShiftEdit(i));
+      container.appendChild(card);
+    });
+    const seeAll=document.getElementById("vagtSeeAll");
+    if(seeAll)seeAll.addEventListener("click",()=>{_vagtShowAllShifts=!_vagtShowAllShifts;_buildVagtActivity(container);});
   }
 
   function _buildVagtRows(rows,snap,editable){
@@ -3083,69 +3585,79 @@
     const shift=getShift();
     if(!shift&&vagtTimerInterval){clearInterval(vagtTimerInterval);vagtTimerInterval=null;}
 
-    const editable=true;
-    const totalMs=totalWorkMs();
-    const worktimeBar=totalMs>0?'<div class="vs-worktime"><span class="vs-worktime-lbl">'+(lang==="da"?"Total arbejdstid":"Total work time")+'</span><span class="vs-worktime-val">'+fmtWorkTime(totalMs)+'</span></div>':'';
-    const pencilSvg='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
-    const addBlock=editable?('<div class="vagt-add-row">'
-      +'<button class="vagt-log-btn" id="vagtLogBtn" aria-label="Log">'+pencilSvg+'</button>'
+    // ── Add row + quick +1 chips ──
+    const sendSvg='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+    const quick=state.counters.filter(c=>!c.subs.length&&(!c.unit||c.unit==="stk")).sort((a,b)=>counterTotal(b)-counterTotal(a)).slice(0,4);
+    const chipsHtml=quick.length?'<div class="vsug">'+quick.map(c=>'<button class="vsug-chip" data-qc="'+c.id+'">+1 '+esc(tLabel(c.label))+'</button>').join("")+'</div>':'';
+    const addBlock='<div class="vagt-add-row">'
       +'<input class="vagt-add-in" id="vagtAddIn" placeholder="'
-      +esc(lang==="da"?"Tilføj fx østers, 500 cocktails…":"Add e.g. oysters, 500 cocktails…")
-      +'" maxlength="200" autocomplete="off" autocorrect="off" autocapitalize="off">'
-      +'<button class="vagt-add-btn" id="vagtAddBtn" aria-label="Tilføj">+</button>'
-      +'</div>'
-      +'<div class="vsug" id="vagtSuggest"></div>')
-      :'';
+      +esc(lang==="da"?"Skriv hvad du lavede…":"Write what you did…")
+      +'" maxlength="200" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">'
+      +'<div class="vagt-ai-spin" id="vagtAiSpin"></div>'
+      +'<button class="vagt-add-btn" id="vagtAddBtn" aria-label="Log">'+sendSvg+'</button>'
+      +'</div>'+chipsHtml;
 
-    let shiftBar='';
+    // ── Action cards ──
+    const playSvg='<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="7 4 20 12 7 20 7 4"/></svg>';
+    const sparkSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4"/><path d="M13 3l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>';
+    let shiftCard;
     if(shift){
-      shiftBar='<div class="vs-bar"><div class="vs-dot"></div>'
-        +'<div class="vs-time" id="vagtTimer">0:00</div>'
-        +'<button class="vs-end" id="vagtEndBtn">'+(lang==="da"?"Afslut vagt":"End shift")+'</button>'
-        +'</div>';
+      shiftCard='<button class="vd2-act vd2-act-shift live" id="vagtShiftCard">'
+        +'<span class="vd2-act-go">LIVE</span>'
+        +'<div class="vd2-live-row"><div class="vd2-live-dot"></div><span class="vd2-timer" id="vagtTimer">0:00</span></div>'
+        +'<div><div class="vd2-act-title">'+(lang==="da"?"Vagt i gang":"Shift running")+'</div>'
+        +'<div class="vd2-act-sub">'+(lang==="da"?"Tryk for at afslutte":"Tap to end")+'</div></div>'
+        +'</button>';
     } else {
-      shiftBar='<div class="vs-noshift">'
-        +'<button class="vs-start" id="vagtStartBtn">'+(lang==="da"?"Start vagt":"Start shift")+'</button>'
-        +'</div>';
+      shiftCard='<button class="vd2-act vd2-act-shift" id="vagtShiftCard">'
+        +'<span class="vd2-act-go">GO</span>'
+        +'<div class="vd2-act-ico">'+playSvg+'</div>'
+        +'<div><div class="vd2-act-title">'+(lang==="da"?"Start vagt":"Start shift")+'</div>'
+        +'<div class="vd2-act-sub">'+(lang==="da"?"Klar til service?":"Ready for service?")+'</div></div>'
+        +'</button>';
+    }
+    const logCard='<button class="vd2-act vd2-act-log" id="vagtLogCard">'
+      +'<div class="vd2-act-ico">'+sparkSvg+'</div>'
+      +'<div><div class="vd2-act-title">'+(lang==="da"?"Log noget":"Log something")+'</div>'
+      +'<div class="vd2-act-sub">'+(lang==="da"?"Skriv hvad du lavede":"Write what you did")+'</div></div>'
+      +'</button>';
+
+    el.innerHTML='<div id="vagtDash"></div>'
+      +'<div class="vd2-actions">'+shiftCard+logCard+'</div>'
+      +addBlock
+      +'<div id="vagtCats"></div>'
+      +'<div id="vagtActivity"></div>'
+      +(state.counters.length?'<div id="vagtDetWrap"></div><div id="vagtRows" class="stdb-h"></div>':'');
+
+    _buildVagtDashboard(document.getElementById("vagtDash"),shift);
+    _buildVagtCats(document.getElementById("vagtCats"),shift);
+    _buildVagtActivity(document.getElementById("vagtActivity"));
+
+    // ── Details toggle + counter rows ──
+    if(state.counters.length){
+      const detWrap=document.getElementById("vagtDetWrap");
+      const rows=document.getElementById("vagtRows");
+      const detOpen=localStorage.getItem("mise_vagt_detail")!=="0";
+      const detHdr=document.createElement("div");detHdr.className="st-detail-hdr"+(detOpen?" stdo":"");
+      detHdr.innerHTML='<div class="st-detail-line"></div><span class="st-detail-lbl">'+(lang==="da"?"Detaljer":"Details")+'</span><span class="st-detail-chev">›</span><div class="st-detail-line"></div>';
+      if(detWrap)detWrap.appendChild(detHdr);
+      if(rows&&detOpen)rows.classList.remove("stdb-h");
+      detHdr.addEventListener("click",()=>{const o=detHdr.classList.toggle("stdo");if(rows)rows.classList.toggle("stdb-h",!o);localStorage.setItem("mise_vagt_detail",o?"1":"0");});
+      _buildVagtRows(rows,shift?shift.snap:null,true);
     }
 
-    if(!state.counters.length){
-      el.innerHTML=shiftBar+worktimeBar+addBlock;
-    } else {
-      el.innerHTML=shiftBar+worktimeBar+'<div id="vagtRows"></div>'+addBlock;
-      _buildVagtRows(document.getElementById("vagtRows"),shift?shift.snap:null,editable);
-    }
+    // ── Wiring ──
+    const sc=document.getElementById("vagtShiftCard");
+    if(sc)sc.addEventListener("click",()=>{if(getShift())openShiftModal();else{startShift();renderVagt();haptic(30);}});
+    const lc=document.getElementById("vagtLogCard");
+    if(lc)lc.addEventListener("click",()=>{const ai=document.getElementById("vagtAddIn");if(ai){ai.scrollIntoView({block:"center",behavior:"smooth"});ai.focus();}});
+    el.querySelectorAll("[data-qc]").forEach(ch=>ch.addEventListener("click",()=>bumpVagtRow(ch.dataset.qc,1)));
+    if(shift)startVagtTimer(shift);
 
-    if(shift){
-      const eb=document.getElementById("vagtEndBtn");if(eb)eb.addEventListener("click",openShiftModal);
-      startVagtTimer(shift);
-    } else {
-      const sb=document.getElementById("vagtStartBtn");if(sb)sb.addEventListener("click",()=>{startShift();renderVagt();});
-    }
-
-    const logBtn=document.getElementById("vagtLogBtn");
-    if(logBtn)logBtn.addEventListener("click",()=>openQlogOverlay());
     const inp=document.getElementById("vagtAddIn"),btn=document.getElementById("vagtAddBtn");
     if(inp){
       if(btn)btn.addEventListener("click",()=>runVagtAdd(inp.value));
       inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runVagtAdd(inp.value);}});
-      function _updateSuggest(){
-        const sug=document.getElementById("vagtSuggest");if(!sug)return;
-        const q=(inp.value||"").toLowerCase().trim();
-        const matches=state.counters.filter(c=>!q||tLabel(c.label).toLowerCase().includes(q)).slice(0,6);
-        sug.innerHTML=matches.map(c=>'<button class="vsug-chip" data-cid="'+esc(c.id)+'">'+esc(tLabel(c.label))+'</button>').join("");
-        sug.querySelectorAll(".vsug-chip").forEach(chip=>{
-          chip.addEventListener("click",e=>{
-            e.preventDefault();
-            const cid=chip.dataset.cid;
-            if(inp.value.trim()){runVagtAdd(inp.value);return;}
-            bumpVagtRow(cid,1);
-            inp.value="";_updateSuggest();
-          });
-        });
-      }
-      inp.addEventListener("focus",_updateSuggest);
-      inp.addEventListener("input",_updateSuggest);
     }
   }
 
@@ -3162,7 +3674,7 @@
     if(el){if(unit==="stk"){animateCount(el,prevDisp,dispVal);}else{el.textContent=fmtCount(dispVal,unit);}if(d>0){tickEl(el);haptic();}}
     const totEl=document.querySelector('.vr[data-cid="'+cid+'"] .vr-total');
     if(totEl)totEl.textContent=fmtCount(c.count,unit);
-    updateCatHeader(c.cat||"andet");renderCareer();save();
+    updateCatHeader(c.cat||"andet");_updateVagtDashboard();renderCareer();save();
   }
 
   function bumpVagtSub(cid,sid,d){
@@ -3181,7 +3693,7 @@
     if(totEl)totEl.textContent=s.count;
     const grpTot=document.getElementById("vr-tot-"+cid);
     if(grpTot)grpTot.textContent=counterTotal(c);
-    updateCatHeader(c.cat||"andet");renderCareer();save();
+    updateCatHeader(c.cat||"andet");_updateVagtDashboard();renderCareer();save();
   }
 
   $("#counterGrid").addEventListener("click",e=>{
@@ -3363,14 +3875,14 @@
     const metaMid=parts.join('<span class="sep">·</span>');
     const vintHtml=w.vint?'<span class="vint">'+esc(w.vint)+'</span>':'<span class="novint" data-act="edit">'+esc(t("add_vintage"))+'</span>';
     const meta=vintHtml+(parts.length?'<span class="sep">·</span>'+metaMid:'');
-    const disp=w.name||w.producer||w.region||w.grape||(lang==="en"?"Unnamed wine":"Unavngiven vin");
+    const baseName=w.name||w.producer||w.region||w.grape||(lang==="en"?"Unnamed wine":"Unavngiven vin");
+    const disp=baseName+(w.vint?" "+w.vint:"");
     const row=document.createElement("div");row.className="wrow";row.dataset.id=w.id;
     if(w.type&&w.type!=="andet")row.dataset.wtype=w.type;
     const photoHtml=w.imageUrl?'<img class="wrow-photo" src="'+esc(w.imageUrl)+'" alt="" loading="lazy" data-act="photo">':'';
-    const aboutStrip=w.about
-      ?'<div class="wabout-strip"><button class="wabout-btn" data-act="about">ℹ︎ '+esc(t("w_about_btn"))+'</button></div>'
-      :'<div class="wabout-strip"><button class="wabout-btn unknown" data-act="about">ℹ︎ '+(lang==="da"?"Vin ikke genkendt":"Wine not recognised")+'</button></div>';
-    row.innerHTML=photoHtml+'<div class="winfo"><div class="wname">'+esc(disp)+'</div><div class="wmeta">'+meta+'</div></div>'+
+    const aboutStrip='<div class="wabout-strip"><button class="wabout-btn" data-act="about">ℹ︎ '+(lang==="da"?"Info":"Info")+'</button></div>';
+    const lineupTag=w.fromLineup?'<span class="wrow-lineup-tag">lineup</span>':'';
+    row.innerHTML=photoHtml+'<div class="winfo"><div class="wname">'+esc(disp)+lineupTag+'</div><div class="wmeta">'+meta+'</div></div>'+
       '<div class="wsteps">'+
       '<div class="stepblock"><div class="steplabel">'+esc(t("glasses"))+'</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
       '<div class="stepblock"><div class="steplabel">'+esc(t("bottles"))+'</div><div class="stepctrl"><button class="sbtn" data-act="b-">−</button><span class="tnum" data-k="bottles">'+w.bottles+'</span><button class="sbtn plus" data-act="b+">+</button></div></div>'+
@@ -3386,33 +3898,73 @@
     const el=$("#wineStats");if(!el)return;
     if(state.wines.length<3){el.style.display="none";return;}
     el.style.display="";
-    let totalB=0;const CC={},GC={};
+    let totalB=0;const CC={},CB={},GC={},GB={};
     state.wines.forEach(w=>{
-      totalB+=w.bottles||0;
-      if(w.land){const l=w.land.trim();CC[l]=(CC[l]||0)+1;}
-      if(w.grape){const g=(w.grape||"").trim().split(/[,\/]/)[0].trim();if(g)GC[g]=(GC[g]||0)+1;}
+      const b=w.bottles||0;totalB+=b;
+      if(w.land){const l=w.land.trim();CC[l]=(CC[l]||0)+1;CB[l]=(CB[l]||0)+b;}
+      if(w.grape){const seen=new Set();(w.grape||"").split(",").forEach(g=>{g=g.trim().split(/\//)[0].replace(/\s*\d+\s*%/,"").trim();if(g&&!seen.has(g.toLowerCase())){seen.add(g.toLowerCase());GC[g]=(GC[g]||0)+1;}});}
     });
     const topLand=Object.keys(CC).sort((a,b)=>CC[b]-CC[a])[0];
     const topGrape=Object.keys(GC).sort((a,b)=>GC[b]-GC[a])[0];
     const flag=topLand?(WINE_FLAGS[topLand]||""):"";
     el.innerHTML=
-      '<div class="wine-stat-tile"><div class="wine-stat-val">'+state.wines.length+'</div><div class="wine-stat-lbl">'+(lang==="da"?"vine":"wines")+'</div></div>'+
-      '<div class="wine-stat-tile"><div class="wine-stat-val">'+totalB+'</div><div class="wine-stat-lbl">'+esc(t("bottles").toLowerCase())+'</div></div>'+
-      (topLand?'<div class="wine-stat-tile"><div class="wine-stat-val sm">'+(flag?flag+' ':'')+esc(topLand)+'</div><div class="wine-stat-lbl">'+(lang==="da"?"top land":"top country")+'</div></div>':'')+
-      (topGrape?'<div class="wine-stat-tile"><div class="wine-stat-val sm">'+esc(topGrape)+'</div><div class="wine-stat-lbl">'+(lang==="da"?"top drue":"top grape")+'</div></div>':'');
+      '<div class="wine-stat-tile"><div class="wine-stat-lbl">'+(lang==="da"?"vine":"wines")+'</div><div class="wine-stat-val">'+state.wines.length+'</div></div>'+
+      '<div class="wine-stat-tile"><div class="wine-stat-lbl">'+esc(t("bottles").toLowerCase())+'</div><div class="wine-stat-val">'+totalB+'</div></div>'+
+      (topLand?'<div class="wine-stat-tile clickable" id="wStatLandTile"><div class="wine-stat-lbl">'+(lang==="da"?"top land":"top country")+'</div><div class="wine-stat-val sm">'+(flag?flag+' ':'')+esc(topLand)+'</div></div>':'')+
+      (topGrape?'<div class="wine-stat-tile clickable" id="wStatGrapeTile"><div class="wine-stat-lbl">'+(lang==="da"?"top drue":"top grape")+'</div><div class="wine-stat-val sm">'+esc(topGrape)+'</div></div>':'');
+    function openStatsModal(title,html){
+      const modal=document.getElementById("wStatsModal");
+      const listEl=document.getElementById("wStatsList");
+      const titleEl=document.getElementById("wStatsTitle");
+      if(!modal||!listEl||!titleEl)return;
+      titleEl.textContent=title;listEl.innerHTML=html;
+      modal.style.display="flex";
+      modal.onclick=e=>{if(e.target===modal)modal.style.display="none";};
+      document.getElementById("wStatsClose").onclick=()=>modal.style.display="none";
+    }
+    const landTile=document.getElementById("wStatLandTile");
+    if(landTile)landTile.addEventListener("click",()=>{
+      const sorted=Object.keys(CC).sort((a,b)=>CC[b]-CC[a]);
+      const total=state.wines.length||1;const max=CC[sorted[0]]||1;
+      openStatsModal(lang==="da"?"Lande":"Countries",sorted.map(k=>{
+        const pct=Math.round(CC[k]/total*100);
+        const fl=WINE_FLAGS[k]||"";const bott=CB[k]||0;
+        const bottStr=bott>0?" · "+bott+(lang==="da"?" fl.":" btl."):"";
+        return '<div class="wstat-row">'
+          +'<div class="wstat-top"><span class="wstat-name">'+(fl?fl+" ":"")+esc(k)+"</span>"
+          +'<span class="wstat-nums">'+pct+"%"+bottStr+"</span></div>"
+          +'<div class="wstat-bar-wrap"><div class="wstat-bar" style="width:'+pct+'%"></div></div>'
+          +'</div>';
+      }).join(""));
+    });
+    const grapeTile=document.getElementById("wStatGrapeTile");
+    if(grapeTile)grapeTile.addEventListener("click",()=>{
+      const sorted=Object.keys(GC).sort((a,b)=>GC[b]-GC[a]);
+      const total=state.wines.length||1;const max=GC[sorted[0]]||1;
+      openStatsModal(lang==="da"?"Druer":"Grapes",sorted.map(k=>{
+        const pct=Math.round(GC[k]/total*100);
+        return '<div class="wstat-row">'
+          +'<div class="wstat-top"><span class="wstat-name">'+esc(k)+'</span>'
+          +'<span class="wstat-nums">'+pct+'%</span></div>'
+          +'<div class="wstat-bar-wrap"><div class="wstat-bar" style="width:'+pct+'%"></div></div>'
+          +'</div>';
+      }).join(""));
+    });
   }
   function renderWineTypeStrip(){
     const strip=$("#wineTypeStrip");if(!strip)return;
     const counts={};
     state.wines.forEach(w=>{const tp=w.type||"andet";counts[tp]=(counts[tp]||0)+1;});
-    const order=["alle","rod","hvid","rose","mousserende","andet"];
+    const lineupCount=state.wines.filter(w=>w.fromLineup).length;
+    const order=["alle","rod","hvid","rose","mousserende","andet","lineup"];
     strip.innerHTML="";
     order.forEach(type=>{
-      if(type!=="alle"&&!counts[type])return;
-      const count=type==="alle"?state.wines.length:(counts[type]||0);
+      if(type==="lineup"){if(!lineupCount)return;}
+      else if(type!=="alle"&&!counts[type])return;
+      const count=type==="alle"?state.wines.length:type==="lineup"?lineupCount:(counts[type]||0);
       const btn=document.createElement("button");btn.className="wtype-strip-btn"+(activeWineType===type?" active":"");btn.dataset.wtype=type;
-      const dotHtml=type!=="alle"?'<span class="wtype-dot wtype-dot-'+type+'"></span>':'';
-      const lbl=type==="alle"?t("wine_alle"):t("wine_type_"+type);
+      const dotHtml=type!=="alle"&&type!=="lineup"?'<span class="wtype-dot wtype-dot-'+type+'"></span>':'';
+      const lbl=type==="alle"?t("wine_alle"):type==="lineup"?(lang==="da"?"Lineup":"Lineup"):t("wine_type_"+type);
       btn.innerHTML=dotHtml+esc(lbl)+'<span class="wtype-count"> '+count+'</span>';
       btn.addEventListener("click",()=>{activeWineType=type;localStorage.setItem("mise_wine_type",type);renderWines();});
       strip.appendChild(btn);
@@ -3427,11 +3979,12 @@
 
     renderWineStats();
     renderWineTypeStrip();
+    renderLevelBar();
 
     const q=wineFilter.trim().toLowerCase();
     const list=$("#wineList");list.innerHTML="";
 
-    const typeFiltered=activeWineType==="alle"?state.wines:state.wines.filter(w=>(w.type||"andet")===activeWineType);
+    const typeFiltered=activeWineType==="alle"?state.wines:activeWineType==="lineup"?state.wines.filter(w=>w.fromLineup):state.wines.filter(w=>(w.type||"andet")===activeWineType);
     const shown=typeFiltered.filter(w=>matchWine(w,q));
     $("#wineSum").innerHTML=sumHtml(shown);
 
@@ -3446,32 +3999,37 @@
 
     // Group by country
     const groups={},noCountry=[];
-    shown.forEach(w=>{const land=(w.land||"").trim();if(land){if(!groups[land])groups[land]=[];groups[land].push(w);}else noCountry.push(w);});
+    shown.forEach(w=>{const land=wLand(w);if(land){if(!groups[land])groups[land]=[];groups[land].push(w);}else noCountry.push(w);});
     const sortedLands=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length);
 
-    function renderCountryGroup(land,wines){
-      const head=document.createElement("div");head.className="wine-country-head";
+    const multiGroup=sortedLands.length+(noCountry.length?1:0)>1;
+    function renderCountryGroup(land,wines,startOpen){
+      const head=document.createElement("div");
       const flag=WINE_FLAGS[land]||"🍷";
-      head.innerHTML='<span class="wine-country-flag">'+flag+'</span><span class="wine-country-name">'+esc(land)+'</span><span class="wine-country-count">'+wines.length+'</span>';
+      const isOpen=!multiGroup||startOpen;
+      head.className="wine-country-head"+(isOpen?" wch-open":"");
+      head.innerHTML='<span class="wine-country-flag">'+flag+'</span><span class="wine-country-name">'+esc(land)+'</span><span class="wine-country-count">'+wines.length+'</span><span class="wine-country-chev">›</span>';
       list.appendChild(head);
-      const grp=document.createElement("div");grp.className="winelist-group";
+      const grp=document.createElement("div");grp.className="winelist-group"+(isOpen?"":" wch-hidden");
       wines.forEach(w=>grp.appendChild(makeWRow(w)));
       list.appendChild(grp);
+      if(multiGroup)head.addEventListener("click",()=>{const open=head.classList.toggle("wch-open");grp.classList.toggle("wch-hidden",!open);});
     }
 
-    sortedLands.forEach(land=>renderCountryGroup(land,groups[land]));
-    if(noCountry.length)renderCountryGroup(t("wine_no_country"),noCountry);
+    sortedLands.forEach((land,i)=>renderCountryGroup(land,groups[land],i===0));
+    if(noCountry.length)renderCountryGroup(t("wine_no_country"),noCountry,!sortedLands.length);
   }
   $("#wineList").addEventListener("click",e=>{
-    if(e.target.closest("[data-act='add-wine']")){openWineModal(null);return;}
+    if(e.target.closest("[data-act='add-wine']")){openWineSheet(null,"edit");return;}
     const del=e.target.closest(".wrow-del");
     if(del){undoSnapshot=clone(state);state.wines=state.wines.filter(x=>x.id!==del.dataset.delId);save();renderWines();renderCareer();showToast(lang==="da"?"Vin slettet":"Wine deleted");return;}
     const row=e.target.closest(".wrow");if(!row)return;
     const act=e.target.closest("[data-act]");if(!act)return;
     const w=state.wines.find(x=>x.id===row.dataset.id);if(!w)return;
     const a=act.dataset.act;
-    if(a==="about"){showWineAbout(w.about,w.name||w.producer||"");return;}
-    if(a==="edit"||a==="photo"){openWineModal(w.id);return;}
+    if(a==="about"){openWineSheet(w,"view");return;}
+    if(a==="photo"){openWineSheet(w,"view");return;}
+    if(a==="edit"){openWineSheet(w,"edit");return;}
     let key,d;if(a==="g+"){key="glasses";d=1;}else if(a==="g-"){key="glasses";d=-1;}else if(a==="b+"){key="bottles";d=1;}else if(a==="b-"){key="bottles";d=-1;}else return;
     w[key]=Math.max(0,(w[key]||0)+d);
     const n=row.querySelector('.tnum[data-k="'+key+'"]');n.textContent=w[key];if(d>0)tickEl(n);
@@ -3499,95 +4057,234 @@
 
   $("#wineSearch").addEventListener("input",e=>{wineFilter=e.target.value;renderWines();});
 
-  let editW=null,winePhotoDataUrl=null,winePhotoExistingUrl=null,wineAbout="";
+  // ---- Wine sheet (view + edit) ----
+  let _waWineId=null,_waPhotoDataUrl=null,_waPhotoExistingUrl=null,_waFromScan=false;
 
-  function renderGrapeInputs(grapes){
-    const wrap=document.getElementById("w_grapes_wrap");if(!wrap)return;
-    wrap.innerHTML="";
-    const vals=grapes&&grapes.length?grapes:[""];
-    function addRow(val){
-      const row=document.createElement("div");row.className="w-grape-row";
-      const inp=document.createElement("input");inp.className="w-grape-input";inp.maxLength=40;inp.autocomplete="off";inp.value=val||"";inp.placeholder=t("w_grape_ph");
-      const rm=document.createElement("button");rm.type="button";rm.className="w-grape-rm";rm.textContent="×";
-      rm.addEventListener("click",()=>{if(wrap.querySelectorAll(".w-grape-row").length>1){row.remove();}else{inp.value="";}});
-      row.appendChild(inp);row.appendChild(rm);wrap.appendChild(row);
-      attachAC(inp,()=>wineSuggest("grape"));
-    }
-    vals.forEach(v=>addRow(v));
-    const addBtn=document.getElementById("w_grape_add_btn");
-    if(addBtn){addBtn.onclick=()=>addRow("");}
+  function _waSetPhotoPreview(src){
+    const prev=document.getElementById("waPhotoPreview"),rm=document.getElementById("waPhotoRemove"),btn=document.getElementById("waPhotoBtn");
+    if(!prev||!rm||!btn)return;
+    if(src){prev.src=src;prev.style.display="block";rm.style.display="";btn.textContent=lang==="da"?"Skift billede":"Change photo";}
+    else{prev.src="";prev.style.display="none";rm.style.display="none";btn.textContent=lang==="da"?"+ Billede":"+ Photo";}
   }
-  function getGrapesFromModal(){
-    const wrap=document.getElementById("w_grapes_wrap");if(!wrap)return"";
-    return Array.from(wrap.querySelectorAll(".w-grape-input")).map(i=>i.value.trim()).filter(Boolean).join(", ");
-  }
-  function wPhotoSetPreview(src){
-    const prev=$("#wPhotoPreview"),rem=$("#wPhotoRemove"),btn=$("#wPhotoBtn");
-    if(src){prev.src=src;prev.classList.add("show");rem.classList.add("show");btn.textContent=t("wine_change_photo");}
-    else{prev.src="";prev.classList.remove("show");rem.classList.remove("show");btn.textContent=t("wine_add_photo");}
-  }
-  function openWineModal(wid){
-    editW=wid;const w=wid?state.wines.find(x=>x.id===wid):null;
-    $("#wineModalTitle").textContent=w?t("wine_edit"):t("wine_new");
-    $("#w_name").value=w?w.name:"";$("#w_producer").value=w?w.producer:"";
-    $("#w_land").value=w?w.land:"";$("#w_region").value=w?w.region:"";
-    const _wgrapes=w&&w.grape?(w.grape.split(/[,\/]/).map(s=>s.trim()).filter(Boolean)):[""];
-    renderGrapeInputs(_wgrapes);
-    $("#w_vint").value=w?w.vint:"";
-    wineAbout=w?w.about||"":"";
-    const wtype=(w&&w.type)||guessWineType(w||{})||"andet";
-    document.querySelectorAll(".wtype-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===wtype));
-    winePhotoDataUrl=null;winePhotoExistingUrl=(w&&w.imageUrl)||null;
-    wPhotoSetPreview(winePhotoExistingUrl);
-    $("#wPhotoInput").value="";
-    $("#wineDelete").style.display=w?"block":"none";
-    $("#wineScrim").classList.add("open");setTimeout(()=>(w?$("#w_vint"):$("#w_name")).focus(),30);
-  }
-  function closeWineModal(){$("#wineScrim").classList.remove("open");editW=null;winePhotoDataUrl=null;winePhotoExistingUrl=null;}
 
-  async function doWineLabelScan(file, openFirst){
+  const _waboutSVGS={
+    land:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    region:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-10.5A7 7 0 0 1 19 10.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+    vint:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+    type:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2h8l1 8c0 4-2.5 7-5 8-2.5-1-5-4-5-8z"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>',
+    grape:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="9" cy="17" r="2"/><circle cx="15" cy="17" r="2"/><circle cx="12" cy="20" r="2"/><path d="M12 10V6"/><path d="M9 6c0-2 6-3 6 0"/></svg>',
+    count:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'
+  };
+
+  function _waShowView(w){
+    const viewEl=document.getElementById("wAboutView"),editEl=document.getElementById("wAboutEdit");
+    const editBtn=document.getElementById("wAboutEditBtn"),hTitle=document.getElementById("wAboutHeaderTitle");
+    const shareBtn=document.getElementById("wAboutShareBtn");
+    const backBtn=document.getElementById("wAboutBackBtn");
+    if(backBtn)backBtn.style.display="none";
+    if(viewEl)viewEl.style.display="";if(editEl)editEl.style.display="none";
+    if(editBtn){editBtn.style.display="";editBtn.textContent=lang==="da"?"✏ Rediger":"✏ Edit";}
+    if(!w){if(hTitle)hTitle.textContent="";if(shareBtn)shareBtn.style.display="none";return;}
+    if(shareBtn)shareBtn.style.display="";
+    const dispName=w.name+(w.vint?" "+w.vint:"");
+    if(hTitle)hTitle.textContent=dispName;
+    const titleEl=document.getElementById("wAboutTitle");if(titleEl)titleEl.textContent=dispName;
+    const prodEl=document.getElementById("wAboutProducer");if(prodEl)prodEl.textContent=w.producer||"";
+    const gridEl=document.getElementById("wAboutGrid");
+    const _wtypeLabel={rod:"Rød",hvid:"Hvid",rose:"Rosé",mousserende:"Mousserende",andet:"Andet"};
+    const cells=[];
+    if(w.land)cells.push({icon:_waboutSVGS.land,label:lang==="da"?"Land":"Country",value:w.land});
+    if(w.region)cells.push({icon:_waboutSVGS.region,label:lang==="da"?"Region":"Region",value:w.region});
+    if(w.vint)cells.push({icon:_waboutSVGS.vint,label:lang==="da"?"Årgang":"Vintage",value:w.vint});
+    if(w.type&&w.type!=="andet")cells.push({icon:_waboutSVGS.type,label:lang==="da"?"Type":"Type",value:_wtypeLabel[w.type]||w.type});
+    if(w.grape)cells.push({icon:_waboutSVGS.grape,label:lang==="da"?"Drue":"Grape",value:w.grape});
+    if(w.imageUrl)cells.push({photo:w.imageUrl});
+    const totG=(w.glasses||0)+(w.bottles||0)*6;
+    if(totG>0)cells.push({icon:_waboutSVGS.count,label:lang==="da"?"Glas total":"Total glasses",value:totG+((w.bottles||0)>0?" ("+w.bottles+" fl.)":"")});
+    if(gridEl)gridEl.innerHTML=cells.map(c=>c.photo?`<div class="wabout-cell wabout-cell-photo"><img src="${esc(c.photo)}" class="wabout-photo-img" alt=""></div>`:`<div class="wabout-cell">${c.icon}<div class="wabout-cell-label">${esc(c.label)}</div><div class="wabout-cell-value">${esc(c.value)}</div></div>`).join("");
+    const divEl=document.getElementById("wAboutDivider");if(divEl)divEl.style.display="";
+    const bodyEl=document.getElementById("wAboutBody");
+    if(bodyEl){bodyEl.style.display="";if(w.about){bodyEl.textContent=w.about;bodyEl.style.color="var(--dim)";}else{bodyEl.textContent=lang==="da"?"Ingen beskrivelse endnu.":"No description yet.";bodyEl.style.color="var(--faint)";}}
+  }
+
+  function _waGrapeUpdateRm(){
+    const rows=document.querySelectorAll("#waGrapeList .wa-grape-row");
+    rows.forEach(r=>{r.querySelector(".wa-grape-rm").style.display=rows.length>1?"":"none";});
+  }
+  function _waAddGrapeRow(val){
+    const container=document.getElementById("waGrapeList");if(!container)return;
+    const row=document.createElement("div");row.className="wa-grape-row";
+    const inp=document.createElement("input");inp.className="wa-input wa-grape-input";inp.maxLength=80;inp.autocomplete="off";
+    inp.placeholder=lang==="da"?"Druésort...":"Grape variety...";inp.value=val||"";
+    const rm=document.createElement("button");rm.type="button";rm.className="wa-grape-rm";rm.textContent="×";
+    rm.addEventListener("click",()=>{row.remove();_waGrapeUpdateRm();});
+    row.append(inp,rm);container.appendChild(row);
+    attachAC(inp,()=>wineSuggest("grape"));
+    _waGrapeUpdateRm();
+  }
+  function _waSetGrapes(list){
+    const container=document.getElementById("waGrapeList");if(!container)return;
+    container.innerHTML="";
+    (list&&list.length?list:[""]).forEach(g=>_waAddGrapeRow(g));
+  }
+
+  function _waEnterEdit(w){
+    const viewEl=document.getElementById("wAboutView"),editEl=document.getElementById("wAboutEdit");
+    const editBtn=document.getElementById("wAboutEditBtn"),hTitle=document.getElementById("wAboutHeaderTitle");
+    const shareBtn2=document.getElementById("wAboutShareBtn");
+    if(viewEl)viewEl.style.display="none";if(editEl)editEl.style.display="";
+    if(editBtn)editBtn.style.display="none";
+    if(shareBtn2)shareBtn2.style.display="none";
+    if(hTitle)hTitle.textContent=w?(lang==="da"?"Rediger vin":"Edit wine"):(lang==="da"?"Tilføj vin":"Add wine");
+    _waPhotoDataUrl=null;_waPhotoExistingUrl=w?w.imageUrl||null:null;_waSetPhotoPreview(_waPhotoExistingUrl);
+    const fields={waName:w?w.name:"",waProducer:w?w.producer:"",waLand:w?w.land:"",waRegion:w?w.region:"",waVint:w?w.vint:"",waAbout:w?w.about||"":""};
+    Object.keys(fields).forEach(id=>{const el=document.getElementById(id);if(el)el.value=fields[id];});
+    _waSetGrapes(w&&w.grape?(w.grape.split(",").map(s=>s.trim()).filter(Boolean)):[]);
+    const wtype=(w&&w.type)||"andet";
+    document.querySelectorAll(".wa-type-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===wtype));
+    const pi=document.getElementById("waPhotoInput");if(pi)pi.value="";
+    const delBtn=document.getElementById("waDelete");if(delBtn)delBtn.style.display=w?"":"none";
+    setTimeout(()=>{const el=document.getElementById("waName");if(el)el.focus();},30);
+  }
+
+  function openWineSheet(wine,mode){
+    const w=(wine&&typeof wine==="object")?wine:(wine?state.wines.find(x=>x.id===wine):null);
+    _waWineId=w?w.id:null;
+    const modal=document.getElementById("wAboutModal");if(!modal)return;
+    if(mode==="edit")_waEnterEdit(w);else _waShowView(w);
+    modal.style.display="flex";
+    const closeBtn=document.getElementById("wAboutClose");if(closeBtn)closeBtn.onclick=closeWineSheet;
+    modal.onclick=function(e){if(e.target===modal)closeWineSheet();};
+  }
+  function closeWineSheet(){
+    const modal=document.getElementById("wAboutModal");if(modal)modal.style.display="none";
+    _waWineId=null;_waPhotoDataUrl=null;_waPhotoExistingUrl=null;_waFromScan=false;
+  }
+
+  function openPostModal(w){
+    const modal=document.getElementById("wPostModal");
+    const titleEl=document.getElementById("wPostTitle");
+    const caption=document.getElementById("wPostCaption");
+    if(!modal||!titleEl||!caption)return;
+    titleEl.textContent=w.name+(w.vint?" "+w.vint:"");
+    caption.value="";
+    modal.style.display="flex";
+    setTimeout(()=>caption.focus(),80);
+    modal.onclick=e=>{if(e.target===modal)modal.style.display="none";};
+    document.getElementById("wPostClose").onclick=()=>modal.style.display="none";
+    document.getElementById("wPostCancel").onclick=()=>modal.style.display="none";
+    document.getElementById("wPostConfirm").onclick=async()=>{
+      const text=caption.value.trim();
+      modal.style.display="none";
+      const base=apiBase();const token=await getToken();
+      if(!base||!token){showToast(lang==="da"?"Log ind for at dele":"Log in to share");return;}
+      const dispName=w.name+(w.vint?" "+w.vint:"");
+      const parts=[w.producer,w.region,w.land].filter(Boolean);
+      const autoSummary=dispName+(parts.length?" · "+parts[0]:"");
+      const summary=text||autoSummary;
+      try{
+        const r=await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({categoryLabel:dispName,delta:1,imageUrl:w.imageUrl||null,summary})});
+        if(r.ok)showToast(lang==="da"?"Postet til feed!":"Posted to feed!");
+        else showToast(lang==="da"?"Fejl ved post":"Post failed");
+      }catch(e){showToast(lang==="da"?"Fejl ved post":"Post failed");}
+    };
+  }
+
+  document.getElementById("wAboutShareBtn").addEventListener("click",()=>{
+    const w=_waWineId?state.wines.find(x=>x.id===_waWineId):null;
+    if(w)openPostModal(w);
+  });
+
+  (function(){
+    const lb=document.getElementById("wPhotoLightbox");
+    const lbImg=document.getElementById("wPhotoLbImg");
+    const lbClose=document.getElementById("wPhotoLbClose");
+    if(!lb||!lbImg||!lbClose)return;
+    function openLb(src){lbImg.src=src;lb.style.display="flex";}
+    function closeLb(){lb.style.display="none";lbImg.src="";}
+    lbClose.addEventListener("click",closeLb);
+    lb.addEventListener("click",e=>{if(!e.target.closest("#wPhotoLbImg"))closeLb();});
+    document.getElementById("wAboutGrid").addEventListener("click",e=>{
+      const img=e.target.closest(".wabout-photo-img");
+      if(img)openLb(img.src);
+    });
+  })();
+
+  async function doWineLabelScan(file,openFirst){
     if(!file)return;
     const base=apiBase();const token=await getToken();if(!base||!token){showToast(t("wine_scan_err"));return;}
-    const btns=[$("#wineScanBtn"),$("#winePageScanBtn")];
-    const lbls=[$("#wineScanLbl"),$("#winePageScanLbl")];
+    const btns=[document.getElementById("waScanBtn"),document.getElementById("winePageScanBtn")];
+    const lbls=[document.getElementById("waScanLbl"),document.getElementById("winePageScanLbl")];
     btns.forEach(b=>{if(b)b.classList.add("loading");});
     lbls.forEach(l=>{if(l)l.textContent=t("wine_scan_loading");});
     try{
-      const dataUrl=await resizeImage(file,1400);
-      if(!dataUrl)throw new Error("image-fail");
+      const dataUrl=await resizeImage(file,1400);if(!dataUrl)throw new Error("image-fail");
       const r=await fetch(base+"/api/visits/wine-from-label",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl,lang})});
-      const d=await r.json();
-      if(!r.ok||(!d.name&&!d.producer))throw new Error(d.error||"empty");
-      if(openFirst){openWineModal(null);}
-      if(d.name)$("#w_name").value=d.name;
-      if(d.producer)$("#w_producer").value=d.producer;
-      if(d.vintage)$("#w_vint").value=d.vintage;
-      if(d.land)$("#w_land").value=d.land;
-      if(d.region)$("#w_region").value=d.region;
-      if(d.grape){const _gs=d.grape.split(/[,\/]/).map(s=>s.trim()).filter(Boolean);renderGrapeInputs(_gs);}
-      if(d.about)wineAbout=d.about;
-      if(d.type){document.querySelectorAll(".wtype-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===d.type));}
-      winePhotoDataUrl=dataUrl;winePhotoExistingUrl=null;wPhotoSetPreview(dataUrl);
-      setTimeout(()=>{const n=$("#w_name");if(n)n.focus();},60);
+      const d=await r.json();if(!r.ok||(!d.name&&!d.producer))throw new Error(d.error||"empty");
+      if(openFirst)openWineSheet(null,"edit");
+      _waFromScan=true;
+      const _f=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.value=val;};
+      _f("waName",d.name);_f("waProducer",d.producer);_f("waVint",d.vintage);_f("waLand",d.land);_f("waRegion",d.region);_f("waAbout",d.about);
+      if(d.grape)_waSetGrapes(d.grape.split(",").map(s=>s.trim()).filter(Boolean));else _waSetGrapes([]);
+      if(d.type)document.querySelectorAll(".wa-type-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===d.type));
+      _waPhotoDataUrl=dataUrl;_waPhotoExistingUrl=null;_waSetPhotoPreview(dataUrl);
+      setTimeout(()=>{const el=document.getElementById("waName");if(el)el.focus();},60);
     }catch(e){showToast(t("wine_scan_err"));}
-    finally{
-      btns.forEach(b=>{if(b)b.classList.remove("loading");});
-      lbls.forEach(l=>{if(l)l.textContent=t("wine_scan");});
-    }
+    finally{btns.forEach(b=>{if(b)b.classList.remove("loading");});lbls.forEach(l=>{if(l)l.textContent=t("wine_scan");});}
   }
 
-  const wineScanBtn=$("#wineScanBtn");const wineScanInput=$("#wineScanInput");
-  if(wineScanBtn&&wineScanInput){
-    wineScanBtn.addEventListener("click",()=>wineScanInput.click());
-    wineScanInput.addEventListener("change",()=>{const f=wineScanInput.files[0];wineScanInput.value="";if(f)doWineLabelScan(f,false);});
-  }
-  const winePageScanBtn=$("#winePageScanBtn");const winePageScanInput=$("#winePageScanInput");
+  document.getElementById("wAboutEditBtn").addEventListener("click",()=>{const w=_waWineId?state.wines.find(x=>x.id===_waWineId):null;_waEnterEdit(w);});
+  document.getElementById("waCancel").addEventListener("click",()=>{const w=_waWineId?state.wines.find(x=>x.id===_waWineId):null;if(w)_waShowView(w);else closeWineSheet();});
+  document.getElementById("waSave").addEventListener("click",async()=>{
+    const gv=id=>(document.getElementById(id)||{}).value||"";
+    const name=gv("waName").trim(),producer=gv("waProducer").trim(),land=gv("waLand").trim(),region=gv("waRegion").trim(),vint=gv("waVint").trim(),about=gv("waAbout").trim();
+    const grape=[...document.querySelectorAll("#waGrapeList .wa-grape-input")].map(i=>i.value.trim()).filter(Boolean).join(", ");
+    if(!name&&!producer&&!region&&!grape)return;
+    let imageUrl=_waPhotoExistingUrl||null;
+    if(_waPhotoDataUrl){const base=apiBase();const token=await getToken();if(base&&token){try{const r=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:_waPhotoDataUrl})});const d=await r.json();if(d.url)imageUrl=d.url;}catch(e){}}}
+    const type=(document.querySelector(".wa-type-btn.active")||{}).dataset?.wtype||"andet";
+    const fromScan=_waFromScan;_waFromScan=false;
+    const data={name,producer,land,region,grape,vint,imageUrl,type,about,glasses:0,bottles:fromScan?1:0};
+    if(!_waWineId){
+      const match=state.wines.find(w=>wineSimilar({name,producer},w));
+      if(match){
+        _pendingWineData=Object.assign(data,{_match:match});
+        const dn=match.name||(match.producer+(match.vint?" "+match.vint:""))||"ukendt vin";
+        document.getElementById("wineDupTitle").textContent=lang==="da"?"Kender vi den her?":"Know this one?";
+        document.getElementById("wineDupBody").textContent=(lang==="da"?"Ligner det ikke ":"Looks like ")+('"'+dn+'"')+(lang==="da"?"? Du kan tilføje til den i stedet for at oprette en kopi.":" you already have? Add to it instead of creating a duplicate.");
+        document.getElementById("wineDupMerge").textContent=lang==="da"?"Ja, tilføj til den":"Yes, add to it";
+        document.getElementById("wineDupNew").textContent=lang==="da"?"Nej, opret ny":"No, create new";
+        document.getElementById("wineDupScrim").classList.add("open");return;
+      }
+    }
+    doWineCommit(data,null);
+  });
+  document.getElementById("waDelete").addEventListener("click",()=>{if(!_waWineId)return;state.wines=state.wines.filter(x=>x.id!==_waWineId);save();renderWines();renderCareer();closeWineSheet();});
+  document.getElementById("waGrapeAdd").addEventListener("click",()=>_waAddGrapeRow(""));
+  document.getElementById("waPhotoBtn").addEventListener("click",()=>document.getElementById("waPhotoInput").click());
+  document.getElementById("waPhotoInput").addEventListener("change",async()=>{const f=document.getElementById("waPhotoInput").files[0];if(!f)return;const u=await resizeImage(f,1200);_waPhotoDataUrl=u;_waPhotoExistingUrl=null;_waSetPhotoPreview(u);});
+  document.getElementById("waPhotoRemove").addEventListener("click",()=>{_waPhotoDataUrl=null;_waPhotoExistingUrl=null;_waSetPhotoPreview(null);document.getElementById("waPhotoInput").value="";});
+  document.querySelectorAll(".wa-type-btn").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".wa-type-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");}));
+  const waScanBtn=document.getElementById("waScanBtn");const waScanInput=document.getElementById("waScanInput");
+  if(waScanBtn&&waScanInput){waScanBtn.addEventListener("click",()=>waScanInput.click());waScanInput.addEventListener("change",()=>{const f=waScanInput.files[0];waScanInput.value="";if(f)doWineLabelScan(f,false);});}
+  const winePageScanBtn=document.getElementById("winePageScanBtn");const winePageScanInput=document.getElementById("winePageScanInput");
   if(winePageScanBtn&&winePageScanInput){
     winePageScanBtn.addEventListener("click",()=>winePageScanInput.click());
     winePageScanInput.addEventListener("change",()=>{const f=winePageScanInput.files[0];winePageScanInput.value="";if(f)doWineLabelScan(f,true);});
   }
 
-  let lineupWines=[];
+  let lineupWines=[],_lineupImageUrl=null;
+  function openLineupWineView(w){
+    const scrim=document.getElementById("lineupScrim");if(scrim)scrim.style.display="none";
+    const wine={id:id(),name:w.name||"",producer:w.producer||"",vint:w.vint||w.vintage||"",type:w.type||"andet",land:w.land||"",region:w.region||"",grape:w.grape||"",glasses:0,bottles:1,imageUrl:_lineupImageUrl||null,about:w.about||"",fromLineup:true};
+    state.wines.push(wine);save();renderWines();
+    openWineSheet(wine,"view");
+    const backBtn=document.getElementById("wAboutBackBtn");
+    if(backBtn){
+      backBtn.style.display="";
+      backBtn.onclick=()=>{closeWineSheet();const s=document.getElementById("lineupScrim");if(s)s.style.display="flex";};
+    }
+  }
   function renderLineupModal(wines){
     lineupWines=wines||[];
     const list=$("#lineupList");if(!list)return;
@@ -3596,21 +4293,24 @@
     const sub=$("#lineupSub");
     if(sub){const fn=t("lineup_sub_fn");sub.textContent=fn.replace("{0}",readable.length).replace("{1}",unreadable.length);}
     const typeColors={"rod":"#C0392B","hvid":"#D4AC0D","rose":"#E08080","champagne":"#C9A465","mousserende":"#C9A465","andet":"#888"};
-    list.innerHTML=lineupWines.map((w,i)=>{
+    list.innerHTML="";
+    lineupWines.forEach((w,i)=>{
       const unread=w.readable===false;
       const color=typeColors[w.type]||"#888";
-      return `<div class="lineup-item${unread?" unreadable":""}" data-lineup-idx="${i}">
-        <div class="lineup-item-dot" style="background:${color}"></div>
-        <div style="flex:1;min-width:0">
-          <div class="lineup-item-name">${w.name||w.producer||"—"}</div>
-          ${w.producer&&w.name?`<div class="lineup-item-meta">${w.producer}${w.vintage?" · "+w.vintage:""}</div>`:(w.vintage?`<div class="lineup-item-meta">${w.vintage}</div>`:"")}
-          ${w.region||w.land?`<div class="lineup-item-meta">${[w.region,w.land].filter(Boolean).join(", ")}</div>`:""}
-          ${w.grape?`<div class="lineup-item-grape">${w.grape}</div>`:""}
-          ${unread?`<div class="lineup-item-warn">${t("lineup_unreadable")}</div>`:""}
-        </div>
-      </div>`;
-    }).join("");
-    const scrim=$("#lineupScrim");if(scrim)scrim.classList.add("open");
+      const item=document.createElement("div");
+      item.className="lineup-item"+(unread?" unreadable":"");
+      item.innerHTML=`<div class="lineup-item-dot" style="background:${color}"></div>`
+        +`<div class="lineup-item-body">`
+        +`<div class="lineup-item-name">${esc(w.name||w.producer||"—")}</div>`
+        +(w.producer&&w.name?`<div class="lineup-item-meta">${esc(w.producer)}${w.vintage?" · "+esc(w.vintage):""}</div>`:(w.vintage?`<div class="lineup-item-meta">${esc(w.vintage)}</div>`:""))
+        +(w.region||w.land?`<div class="lineup-item-meta">${esc([w.region,w.land].filter(Boolean).join(", "))}</div>`:"")
+        +(w.grape?`<div class="lineup-item-grape">${esc(w.grape)}</div>`:"")
+        +(unread?`<div class="lineup-item-warn">${t("lineup_unreadable")}</div>`:"")
+        +`</div><span class="lineup-item-arrow">›</span>`;
+      if(!unread)item.addEventListener("click",()=>openLineupWineView(w));
+      list.appendChild(item);
+    });
+    const scrim=$("#lineupScrim");if(scrim){scrim.style.display="flex";scrim.onclick=e=>{if(e.target===scrim)scrim.style.display="none";};}
   }
   async function doLineupScan(file){
     if(!file)return;
@@ -3623,6 +4323,8 @@
       const r=await fetch(base+"/api/visits/wine-lineup",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl,lang})});
       const d=await r.json();
       if(!r.ok||!Array.isArray(d.wines))throw new Error(d.error||"empty");
+      _lineupImageUrl=null;
+      try{const ur=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl})});const ud=await ur.json();if(ud.url)_lineupImageUrl=ud.url;}catch(e){}
       renderLineupModal(d.wines);
     }catch(e){showToast(t("wine_lineup_err"));}
     finally{
@@ -3634,30 +4336,19 @@
     wineLineupBtn.addEventListener("click",()=>wineLineupInput.click());
     wineLineupInput.addEventListener("change",()=>{const f=wineLineupInput.files[0];wineLineupInput.value="";if(f)doLineupScan(f);});
   }
-  const lineupCloseBtn=$("#lineupClose");if(lineupCloseBtn)lineupCloseBtn.addEventListener("click",()=>{const s=$("#lineupScrim");if(s)s.classList.remove("open");});
+  const lineupCloseBtn=$("#lineupClose");if(lineupCloseBtn)lineupCloseBtn.addEventListener("click",()=>{const s=$("#lineupScrim");if(s)s.style.display="none";});
   const lineupAddAllBtn=$("#lineupAddAll");if(lineupAddAllBtn)lineupAddAllBtn.addEventListener("click",()=>{
     const readable=lineupWines.filter(w=>w.readable!==false&&(w.name||w.producer));
     readable.forEach(w=>{
-      state.wines.push({id:Date.now()+Math.random(),name:w.name||"",producer:w.producer||"",vintage:w.vintage||"",type:w.type||"",land:w.land||"",region:w.region||"",grape:w.grape||"",rating:0,notes:"",imageUrl:null,createdAt:new Date().toISOString()});
+      state.wines.push({id:id(),name:w.name||"",producer:w.producer||"",vint:w.vint||w.vintage||"",type:w.type||"andet",land:w.land||"",region:w.region||"",grape:w.grape||"",glasses:0,bottles:1,imageUrl:_lineupImageUrl||null,about:w.about||"",fromLineup:true});
     });
-    saveState();renderWines();
-    const s=$("#lineupScrim");if(s)s.classList.remove("open");
+    save();renderWines();
+    const s=$("#lineupScrim");if(s)s.style.display="none";
     showToast(lang==="da"?readable.length+" vine tilføjet":readable.length+" wines added");
   });
 
-  $("#wPhotoBtn").addEventListener("click",()=>$("#wPhotoInput").click());
-  $("#wPhotoInput").addEventListener("change",async()=>{
-    const file=$("#wPhotoInput").files[0];if(!file)return;
-    const allowed=["image/jpeg","image/png","image/webp","image/heic","image/heif"];
-    if(!allowed.includes(file.type)&&!file.type.startsWith("image/")){showToast(lang==="da"?"Kun billeder (JPEG, PNG, WebP)":"Images only (JPEG, PNG, WebP)");return;}
-    if(file.size>20*1024*1024){showToast(lang==="da"?"Billedet er for stort (maks 20 MB)":"Image too large (max 20 MB)");return;}
-    const url=await resizeImage(file,1200);
-    winePhotoDataUrl=url;winePhotoExistingUrl=null;
-    wPhotoSetPreview(url);
-  });
-  $("#wPhotoRemove").addEventListener("click",()=>{winePhotoDataUrl=null;winePhotoExistingUrl=null;wPhotoSetPreview(null);$("#wPhotoInput").value="";});
-  $("#wineCancel").addEventListener("click",closeWineModal);
-  $("#addWineBtn").addEventListener("click",()=>openWineModal(null));
+  $("#addWineBtn").addEventListener("click",()=>openWineSheet(null,"edit"));
+  const _lvlBar=document.getElementById("wineLevelBar");if(_lvlBar)_lvlBar.addEventListener("click",openAchievements);
   function wineNorm(s){return (s||"").toLowerCase().replace(/[^a-z0-9æøå]/g," ").replace(/\s+/g," ").trim();}
   function wineSimilar(a,b){
     const na=wineNorm(a.name)+" "+wineNorm(a.producer);
@@ -3669,68 +4360,103 @@
     let shared=0;wa.forEach(w=>{if(wb.has(w))shared++;});
     return shared/Math.min(wa.size,wb.size)>=0.6;
   }
-
+  const _LEVELS=[
+    {da:"Nybegynder",en:"Rookie",xp:0},
+    {da:"Vinelsker",en:"Wine Lover",xp:100},
+    {da:"Entusiast",en:"Enthusiast",xp:300},
+    {da:"Kendere",en:"Connoisseur",xp:600},
+    {da:"Sommelier",en:"Sommelier",xp:1000},
+    {da:"Chef Sommelier",en:"Head Sommelier",xp:1800},
+    {da:"Maître de Cave",en:"Maître de Cave",xp:3000},
+  ];
+  const _ACHS=[
+    {id:"first",cat:{da:"Kælder",en:"Cellar"},icon:"🍷",da:"Første skænk",en:"First Pour",check:s=>s.wines.length>=1},
+    {id:"five",cat:{da:"Kælder",en:"Cellar"},icon:"🏠",da:"Lille kælder",en:"Baby Cellar",check:s=>s.wines.length>=5},
+    {id:"collector",cat:{da:"Kælder",en:"Cellar"},icon:"📦",da:"Samleren",en:"The Collector",check:s=>s.wines.length>=25},
+    {id:"hoarder",cat:{da:"Kælder",en:"Cellar"},icon:"👑",da:"Vinmonopolet",en:"The Hoarder",check:s=>s.wines.length>=50},
+    {id:"wanderer",cat:{da:"Udforsker",en:"Explorer"},icon:"🗺️",da:"Rejsende",en:"Wanderer",check:s=>new Set(s.wines.map(w=>w.land).filter(Boolean)).size>=3},
+    {id:"globetrotter",cat:{da:"Udforsker",en:"Explorer"},icon:"🌍",da:"Globetrotter",en:"Globetrotter",check:s=>new Set(s.wines.map(w=>w.land).filter(Boolean)).size>=8},
+    {id:"grapeH",cat:{da:"Udforsker",en:"Explorer"},icon:"🍇",da:"Druejæger",en:"Grape Hunter",check:s=>{const g=new Set();s.wines.forEach(w=>(w.grape||"").split(",").forEach(x=>{x=x.trim().replace(/\s*\d+\s*%/,"").toLowerCase().trim();if(x)g.add(x);}));return g.size>=5;}},
+    {id:"grapeN",cat:{da:"Udforsker",en:"Explorer"},icon:"🔬",da:"Druenørd",en:"Grape Nerd",check:s=>{const g=new Set();s.wines.forEach(w=>(w.grape||"").split(",").forEach(x=>{x=x.trim().replace(/\s*\d+\s*%/,"").toLowerCase().trim();if(x)g.add(x);}));return g.size>=15;}},
+    {id:"photo",cat:{da:"Scanner",en:"Scanner"},icon:"📸",da:"Fotografen",en:"Photographer",check:s=>s.wines.some(w=>w.imageUrl)},
+    {id:"lineup1",cat:{da:"Scanner",en:"Scanner"},icon:"🔍",da:"Lineup-pro",en:"Lineup Pro",check:s=>s.wines.some(w=>w.fromLineup)},
+    {id:"lineup5",cat:{da:"Scanner",en:"Scanner"},icon:"⚡",da:"Lineup-addict",en:"Lineup Addict",check:s=>s.wines.filter(w=>w.fromLineup).length>=5},
+    {id:"bubbly",cat:{da:"Typer",en:"Types"},icon:"🥂",da:"Boblerne",en:"Bubbly",check:s=>s.wines.some(w=>w.type==="mousserende")},
+    {id:"rose",cat:{da:"Typer",en:"Types"},icon:"🌹",da:"Rosé gang",en:"Rosé Gang",check:s=>s.wines.some(w=>w.type==="rose")},
+    {id:"red10",cat:{da:"Typer",en:"Types"},icon:"❤️",da:"Rødvinsromantiker",en:"Red Romanticist",check:s=>s.wines.filter(w=>w.type==="rod").length>=10},
+    {id:"white5",cat:{da:"Typer",en:"Types"},icon:"⭐",da:"Hvid & stolt",en:"White & Proud",check:s=>s.wines.filter(w=>w.type==="hvid").length>=5},
+  ];
+  function computeXP(){
+    const countries=new Set(state.wines.map(w=>w.land).filter(Boolean));
+    const grapes=new Set();state.wines.forEach(w=>(w.grape||"").split(",").forEach(g=>{g=g.trim().replace(/\s*\d+\s*%/,"").toLowerCase().trim();if(g)grapes.add(g);}));
+    return state.wines.length*10+countries.size*25+grapes.size*15+state.wines.filter(w=>w.fromLineup).length*10+state.wines.filter(w=>w.imageUrl).length*5;
+  }
+  function getLevelInfo(xp){
+    let lvl=_LEVELS[0],next=_LEVELS[1];
+    for(let i=0;i<_LEVELS.length;i++){if(xp>=_LEVELS[i].xp){lvl=_LEVELS[i];next=_LEVELS[i+1]||null;}}
+    const pct=next?Math.min(100,Math.round((xp-lvl.xp)/(next.xp-lvl.xp)*100)):100;
+    return{title:lang==="da"?lvl.da:lvl.en,xp,pct,nextXp:next?next.xp:null,nextTitle:next?(lang==="da"?next.da:next.en):null};
+  }
+  function renderLevelBar(){
+    const bar=document.getElementById("wineLevelBar");if(!bar)return;
+    if(!state.wines.length){bar.style.display="none";return;}
+    bar.style.display="flex";
+    const info=getLevelInfo(computeXP());
+    const rankEl=document.getElementById("wineLevelRank");if(rankEl)rankEl.textContent=info.title;
+    const fill=document.getElementById("wineLevelXpFill");if(fill)fill.style.width=info.pct+"%";
+    const lbl=document.getElementById("wineLevelXpLbl");if(lbl)lbl.textContent=info.nextXp?info.xp+" / "+info.nextXp+" XP":info.xp+" XP";
+  }
+  function openAchievements(){
+    const modal=document.getElementById("wAchievModal");if(!modal)return;
+    const content=document.getElementById("wAchievContent");if(!content)return;
+    const xp=computeXP();const info=getLevelInfo(xp);
+    const cats={};_ACHS.forEach(a=>{const c=lang==="da"?a.cat.da:a.cat.en;if(!cats[c])cats[c]=[];cats[c].push(a);});
+    const nextTxt=info.nextXp?(lang==="da"?`Næste: ${info.nextTitle} · ${info.nextXp-xp} XP mangler`:`Next: ${info.nextTitle} · ${info.nextXp-xp} XP to go`):(lang==="da"?"Max level! 🎉":"Max level! 🎉");
+    let html=`<div class="wach-level-card"><div class="wach-level-icon">🏆</div><div class="wach-level-name">${esc(info.title)}</div><div class="wach-level-xp">${xp} XP</div><div class="wach-level-xp-wrap"><div class="wach-level-xp-fill" style="width:${info.pct}%"></div></div><div class="wach-level-next">${esc(nextTxt)}</div></div>`;
+    Object.entries(cats).forEach(([cat,list])=>{
+      const unlockedCount=list.filter(a=>a.check(state)).length;
+      html+=`<div class="wach-section"><div class="wach-section-ttl wach-open">${esc(cat)}<span style="font-size:10px;color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">${unlockedCount}/${list.length}</span><span class="wach-section-chev">›</span></div><div class="wach-grid">`;
+      list.forEach(a=>{const on=a.check(state);html+=`<div class="wach-badge${on?" on":""}"><div class="wach-badge-icon">${a.icon}</div><div class="wach-badge-name">${esc(lang==="da"?a.da:a.en)}</div></div>`;});
+      html+="</div></div>";
+    });
+    content.innerHTML=html;
+    document.getElementById("wAchievTitle").textContent="Achievements";
+    content.querySelectorAll(".wach-section-ttl").forEach(ttl=>{
+      ttl.addEventListener("click",()=>{const open=ttl.classList.toggle("wach-open");const grid=ttl.nextElementSibling;if(grid)grid.classList.toggle("wach-hidden",!open);});
+    });
+    modal.style.display="flex";
+    modal.onclick=e=>{if(e.target===modal)modal.style.display="none";};
+    document.getElementById("wAchievClose").onclick=()=>modal.style.display="none";
+  }
   let _pendingWineData=null;
   function doWineCommit(data,mergeInto){
     const {name,producer,land,region,grape,vint,imageUrl,type,about}=data;
+    let resultWine=null;
+    const prevXp=computeXP();const prevLvl=getLevelInfo(prevXp).title;
     if(mergeInto){
       mergeInto.glasses=(mergeInto.glasses||0)+data.glasses;
       mergeInto.bottles=(mergeInto.bottles||0)+data.bottles;
       if(!mergeInto.imageUrl&&imageUrl)mergeInto.imageUrl=imageUrl;
       if(!mergeInto.about&&about)mergeInto.about=about;
-    } else if(editW){
-      const w=state.wines.find(x=>x.id===editW);
-      if(w)Object.assign(w,{name,producer,land,region,grape,vint,imageUrl,type,about});
+      resultWine=mergeInto;
+    } else if(_waWineId){
+      const w=state.wines.find(x=>x.id===_waWineId);
+      if(w){Object.assign(w,{name,producer,land,region,grape,vint,imageUrl,type,about});resultWine=w;}
     } else {
-      state.wines.unshift({id:id(),name,producer,land,region,grape,vint,glasses:0,bottles:0,imageUrl,type,about});
+      const nw={id:id(),name,producer,land,region,grape,vint,glasses:0,bottles:0,imageUrl,type,about};
+      state.wines.unshift(nw);resultWine=nw;
     }
-    save();renderWines();renderCareer();closeWineModal();
+    save();renderWines();renderCareer();
+    const newXp=computeXP();const newLvl=getLevelInfo(newXp).title;
+    if(newLvl!==prevLvl)showToast("🏆 "+newLvl+"!");
+    else if(newXp>prevXp)showToast("+"+(newXp-prevXp)+" XP");
+    if(resultWine){_waWineId=resultWine.id;_waShowView(resultWine);}else closeWineSheet();
   }
-
-  $("#wineDupMerge").addEventListener("click",()=>{
-    if(!_pendingWineData)return;
-    doWineCommit(_pendingWineData,_pendingWineData._match);
-    _pendingWineData=null;
-    $("#wineDupScrim").classList.remove("open");
-  });
-  $("#wineDupNew").addEventListener("click",()=>{
-    if(!_pendingWineData)return;
-    const d=_pendingWineData;_pendingWineData=null;
-    $("#wineDupScrim").classList.remove("open");
-    doWineCommit(d,null);
-  });
-
-  $("#wineSave").addEventListener("click",async()=>{
-    const name=$("#w_name").value.trim(),producer=$("#w_producer").value.trim(),land=$("#w_land").value.trim(),region=$("#w_region").value.trim(),grape=getGrapesFromModal(),vint=$("#w_vint").value.trim(),about=wineAbout||"";
-    if(!name&&!producer&&!region&&!grape)return;
-    let imageUrl=winePhotoExistingUrl||null;
-    if(winePhotoDataUrl){
-      const base=apiBase();const token=await getToken();
-      if(base&&token){try{const r=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:winePhotoDataUrl})});const d=await r.json();if(d.url)imageUrl=d.url;}catch(e){}}
-    }
-    const type=(document.querySelector(".wtype-btn.active")||{}).dataset?.wtype||"andet";
-    const data={name,producer,land,region,grape,vint,imageUrl,type,about,glasses:0,bottles:0};
-    if(!editW){
-      const match=state.wines.find(w=>wineSimilar({name,producer},w));
-      if(match){
-        _pendingWineData=Object.assign(data,{_match:match});
-        const dispName=match.name||(match.producer+(match.vint?" "+match.vint:""))||"ukendt vin";
-        $("#wineDupTitle").textContent=lang==="da"?"Kender vi den her?":"Know this one?";
-        $("#wineDupBody").textContent=(lang==="da"?"Ligner det ikke ":"Looks like ")+('"'+dispName+'"')+(lang==="da"?"? Du kan tilføje til den i stedet for at oprette en kopi.":" you already have? Add to it instead of creating a duplicate.");
-        $("#wineDupMerge").textContent=lang==="da"?"Ja, tilføj til den":"Yes, add to it";
-        $("#wineDupNew").textContent=lang==="da"?"Nej, opret ny":"No, create new";
-        $("#wineDupScrim").classList.add("open");
-        return;
-      }
-    }
-    doWineCommit(data,null);
-  });
-  $("#wineDelete").addEventListener("click",()=>{state.wines=state.wines.filter(x=>x.id!==editW);save();renderWines();renderCareer();closeWineModal();});
-
-  attachAC($("#w_producer"),()=>wineSuggest("producer"));
-  attachAC($("#w_land"),()=>wineSuggest("land"));
-  attachAC($("#w_region"),()=>wineSuggest("region"));
-  // grape AC is attached per-input in renderGrapeInputs
+  document.getElementById("wineDupMerge").addEventListener("click",()=>{if(!_pendingWineData)return;doWineCommit(_pendingWineData,_pendingWineData._match);_pendingWineData=null;document.getElementById("wineDupScrim").classList.remove("open");});
+  document.getElementById("wineDupNew").addEventListener("click",()=>{if(!_pendingWineData)return;const d=_pendingWineData;_pendingWineData=null;document.getElementById("wineDupScrim").classList.remove("open");doWineCommit(d,null);});
+  attachAC(document.getElementById("waProducer"),()=>wineSuggest("producer"));
+  attachAC(document.getElementById("waLand"),()=>wineSuggest("land"));
+  attachAC(document.getElementById("waRegion"),()=>wineSuggest("region"));
 
   // ---- quick log ----
   async function parseLog(text){
@@ -3813,20 +4539,6 @@
     return actions;
   }
   let toastTimer=null,undoSnapshot=null;
-  function showWineAbout(text,title){
-    const modal=document.getElementById("wAboutModal");
-    const titleEl=document.getElementById("wAboutTitle");
-    const bodyEl=document.getElementById("wAboutBody");
-    if(!modal||!titleEl||!bodyEl)return;
-    titleEl.textContent=title||t("w_about_btn");
-    bodyEl.textContent=text||t("w_about_unknown");
-    modal.style.display="flex";
-    document.getElementById("wAboutClose").onclick=closeWineAbout;
-    modal.onclick=function(e){if(e.target===modal)closeWineAbout();};
-  }
-  function closeWineAbout(){
-    const modal=document.getElementById("wAboutModal");if(modal)modal.style.display="none";
-  }
   function showToast(msg){
     clearTimeout(toastTimer);$("#toastMsg").textContent=msg;
     const toast=$("#toast");toast.classList.add("show");
@@ -3881,6 +4593,32 @@
   }
   document.querySelectorAll('input[name="askmode"]').forEach(r=>r.addEventListener("change",()=>{$("#askParent").disabled=document.querySelector('input[name="askmode"]:checked').value!=="sub";}));
   $("#qlogInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runQuickLog();}});
+
+  // ── AI bar (station view) ──
+  async function runAiBar(){
+    const inp=document.getElementById("stAiInp");if(!inp)return;
+    const text=inp.value.trim();if(!text)return;
+    const spin=document.getElementById("stAiSpin2");const send=document.getElementById("stAiSend");
+    if(spin)spin.classList.add("on");if(send)send.disabled=true;inp.disabled=true;
+    let actions=[];
+    try{actions=await parseLog(text);}catch(e){console.warn("AI bar parse failed:",e);}
+    if(!actions.length)actions=localParse(text);
+    if(spin)spin.classList.remove("on");if(send)send.disabled=false;inp.disabled=false;
+    if(!actions.length){showToast(t("toast_unknown"));inp.focus();return;}
+    undoSnapshot=clone(state);
+    const summary=[],ask=[],syncItems=[];
+    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems);});
+    inp.value="";save();renderCounters();renderWines();renderCareer();
+    if(!ask.length){finishLog(summary,syncItems,null);return;}
+    processAsk(ask,0,summary,syncItems,null);
+  }
+  const _stAiSend=document.getElementById("stAiSend");
+  if(_stAiSend)_stAiSend.addEventListener("click",runAiBar);
+  const _stAiInp=document.getElementById("stAiInp");
+  if(_stAiInp){
+    _stAiInp.placeholder=lang==="da"?"Log hvad du lavede…":"Log what you did…";
+    _stAiInp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runAiBar();}});
+  }
 
   // Qlog focus overlay
   function openQlogOverlay(){
@@ -3939,6 +4677,8 @@
       document.querySelectorAll(".bnav-btn").forEach(x=>x.classList.toggle("active",x.dataset.tab===v));
       ["station","vin","social","feed","lab","vagt"].forEach(n=>{const ve=document.getElementById("view-"+n);if(ve)ve.classList.toggle("active",v===n);});
       $("#viewToggle").style.display="none";
+      const aiBar=document.getElementById("stAiBar");if(aiBar)aiBar.classList.toggle("on",v==="station");
+      const fab=document.getElementById("stationFab");if(fab)fab.style.display=v==="station"?"none":"";
       if(v==="vagt")renderVagt();
       if(v==="social")loadSocial();
       if(v==="feed"){loadFeed(false,window._activeFeedTab?window._activeFeedTab()==="mine":true);loadFollowRequests();}
@@ -4007,24 +4747,83 @@
     try{const p=session.access_token.split(".")[1];const d=JSON.parse(atob(p.replace(/-/g,"+").replace(/_/g,"/")));return d.sub||null;}catch(e){return null;}
   }
 
-  async function renderLeaderboard(){
+  let _lbPeriod="week";
+  function _lbMedalHtml(i){return i===0?'🥇':i===1?'🥈':i===2?'🥉':'<span style="font-size:12px;color:var(--faint)">'+(i+1)+'</span>';}
+  function _lbRowsHtml(rows,myId){
+    if(!rows.length)return '<div class="lb-empty">'+esc(t("lb_empty"))+'</div>';
+    return rows.map((r,i)=>{
+      const isMe=(r.user_id||r.userId)===myId;
+      const nick=esc(r.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
+      const prof=r.profession?'<span class="lb-prof">'+esc(r.profession)+'</span>':'';
+      return '<div class="lb-row'+(isMe?" lb-me":"")+'">'
+        +'<span class="lb-medal">'+_lbMedalHtml(i)+'</span>'
+        +'<span class="lb-name">'+nick+prof+'</span>'
+        +'<span class="lb-score">'+(r.total||0)+'</span></div>';
+    }).join("");
+  }
+  async function renderLeaderboard(period){
+    period=period||_lbPeriod;_lbPeriod=period;
     const el=$("#lbContent");if(!el)return;
     el.innerHTML=skeletonRows(5);
     const base=apiBase();if(!base){el.innerHTML=esc(t("lb_empty"));return;}
     try{
       const token=await getToken();
-      const res=await fetch(base+"/api/leaderboard",{headers:token?{"Authorization":"Bearer "+token}:{}});
+      const res=await fetch(base+"/api/leaderboard?period="+period,{headers:token?{"Authorization":"Bearer "+token}:{}});
       const data=await res.json();
-      const rows=data.rows||[];
+      const rows=data.leaderboard||[];
       const myId=getJwtSub();
-      if(!rows.length){el.innerHTML='<div class="lb-empty">'+esc(t("lb_empty"))+'</div>';return;}
-      el.innerHTML=rows.map((r,i)=>{
-        const isMe=r.user_id===myId;
-        const nick=esc(r.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
-        const prof=r.profession?'<span class="lb-prof">'+esc(r.profession)+'</span>':'';
-        return '<div class="lb-row'+(isMe?" lb-me":"")+'">'+'<span class="lb-rank">'+(i+1)+'</span>'+'<span class="lb-name">'+nick+prof+'</span>'+'<span class="lb-score">'+r.total+'</span></div>';
-      }).join("");
+      el.innerHTML=_lbRowsHtml(rows,myId);
     }catch(e){el.innerHTML=esc(t("lb_empty"));}
+  }
+  async function renderSocialTeam(){
+    const el=$("#socialTeamContent");if(!el)return;
+    el.innerHTML=skeletonRows(3);
+    const base=apiBase();const token=await getToken();
+    if(!base||!token){el.innerHTML='<p class="lb-empty">'+esc(t("team_no_team"))+'</p>';_renderSocialTeamAdd(el);return;}
+    try{
+      const res=await fetch(base+"/api/teams/mine",{headers:{"Authorization":"Bearer "+token}});
+      const d=await res.json();const teams=d.teams||[];const myId=getJwtSub();
+      let html="";
+      teams.forEach(({team,members})=>{
+        const myIdx=members.findIndex(m=>m.userId===myId);
+        html+='<div class="lb-team-head">'+esc(team.name)+'</div>';
+        html+='<div class="lb-team-sub">'+esc(team.invite_code)+' · '+(lang==="da"?"Denne uge":"This week")+'</div>';
+        html+=_lbRowsHtml(members.map(m=>({user_id:m.userId,nickname:m.nickname,profession:m.profession,total:m.total})),myId);
+        html+='<div class="team-inv-row"><span class="team-inv-lbl">'+esc(lang==="da"?"Kode":"Code")+'</span><span class="team-inv-code">'+esc(team.invite_code)+'</span><button class="btn ghost btn-sm team-copy-btn" data-code="'+esc(team.invite_code)+'">'+esc(t("team_copy"))+'</button><button class="team-leave-lnk team-leave-btn" data-team-id="'+esc(team.id)+'">'+esc(lang==="da"?"Forlad":"Leave")+'</button></div>';
+        html+='<div class="social-sec-gap"></div>';
+      });
+      el.innerHTML=html||'<p class="lb-empty">'+esc(t("team_no_team"))+'</p>';
+      _renderSocialTeamAdd(el,teams.length===0);
+      el.querySelectorAll(".team-copy-btn").forEach(btn=>btn.addEventListener("click",()=>{navigator.clipboard.writeText(btn.dataset.code||"").then(()=>{btn.textContent=t("team_copied");setTimeout(()=>btn.textContent=t("team_copy"),2000);});}));
+      el.querySelectorAll(".team-leave-btn").forEach(btn=>btn.addEventListener("click",async()=>{
+        if(!confirm(lang==="da"?"Forlad dette hold?":"Leave this team?"))return;
+        try{await fetch(base+"/api/teams/"+btn.dataset.teamId+"/leave",{method:"DELETE",headers:{"Authorization":"Bearer "+token}});renderSocialTeam();}catch(e){}
+      }));
+    }catch(e){el.innerHTML='<p class="lb-empty">'+esc(t("team_no_team"))+'</p>';_renderSocialTeamAdd(el);}
+  }
+  function _renderSocialTeamAdd(container,open){
+    const div=document.createElement("div");
+    div.className="team-add-panel"+(open?" open":"");
+    div.innerHTML='<div class="team-add-hd"><svg class="team-panel-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="team-add-lbl">'+esc(lang==="da"?"+ Tilslut eller opret hold":"+ Join or create team")+'</span></div>'
+      +'<div class="team-add-bd">'
+      +'<div class="team-form"><input class="input stac-name-inp" placeholder="'+esc(lang==="da"?"fx Noma Kitchen":"e.g. Noma Kitchen")+'" maxlength="40"><button class="btn primary btn-sm stac-create-btn">'+esc(lang==="da"?"Opret":"Create")+'</button></div>'
+      +'<div class="team-or">'+esc(t("team_or"))+'</div>'
+      +'<div class="team-form"><input class="input stac-code-inp" placeholder="XXXXXX" maxlength="6" style="text-transform:uppercase;font-family:monospace"><button class="btn ghost btn-sm stac-join-btn">'+esc(lang==="da"?"Tilslut":"Join")+'</button></div>'
+      +'</div>';
+    div.querySelector(".team-add-hd").addEventListener("click",()=>div.classList.toggle("open"));
+    const base=apiBase();
+    div.querySelector(".stac-create-btn").addEventListener("click",async()=>{
+      const name=div.querySelector(".stac-name-inp").value.trim();if(!name)return;
+      const token=await getToken();if(!token)return;
+      try{await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});renderSocialTeam();}catch(e){}
+    });
+    div.querySelector(".stac-join-btn").addEventListener("click",async()=>{
+      const code=div.querySelector(".stac-code-inp").value.trim().toUpperCase();if(!code)return;
+      const token=await getToken();if(!token)return;
+      try{const r=await fetch(base+"/api/teams/join",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({code})});if(!r.ok)throw new Error();renderSocialTeam();}
+      catch(e){showToast(t("team_not_found"));}
+    });
+    container.appendChild(div);
   }
 
   async function renderChallenge(){
@@ -4152,8 +4951,27 @@
     });
   }
 
+  let _activeSocialTab="global";
+  function _switchSocialTab(tab){
+    _activeSocialTab=tab;
+    document.querySelectorAll(".social-tab").forEach(b=>b.classList.toggle("active",b.dataset.stab===tab));
+    ["global","team","challenge"].forEach(id=>{const el=document.getElementById("social-"+id);if(el)el.style.display=id===tab?"":"none";});
+    if(tab==="global")renderLeaderboard(_lbPeriod);
+    else if(tab==="team")renderSocialTeam();
+    else if(tab==="challenge")renderChallenge();
+  }
   async function loadSocial(){
-    renderLeaderboard();
+    document.querySelectorAll(".social-tab").forEach(btn=>{btn.onclick=()=>_switchSocialTab(btn.dataset.stab);});
+    document.querySelectorAll(".lb-period-btn").forEach(btn=>{
+      btn.onclick=()=>{document.querySelectorAll(".lb-period-btn").forEach(b=>b.classList.toggle("active",b===btn));renderLeaderboard(btn.dataset.period);};
+    });
+    const lbPW=document.getElementById("lbPeriodWeek");if(lbPW)lbPW.textContent=t("lb_period_week");
+    const lbPM=document.getElementById("lbPeriodMonth");if(lbPM)lbPM.textContent=t("lb_period_month");
+    const lbPA=document.getElementById("lbPeriodAll");if(lbPA)lbPA.textContent=t("lb_period_all");
+    const stabG=document.getElementById("stab-global");if(stabG)stabG.textContent=t("stab_global");
+    const stabT=document.getElementById("stab-team");if(stabT)stabT.textContent=t("stab_team");
+    const stabC=document.getElementById("stab-challenge");if(stabC)stabC.textContent=t("stab_challenge");
+    _switchSocialTab(_activeSocialTab);
   }
 
   // ---- profile modal ----
@@ -5863,11 +6681,15 @@
   </div>
 </div>
 
-<div class="wabout-modal" id="wAboutModal" style="display:none" role="dialog" aria-modal="true">
-  <div class="wabout-card">
-    <div class="wabout-card-title" id="wAboutTitle"></div>
-    <div class="wabout-card-body" id="wAboutBody"></div>
-    <button class="wabout-card-close" id="wAboutClose" aria-label="Luk">×</button>
+
+<div class="st-ai-bar" id="stAiBar">
+  <div class="st-ai-inner">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--faint);flex:none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <input class="st-ai-inp" id="stAiInp" autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="st-ai-spin2" id="stAiSpin2"></div>
+    <button class="st-ai-sendbtn" id="stAiSend" aria-label="Log">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>
+    </button>
   </div>
 </div>
 
