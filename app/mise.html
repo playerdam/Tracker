@@ -1065,6 +1065,10 @@
   .vd2-act-title{font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1.15}
   .vd2-act-sub{font-size:11px;font-weight:500;opacity:.68;line-height:1.3;margin-top:2px}
   .vd2-act-go{position:absolute;top:12px;right:12px;font-size:9px;font-weight:800;letter-spacing:.1em;background:rgba(255,255,255,.2);border-radius:8px;padding:3px 8px}
+  .vd2-act.loading{opacity:.55;pointer-events:none}
+  .vd2-tile-btn{appearance:none;cursor:pointer;font-family:inherit;text-align:left;-webkit-tap-highlight-color:transparent;transition:transform .1s}
+  .vd2-tile-btn:active{transform:scale(.96)}
+  .vd2-ring-btn{appearance:none;background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
   .vd2-live-row{display:flex;align-items:center;gap:8px}
   .vd2-live-dot{width:8px;height:8px;border-radius:50%;background:#4ADE80;flex:none;box-shadow:0 0 0 3px rgba(74,222,128,.25);animation:vsPulse 2s ease infinite}
   .vd2-timer{font-family:"Fraunces",serif;font-size:25px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.02em;color:#fff}
@@ -1463,31 +1467,28 @@
   </div>
 
   <section class="view" id="view-vin">
+    <div id="wineStats" style="display:none"></div>
+    <div class="vd2-actions">
+      <button class="vd2-act vd2-act-shift" id="winePageScanBtn" type="button">
+        <span class="vd2-act-go">SCAN</span>
+        <div class="vd2-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <div><div class="vd2-act-title" id="winePageScanLbl">Scan etiket</div>
+        <div class="vd2-act-sub" id="winePageScanSub">AI læser etiketten</div></div>
+      </button>
+      <button class="vd2-act vd2-act-log" id="wineLineupBtn" type="button">
+        <div class="vd2-act-ico"><svg width="26" height="18" viewBox="0 0 58 21" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1,21 L9,21 L9,11 Q9,5 7,4 L7,1 L3,1 L3,4 Q1,5 1,11 Z"/><rect x="1.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M13,21 L21,21 L21,11 Q21,5 19,4 L19,1 L15,1 L15,4 Q13,5 13,11 Z"/><rect x="13.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M25,21 L33,21 L33,11 Q33,5 31,4 L31,1 L27,1 L27,4 Q25,5 25,11 Z"/><rect x="25.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M37,21 L45,21 L45,11 Q45,5 43,4 L43,1 L39,1 L39,4 Q37,5 37,11 Z"/><rect x="37.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M49,21 L57,21 L57,11 Q57,5 55,4 L55,1 L51,1 L51,4 Q49,5 49,11 Z"/><rect x="49.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/></svg></div>
+        <div><div class="vd2-act-title" id="wineLineupLbl">Scan lineup</div>
+        <div class="vd2-act-sub" id="wineLineupSub">Flere flasker på ét billede</div></div>
+      </button>
+    </div>
+    <input type="file" id="winePageScanInput" accept="image/*" style="display:none">
+    <input type="file" id="wineLineupInput" accept="image/*" style="display:none">
     <div class="searchwrap">
       <div class="searchbox">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="wineSearch" autocomplete="off">
       </div>
     </div>
-    <div id="wineLevelBar" class="wlevel-bar" style="display:none">
-      <span id="wineLevelRank" class="wlevel-rank"></span>
-      <div class="wlevel-xp-wrap"><div class="wlevel-xp-fill" id="wineLevelXpFill"></div></div>
-      <span id="wineLevelXpLbl" class="wlevel-xp-lbl"></span>
-      <span style="font-size:16px;flex:none">🏆</span>
-    </div>
-    <div id="wineStats" class="wine-stats" style="display:none"></div>
-    <div class="wine-scan-bar">
-      <button class="wine-scan-bar-btn" id="winePageScanBtn" type="button">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <span id="winePageScanLbl">Scan etiket</span>
-      </button>
-      <button class="wine-scan-bar-btn outline" id="wineLineupBtn" type="button">
-        <svg width="24" height="20" viewBox="0 0 58 21" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1,21 L9,21 L9,11 Q9,5 7,4 L7,1 L3,1 L3,4 Q1,5 1,11 Z"/><rect x="1.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M13,21 L21,21 L21,11 Q21,5 19,4 L19,1 L15,1 L15,4 Q13,5 13,11 Z"/><rect x="13.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M25,21 L33,21 L33,11 Q33,5 31,4 L31,1 L27,1 L27,4 Q25,5 25,11 Z"/><rect x="25.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M37,21 L45,21 L45,11 Q45,5 43,4 L43,1 L39,1 L39,4 Q37,5 37,11 Z"/><rect x="37.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/><path d="M49,21 L57,21 L57,11 Q57,5 55,4 L55,1 L51,1 L51,4 Q49,5 49,11 Z"/><rect x="49.5" y="12.5" width="7" height="5.5" fill="white" fill-opacity="0.22" rx="0.5"/></svg>
-        <span id="wineLineupLbl">Scan lineup</span>
-      </button>
-    </div>
-    <input type="file" id="winePageScanInput" accept="image/*" style="display:none">
-    <input type="file" id="wineLineupInput" accept="image/*" style="display:none">
     <div id="wineTypeStrip" class="wine-type-strip"></div>
     <div class="wsum" id="wineSum"></div>
     <div id="wineList"></div>
@@ -2621,6 +2622,8 @@
     const vaGemFeedL=$("#vaGemFeedLbl");if(vaGemFeedL)vaGemFeedL.textContent=t("va_save_feed");
     const vaGemDelL=$("#vaGemDeleteLbl");if(vaGemDelL)vaGemDelL.textContent=t("va_delete_visit");
     const wineLineupLbl=$("#wineLineupLbl");if(wineLineupLbl)wineLineupLbl.textContent=t("wine_lineup");
+    const winePageScanSub=$("#winePageScanSub");if(winePageScanSub)winePageScanSub.textContent=lang==="da"?"AI læser etiketten":"AI reads the label";
+    const wineLineupSub=$("#wineLineupSub");if(wineLineupSub)wineLineupSub.textContent=lang==="da"?"Flere flasker på ét billede":"Several bottles in one shot";
     const lineupTitle=$("#lineupTitle");if(lineupTitle)lineupTitle.textContent=t("lineup_title");
     const lineupAddAll=$("#lineupAddAll");if(lineupAddAll)lineupAddAll.textContent=t("lineup_add_all");
     const lineupClose=$("#lineupClose");if(lineupClose)lineupClose.textContent=lang==="da"?"Luk":"Close";
@@ -3951,11 +3954,12 @@
     return wrap;
   }
 
+  const WTYPE_COLORS={rod:["#D97383","rgba(217,115,131,.15)"],hvid:["#E5C368","rgba(229,195,104,.16)"],rose:["#F0A3B8","rgba(240,163,184,.15)"],mousserende:["#7EC8C0","rgba(126,200,192,.15)"],andet:["#9B7EDE","rgba(155,126,222,.15)"]};
   function renderWineStats(){
     const el=$("#wineStats");if(!el)return;
-    if(state.wines.length<3){el.style.display="none";return;}
+    if(!state.wines.length){el.style.display="none";el.innerHTML="";return;}
     el.style.display="";
-    let totalB=0;const CC={},CB={},GC={},GB={};
+    let totalB=0;const CC={},CB={},GC={};
     state.wines.forEach(w=>{
       const b=w.bottles||0;totalB+=b;
       if(w.land){const l=w.land.trim();CC[l]=(CC[l]||0)+1;CB[l]=(CB[l]||0)+b;}
@@ -3963,12 +3967,58 @@
     });
     const topLand=Object.keys(CC).sort((a,b)=>CC[b]-CC[a])[0];
     const topGrape=Object.keys(GC).sort((a,b)=>GC[b]-GC[a])[0];
-    const flag=topLand?(WINE_FLAGS[topLand]||""):"";
-    el.innerHTML=
-      '<div class="wine-stat-tile"><div class="wine-stat-lbl">'+(lang==="da"?"vine":"wines")+'</div><div class="wine-stat-val">'+state.wines.length+'</div></div>'+
-      '<div class="wine-stat-tile"><div class="wine-stat-lbl">'+esc(t("bottles").toLowerCase())+'</div><div class="wine-stat-val">'+totalB+'</div></div>'+
-      (topLand?'<div class="wine-stat-tile clickable" id="wStatLandTile"><div class="wine-stat-lbl">'+(lang==="da"?"top land":"top country")+'</div><div class="wine-stat-val sm">'+(flag?flag+' ':'')+esc(topLand)+'</div></div>':'')+
-      (topGrape?'<div class="wine-stat-tile clickable" id="wStatGrapeTile"><div class="wine-stat-lbl">'+(lang==="da"?"top drue":"top grape")+'</div><div class="wine-stat-val sm">'+esc(topGrape)+'</div></div>':'');
+    const flag=topLand?(WINE_FLAGS[topLand]||"\ud83c\udf0d"):"";
+    const info=getLevelInfo(computeXP());
+    const r=52,circ=+(2*Math.PI*r).toFixed(2);
+    const arcLen=+(circ*Math.min(1,info.pct/100)).toFixed(2);
+    const grapeSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="3"/><circle cx="15" cy="12" r="3"/><circle cx="12" cy="17" r="3"/><path d="M12 9V5l3-3"/></svg>';
+    // top-5 wines by servings, ring colored by wine type
+    const tops=state.wines.map(w=>({w,tot:(w.glasses||0)+(w.bottles||0)})).sort((a,b)=>b.tot-a.tot).slice(0,5);
+    const maxTot=Math.max(1,...tops.map(x=>x.tot));
+    const mr=25,mc=+(2*Math.PI*mr).toFixed(2);
+    const minis='<div class="vd2-minis">'+tops.map(x=>{
+      const col=(WTYPE_COLORS[x.w.type]||WTYPE_COLORS.andet)[0];
+      const len=+(mc*Math.min(1,x.tot/maxTot)).toFixed(2);
+      const nm=x.w.name||x.w.producer||x.w.grape||(lang==="da"?"Uden navn":"Unnamed");
+      return '<div class="vd2-mini">'
+        +'<div class="vd2-mini-ringwrap">'
+          +'<svg class="vd2-mini-svg" viewBox="0 0 60 60"><circle class="vd2-mini-track" cx="30" cy="30" r="'+mr+'"/><circle class="vd2-mini-arc" cx="30" cy="30" r="'+mr+'" stroke="'+col+'" stroke-dasharray="'+len+' '+mc+'"/></svg>'
+          +'<span class="vd2-mini-num">'+x.tot+'</span>'
+        +'</div>'
+        +'<span class="vd2-mini-lbl">'+esc(nm)+'</span>'
+      +'</div>';
+    }).join("")
+    +'<button class="vd2-mini vd2-mini-all" id="wineRankBtn" aria-label="Achievements">'
+      +'<div class="vd2-mini-ringwrap">'
+        +'<svg class="vd2-mini-svg" viewBox="0 0 60 60"><circle class="vd2-mini-track dashed" cx="30" cy="30" r="'+mr+'"/></svg>'
+        +'<span class="vd2-mini-num" style="font-size:17px">\ud83c\udfc6</span>'
+      +'</div>'
+      +'<span class="vd2-mini-lbl">Rank</span>'
+    +'</button>'
+    +'</div>';
+    el.innerHTML='<div class="vd2-hero">'
+      +'<div class="vd2-top">'
+        +'<button class="vd-ring-wrap vd2-ring-btn" id="wineRingBtn" type="button">'
+          +'<svg class="vd-ring-svg" viewBox="0 0 120 120">'
+            +'<defs><linearGradient id="vwGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFB36B"/><stop offset="100%" stop-color="#FF6B8A"/></linearGradient></defs>'
+            +'<circle class="vd-ring-track" cx="60" cy="60" r="'+r+'"/>'
+            +'<circle class="vd-ring-arc" cx="60" cy="60" r="'+r+'" style="stroke:url(#vwGrad)" stroke-dasharray="'+arcLen+' '+circ+'"/>'
+          +'</svg>'
+          +'<div class="vd-ring-center">'
+            +'<span class="vd-ring-num">'+state.wines.length+'</span>'
+            +'<span class="vd-ring-lbl">'+(lang==="da"?"vine":"wines")+'</span>'
+            +'<span class="vd-ring-goal">'+esc(info.title)+'</span>'
+          +'</div>'
+        +'</button>'
+        +'<div class="vd2-tiles">'
+          +(topLand?'<button class="vd2-tile vd2-tile-btn" id="wStatLandTile" type="button"><div class="vd2-tile-ico" style="background:rgba(255,179,107,.16);font-size:17px">'+flag+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+esc(topLand)+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Top land":"Top country")+'</div></div></button>':'')
+          +(topGrape?'<button class="vd2-tile vd2-tile-btn" id="wStatGrapeTile" type="button"><div class="vd2-tile-ico" style="background:rgba(126,200,192,.16);color:#7EC8C0">'+grapeSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+esc(topGrape)+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Top drue":"Top grape")+'</div></div></button>':'')
+        +'</div>'
+      +'</div>'
+      +minis
+    +'</div>';
+    const ringBtn=document.getElementById("wineRingBtn");if(ringBtn)ringBtn.addEventListener("click",openAchievements);
+    const rankBtn=document.getElementById("wineRankBtn");if(rankBtn)rankBtn.addEventListener("click",openAchievements);
     function openStatsModal(title,html){
       const modal=document.getElementById("wStatsModal");
       const listEl=document.getElementById("wStatsList");
