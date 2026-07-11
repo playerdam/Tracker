@@ -1,5 +1,5 @@
-const CACHE = 'craft-tracker-v3';
-const SHELL = ['/', '/mise.html'];
+const CACHE = 'craft-tracker-v4';
+const SHELL = ['/', '/mise.html', '/styles.css', '/app.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));
