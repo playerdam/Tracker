@@ -2441,10 +2441,11 @@
   // ---- quick log ----
   async function parseLog(text){
     const base=apiBase();if(!base)throw new Error("no-backend");
+    const token=await getToken();if(!token)throw new Error("no-auth");
     const counters=state.counters.map(c=>({label:c.label,subs:c.subs.map(s=>s.name),muligeTyper:c.suggest||[]}));
     const wines=state.wines.map(w=>w.name).filter(Boolean);
     const _ctrl=new AbortController();const _to=setTimeout(()=>_ctrl.abort(),8000);
-    try{const res=await fetch(base+"/api/parse-log",{signal:_ctrl.signal,method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,counters,wines,lang})});clearTimeout(_to);if(!res.ok)throw new Error("Backend "+res.status);const data=await res.json();return Array.isArray(data.actions)?data.actions:[];}
+    try{const res=await fetch(base+"/api/parse-log",{signal:_ctrl.signal,method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({text,counters,wines,lang})});clearTimeout(_to);if(!res.ok)throw new Error("Backend "+res.status);const data=await res.json();return Array.isArray(data.actions)?data.actions:[];}
     catch(e){clearTimeout(_to);throw e;}
   }
   function findCounter(name){

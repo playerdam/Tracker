@@ -100,6 +100,18 @@ async function verifyAuth(req) {
   return data.id;
 }
 
+// Simpel in-memory rate limiter pr. bruger
+const _rateBuckets = new Map();
+function rateLimited(bucket, key, max, windowMs) {
+  const now = Date.now();
+  const k = bucket + ":" + key;
+  const hits = (_rateBuckets.get(k) || []).filter(t => now - t < windowMs);
+  if (hits.length >= max) { _rateBuckets.set(k, hits); return true; }
+  hits.push(now);
+  _rateBuckets.set(k, hits);
+  return false;
+}
+
 function authErr(msg) {
   return msg === "Ikke autoriseret" || msg === "Ugyldig token";
 }
@@ -194,6 +206,11 @@ app.post("/api/log-entry", async (req, res) => {
     let { delta } = req.body || {};
     delta = parseInt(delta, 10);
     if (!categoryLabel || !delta) return res.status(400).json({ error: "Felter mangler" });
+    // Ranglisten er kun sjov hvis tallene er plausible
+    if (!Number.isFinite(delta) || Math.abs(delta) > 500) return res.status(400).json({ error: "delta ude af interval (max 500)" });
+    const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
+    const todays = await sb(`log_entries?user_id=eq.${userId}&logged_at=gte.${dayStart.toISOString()}&select=id&limit=301`) || [];
+    if (todays.length > 300) return res.status(429).json({ error: "dagligt loft nået" });
 
     const existing = await sb(`categories?label_da=eq.${encodeURIComponent(categoryLabel)}&select=id`);
     let categoryId;
@@ -564,8 +581,15 @@ app.post("/api/state", async (req, res) => {
 
 app.post("/api/parse-log", async (req, res) => {
   try {
-    const { text, counters = [], wines = [], lang = "da" } = req.body || {};
+    const userId = await verifyAuth(req);
+    if (rateLimited("parse", userId, 30, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
+    let { text, counters = [], wines = [], lang = "da" } = req.body || {};
     if (!text || !String(text).trim()) return res.json({ actions: [] });
+    text = String(text).slice(0, 300);
+    if (!Array.isArray(counters)) counters = [];
+    counters = counters.slice(0, 120);
+    if (!Array.isArray(wines)) wines = [];
+    wines = wines.slice(0, 200);
 
     const content =
       'Eksisterende tællere (med underkategorier og mulige typer): ' + JSON.stringify(counters) + '\n' +
@@ -596,8 +620,11 @@ app.post("/api/parse-log", async (req, res) => {
 // ---- Vin-opslag ----
 app.post("/api/wine-search", async (req, res) => {
   try {
-    const { query } = req.body || {};
+    const userId = await verifyAuth(req);
+    if (rateLimited("winesearch", userId, 20, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
+    let { query } = req.body || {};
     if (!query || String(query).trim().length < 2) return res.json({ wines: [] });
+    query = String(query).slice(0, 80);
     const out = await callClaude({
       model: WINE_MODEL,
       system: "Du er en vindatabase. Svar KUN med gyldig JSON. Ingen markdown.",
