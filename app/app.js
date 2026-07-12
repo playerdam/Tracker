@@ -353,8 +353,6 @@
     const shiftPhotoBtn=$("#shiftPhotoBtn");if(shiftPhotoBtn)shiftPhotoBtn.textContent=t("shift_photo");
     const lbTitle=$("#lbTitle");if(lbTitle)lbTitle.textContent=t("lb_title");
     const teamTitle=$("#teamTitle");if(teamTitle)teamTitle.textContent=t("team_title");
-    const teamModalTitle=$("#teamModalTitle");if(teamModalTitle)teamModalTitle.textContent=t("team_title");
-    const teamModalClose=$("#teamModalClose");if(teamModalClose)teamModalClose.textContent=lang==="da"?"Luk":"Close";
     const pSave=$("#profileSave");if(pSave)pSave.textContent=t("profile_save");
     const pClose=$("#profileClose");if(pClose)pClose.textContent=t("profile_close");
     const pNick=$("#profileNick");if(pNick)pNick.placeholder=t("profile_nick_ph");
@@ -2700,7 +2698,7 @@
       if(v==="vagt")renderVagt();
       if(v==="social")loadSocial();
       if(v==="feed"){loadFeed(false,window._activeFeedTab?window._activeFeedTab()==="mine":true);loadFollowRequests();}
-      if(v==="lab")loadLabDishes();
+      if(v==="lab")renderLabSeg();
       window.scrollTo({top:0,behavior:"instant"});
     }
     if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
@@ -2709,11 +2707,8 @@
   document.querySelectorAll(".bnav-btn").forEach(btn=>btn.addEventListener("click",()=>switchTab(btn.dataset.tab)));
 
   function openLogDrawer(){renderLogView();renderShiftLog();$("#logDrawer").classList.add("open");$("#logScrim").classList.add("open");}
-  function openTeamModal(){renderTeam();$("#teamScrim").classList.add("open");}
-  function closeTeamModal(){$("#teamScrim").classList.remove("open");}
-  var _teamDrawerLink=$("#teamDrawerLink");if(_teamDrawerLink)_teamDrawerLink.addEventListener("click",()=>{closeLogDrawer();openTeamModal();});
-  var _teamModalClose=$("#teamModalClose");if(_teamModalClose)_teamModalClose.addEventListener("click",closeTeamModal);
-  var _teamScrim=$("#teamScrim");if(_teamScrim)_teamScrim.addEventListener("click",e=>{if(e.target===_teamScrim)closeTeamModal();});
+  function goToTeams(){switchTab("social");setTimeout(()=>_switchSocialTab("team"),60);}
+  var _teamDrawerLink=$("#teamDrawerLink");if(_teamDrawerLink)_teamDrawerLink.addEventListener("click",()=>{closeLogDrawer();goToTeams();});
   function closeLogDrawer(){$("#logDrawer").classList.remove("open");$("#logScrim").classList.remove("open");}
   var _burgerBtn=$("#burgerBtn");if(_burgerBtn)_burgerBtn.addEventListener("click",openLogDrawer);
   var _drawerClose=$("#logDrawerClose");if(_drawerClose)_drawerClose.addEventListener("click",closeLogDrawer);
@@ -2811,7 +2806,7 @@
       el.querySelectorAll(".team-copy-btn").forEach(btn=>btn.addEventListener("click",()=>{navigator.clipboard.writeText(btn.dataset.code||"").then(()=>{btn.textContent=t("team_copied");setTimeout(()=>btn.textContent=t("team_copy"),2000);});}));
       el.querySelectorAll(".team-leave-btn").forEach(btn=>btn.addEventListener("click",async()=>{
         if(!confirm(lang==="da"?"Forlad dette hold?":"Leave this team?"))return;
-        try{await fetch(base+"/api/teams/"+btn.dataset.teamId+"/leave",{method:"DELETE",headers:{"Authorization":"Bearer "+token}});renderSocialTeam();}catch(e){}
+        try{await fetch(base+"/api/teams/"+btn.dataset.teamId+"/leave",{method:"DELETE",headers:{"Authorization":"Bearer "+token}});invalidateLabTeams();_labSeg==="kitchen"&&renderLabSeg();renderSocialTeam();}catch(e){}
       }));
     }catch(e){el.innerHTML='<p class="lb-empty">'+esc(t("team_no_team"))+'</p>';_renderSocialTeamAdd(el);}
   }
@@ -2829,12 +2824,12 @@
     div.querySelector(".stac-create-btn").addEventListener("click",async()=>{
       const name=div.querySelector(".stac-name-inp").value.trim();if(!name)return;
       const token=await getToken();if(!token)return;
-      try{await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});renderSocialTeam();}catch(e){}
+      try{await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});invalidateLabTeams();renderSocialTeam();}catch(e){}
     });
     div.querySelector(".stac-join-btn").addEventListener("click",async()=>{
       const code=div.querySelector(".stac-code-inp").value.trim().toUpperCase();if(!code)return;
       const token=await getToken();if(!token)return;
-      try{const r=await fetch(base+"/api/teams/join",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({code})});if(!r.ok)throw new Error();renderSocialTeam();}
+      try{const r=await fetch(base+"/api/teams/join",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({code})});if(!r.ok)throw new Error();invalidateLabTeams();renderSocialTeam();}
       catch(e){showToast(t("team_not_found"));}
     });
     container.appendChild(div);
@@ -2869,101 +2864,6 @@
     }catch(e){el.innerHTML="";}
   }
   function mondayLocal(){const d=new Date();d.setHours(0,0,0,0);const day=d.getDay();d.setDate(d.getDate()-((day+6)%7));return d;}
-
-  async function renderTeam(){
-    const el=$("#teamContent");if(!el)return;
-    const base=apiBase();if(!base){el.innerHTML="";renderTeamAddPanel(el,true);return;}
-    const token=await getToken();if(!token){el.innerHTML="";renderTeamAddPanel(el,true);return;}
-    try{
-      const res=await fetch(base+"/api/teams/mine",{headers:{"Authorization":"Bearer "+token}});
-      const d=await res.json();
-      const teams=d.teams||[];
-      const myId=getJwtSub();
-      let html="";
-      teams.forEach(({team,members},ti)=>{
-        const myIdx=members.findIndex(m=>m.userId===myId);
-        const myRank=myIdx>=0?myIdx+1:null;
-        const myTotal=myIdx>=0?(members[myIdx].total||0):0;
-        const badge=myRank?(lang==="da"?"Du: #"+myRank+" · "+myTotal+" pt":"You: #"+myRank+" · "+myTotal+" pts"):"";
-        html+='<div class="team-panel'+(ti===0?" open":"")+'" data-team-id="'+esc(team.id)+'">'
-          +'<div class="team-panel-hd">'
-          +'<svg class="team-panel-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>'
-          +'<span class="team-panel-title">'+esc(team.name||"")+'</span>'
-          +(badge?'<span class="team-panel-badge">'+esc(badge)+'</span>':'')
-          +'</div>'
-          +'<div class="team-panel-bd">'
-          +'<div class="lb-section">'
-          +members.map((m,i)=>{
-            const isMe=m.userId===myId;
-            const nick=esc(m.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
-            return '<div class="lb-row'+(isMe?" lb-me":"")+'">'+'<span class="lb-rank">'+(i+1)+'</span>'+'<span class="lb-name">'+nick+'</span>'+'<span class="lb-score">'+(m.total||0)+'</span></div>';
-          }).join("")
-          +'</div>'
-          +'<div class="team-inv-row">'
-          +'<span class="team-inv-lbl">'+(lang==="da"?"Kode":"Code")+'</span>'
-          +'<span class="team-inv-code">'+esc(team.invite_code||"")+'</span>'
-          +'<button class="btn ghost btn-sm team-copy-btn" data-code="'+esc(team.invite_code||"")+'">'+esc(t("team_copy"))+'</button>'
-          +'</div>'
-          +'<button class="team-leave-lnk team-leave-btn" data-team-id="'+esc(team.id)+'">'+(lang==="da"?"Forlad hold":"Leave team")+'</button>'
-          +'</div>'
-          +'</div>';
-      });
-      el.innerHTML=html;
-      renderTeamAddPanel(el,teams.length===0);
-      el.querySelectorAll(".team-panel-hd").forEach(hd=>{
-        hd.addEventListener("click",()=>{hd.closest(".team-panel").classList.toggle("open");});
-      });
-      el.querySelectorAll(".team-copy-btn").forEach(btn=>{
-        btn.addEventListener("click",()=>{
-          navigator.clipboard.writeText(btn.dataset.code||"").then(()=>{btn.textContent=t("team_copied");setTimeout(()=>btn.textContent=t("team_copy"),2000);});
-        });
-      });
-      el.querySelectorAll(".team-leave-btn").forEach(btn=>{
-        btn.addEventListener("click",async()=>{
-          if(!confirm(lang==="da"?"Forlad dette hold?":"Leave this team?"))return;
-          const tid=btn.dataset.teamId;
-          try{await fetch(base+"/api/teams/"+tid+"/leave",{method:"DELETE",headers:{"Authorization":"Bearer "+token}});renderTeam();}
-          catch(e){}
-        });
-      });
-    }catch(e){el.innerHTML="";renderTeamAddPanel(el,true);}
-  }
-  function renderTeamAddPanel(el,open){
-    const addHtml='<div class="team-add-panel'+(open?" open":"")+'">'
-      +'<div class="team-add-hd">'
-      +'<svg class="team-panel-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>'
-      +'<span class="team-add-lbl">'+(lang==="da"?"+ Tilføj hold":"+ Add team")+'</span>'
-      +'</div>'
-      +'<div class="team-add-bd">'
-      +'<div class="team-form" style="margin-top:4px">'
-      +'<input id="teamNameInput" class="input" placeholder="'+esc(t("team_create_ph"))+'" maxlength="40">'
-      +'<button class="btn primary btn-sm" id="teamCreateBtn">'+esc(t("team_create_btn"))+'</button>'
-      +'</div>'
-      +'<div class="team-or">'+esc(t("team_or"))+'</div>'
-      +'<div class="team-form">'
-      +'<input id="teamCodeInput" class="input" placeholder="'+esc(t("team_join_ph"))+'" maxlength="6" style="text-transform:uppercase;font-family:monospace">'
-      +'<button class="btn ghost btn-sm" id="teamJoinBtn">'+esc(t("team_join_btn"))+'</button>'
-      +'</div>'
-      +'</div>'
-      +'</div>';
-    el.insertAdjacentHTML("beforeend",addHtml);
-    el.querySelector(".team-add-hd").addEventListener("click",()=>{el.querySelector(".team-add-panel").classList.toggle("open");});
-    const base=apiBase();
-    document.getElementById("teamCreateBtn").addEventListener("click",async()=>{
-      const name=(document.getElementById("teamNameInput").value||"").trim();if(!name)return;
-      const token=await getToken();if(!base||!token)return;
-      try{await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});renderTeam();}catch(e){}
-    });
-    document.getElementById("teamJoinBtn").addEventListener("click",async()=>{
-      const code=(document.getElementById("teamCodeInput").value||"").trim().toUpperCase();if(!code)return;
-      const token=await getToken();if(!base||!token)return;
-      try{
-        const res=await fetch(base+"/api/teams/join",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({code})});
-        const d=await res.json();
-        if(d.error){showToast(t("team_not_found"));}else{renderTeam();}
-      }catch(e){showToast(t("team_not_found"));}
-    });
-  }
 
   let _activeSocialTab="global";
   function _switchSocialTab(tab){
@@ -3855,9 +3755,10 @@
   async function _labTeams(){
     if(_myLabTeams!==null)return _myLabTeams;
     const base=apiBase();const token=await getToken();if(!base||!token)return (_myLabTeams=[]);
-    try{const r=await fetch(base+"/api/teams/mine",{headers:{"Authorization":"Bearer "+token}});const d=await r.json();_myLabTeams=(d.teams||[]).map(x=>x.team);}catch(e){_myLabTeams=[];}
+    try{const r=await fetch(base+"/api/teams/list",{headers:{"Authorization":"Bearer "+token}});const d=await r.json();_myLabTeams=d.teams||[];}catch(e){_myLabTeams=[];}
     return _myLabTeams;
   }
+  function invalidateLabTeams(){_myLabTeams=null;}
 
   function setupLab(){
     const sub=$("#labSub");if(sub)sub.textContent=lang==="da"?"Opskrifter i udvikling":"Recipes in development";
@@ -4105,7 +4006,16 @@
     d.winePairing=(document.getElementById("deWine")||{}).value||"";
     var base=apiBase();var token=await getToken();if(!base||!token)return;
     try{
-      await fetch(base+"/api/lab/dishes/"+_currentDish.id,{method:"PUT",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name:_currentDish.name,status:_currentDish.status,heroUrl:_currentDish.heroUrl||null,data:d,visibility:_currentDish.visibility||"private",teamId:_currentDish.teamId||null})});
+      var putRes=await fetch(base+"/api/lab/dishes/"+_currentDish.id,{method:"PUT",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name:_currentDish.name,status:_currentDish.status,heroUrl:_currentDish.heroUrl||null,data:d,visibility:_currentDish.visibility||"private",teamId:_currentDish.teamId||null})});
+      if(putRes.status===403){
+        var errD=await putRes.json().catch(function(){return{};});
+        _currentDish.visibility="private";_currentDish.teamId=null;updateVisChips("private");
+        var localD=_labDishes.find(function(x){return x.id===_currentDish.id;});
+        if(localD){localD.visibility="private";localD.teamId=null;}
+        if(errD.error==="limit_team"||errD.error==="limit_public")openLabPro();
+        else showToast(lang==="da"?"Kunne ikke dele — er du stadig på holdet?":"Couldn\u2019t share — are you still on the team?");
+        saveDish(false);return;
+      }
       _dishDirty=false;
       if(showFeedback){
         var saveBtn=$("#deSaveBtn");var saveLbl=$("#deSaveLbl");
@@ -4341,7 +4251,7 @@
     var statusLabels=_dishStatusLabels();
     if(seg==="kitchen"&&resp&&resp.noTeam){
       list.innerHTML='<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-title">'+(lang==="da"?"Du er ikke på et hold endnu":"You\u2019re not on a team yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Opret eller join et hold under Rangliste → Hold, så deler I retter automatisk her":"Create or join a team under Leaderboard → Team to share dishes here")+'</div><button class="btn primary btn-sm" id="labGoTeam" style="margin-top:12px">'+(lang==="da"?"Gå til Hold":"Go to Teams")+'</button></div>';
-      var go=$("#labGoTeam");if(go)go.addEventListener("click",function(){switchTab("social");});
+      var go=$("#labGoTeam");if(go)go.addEventListener("click",goToTeams);
       return;
     }
     if(!_sharedCache.length){
@@ -4361,7 +4271,7 @@
           +'<div class="dish-card-body">'
           +'<div class="dish-card-top"><span class="dish-card-name">'+esc(dish.name||"")+'</span>'
           +'<span class="dish-status dish-status-'+esc(dish.status||"idea")+'">'+esc(statusLabels[dish.status||"idea"]||dish.status)+'</span></div>'
-          +'<div class="dish-card-author"><span class="dish-card-avatar">'+esc((author||"?").charAt(0).toUpperCase())+'</span>'+esc(author)+'<span class="dish-vis-tag">'+vis+'</span></div>'
+          +'<div class="dish-card-author"><span class="dish-card-avatar">'+esc((author||"?").charAt(0).toUpperCase())+'</span>'+esc(author)+(dish.teamName?' <span style="color:var(--faint)">· '+esc(dish.teamName)+'</span>':'')+'<span class="dish-vis-tag">'+vis+'</span></div>'
           +'</div></div>';
       }).join("");
     }).join("");
@@ -4436,7 +4346,12 @@
       if(!teams.length){showToast(lang==="da"?"Opret eller join et hold under Rangliste først":"Create or join a team under Leaderboard first");return;}
       var shared=_labDishes.filter(function(d){return d.id!==_currentDish.id&&(d.visibility==="team"||d.visibility==="public");}).length;
       if(shared>=FREE_TEAM_SHARES){openLabPro();return;}
-      _currentDish.teamId=teams[0].id;
+      if(teams.length===1)_currentDish.teamId=teams[0].id;
+      else{
+        var picked=await pickTeam(teams);
+        if(!picked)return;
+        _currentDish.teamId=picked.id;
+      }
     }
     if(vis==="public"){
       var pub=_labDishes.filter(function(d){return d.id!==_currentDish.id&&d.visibility==="public";}).length;
@@ -4455,6 +4370,22 @@
       syncLogEntry(lang==="da"?"Ret publiceret":"Dish published",1,_currentDish.heroUrl||null,false,(lang==="da"?"📖 Publicerede \"":"📖 Published \"")+(_currentDish.name||"")+(lang==="da"?"\" i kogebogen":"\" to the cookbook"));
     }
     if(vis==="private")showToast(lang==="da"?"Retten er privat igen 🔒":"Dish is private again 🔒");
+  }
+  function pickTeam(teams){
+    return new Promise(function(resolve){
+      var scrim=$("#teamPickScrim");var list=$("#teamPickList");if(!scrim||!list){resolve(teams[0]);return;}
+      var ttl=$("#teamPickTitle");if(ttl)ttl.textContent=lang==="da"?"Del med hvilket hold?":"Share with which team?";
+      list.innerHTML="";
+      teams.forEach(function(tm){
+        var b=document.createElement("button");b.className="btn ghost";b.style.cssText="width:100%;margin-bottom:8px;justify-content:flex-start";
+        b.textContent="👥 "+(tm.name||"?");
+        b.addEventListener("click",function(){scrim.classList.remove("open");resolve(tm);});
+        list.appendChild(b);
+      });
+      var cancel=$("#teamPickCancel");
+      if(cancel){cancel.textContent=lang==="da"?"Annuller":"Cancel";cancel.onclick=function(){scrim.classList.remove("open");resolve(null);};}
+      scrim.classList.add("open");
+    });
   }
   function openLabPro(){
     var t1=$("#labProTitle");if(t1)t1.textContent="Lab Pro";

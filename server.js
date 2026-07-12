@@ -335,9 +335,15 @@ app.post("/api/teams", async (req, res) => {
 });
 
 // ---- Hold: tilslut ----
+const _joinAttempts = new Map();
 app.post("/api/teams/join", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    const nowTs = Date.now();
+    const attempts = (_joinAttempts.get(userId) || []).filter(t => nowTs - t < 600000);
+    if (attempts.length >= 10) return res.status(429).json({ error: "for mange forsøg — vent lidt" });
+    attempts.push(nowTs);
+    _joinAttempts.set(userId, attempts);
     const { code } = req.body || {};
     if (!code) return res.status(400).json({ error: "Kode mangler" });
     const teams = await sb(`teams?invite_code=eq.${encodeURIComponent(code.trim().toUpperCase())}`);
@@ -356,6 +362,22 @@ app.post("/api/teams/join", async (req, res) => {
 });
 
 // ---- Hold: hent alle mine hold + ugens stats ----
+async function userTeamIds(userId) {
+  const memberships = await sb(`team_members?user_id=eq.${userId}&select=team_id`) || [];
+  return memberships.map(m => m.team_id);
+}
+
+// Letvægts hold-liste (id/navn/kode) — én query, ingen leaderboard-beregning
+app.get("/api/teams/list", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const memberships = await sb(`team_members?user_id=eq.${userId}&select=teams(id,name,invite_code)`) || [];
+    res.json({ teams: memberships.map(m => m.teams).filter(Boolean) });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
 app.get("/api/teams/mine", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
@@ -396,6 +418,11 @@ app.delete("/api/teams/:id/leave", async (req, res) => {
     const userId = await verifyAuth(req);
     const teamId = req.params.id;
     await sb(`team_members?user_id=eq.${userId}&team_id=eq.${teamId}`, { method: "DELETE" });
+    // Ingen spøgelsesretter: afdel brugerens retter i det hold han forlader
+    await sb(`lab_dishes?user_id=eq.${userId}&team_id=eq.${teamId}`, { method: "PATCH", body: JSON.stringify({ team_id: null, visibility: "private" }) });
+    // Slet holdet hvis sidste medlem gik
+    const remaining = await sb(`team_members?team_id=eq.${teamId}&select=user_id&limit=1`) || [];
+    if (!remaining.length) await sb(`teams?id=eq.${teamId}`, { method: "DELETE" });
     res.json({ ok: true });
   } catch (err) {
     console.error("teams/leave:", err.message);
@@ -448,12 +475,14 @@ async function fetchAuthors(rows) {
 app.get("/api/lab/kitchen", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
-    const memberships = await sb(`team_members?user_id=eq.${userId}&select=team_id`) || [];
-    const teamIds = memberships.map(m => m.team_id);
+    const teamIds = await userTeamIds(userId);
     if (!teamIds.length) return res.json({ dishes: [], noTeam: true });
-    const rows = await sb(`lab_dishes?team_id=in.(${teamIds.join(",")})&visibility=in.(team,public)&order=updated_at.desc&limit=100&select=id,user_id,name,status,hero_url,data,visibility,updated_at`) || [];
+    const rows = await sb(`lab_dishes?team_id=in.(${teamIds.join(",")})&visibility=in.(team,public)&order=updated_at.desc&limit=100&select=id,user_id,name,status,hero_url,data,visibility,team_id,updated_at`) || [];
     const authors = await fetchAuthors(rows);
-    res.json({ dishes: rows.map(r => mapSharedDish(r, authors)), noTeam: false });
+    const teamRows = await sb(`teams?id=in.(${teamIds.join(",")})&select=id,name`) || [];
+    const teamNames = {};
+    teamRows.forEach(t => { teamNames[t.id] = t.name; });
+    res.json({ dishes: rows.map(r => ({ ...mapSharedDish(r, authors), teamName: teamNames[r.team_id] || null })), noTeam: false });
   } catch (err) {
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
@@ -935,7 +964,19 @@ app.put("/api/lab/dishes/:id", async (req, res) => {
     if (heroUrl !== undefined) patch.hero_url = heroUrl;
     if (data !== undefined) patch.data = data;
     if (visibility !== undefined && ["private","team","public"].includes(visibility)) patch.visibility = visibility;
-    if (teamId !== undefined) patch.team_id = teamId || null;
+    if (teamId !== undefined) {
+      if (teamId) {
+        const myTeams = await userTeamIds(userId);
+        if (!myTeams.includes(teamId)) return res.status(403).json({ error: "not_team_member" });
+      }
+      patch.team_id = teamId || null;
+    }
+    // Gratis-grænser håndhæves også her (klienten er kun høflighed)
+    if (patch.visibility === "team" || patch.visibility === "public") {
+      const shared = await sb(`lab_dishes?user_id=eq.${userId}&id=neq.${req.params.id}&visibility=in.(team,public)&select=id,visibility`) || [];
+      if (shared.length >= 3) return res.status(403).json({ error: "limit_team" });
+      if (patch.visibility === "public" && shared.filter(d => d.visibility === "public").length >= 2) return res.status(403).json({ error: "limit_public" });
+    }
     await sb(`lab_dishes?id=eq.${req.params.id}&user_id=eq.${userId}`, { method: "PATCH", body: JSON.stringify(patch) });
     res.json({ ok: true });
   } catch (err) { res.status(authErr(err.message) ? 401 : 500).json({ error: err.message }); }
