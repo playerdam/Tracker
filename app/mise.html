@@ -596,11 +596,6 @@
     <button class="log-drawer-close" id="logDrawerClose" aria-label="Luk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <div class="log-drawer-body">
-    <button class="va-drawer-link" id="vaDrawerLink">
-      <span class="va-drawer-link-icon">🍽️</span>
-      <span class="va-drawer-link-label" id="vaDrawerLinkLbl">Restaurantbesøg</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
     <button class="va-drawer-link" id="teamDrawerLink">
       <span class="va-drawer-link-icon">👥</span>
       <span class="va-drawer-link-label" id="teamTitle"></span>
@@ -624,96 +619,6 @@
   </div>
 </div>
 
-<div id="visitApp">
-  <div class="va-hdr">
-    <button class="va-back-btn" id="vaLeftBtn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      <span id="vaLeftLabel">Craft Tracker</span>
-    </button>
-    <span class="va-hdr-title" id="vaHdrTitle">Restaurantbesøg</span>
-    <button class="va-add-btn" id="vaRightBtn" aria-label="Nyt besøg" id="vaRightBtn">+</button>
-  </div>
-  <div class="va-pages">
-    <!-- Visit list -->
-    <div class="va-page" id="vaListPage"><div id="vaList"></div></div>
-    <!-- Single edit page: everything inline -->
-    <div class="va-page va-page-offscreen" id="vaEditPage">
-      <div class="va-cover-wrap" id="vaEditCover">
-        <div class="va-cover-placeholder" id="vaEditCoverPlaceholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span id="vaCoverPlaceholderLbl">Tilføj coverbillede</span></div>
-      </div>
-      <div class="va-edit-inner">
-        <input class="va-detail-name" id="vaEditName" placeholder="Restaurantens navn" maxlength="80" autocomplete="off">
-        <input type="date" class="va-detail-date" id="vaEditDate">
-        <div class="va-price-strip" id="vaEditPriceStrip">
-          <button class="va-price-btn" data-price="1">€</button>
-          <button class="va-price-btn" data-price="2">€€</button>
-          <button class="va-price-btn" data-price="3">€€€</button>
-          <button class="va-price-btn" data-price="4">€€€€</button>
-        </div>
-        <span class="va-sec-label" id="vaLblRating">Vurdering</span>
-        <div id="vaEditStars"></div>
-        <span class="va-sec-label" id="vaLblComment">Kommentar</span>
-        <textarea class="va-notes" id="vaEditComment" rows="3" placeholder="Helhedsindtryk, stemning, service..."></textarea>
-        <button class="va-ai-btn" id="vaAiBtn" type="button">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
-          <span id="vaAiBtnLbl">Opsummer besøg med AI</span>
-        </button>
-        <!-- Wines -->
-        <div class="va-divider"></div>
-        <span class="va-sec-label" id="vaLblWines">Vine</span>
-        <div id="vaWineList"></div>
-        <div class="va-inline-form" id="vaWineForm" style="display:none">
-          <button class="va-scan-btn" id="vaScanLabelBtn" type="button">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            <span id="vaScanLabelLbl">Scan etiket</span>
-          </button>
-          <input type="file" id="vaScanLabelInput" accept="image/*" style="display:none">
-          <div class="va-wine-type-strip" id="vaWineTypeStrip">
-            <button class="va-wine-type-btn" data-wtype="rod" id="vaWineTypeRod">🍷 Rød</button>
-            <button class="va-wine-type-btn" data-wtype="hvid" id="vaWineTypeHvid">🍋 Hvid</button>
-            <button class="va-wine-type-btn" data-wtype="rose" id="vaWineTypeRose">🌸 Rosé</button>
-            <button class="va-wine-type-btn" data-wtype="champagne" id="vaWineTypeChamp">🍾 Champagne</button>
-            <button class="va-wine-type-btn" data-wtype="mousserende" id="vaWineTypeMous">✨ Mousserende</button>
-          </div>
-          <input class="va-inline-input" id="vaWineFormName" placeholder="Navn / betegnelse" maxlength="80" autocomplete="off">
-          <input class="va-inline-input" id="vaWineFormProducer" placeholder="Producent (valgfrit)" maxlength="60" autocomplete="off">
-          <input class="va-inline-input" id="vaWineFormVintage" placeholder="Årgang" inputmode="numeric" maxlength="4">
-          <div id="vaWineFormStars" style="margin:4px 0 10px"></div>
-          <textarea class="va-inline-input va-inline-textarea" id="vaWineFormComment" placeholder="Smag, balance, aroma..."></textarea>
-          <button class="va-inline-add-btn" id="vaWineFormSave">Tilføj vin</button>
-        </div>
-        <button class="va-add-row" id="vaAddWineBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span id="vaAddWineBtnLbl">Tilføj vin</span></button>
-        <!-- Dishes -->
-        <div class="va-divider"></div>
-        <span class="va-sec-label" id="vaLblDishes">Retter</span>
-        <div id="vaDishList"></div>
-        <div class="va-inline-form" id="vaDishForm" style="display:none">
-          <input class="va-inline-input" id="vaDishFormName" placeholder="Rettens navn" maxlength="80" autocomplete="off">
-          <div id="vaDishFormStars" style="margin:4px 0 10px"></div>
-          <textarea class="va-inline-input va-inline-textarea" id="vaDishFormComment" placeholder="Smag, tilberedning, præsentation..."></textarea>
-          <button class="va-photo-upload-btn" id="vaDishPhotoBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span id="vaDishPhotoBtnLbl">Tilføj foto</span></button>
-          <img class="va-photo-preview" id="vaDishPhotoPreview" alt="">
-          <button class="va-inline-add-btn" id="vaDishFormSave">Tilføj ret</button>
-        </div>
-        <button class="va-add-row" id="vaAddDishBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span id="vaAddDishBtnLbl">Tilføj ret</span></button>
-        <!-- Actions -->
-        <div class="va-divider"></div>
-        <button class="va-inline-add-btn" id="vaGemBtn">Gem</button>
-      </div>
-    </div>
-  </div>
-  <!-- Gem bottom sheet (inside visitApp so it stays in dark theme) -->
-  <div id="vaGemScrim" style="position:absolute;inset:0;background:rgba(5,2,8,.7);display:none;align-items:flex-end">
-    <div id="vaGemSheet" style="background:#1A0D14;border-top:1px solid #2C1520;border-radius:20px 20px 0 0;width:100%;padding:0 16px max(28px,env(safe-area-inset-bottom,16px))">
-      <div style="width:32px;height:4px;background:#2C1520;border-radius:2px;margin:12px auto 20px"></div>
-      <button class="va-gem-opt va-gem-primary" id="vaGemSave">Gem besøg</button>
-      <button class="va-gem-opt va-gem-feed" id="vaGemFeed"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span id="vaGemFeedLbl">Gem og del til feed</span></button>
-      <button class="va-gem-opt va-gem-del" id="vaGemDelete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg><span id="vaGemDeleteLbl">Slet besøg</span></button>
-    </div>
-  </div>
-</div>
-<input type="file" id="vaCoverPhotoInput" accept="image/*" style="display:none">
-<input type="file" id="vaDishPhotoInput" accept="image/*" style="display:none">
 
 <nav class="bottom-nav" id="bottomNav" aria-label="Navigation">
   <div class="bnav-inner">

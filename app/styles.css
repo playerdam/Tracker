@@ -812,94 +812,16 @@
 
   /* ---- Restaurant visits (full-screen, exclusive dark) ---- */
   /* Palette: near-black bg, Craft Tracker red header, gold ratings, white text */
-  #visitApp{position:fixed;inset:0;background:#0C0710;color:#F0E8EC;z-index:300;transform:translateY(102%);transition:transform .38s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
-  #visitApp.open{transform:translateY(0)}
-  .va-hdr{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 14px;background:#8A2E3F;border-bottom:1px solid #7A2635;flex:none}
-  .va-back-btn{appearance:none;background:none;border:none;color:rgba(255,255,255,.9);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:6px 8px 6px 0;display:flex;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
-  .va-back-btn:active{opacity:.65;transition:opacity .06s}
-  .va-hdr-title{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:#FFFFFF;letter-spacing:-.01em}
-  .va-add-btn{appearance:none;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35);color:#FFFFFF;font-size:24px;font-weight:300;cursor:pointer;display:grid;place-items:center;line-height:1;-webkit-tap-highlight-color:transparent;transition:.12s}
-  .va-add-btn:active{transform:scale(.88);background:rgba(255,255,255,.28);transition:transform .07s}
-  .va-pages{flex:1;position:relative;overflow:hidden}
-  .va-page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(40px + env(safe-area-inset-bottom,0px));transition:transform .3s cubic-bezier(.4,0,.2,1)}
-  .va-page-offscreen{transform:translateX(105%)}
   #vaListPage{padding:20px 16px calc(40px + env(safe-area-inset-bottom,0px))}
-  .va-list{display:flex;flex-direction:column;gap:14px}
-  .va-card{background:#1A0D14;border:1px solid #2C1520;border-radius:16px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:opacity .12s}
-  .va-card:active{opacity:.78}
-  .va-card-img{width:100%;height:160px;object-fit:cover;display:block}
-  .va-card-no-img{width:100%;height:40px;background:#2C1520}
-  .va-card-body{padding:14px 16px 16px}
-  .va-card-name{font-family:"Fraunces",serif;font-size:19px;font-weight:600;color:#F0E8EC;line-height:1.2}
-  .va-card-meta{display:flex;align-items:center;gap:10px;margin-top:5px}
-  .va-card-date{font-size:12px;color:#8A6070}
-  .va-card-comment{font-size:13px;color:#7A5060;margin-top:7px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-  .va-card-chips{font-size:11px;color:#8A6070;margin-top:5px}
-  .va-empty{padding:80px 20px;text-align:center}
-  .va-empty-icon{font-size:52px;margin-bottom:14px}
-  .va-empty-title{font-family:"Fraunces",serif;font-size:22px;font-weight:600;color:#F0E8EC;margin-bottom:8px}
-  .va-empty-sub{font-size:14px;color:#7A5060;line-height:1.6}
   /* Half-star widget */
-  .va-stars{display:flex;gap:1px;align-items:center}
-  .va-star{appearance:none;border:none;font-size:28px;line-height:1;cursor:pointer;padding:3px 2px;-webkit-tap-highlight-color:transparent;background:none;position:relative}
-  .va-star[data-fill="full"]{color:#C9A465}
-  .va-star[data-fill="half"]{color:#2C1520}
-  .va-star[data-fill="empty"]{color:#2C1520}
-  .va-star:active{transform:scale(1.2);transition:transform .07s}
   /* Cover */
-  .va-cover-wrap{margin:0;cursor:pointer;background:#1A0D14;position:relative;flex:none}
-  .va-cover-img{width:100%;max-height:260px;object-fit:cover;display:block}
-  .va-cover-placeholder{width:100%;height:90px;display:flex;align-items:center;justify-content:center;gap:8px;color:#5C3548;font-size:12px;font-weight:600}
   /* Edit page */
-  .va-edit-inner{padding:0 16px calc(60px + env(safe-area-inset-bottom,0px))}
-  .va-detail-name{font-family:"Fraunces",serif;font-size:26px;font-weight:600;color:#F0E8EC;border:none;background:none;width:100%;outline:none;padding:0;margin:18px 0 6px;caret-color:#C9A465}
-  .va-detail-date{border:none;background:none;color:#8A6070;font-family:inherit;font-size:13px;padding:0;cursor:pointer;outline:none;-webkit-appearance:none;color-scheme:dark}
-  .va-sec-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5C3548;margin-bottom:8px;margin-top:24px;display:block}
-  .va-notes{width:100%;background:#1A0D14;border:1px solid #2C1520;border-radius:10px;color:#F0E8EC;font-family:inherit;font-size:14px;padding:12px;resize:none;min-height:76px;transition:.12s;caret-color:#C9A465;line-height:1.55}
-  .va-notes:focus{outline:none;border-color:rgba(255,255,255,.3);box-shadow:0 0 0 3px rgba(138,46,63,.2)}
   /* Price strip */
-  .va-price-strip{display:flex;gap:6px;margin-top:10px}
-  .va-price-btn{flex:1;padding:9px 2px;background:#1A0D14;border:1.5px solid #2C1520;border-radius:9px;color:#8A6070;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:.12s;-webkit-tap-highlight-color:transparent}
-  .va-price-btn:active{opacity:.7}
-  .va-price-btn.on{background:#8A2E3F;border-color:#8A2E3F;color:#FFFFFF}
   /* Inline forms */
-  .va-inline-form{background:#1A0D14;border:1px solid #2C1520;border-radius:14px;padding:16px;margin-bottom:10px}
-  .va-inline-input{width:100%;background:#0C0710;border:1px solid #2C1520;border-radius:9px;color:#F0E8EC;font-family:inherit;font-size:14px;padding:11px 13px;margin-bottom:8px;caret-color:#C9A465;-webkit-appearance:none;color-scheme:dark}
-  .va-inline-input:focus{outline:none;border-color:rgba(255,255,255,.3);box-shadow:0 0 0 2px rgba(138,46,63,.18)}
-  .va-inline-textarea{resize:none;min-height:68px;line-height:1.5}
-  .va-inline-add-btn{appearance:none;width:100%;padding:12px;background:#8A2E3F;border:none;border-radius:10px;color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;-webkit-tap-highlight-color:transparent}
-  .va-inline-add-btn:active{opacity:.8}
-  .va-wine-type-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
-  .va-wine-type-strip::-webkit-scrollbar{display:none}
-  .va-wine-type-btn{flex-shrink:0;padding:8px 13px;background:#0C0710;border:1.5px solid #2C1520;border-radius:20px;color:#8A6070;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.12s;-webkit-tap-highlight-color:transparent}
-  .va-wine-type-btn.on{background:#8A2E3F;border-color:#8A2E3F;color:#FFFFFF}
   /* Item cards */
-  .va-item-card{background:#1A0D14;border:1px solid #2C1520;border-radius:12px;overflow:hidden;position:relative;margin-bottom:10px}
-  .va-item-card-img{width:100%;height:110px;object-fit:cover;display:block}
-  .va-item-card-body{padding:11px 36px 11px 13px}
-  .va-item-name{font-size:15px;font-weight:600;color:#F0E8EC}
-  .va-item-meta{font-size:12px;color:#8A6070;margin-top:2px}
-  .va-item-comment{font-size:12px;color:#7A5060;margin-top:4px;line-height:1.4}
-  .va-item-del{position:absolute;top:10px;right:10px;appearance:none;background:rgba(0,0,0,.45);border:none;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:none}
-  .va-add-row{appearance:none;background:none;border:1.5px dashed #2C1520;border-radius:12px;width:100%;padding:13px;color:#C9A465;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;-webkit-tap-highlight-color:transparent;margin-bottom:8px}
-  .va-add-row:active{opacity:.7}
   /* Photo */
-  .va-photo-upload-btn{appearance:none;width:100%;padding:12px;background:#0C0710;border:1.5px dashed #2C1520;border-radius:9px;color:#8A6070;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:8px;-webkit-tap-highlight-color:transparent}
-  .va-photo-upload-btn:active{opacity:.7}
-  .va-photo-preview{width:100%;border-radius:9px;max-height:180px;object-fit:cover;display:none;margin-bottom:8px;cursor:pointer}
   /* Divider */
-  .va-divider{height:1px;background:#1E0F18;margin:22px 0}
   /* Gem sheet */
-  .va-gem-opt{appearance:none;width:100%;padding:15px;background:none;border:none;border-radius:13px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;margin-bottom:8px}
-  .va-gem-opt:active{opacity:.75}
-  .va-gem-primary{background:#8A2E3F;color:#FFFFFF}
-  .va-gem-feed{border:1.5px solid #2C1520;color:#C9A465}
-  .va-gem-del{color:#C05060}
-  .va-ai-btn{appearance:none;background:none;border:1.5px solid #2C1520;border-radius:10px;width:100%;padding:11px;color:#C9A465;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;-webkit-tap-highlight-color:transparent;transition:.1s}
-  .va-ai-btn:active{background:#2C1520}
-  .va-scan-btn{appearance:none;background:#1A0D14;border:1.5px dashed #3D1E2C;border-radius:10px;width:100%;padding:12px;color:#C9A465;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:12px;-webkit-tap-highlight-color:transparent;transition:.1s}
-  .va-scan-btn:active{background:#2C1520}
-  .va-scan-btn.loading{opacity:.5;pointer-events:none}
   /* Modal fields (light-theme modals only) */
   .modal-field-label{font-size:12px;font-weight:600;color:var(--dim);letter-spacing:.04em;margin-bottom:5px;margin-top:16px;display:block}
   .modal-field-label:first-child{margin-top:0}

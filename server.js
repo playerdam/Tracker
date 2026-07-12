@@ -1137,26 +1137,5 @@ app.post("/api/lab/dishes/description", async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post("/api/visits/summary", async (req, res) => {
-  try {
-    await verifyAuth(req);
-    const { name, dishes = [], wines = [], rating = 0, lang = "da" } = req.body || {};
-    const isDa = lang === "da";
-    const dishList = dishes.map(d => `${d.name}${d.rating ? " ("+d.rating+"★)" : ""}${d.comment ? ": "+d.comment : ""}`).join("; ");
-    const wineList = wines.map(w => `${w.name||""}${w.type ? " ("+w.type+")" : ""}${w.comment ? ": "+w.comment : ""}`).join("; ");
-    const ctx = isDa
-      ? `Restaurant: ${name||"?"}\nVurdering: ${rating ? rating+"★" : "–"}\nRetter: ${dishList||"–"}\nVine: ${wineList||"–"}`
-      : `Restaurant: ${name||"?"}\nRating: ${rating ? rating+"★" : "–"}\nDishes: ${dishList||"–"}\nWines: ${wineList||"–"}`;
-    const system = isDa
-      ? "Du er en præcis kulinarisk skribent. Skriv 1-2 sætninger (max 200 tegn) der fanger essensen af restaurantbesøget — hvad der stod ud, stemningen, det vigtigste take-away. Ingen hashtags. Ingen emoji. Ingen overskrift."
-      : "You are a concise culinary writer. Write 1-2 sentences (max 200 chars) capturing the essence of the restaurant visit — what stood out, the atmosphere, the key take-away. No hashtags. No emoji. No heading.";
-    const prompt = isDa
-      ? `Besøgsoplysninger:\n${ctx}\n\nSkriv en kort opsummering.`
-      : `Visit details:\n${ctx}\n\nWrite a brief summary.`;
-    const summary = await callClaude({ model: "claude-haiku-4-5-20251001", maxTokens: 100, system, content: prompt });
-    res.json({ summary: summary.trim() });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Craft Tracker backend kører på port " + PORT));
