@@ -404,6 +404,27 @@ app.delete("/api/teams/:id/leave", async (req, res) => {
 });
 
 // ---- Parse fritekst ----
+// ---- Oversæt tæller-navn (da<->en) ----
+app.post("/api/translate-label", async (req, res) => {
+  try {
+    await verifyAuth(req);
+    const { label } = req.body || {};
+    if (!label || typeof label !== "string" || label.length > 80)
+      return res.status(400).json({ error: "invalid" });
+    const out = await callClaude({
+      model: PARSE_MODEL,
+      maxTokens: 200,
+      system: "Du oversætter korte restaurant-tæller-navne mellem dansk og engelsk. Svar KUN med gyldig JSON, ingen markdown.",
+      content: 'Navn: "' + label + '"\nReturnér {"da":"<navnet på dansk>","en":"<the name in English>"}. Behold navnets form (fx datid/flertal). Er navnet allerede på det ene sprog, oversæt kun til det andet.',
+    });
+    const p = extractJSON(out);
+    if (!p || !p.da || !p.en) throw new Error("empty");
+    res.json({ da: String(p.da).slice(0, 80), en: String(p.en).slice(0, 80) });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
 // ---- State backup (taellere, vine, vagter - hele klient-staten) ----
 app.get("/api/state", async (req, res) => {
   try {
@@ -442,7 +463,7 @@ app.post("/api/parse-log", async (req, res) => {
       'Eksisterende vine: ' + JSON.stringify(wines) + '\n' +
       'Brugerens tekst: "' + text + '"\n\n' +
       'Returnér {"actions":[...]}. Hver handling er én af:\n' +
-      '{"kind":"counter","counter":"<tæller-navn>","sub":"<underkategori eller tom streng>","delta":<heltal>,"cat":"<kategori-id>"}\n' +
+      '{"kind":"counter","counter":"<tæller-navn>","counter_da":"<navnet på dansk>","counter_en":"<the name in English>","sub":"<underkategori eller tom streng>","delta":<heltal>,"cat":"<kategori-id>"}\n' +
       '{"kind":"wine","wine":"<vinnavn>","measure":"glasses"|"bottles","delta":<heltal>,"producer":"","country":"","region":"","grape":""}\n\n' +
       'Feltet "cat" SKAL være præcis ét af disse id\'er: "aabnet-mad" (åbnet mad/råvarer: østers, dåser, konserves), "aabnet-drikke" (åbnet drikkevarer: vin, øl, flasker, champagne), "snittet" (snittet/skåret/hakket råvarer), "tilberedt" (lavet/tilberedt mad & drikke: retter, pizzaer, kaffe, cocktails, saucer), "serveret" (serveret/leveret til gæster: couverter, retter, borde), "andet" (alt der ikke passer). Vælg ud fra hvad brugeren GJORDE ved objektet.\n' +
       'VIGTIGT: Nævner brugeren en bestemt type/sort/variant af det der tælles, SKAL den i feltet "sub". Brug stavemåden fra "muligeTyper" hvis typen står der.\n' +

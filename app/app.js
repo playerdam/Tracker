@@ -607,6 +607,25 @@
   const _LBL_DA2EN={},_LBL_EN2DA={};
   CATALOG.forEach(p=>{_LBL_DA2EN[p.da.toLowerCase()]=p.en;_LBL_EN2DA[p.en.toLowerCase()]=p.da;});
   Object.keys(LABEL_TRANSLATIONS).forEach(da=>{const en=LABEL_TRANSLATIONS[da].en;if(en){_LBL_DA2EN[da.toLowerCase()]=en;_LBL_EN2DA[en.toLowerCase()]=da;}});
+  function registerLabelPair(da,en){
+    if(!da||!en||da.toLowerCase()===en.toLowerCase())return;
+    _LBL_DA2EN[da.toLowerCase()]=en;_LBL_EN2DA[en.toLowerCase()]=da;
+    if(!state.labelI18n)state.labelI18n={};
+    state.labelI18n[da]=en;
+  }
+  // Nye bruger-navngivne tællere får den anden sprogversion genereret af AI i baggrunden
+  async function requestLabelTranslation(label){
+    if(!label)return;
+    const k=label.toLowerCase();
+    if(_LBL_DA2EN[k]||_LBL_EN2DA[k])return;
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    try{
+      const r=await fetch(base+"/api/translate-label",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({label})});
+      if(!r.ok)return;
+      const d=await r.json();
+      if(d&&d.da&&d.en){registerLabelPair(d.da,d.en);save();}
+    }catch(e){}
+  }
 
   const OYSTER_TYPES=["Gillardeau","Fine de Claire","Spéciale de Claire","Marennes-Oléron","Belon","Tsarskaya","Limfjordsøsters","Kumamoto","Blue Point","Utah Beach","Pied de Cheval"];
   const LANDE=["Frankrig","Italien","Spanien","Tyskland","Portugal","Østrig","USA","Argentina","Chile","Australien","New Zealand","Sydafrika","Danmark","Ungarn","Grækenland","Libanon","Georgien"];
@@ -620,7 +639,7 @@
   function clone(o){return JSON.parse(JSON.stringify(o));}
   function seedFor(label){const l=(label||"").toLowerCase();if(/østers|oyster/.test(l))return OYSTER_TYPES.slice();if(/løg/.test(l))return LOEG_TYPER.slice();if(/vin|flaske/.test(l))return VIN_TYPER.slice();return [];}
 
-  const DEFAULTS={counters:[],wines:[],log:[],shiftHistory:[]};
+  const DEFAULTS={counters:[],wines:[],log:[],shiftHistory:[],labelI18n:{}};
 
   let state={counters:[],wines:[],log:[],customCats:[]},mem=null,wineFilter="";
   let listView=localStorage.getItem("mise_listview")==="1";
@@ -819,6 +838,8 @@
     s.log=Array.isArray(s.log)?s.log.filter(e=>e&&e.ts&&e.text):[];
     s.customCats=Array.isArray(s.customCats)?s.customCats.map(c=>({id:c.id||id(),name:c.name||"",icon:c.icon||"",iconPending:!!c.iconPending})):[];
     s.shiftHistory=Array.isArray(s.shiftHistory)?s.shiftHistory:[];
+    s.labelI18n=(s.labelI18n&&typeof s.labelI18n==="object"&&!Array.isArray(s.labelI18n))?s.labelI18n:{};
+    Object.keys(s.labelI18n).forEach(da=>{const en=s.labelI18n[da];if(en){_LBL_DA2EN[da.toLowerCase()]=en;_LBL_EN2DA[en.toLowerCase()]=da;}});
     return s;
   }
   function counterTotal(c){return c.subs.length?c.subs.reduce((a,b)=>a+b.count,0):c.count;}
@@ -1721,7 +1742,7 @@
     const cat=$("#counterCat").value||"andet";
     const unit=document.querySelector(".unit-seg-btn.active")?.dataset.unit||"stk";
     if(editC){const c=state.counters.find(x=>x.id===editC);if(c){c.label=v;c.cat=cat;c.unit=unit;}}
-    else state.counters.push({id:id(),label:v,count:0,unit,subs:[],suggest:seedFor(v),cat});
+    else {state.counters.push({id:id(),label:v,count:0,unit,subs:[],suggest:seedFor(v),cat});requestLabelTranslation(v);}
     save();renderCounters();closeCounterModal();
   });
   $("#counterDelete").addEventListener("click",()=>{state.counters=state.counters.filter(x=>x.id!==editC);save();renderCounters();renderCareer();closeCounterModal();});
@@ -2495,7 +2516,12 @@
     try{const res=await fetch(base+"/api/parse-log",{signal:_ctrl.signal,method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,counters,wines,lang})});clearTimeout(_to);if(!res.ok)throw new Error("Backend "+res.status);const data=await res.json();return Array.isArray(data.actions)?data.actions:[];}
     catch(e){clearTimeout(_to);throw e;}
   }
-  function findCounter(name){const n=(name||"").toLowerCase();return state.counters.find(c=>c.label.toLowerCase()===n)||state.counters.find(c=>c.label.toLowerCase().includes(n)||n.includes(c.label.toLowerCase()));}
+  function findCounter(name){
+    const n=(name||"").toLowerCase();if(!n)return null;
+    const forms=c=>{const l=c.label.toLowerCase();return [l,(_LBL_DA2EN[l]||"").toLowerCase(),(_LBL_EN2DA[l]||"").toLowerCase()].filter(Boolean);};
+    return state.counters.find(c=>forms(c).some(f=>f===n))
+      ||state.counters.find(c=>forms(c).some(f=>f.includes(n)||n.includes(f)));
+  }
   function addToSub(c,subName,delta,summary){
     const canon=(c.suggest||[]).find(x=>x.toLowerCase()===subName.toLowerCase())||subName;
     let s=c.subs.find(x=>x.name.toLowerCase()===canon.toLowerCase());
@@ -2512,7 +2538,12 @@
     if(a.kind==="counter"){
       const delta=parseInt(a.delta,10)||0;if(delta===0)return;
       let c=findCounter(a.counter);
-      if(!c){c={id:id(),label:a.counter||"Ny tæller",count:0,unit:"stk",cat:_guessCat(a),subs:[],suggest:seedFor(a.counter)};state.counters.push(c);}
+      if(!c){
+        let nm=a.counter||"Ny tæller";
+        if(a.counter_da&&a.counter_en){nm=lang==="en"?a.counter_en:a.counter_da;registerLabelPair(a.counter_da,a.counter_en);}
+        c={id:id(),label:nm,count:0,unit:"stk",cat:_guessCat(a),subs:[],suggest:seedFor(nm)};state.counters.push(c);
+        if(!(a.counter_da&&a.counter_en))requestLabelTranslation(nm);
+      }
       const subName=(a.sub||"").trim();
       if(subName){addToSub(c,subName,delta,summary);}
       else if(c.subs.length){let s=c.subs.find(x=>x.name==="Uden type");if(!s){s={id:id(),name:"Uden type",count:0};c.subs.push(s);}s.count=Math.max(0,s.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
@@ -2641,7 +2672,7 @@
       const name=(nameInput.value||"").trim()||detectedName;
       const mode=document.querySelector('input[name="askmode"]:checked').value;
       if(mode==="sub"){const parent=state.counters.find(c=>c.id===sel.value);if(parent)addToSub(parent,name,delta,summary);}
-      else{const c={id:id(),label:name,count:0,subs:[],suggest:seedFor(name)};state.counters.push(c);const subName=(item.sub||"").trim();if(subName)addToSub(c,subName,delta,summary);else{c.count=Math.max(0,delta);summary.push((delta>0?"+":"")+delta+" "+c.label);if(syncItems)syncItems.push({categoryLabel:name,delta});}}
+      else{const c={id:id(),label:name,count:0,subs:[],suggest:seedFor(name)};state.counters.push(c);requestLabelTranslation(name);const subName=(item.sub||"").trim();if(subName)addToSub(c,subName,delta,summary);else{c.count=Math.max(0,delta);summary.push((delta>0?"+":"")+delta+" "+c.label);if(syncItems)syncItems.push({categoryLabel:name,delta});}}
       save();renderCounters();renderWines();renderCareer();scrim._askSkip=null;scrim.classList.remove("open");next();
     };
     $("#askSkip").onclick=()=>{if(scrim._askSkip)scrim._askSkip();};
