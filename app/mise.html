@@ -347,17 +347,32 @@
   <div class="modal shift-modal">
     <h2 id="shiftModalTitle"></h2>
     <div class="shift-duration" id="shiftDuration"></div>
-    <div class="shift-totals" id="shiftTotals"></div>
-    <textarea id="shiftCaption" class="shift-caption" maxlength="220"></textarea>
-    <div class="field" style="margin-bottom:14px">
-      <img id="shiftPhotoThumb" class="photo-thumb" alt="" style="width:56px;height:56px">
-      <button class="btn ghost btn-sm" id="shiftPhotoBtn"></button>
-      <input id="shiftPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
+    <div id="shiftStep1">
+      <p class="shift-log-hint" id="shiftLogHint"></p>
+      <div class="vagt-add-row">
+        <input class="vagt-add-in" id="shiftLogIn" maxlength="200" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="vagt-ai-spin" id="shiftLogSpin"></div>
+        <button class="vagt-add-btn" id="shiftLogAdd" aria-label="Log"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+      <div class="shift-totals" id="shiftStep1Totals" style="max-height:32vh;overflow-y:auto"></div>
+      <div class="mactions">
+        <button class="btn primary btn-sm" id="shiftStep1Next"></button>
+        <button class="btn ghost btn-sm" id="shiftStep1Cancel" style="color:var(--faint)"></button>
+      </div>
     </div>
-    <div class="mactions">
-      <button class="btn primary btn-sm" id="shiftPost"></button>
-      <button class="btn ghost btn-sm" id="shiftFeedPost" style="border-color:var(--accent);color:var(--accent)"></button>
-      <button class="btn ghost btn-sm" id="shiftDiscard" style="color:var(--faint)"></button>
+    <div id="shiftStep2">
+      <div class="shift-totals" id="shiftTotals"></div>
+      <textarea id="shiftCaption" class="shift-caption" maxlength="220"></textarea>
+      <div class="field" style="margin-bottom:14px">
+        <img id="shiftPhotoThumb" class="photo-thumb" alt="" style="width:56px;height:56px">
+        <button class="btn ghost btn-sm" id="shiftPhotoBtn"></button>
+        <input id="shiftPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
+      </div>
+      <div class="mactions">
+        <button class="btn primary btn-sm" id="shiftPost"></button>
+        <button class="btn ghost btn-sm" id="shiftFeedPost" style="border-color:var(--accent);color:var(--accent)"></button>
+        <button class="btn ghost btn-sm" id="shiftDiscard" style="color:var(--faint)"></button>
+      </div>
     </div>
   </div>
 </div>

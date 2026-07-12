@@ -3363,10 +3363,7 @@
     finally{if(btn)btn.disabled=false;if(lbl)lbl.textContent=t("va_ai_btn");}
   }
 
-  function openShiftModal(){
-    const shift=getShift();if(!shift)return;
-    const durationMs=Date.now()-new Date(shift.startedAt).getTime();
-    // calc deltas vs snapshot
+  function _shiftChanges(shift){
     const snapMap={};(shift.snap||[]).forEach(c=>{snapMap[c.id]={count:c.count,subs:{}};(c.subs||[]).forEach(s=>{snapMap[c.id].subs[s.id]=s.count;});});
     const changes=[];
     state.counters.forEach(c=>{
@@ -3377,16 +3374,62 @@
         const diff=c.count-(snap.count||0);if(diff>0)changes.push({label:tLabel(c.label),delta:diff});
       }
     });
-    const totalsEl=$("#shiftTotals");
-    totalsEl.innerHTML=changes.length
-      ?changes.map(c=>'<div class="shift-total-row"><span class="shift-total-lbl">'+esc(c.label)+'</span><span class="shift-total-val">+'+c.delta+'</span></div>').join("")
+    return changes;
+  }
+  function _shiftTotalsHtml(changes){
+    return changes.length
+      ?changes.map(c=>'<div class="shift-total-row"><span class="shift-total-lbl">'+esc(c.label)+'</span><span class="shift-total-val">+'+fmtCount(c.delta)+'</span></div>').join("")
       :'<p class="muted">'+esc(t("shift_no_data"))+'</p>';
+  }
+  function _renderShiftStep1Totals(){
+    const shift=getShift();if(!shift)return;
+    const el=$("#shiftStep1Totals");if(el)el.innerHTML=_shiftTotalsHtml(_shiftChanges(shift));
+  }
+  // Trin 1: log hvad du lavede, før opsummeringen
+  function openShiftModal(){
+    const shift=getShift();if(!shift)return;
+    const durationMs=Date.now()-new Date(shift.startedAt).getTime();
     const durEl=$("#shiftDuration");if(durEl)durEl.textContent=t("shift_duration",fmtDuration(durationMs));
+    const titleEl=$("#shiftModalTitle");if(titleEl)titleEl.textContent=lang==="da"?"Hvad nåede du?":"What did you get done?";
+    const hint=$("#shiftLogHint");if(hint)hint.textContent=lang==="da"?"Skriv hvad du lavede på vagten — tallene opdateres med det samme. Spring over hvis alt allerede er talt.":"Write what you did during the shift — the numbers update instantly. Skip if everything is already counted.";
+    const inp=$("#shiftLogIn");if(inp){inp.value="";inp.placeholder=lang==="da"?"Fx: åbnede 30 østers og lavede 12 kaffe":"E.g.: opened 30 oysters and made 12 coffees";}
+    const nxt=$("#shiftStep1Next");if(nxt)nxt.textContent=lang==="da"?"Videre til opsummering":"Continue to summary";
+    const cnc=$("#shiftStep1Cancel");if(cnc)cnc.textContent=lang==="da"?"Tilbage til vagten":"Back to shift";
+    const s1=$("#shiftStep1"),s2=$("#shiftStep2");
+    if(s1)s1.style.display="";if(s2)s2.style.display="none";
+    _renderShiftStep1Totals();
+    $("#shiftScrim").classList.add("open");
+    if(inp)setTimeout(()=>inp.focus(),250);
+  }
+  async function runShiftLogAdd(text){
+    text=(text||"").trim();if(!text)return;
+    const inp=$("#shiftLogIn"),spin=$("#shiftLogSpin"),btn=$("#shiftLogAdd");
+    if(spin)spin.classList.add("on");if(btn)btn.disabled=true;if(inp)inp.disabled=true;
+    let actions=[];
+    try{actions=await parseLog(text);}catch(e){console.warn("shift log parse failed:",e);}
+    if(!actions.length)actions=localParse(text);
+    if(spin)spin.classList.remove("on");if(btn)btn.disabled=false;if(inp)inp.disabled=false;
+    if(!actions.length){showToast(lang==="da"?"Forstod ikke — prøv igen":"Couldn\u2019t parse — try again");if(inp)inp.focus();return;}
+    undoSnapshot=clone(state);
+    const summary=[],syncItems=[];
+    actions.forEach(a=>applyOne(a,summary,syncItems));
+    if(inp)inp.value="";
+    save();renderVagt();renderCounters();renderCareer();
+    if(summary.length){addLogEntry(summary.join(" · "),null);haptic(40);deferSync(syncItems,null,summary.join(" · "));}
+    checkBadges();checkRecords();
+    _renderShiftStep1Totals();
+    if(inp)inp.focus();
+  }
+  // Trin 2: opsummering + post
+  function _showShiftSummaryStep(){
+    const shift=getShift();if(!shift)return;
+    const s1=$("#shiftStep1"),s2=$("#shiftStep2");
+    if(s1)s1.style.display="none";if(s2)s2.style.display="";
     const titleEl=$("#shiftModalTitle");if(titleEl)titleEl.textContent=t("shift_title");
+    const totalsEl=$("#shiftTotals");if(totalsEl)totalsEl.innerHTML=_shiftTotalsHtml(_shiftChanges(shift));
     const capEl=$("#shiftCaption");if(capEl)capEl.value="";
     shiftPhotoDataUrl=null;
     const thumb=$("#shiftPhotoThumb");if(thumb){thumb.src="";thumb.style.display="none";}
-    $("#shiftScrim").classList.add("open");
     generateShiftSummary();
   }
 
@@ -3476,6 +3519,11 @@
       recordShiftEnd(getShift());saveShift(null);renderShiftBar();renderVagt();$("#shiftScrim").classList.remove("open");showToast(lang==="da"?"Vagt afsluttet":"Shift ended");setTimeout(()=>requestNotifPermission(),1500);
     });
     const feedPostBtn=$("#shiftFeedPost");if(feedPostBtn)feedPostBtn.addEventListener("click",postShift);
+    const slAdd=$("#shiftLogAdd"),slIn=$("#shiftLogIn");
+    if(slAdd&&slIn)slAdd.addEventListener("click",()=>runShiftLogAdd(slIn.value));
+    if(slIn)slIn.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runShiftLogAdd(slIn.value);}});
+    const slNext=$("#shiftStep1Next");if(slNext)slNext.addEventListener("click",_showShiftSummaryStep);
+    const slCancel=$("#shiftStep1Cancel");if(slCancel)slCancel.addEventListener("click",()=>$("#shiftScrim").classList.remove("open"));
     const discardBtn=$("#shiftDiscard");
     if(discardBtn)discardBtn.addEventListener("click",()=>{saveShift(null);renderShiftBar();renderVagt();$("#shiftScrim").classList.remove("open");});
     // shift photo picker
