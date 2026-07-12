@@ -425,6 +425,75 @@ app.post("/api/translate-label", async (req, res) => {
   }
 });
 
+// ---- The Lab: delte retter ----
+function mapSharedDish(r, authors) {
+  const a = authors[r.user_id] || {};
+  return {
+    id: r.id, name: r.name, status: r.status, heroUrl: r.hero_url,
+    data: typeof r.data === "string" ? JSON.parse(r.data) : (r.data || {}),
+    visibility: r.visibility, updatedAt: r.updated_at, ownerId: r.user_id,
+    author: a.nickname || a.username || "Ukendt",
+  };
+}
+async function fetchAuthors(rows) {
+  const ids = [...new Set(rows.map(r => r.user_id))];
+  if (!ids.length) return {};
+  const users = await sb(`users?id=in.(${ids.join(",")})&select=id,nickname,username`) || [];
+  const map = {};
+  users.forEach(u => { map[u.id] = u; });
+  return map;
+}
+
+// Køkkenet: delte retter fra mine hold
+app.get("/api/lab/kitchen", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const memberships = await sb(`team_members?user_id=eq.${userId}&select=team_id`) || [];
+    const teamIds = memberships.map(m => m.team_id);
+    if (!teamIds.length) return res.json({ dishes: [], noTeam: true });
+    const rows = await sb(`lab_dishes?team_id=in.(${teamIds.join(",")})&visibility=in.(team,public)&order=updated_at.desc&limit=100&select=id,user_id,name,status,hero_url,data,visibility,updated_at`) || [];
+    const authors = await fetchAuthors(rows);
+    res.json({ dishes: rows.map(r => mapSharedDish(r, authors)), noTeam: false });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// Kogebøger: offentlige retter fra folk jeg følger (+ mine egne)
+app.get("/api/lab/cookbooks", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const follows = await sb(`follows?follower_id=eq.${userId}&select=following_id`) || [];
+    const ids = [...new Set([userId, ...follows.map(f => f.following_id)])];
+    const rows = await sb(`lab_dishes?user_id=in.(${ids.join(",")})&visibility=eq.public&order=updated_at.desc&limit=200&select=id,user_id,name,status,hero_url,data,visibility,updated_at`) || [];
+    const authors = await fetchAuthors(rows);
+    res.json({ dishes: rows.map(r => mapSharedDish(r, authors)) });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// AI-opsummering af service-noter
+app.post("/api/lab/notes-summary", async (req, res) => {
+  try {
+    await verifyAuth(req);
+    const { name, notes = [], lang = "da" } = req.body || {};
+    if (!Array.isArray(notes) || !notes.length) return res.status(400).json({ error: "no notes" });
+    const noteText = notes.slice(-30).map(n => "- " + new Date(n.ts).toLocaleDateString("da-DK") + ": " + String(n.text).slice(0, 300)).join("\n");
+    const out = await callClaude({
+      model: PARSE_MODEL,
+      maxTokens: 400,
+      system: "Du er souschef og opsummerer service-noter for en ret. Svar KUN med gyldig JSON, ingen markdown.",
+      content: 'Ret: "' + (name || "") + '"\nService-noter fra vagterne:\n' + noteText + '\n\nReturnér {"summary":"<3-5 sætninger på ' + (lang === "en" ? "engelsk" : "dansk") + ': hvad fungerer, hvad driller, og den vigtigste konkrete justering>"}',
+    });
+    const p = extractJSON(out);
+    if (!p || !p.summary) throw new Error("empty");
+    res.json({ summary: String(p.summary).slice(0, 800) });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
 // ---- State backup (taellere, vine, vagter - hele klient-staten) ----
 app.get("/api/state", async (req, res) => {
   try {
@@ -833,10 +902,11 @@ app.delete("/api/lab/entry/:id", async (req, res) => {
 app.get("/api/lab/dishes", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
-    const rows = await sb(`lab_dishes?user_id=eq.${userId}&order=updated_at.desc&limit=100&select=id,name,status,hero_url,data,created_at,updated_at`) || [];
+    const rows = await sb(`lab_dishes?user_id=eq.${userId}&order=updated_at.desc&limit=100&select=id,name,status,hero_url,data,visibility,team_id,created_at,updated_at`) || [];
     res.json({ dishes: rows.map(r => ({
       id: r.id, name: r.name, status: r.status, heroUrl: r.hero_url,
       data: typeof r.data === "string" ? JSON.parse(r.data) : (r.data || {}),
+      visibility: r.visibility || "private", teamId: r.team_id || null,
       createdAt: r.created_at, updatedAt: r.updated_at,
     })) });
   } catch (err) { res.status(authErr(err.message) ? 401 : 500).json({ error: err.message }); }
@@ -859,11 +929,13 @@ app.put("/api/lab/dishes/:id", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
     const patch = { updated_at: new Date().toISOString() };
-    const { name, status, heroUrl, data } = req.body || {};
+    const { name, status, heroUrl, data, visibility, teamId } = req.body || {};
     if (name !== undefined) patch.name = name;
     if (status !== undefined) patch.status = status;
     if (heroUrl !== undefined) patch.hero_url = heroUrl;
     if (data !== undefined) patch.data = data;
+    if (visibility !== undefined && ["private","team","public"].includes(visibility)) patch.visibility = visibility;
+    if (teamId !== undefined) patch.team_id = teamId || null;
     await sb(`lab_dishes?id=eq.${req.params.id}&user_id=eq.${userId}`, { method: "PATCH", body: JSON.stringify(patch) });
     res.json({ ok: true });
   } catch (err) { res.status(authErr(err.message) ? 401 : 500).json({ error: err.message }); }

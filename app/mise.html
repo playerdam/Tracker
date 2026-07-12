@@ -175,6 +175,11 @@
         <span id="labNewBtnLbl">Ny ret</span>
       </button>
     </div>
+    <div class="lab-seg" id="labSeg">
+      <button class="lab-seg-btn active" data-seg="mine" id="labSegMine">Mine retter</button>
+      <button class="lab-seg-btn" data-seg="kitchen" id="labSegKitchen">Køkkenet</button>
+      <button class="lab-seg-btn" data-seg="books" id="labSegBooks">Kogebøger</button>
+    </div>
     <div class="lab-filter-row" id="labFilterRow">
       <button class="lab-filter-chip active" data-filter="all" id="labFilterAll">Alle</button>
       <button class="lab-filter-chip" data-filter="idea" id="labFilterIdea">Idé</button>
@@ -204,6 +209,12 @@
     <button class="de-status-chip" data-status="testing" id="dsChipTesting">Test</button>
     <button class="de-status-chip" data-status="ready" id="dsChipReady">Klar</button>
     <button class="de-status-chip" data-status="menu" id="dsChipMenu">På menu</button>
+  </div>
+  <div class="de-vis-bar" id="deVisBar">
+    <span class="de-vis-lbl" id="deVisLbl">Deling</span>
+    <button class="de-vis-chip active" data-vis="private" id="dvChipPrivate">🔒 <span>Privat</span></button>
+    <button class="de-vis-chip" data-vis="team" id="dvChipTeam">👥 <span>Holdet</span></button>
+    <button class="de-vis-chip" data-vis="public" id="dvChipPublic">🌍 <span>Offentlig</span></button>
   </div>
   <!-- Hero photo -->
   <div id="deHeroWrap" style="position:relative;background:var(--bg);border-bottom:1px solid var(--border)">
@@ -289,6 +300,19 @@
       </button>
     </div>
   </div>
+  <!-- Service-noter -->
+  <div class="ds" id="dsService">
+    <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitleService">Service-noter</span><span class="ds-count" id="dsServiceCount"></span></div>
+    <div class="ds-bd">
+      <div id="deNotesSummary" class="denotes-summary" style="display:none"></div>
+      <div id="deNotesList"></div>
+      <p id="deNotesEmpty" class="denotes-empty"></p>
+      <button class="ing-ai-btn" id="notesAiBtn" style="margin-top:8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+        <span id="notesAiBtnLbl">Opsummér noter med AI</span>
+      </button>
+    </div>
+  </div>
   <!-- Vine -->
   <div class="ds" id="dsWine">
     <div class="ds-hd"><svg class="ds-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="ds-title" id="dsTitleWine">Vine &amp; parring</span></div>
@@ -354,7 +378,11 @@
         <div class="vagt-ai-spin" id="shiftLogSpin"></div>
         <button class="vagt-add-btn" id="shiftLogAdd" aria-label="Log"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
       </div>
-      <div class="shift-totals" id="shiftStep1Totals" style="max-height:32vh;overflow-y:auto"></div>
+      <div class="shift-totals" id="shiftStep1Totals" style="max-height:26vh;overflow-y:auto"></div>
+      <div id="shiftDishNotes" style="display:none">
+        <div class="sdn-hd" id="sdnTitle"></div>
+        <div id="sdnList"></div>
+      </div>
       <div class="mactions">
         <button class="btn primary btn-sm" id="shiftStep1Next"></button>
         <button class="btn ghost btn-sm" id="shiftStep1Cancel" style="color:var(--faint)"></button>
@@ -445,6 +473,32 @@
   <div id="catOvList" style="max-height:56vh;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
   <div class="catov-total" id="catOvTotal"></div>
   <button class="btn ghost" id="catOvManage" style="width:100%;margin-top:12px"></button>
+</div></div>
+
+<div class="scrim" id="sharedDishScrim"><div class="modal" style="padding:0;overflow:hidden;max-height:86vh;display:flex;flex-direction:column">
+  <img id="sdHero" style="width:100%;height:190px;object-fit:cover;display:none" alt="">
+  <div style="padding:16px 20px 4px;flex:none">
+    <div class="sd-top">
+      <h2 id="sdName" style="font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin:0;flex:1"></h2>
+      <span id="sdStatus" class="dish-status"></span>
+    </div>
+    <p id="sdAuthor" class="sd-author"></p>
+  </div>
+  <div id="sdBody" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 20px 12px"></div>
+  <div style="padding:10px 20px max(16px,env(safe-area-inset-bottom,16px));flex:none;display:flex;gap:8px;border-top:1px solid var(--border)">
+    <button class="btn primary" id="sdFork" style="flex:1"></button>
+    <button class="btn ghost" id="sdClose"></button>
+  </div>
+</div></div>
+
+<div class="scrim" id="labProScrim"><div class="modal">
+  <div class="labpro-hero">
+    <div class="labpro-badge">PRO</div>
+    <h2 class="labpro-title" id="labProTitle"></h2>
+    <p class="labpro-sub" id="labProSub"></p>
+  </div>
+  <div id="labProFeats"></div>
+  <button class="btn primary" id="labProOk" style="width:100%;margin-top:16px"></button>
 </div></div>
 
 <div class="scrim" id="shiftEditScrim"><div class="modal" style="max-height:80vh;overflow-y:auto">
