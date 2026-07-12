@@ -513,7 +513,7 @@
     const lineupAddAll=$("#lineupAddAll");if(lineupAddAll)lineupAddAll.textContent=t("lineup_add_all");
     const lineupClose=$("#lineupClose");if(lineupClose)lineupClose.textContent=lang==="da"?"Luk":"Close";
   }
-  function setLang(l){lang=l;localStorage.setItem("mise_lang",l);translateUI();renderCounters();renderWines();renderLogView();}
+  function setLang(l){lang=l;localStorage.setItem("mise_lang",l);translateUI();renderCounters();renderWines();renderLogView();renderVagt();}
   $("#langBtn").addEventListener("click",()=>setLang(lang==="da"?"en":"da"));
 
   // Translations for default counter/sub labels — user-created labels stay as-is
@@ -534,7 +534,13 @@
     "Konventionel vin":    {en:"Conventional wine"},
     "Naturvin":            {en:"Natural wine"},
   };
-  function tLabel(label){if(lang==="da")return label;return(LABEL_TRANSLATIONS[label]&&LABEL_TRANSLATIONS[label][lang])||label;}
+  // Oversættelses-opslag bygges fra CATALOG (da<->en) + den manuelle tabel — begge retninger
+  function tLabel(label){
+    if(!label)return label;
+    const key=label.toLowerCase();
+    if(lang==="da")return _LBL_EN2DA[key]||label;
+    return _LBL_DA2EN[key]||label;
+  }
 
   const CATS=[
     {id:"aabnet-mad",da:"Åbnet mad",en:"Opened food",
@@ -598,6 +604,9 @@
   ];
 
   const CAT_BY_LABEL={};CATALOG.forEach(p=>{CAT_BY_LABEL[p.da.toLowerCase()]=p.cat;CAT_BY_LABEL[p.en.toLowerCase()]=p.cat;});
+  const _LBL_DA2EN={},_LBL_EN2DA={};
+  CATALOG.forEach(p=>{_LBL_DA2EN[p.da.toLowerCase()]=p.en;_LBL_EN2DA[p.en.toLowerCase()]=p.da;});
+  Object.keys(LABEL_TRANSLATIONS).forEach(da=>{const en=LABEL_TRANSLATIONS[da].en;if(en){_LBL_DA2EN[da.toLowerCase()]=en;_LBL_EN2DA[en.toLowerCase()]=da;}});
 
   const OYSTER_TYPES=["Gillardeau","Fine de Claire","Spéciale de Claire","Marennes-Oléron","Belon","Tsarskaya","Limfjordsøsters","Kumamoto","Blue Point","Utah Beach","Pied de Cheval"];
   const LANDE=["Frankrig","Italien","Spanien","Tyskland","Portugal","Østrig","USA","Argentina","Chile","Australien","New Zealand","Sydafrika","Danmark","Ungarn","Grækenland","Libanon","Georgien"];
