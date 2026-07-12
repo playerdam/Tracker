@@ -613,7 +613,7 @@ app.post("/api/parse-log", async (req, res) => {
     res.json({ actions });
   } catch (err) {
     console.error("parse-log:", err.message);
-    res.status(500).json({ error: err.message });
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
 
@@ -634,7 +634,7 @@ app.post("/api/wine-search", async (req, res) => {
     res.json({ wines: Array.isArray(p) ? p : (p && Array.isArray(p.wines)) ? p.wines : [] });
   } catch (err) {
     console.error("wine-search:", err.message);
-    res.status(500).json({ error: err.message });
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
 
