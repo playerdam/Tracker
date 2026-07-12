@@ -385,23 +385,34 @@ app.get("/api/teams/mine", async (req, res) => {
     if (!memberships?.length) return res.json({ teams: [] });
 
     const monday = mondayOfWeek();
+    const lastMonday = new Date(monday.getTime() - 7 * 24 * 3600 * 1000);
     const results = await Promise.all(memberships.map(async (ms) => {
       const team = ms.teams;
       const members = await sb(`team_members?team_id=eq.${team.id}&select=user_id,users!user_id(nickname,profession)`) || [];
       const memberIds = members.map(m => m.user_id);
       let entries = [];
       if (memberIds.length) {
-        entries = await sb(`log_entries?logged_at=gte.${monday.toISOString()}&user_id=in.(${memberIds.join(",")})&select=user_id,delta`) || [];
+        // To ugers vindue: denne uges totaler + sidste uges sammenligning + sidste aktivitet
+        entries = await sb(`log_entries?logged_at=gte.${lastMonday.toISOString()}&user_id=in.(${memberIds.join(",")})&select=user_id,delta,logged_at`) || [];
       }
       const stats = {};
       for (const m of members) {
-        stats[m.user_id] = { userId: m.user_id, nickname: m.users?.nickname || null, profession: m.users?.profession || null, total: 0 };
+        stats[m.user_id] = { userId: m.user_id, nickname: m.users?.nickname || null, profession: m.users?.profession || null, total: 0, lastTs: null };
       }
+      let lastWeekTotal = 0;
       for (const e of entries) {
-        if (stats[e.user_id] && e.delta > 0) stats[e.user_id].total += e.delta;
+        const st = stats[e.user_id];
+        if (!st) continue;
+        const ts = new Date(e.logged_at).getTime();
+        if (e.delta > 0) {
+          if (ts >= monday.getTime()) st.total += e.delta;
+          else lastWeekTotal += e.delta;
+        }
+        if (!st.lastTs || ts > st.lastTs) st.lastTs = ts;
       }
       return {
         team: { id: team.id, name: team.name, invite_code: team.invite_code },
+        lastWeekTotal,
         members: Object.values(stats).sort((a, b) => b.total - a.total),
       };
     }));

@@ -740,6 +740,67 @@
   .sdn-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
   /* Åbnes oven på dish-editoren (z 200) — skal ligge over */
   #teamPickScrim,#labProScrim{z-index:310}
+  /* ── Holdkort ── */
+  .tcard{position:relative;border-radius:22px;padding:18px 18px 0;margin-bottom:14px;color:#fff;overflow:hidden;box-shadow:0 10px 26px rgba(30,15,20,.30)}
+  .tcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .tcard-name{font-family:"Fraunces",serif;font-size:21px;font-weight:600;letter-spacing:-.01em;line-height:1.15;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .tcard-rank{flex:none;font-size:11px;font-weight:800;background:rgba(255,255,255,.16);border-radius:12px;padding:5px 11px;letter-spacing:.02em;white-space:nowrap}
+  .tcard-mid{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+  .tcard-avatars{display:flex;align-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .tcard-av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin-left:-9px;position:relative;flex:none;backdrop-filter:blur(2px)}
+  .tcard-av:first-child{margin-left:0}
+  .tcard-av.on::after{content:'';position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:50%;background:#4ADE80;border:2px solid rgba(40,20,26,.9);box-shadow:0 0 6px rgba(74,222,128,.8)}
+  .tcard-av.more{background:rgba(255,255,255,.12);font-size:11px}
+  .tcard-week{text-align:right}
+  .tcard-week-num{font-family:"Fraunces",serif;font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .tcard-week-lbl{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:3px}
+  .tcard-week-trend{font-size:10.5px;font-weight:700;margin-top:2px;color:rgba(255,255,255,.75)}
+  /* Race-bar: medlemmernes prikker på ugens bane */
+  .tcard-race{position:relative;height:22px;margin-bottom:4px}
+  .tcard-race-track{position:absolute;left:0;right:0;top:50%;height:4px;transform:translateY(-50%);background:rgba(255,255,255,.16);border-radius:2px}
+  .tcard-race-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.85);color:#3a1c26;font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.9);transition:left .6s cubic-bezier(.34,1.2,.64,1)}
+  .tcard-race-dot.me{background:#FFD98A;box-shadow:0 0 10px rgba(255,217,138,.7);z-index:2}
+  /* Billet-kant m. udstansning */
+  .tcard-tear{position:relative;margin:10px -18px 0;padding:12px 18px calc(13px + 0px);border-top:2px dashed rgba(255,255,255,.28);display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.14)}
+  .tcard-tear::before,.tcard-tear::after{content:'';position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--bg)}
+  .tcard-tear::before{left:-10px}
+  .tcard-tear::after{right:-10px}
+  .tcard-code{flex:1;font-family:ui-monospace,Menlo,monospace;font-size:17px;font-weight:700;letter-spacing:.42em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap}
+  .tcard-code-lbl{display:block;font-size:8.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:2px}
+  .tcard-share{flex:none;appearance:none;border:none;background:rgba(255,255,255,.92);color:#3a1c26;font-family:inherit;font-size:12.5px;font-weight:800;border-radius:20px;padding:9px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;gap:6px;transition:transform .1s}
+  .tcard-share:active{transform:scale(.93)}
+  .tcard-list{overflow:hidden;max-height:0;transition:max-height .35s ease}
+  .tcard-list.open{max-height:600px;margin-bottom:10px}
+  .tcard-leave{appearance:none;background:none;border:none;color:var(--faint);font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;padding:6px 2px;margin:0 0 14px;-webkit-tap-highlight-color:transparent;display:block}
+  /* ── Join/opret ── */
+  .tjoin{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:14px}
+  .tjoin-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:3px}
+  .tjoin-sub{font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.4}
+  .otp-row{display:flex;gap:7px;justify-content:center;margin-bottom:6px}
+  .otp-box{width:44px;height:54px;border:1.5px solid var(--border-2);border-radius:12px;background:var(--bg);text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:22px;font-weight:800;color:var(--text);text-transform:uppercase;outline:none;-webkit-appearance:none;caret-color:var(--accent);transition:border-color .12s,box-shadow .12s,transform .12s}
+  .otp-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .otp-box.filled{border-color:var(--accent);background:var(--accent-soft)}
+  .otp-row.checking .otp-box{border-color:var(--accent);animation:otpPulse 1s ease infinite}
+  @keyframes otpPulse{0%,100%{box-shadow:0 0 0 0 var(--ring)}50%{box-shadow:0 0 0 5px var(--ring)}}
+  .otp-row.err .otp-box{border-color:#DC2626;background:rgba(220,38,38,.06);animation:otpShake .4s ease}
+  @keyframes otpShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+  .otp-hint{text-align:center;font-size:11px;color:var(--faint);min-height:16px;margin-bottom:4px}
+  .tjoin-div{display:flex;align-items:center;gap:12px;margin:14px 0}
+  .tjoin-div::before,.tjoin-div::after{content:'';flex:1;height:1px;background:var(--border)}
+  .tjoin-div span{font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--faint);text-transform:uppercase}
+  /* ── Velkomst-ceremoni ── */
+  #teamWelcome{position:fixed;inset:0;z-index:420;display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:32px;-webkit-tap-highlight-color:transparent}
+  #teamWelcome.on{display:flex;animation:twIn .45s cubic-bezier(.22,1,.36,1)}
+  #teamWelcome.out{opacity:0;transition:opacity .4s}
+  @keyframes twIn{from{opacity:0}to{opacity:1}}
+  .tw-kicker{font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:10px;animation:twRise .5s .1s cubic-bezier(.22,1,.36,1) both}
+  .tw-name{font-family:"Fraunces",serif;font-size:34px;font-weight:600;line-height:1.15;margin-bottom:26px;animation:twRise .5s .22s cubic-bezier(.22,1,.36,1) both}
+  .tw-avs{display:flex;justify-content:center;margin-bottom:22px}
+  .tw-av{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.2);border:2.5px solid rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;margin:0 -7px;opacity:0;transform:scale(.3);animation:twPop .45s cubic-bezier(.34,1.5,.64,1) both}
+  @keyframes twPop{to{opacity:1;transform:scale(1)}}
+  @keyframes twRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .tw-sub{font-size:13.5px;color:rgba(255,255,255,.75);animation:twRise .5s .5s cubic-bezier(.22,1,.36,1) both}
+  .tw-skip{position:absolute;bottom:max(30px,env(safe-area-inset-bottom,30px));left:0;right:0;font-size:11px;color:rgba(255,255,255,.45);animation:twRise .5s .9s both}
   .labpro-hero{text-align:center;padding:8px 0 16px}
   .labpro-badge{display:inline-block;background:linear-gradient(140deg,#FFB36B,#FF6B8A);color:#fff;font-size:11px;font-weight:800;letter-spacing:.14em;border-radius:8px;padding:4px 12px;margin-bottom:10px}
   .labpro-title{font-family:"Fraunces",serif;font-size:22px;font-weight:600;margin:0 0 6px}

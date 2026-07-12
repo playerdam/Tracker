@@ -2784,55 +2784,195 @@
       el.innerHTML=_lbRowsHtml(rows,myId);
     }catch(e){el.innerHTML=esc(t("lb_empty"));}
   }
+  // Deterministisk gradient pr. hold (hashet på navnet)
+  const TEAM_GRADS=[
+    ["#2E1A3E","#6D3C8E"],["#12333B","#2C7A7B"],["#3B1A20","#8A2E3F"],
+    ["#1A2E3B","#3B6E9E"],["#3B2A12","#B07C3A"],["#25321A","#5E8C4A"]
+  ];
+  function teamGrad(name){
+    let h=0;const str=name||"?";
+    for(let k=0;k<str.length;k++)h=(h*31+str.charCodeAt(k))>>>0;
+    const g=TEAM_GRADS[h%TEAM_GRADS.length];
+    return "linear-gradient(150deg,"+g[0]+" 0%,"+g[1]+" 100%)";
+  }
+  function _initial(n){return (n||"?").trim().charAt(0).toUpperCase()||"?";}
+
+  function _teamCardHtml(team,members,lastWeekTotal,myId){
+    const weekTotal=members.reduce((a,m)=>a+(m.total||0),0);
+    const myIdx=members.findIndex(m=>m.userId===myId);
+    const nowTs=Date.now();
+    const avatars=members.slice(0,5).map(m=>{
+      const active=m.lastTs&&(nowTs-m.lastTs)<3600000;
+      return '<span class="tcard-av'+(active?" on":"")+'" title="'+esc(m.nickname||"?")+'">'+esc(_initial(m.nickname))+'</span>';
+    }).join("")+(members.length>5?'<span class="tcard-av more">+'+(members.length-5)+'</span>':'');
+    const trend=lastWeekTotal>0?Math.round((weekTotal-lastWeekTotal)/lastWeekTotal*100):null;
+    const trendHtml=trend===null?'':'<div class="tcard-week-trend">'+(trend>=0?"▲ ":"▼ ")+Math.abs(trend)+'% '+(lang==="da"?"vs sidste uge":"vs last week")+'</div>';
+    const maxTot=Math.max(1,...members.map(m=>m.total||0));
+    const race=members.length>1?'<div class="tcard-race"><div class="tcard-race-track"></div>'
+      +members.slice(0,8).map(m=>{
+        const pct=6+((m.total||0)/maxTot)*88;
+        return '<span class="tcard-race-dot'+(m.userId===myId?" me":"")+'" style="left:'+pct.toFixed(1)+'%" title="'+esc(m.nickname||"?")+'">'+esc(_initial(m.nickname))+'</span>';
+      }).join("")+'</div>':'';
+    const codeSp=(team.invite_code||"").split("").join(" ");
+    return '<div class="tcard" data-team-id="'+esc(team.id)+'" style="background:'+teamGrad(team.name)+'">'
+      +'<div class="tcard-top"><div class="tcard-name">'+esc(team.name)+'</div>'
+      +(myIdx>=0?'<div class="tcard-rank">#'+(myIdx+1)+' '+(lang==="da"?"af":"of")+' '+members.length+'</div>':'')+'</div>'
+      +'<div class="tcard-mid">'
+        +'<div class="tcard-avatars" data-toggle-list="'+esc(team.id)+'" role="button" aria-label="'+(lang==="da"?"Vis rangliste":"Show ranking")+'">'+avatars+'</div>'
+        +'<div class="tcard-week"><div class="tcard-week-num">'+fmtNum(weekTotal)+'</div><div class="tcard-week-lbl">'+(lang==="da"?"Ugens total":"This week")+'</div>'+trendHtml+'</div>'
+      +'</div>'
+      +race
+      +'<div class="tcard-tear">'
+        +'<div class="tcard-code" data-code="'+esc(team.invite_code)+'" role="button"><span class="tcard-code-lbl">'+(lang==="da"?"Invite-kode · tryk for at kopiere":"Invite code · tap to copy")+'</span>'+esc(codeSp)+'</div>'
+        +'<button class="tcard-share" data-share-code="'+esc(team.invite_code)+'" data-share-name="'+esc(team.name)+'">'
+        +'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>'
+        +(lang==="da"?"Invitér":"Invite")+'</button>'
+      +'</div>'
+    +'</div>';
+  }
+
+  async function shareTeamInvite(code,name){
+    const msg=(lang==="da"
+      ?"Join mit hold \""+name+"\" i Craft Tracker! Brug koden "+code+" under Rangliste → Hold."
+      :"Join my team \""+name+"\" in Craft Tracker! Use code "+code+" under Leaderboard → Team.");
+    if(navigator.share){
+      try{await navigator.share({title:"Craft Tracker",text:msg});return;}catch(e){if(e&&e.name==="AbortError")return;}
+    }
+    try{await navigator.clipboard.writeText(msg);showToast(lang==="da"?"Invitation kopieret 📋":"Invite copied 📋");}catch(e){}
+  }
+
   async function renderSocialTeam(){
     const el=$("#socialTeamContent");if(!el)return;
     el.innerHTML=skeletonRows(3);
     const base=apiBase();const token=await getToken();
-    if(!base||!token){el.innerHTML='<p class="lb-empty">'+esc(t("team_no_team"))+'</p>';_renderSocialTeamAdd(el);return;}
+    if(!base||!token){el.innerHTML="";_renderSocialTeamAdd(el,true);return;}
     try{
       const res=await fetch(base+"/api/teams/mine",{headers:{"Authorization":"Bearer "+token}});
       const d=await res.json();const teams=d.teams||[];const myId=getJwtSub();
       let html="";
-      teams.forEach(({team,members})=>{
-        const myIdx=members.findIndex(m=>m.userId===myId);
-        html+='<div class="lb-team-head">'+esc(team.name)+'</div>';
-        html+='<div class="lb-team-sub">'+esc(team.invite_code)+' · '+(lang==="da"?"Denne uge":"This week")+'</div>';
-        html+=_lbRowsHtml(members.map(m=>({user_id:m.userId,nickname:m.nickname,profession:m.profession,total:m.total})),myId);
-        html+='<div class="team-inv-row"><span class="team-inv-lbl">'+esc(lang==="da"?"Kode":"Code")+'</span><span class="team-inv-code">'+esc(team.invite_code)+'</span><button class="btn ghost btn-sm team-copy-btn" data-code="'+esc(team.invite_code)+'">'+esc(t("team_copy"))+'</button><button class="team-leave-lnk team-leave-btn" data-team-id="'+esc(team.id)+'">'+esc(lang==="da"?"Forlad":"Leave")+'</button></div>';
-        html+='<div class="social-sec-gap"></div>';
+      teams.forEach(({team,members,lastWeekTotal})=>{
+        html+=_teamCardHtml(team,members,lastWeekTotal||0,myId);
+        html+='<div class="tcard-list" id="tlist-'+esc(team.id)+'">'
+          +_lbRowsHtml(members.map(m=>({user_id:m.userId,nickname:m.nickname,profession:m.profession,total:m.total})),myId)
+          +'<button class="tcard-leave" data-team-id="'+esc(team.id)+'">'+(lang==="da"?"Forlad holdet":"Leave team")+'</button>'
+          +'</div>';
       });
-      el.innerHTML=html||'<p class="lb-empty">'+esc(t("team_no_team"))+'</p>';
+      el.innerHTML=html;
       _renderSocialTeamAdd(el,teams.length===0);
-      el.querySelectorAll(".team-copy-btn").forEach(btn=>btn.addEventListener("click",()=>{navigator.clipboard.writeText(btn.dataset.code||"").then(()=>{btn.textContent=t("team_copied");setTimeout(()=>btn.textContent=t("team_copy"),2000);});}));
-      el.querySelectorAll(".team-leave-btn").forEach(btn=>btn.addEventListener("click",async()=>{
-        if(!confirm(lang==="da"?"Forlad dette hold?":"Leave this team?"))return;
+      el.querySelectorAll("[data-toggle-list]").forEach(av=>av.addEventListener("click",()=>{
+        const l=document.getElementById("tlist-"+av.dataset.toggleList);if(l)l.classList.toggle("open");haptic(15);
+      }));
+      el.querySelectorAll(".tcard-code").forEach(c=>c.addEventListener("click",()=>{
+        navigator.clipboard.writeText(c.dataset.code||"").then(()=>{showToast(lang==="da"?"Kode kopieret 📋":"Code copied 📋");haptic(25);}).catch(()=>{});
+      }));
+      el.querySelectorAll(".tcard-share").forEach(b=>b.addEventListener("click",()=>shareTeamInvite(b.dataset.shareCode,b.dataset.shareName)));
+      el.querySelectorAll(".tcard-leave").forEach(btn=>btn.addEventListener("click",async()=>{
+        if(!confirm(lang==="da"?"Forlad dette hold? Dine delte retter bliver private igen.":"Leave this team? Your shared dishes become private again."))return;
         try{await fetch(base+"/api/teams/"+btn.dataset.teamId+"/leave",{method:"DELETE",headers:{"Authorization":"Bearer "+token}});invalidateLabTeams();_labSeg==="kitchen"&&renderLabSeg();renderSocialTeam();}catch(e){}
       }));
-    }catch(e){el.innerHTML='<p class="lb-empty">'+esc(t("team_no_team"))+'</p>';_renderSocialTeamAdd(el);}
+    }catch(e){el.innerHTML="";_renderSocialTeamAdd(el,true);}
   }
+
+  // ── OTP-join + opret ──
+  let _otpBusy=false;
   function _renderSocialTeamAdd(container,open){
+    if(!open){
+      const tog=document.createElement("button");
+      tog.className="tcard-leave";tog.style.cssText="margin:2px 0 10px;color:var(--dim);font-size:12.5px;font-weight:700";
+      tog.textContent=(lang==="da"?"＋ Join eller opret endnu et hold":"＋ Join or create another team");
+      container.appendChild(tog);
+      tog.addEventListener("click",()=>{tog.remove();_renderSocialTeamAdd(container,true);const b=container.querySelector(".otp-box");if(b)b.focus();});
+      return;
+    }
     const div=document.createElement("div");
-    div.className="team-add-panel"+(open?" open":"");
-    div.innerHTML='<div class="team-add-hd"><svg class="team-panel-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="team-add-lbl">'+esc(lang==="da"?"+ Tilslut eller opret hold":"+ Join or create team")+'</span></div>'
-      +'<div class="team-add-bd">'
-      +'<div class="team-form"><input class="input stac-name-inp" placeholder="'+esc(lang==="da"?"fx Noma Kitchen":"e.g. Noma Kitchen")+'" maxlength="40"><button class="btn primary btn-sm stac-create-btn">'+esc(lang==="da"?"Opret":"Create")+'</button></div>'
-      +'<div class="team-or">'+esc(t("team_or"))+'</div>'
-      +'<div class="team-form"><input class="input stac-code-inp" placeholder="XXXXXX" maxlength="6" style="text-transform:uppercase;font-family:monospace"><button class="btn ghost btn-sm stac-join-btn">'+esc(lang==="da"?"Tilslut":"Join")+'</button></div>'
-      +'</div>';
-    div.querySelector(".team-add-hd").addEventListener("click",()=>div.classList.toggle("open"));
-    const base=apiBase();
-    div.querySelector(".stac-create-btn").addEventListener("click",async()=>{
-      const name=div.querySelector(".stac-name-inp").value.trim();if(!name)return;
-      const token=await getToken();if(!token)return;
-      try{await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});invalidateLabTeams();renderSocialTeam();}catch(e){}
-    });
-    div.querySelector(".stac-join-btn").addEventListener("click",async()=>{
-      const code=div.querySelector(".stac-code-inp").value.trim().toUpperCase();if(!code)return;
-      const token=await getToken();if(!token)return;
-      try{const r=await fetch(base+"/api/teams/join",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({code})});if(!r.ok)throw new Error();invalidateLabTeams();renderSocialTeam();}
-      catch(e){showToast(t("team_not_found"));}
-    });
+    div.className="tjoin";
+    div.innerHTML='<div class="tjoin-title">'+(lang==="da"?"Join et hold":"Join a team")+'</div>'
+      +'<div class="tjoin-sub">'+(lang==="da"?"Indtast 6-tegns koden fra en kollega — I deler rangliste og opskrifter":"Enter the 6-char code from a colleague — you share the leaderboard and recipes")+'</div>'
+      +'<div class="otp-row" id="otpRow">'+Array.from({length:6}).map((_,k)=>'<input class="otp-box" data-otp="'+k+'" maxlength="1" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" inputmode="text">').join("")+'</div>'
+      +'<div class="otp-hint" id="otpHint"></div>'
+      +'<div class="tjoin-div"><span>'+(lang==="da"?"eller":"or")+'</span></div>'
+      +'<div class="tjoin-title">'+(lang==="da"?"Start dit eget":"Start your own")+'</div>'
+      +'<div class="team-form" style="margin-top:10px;margin-bottom:0"><input class="input stac-name-inp" placeholder="'+esc(lang==="da"?"fx Restaurant Nord":"e.g. Noma Kitchen")+'" maxlength="40"><button class="btn primary btn-sm stac-create-btn">'+esc(lang==="da"?"Opret":"Create")+'</button></div>';
     container.appendChild(div);
+    const boxes=[...div.querySelectorAll(".otp-box")];
+    const row=div.querySelector("#otpRow");const hint=div.querySelector("#otpHint");
+    function setHint(txt){if(hint)hint.textContent=txt||"";}
+    function clearOtp(){boxes.forEach(b=>{b.value="";b.classList.remove("filled");});boxes[0].focus();}
+    async function tryJoin(){
+      if(_otpBusy)return;
+      const code=boxes.map(b=>b.value).join("").toUpperCase();
+      if(code.length!==6)return;
+      _otpBusy=true;row.classList.add("checking");setHint(lang==="da"?"Tjekker koden…":"Checking code…");
+      const base=apiBase();const token=await getToken();
+      try{
+        const r=await fetch(base+"/api/teams/join",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({code})});
+        row.classList.remove("checking");
+        if(!r.ok)throw new Error();
+        haptic(60);setHint("");invalidateLabTeams();
+        await showTeamWelcome(code);
+        renderSocialTeam();
+      }catch(e){
+        row.classList.remove("checking");row.classList.add("err");haptic(80);
+        setHint(lang==="da"?"Koden findes ikke — tjek den igen":"Code not found — check it again");
+        setTimeout(()=>{row.classList.remove("err");clearOtp();},450);
+      }
+      _otpBusy=false;
+    }
+    boxes.forEach((b,k)=>{
+      b.addEventListener("input",()=>{
+        b.value=(b.value||"").replace(/[^a-zA-Z0-9]/g,"").toUpperCase().slice(0,1);
+        b.classList.toggle("filled",!!b.value);
+        if(b.value){haptic(8);if(k<5)boxes[k+1].focus();else tryJoin();}
+      });
+      b.addEventListener("keydown",e=>{
+        if(e.key==="Backspace"&&!b.value&&k>0){boxes[k-1].focus();boxes[k-1].value="";boxes[k-1].classList.remove("filled");e.preventDefault();}
+      });
+      b.addEventListener("paste",e=>{
+        e.preventDefault();
+        const txt=((e.clipboardData||window.clipboardData).getData("text")||"").replace(/[^a-zA-Z0-9]/g,"").toUpperCase().slice(0,6);
+        if(!txt)return;
+        boxes.forEach((bx,m)=>{bx.value=txt[m]||"";bx.classList.toggle("filled",!!bx.value);});
+        if(txt.length===6)tryJoin();else boxes[Math.min(txt.length,5)].focus();
+      });
+    });
+    div.querySelector(".stac-create-btn").addEventListener("click",async()=>{
+      const inp=div.querySelector(".stac-name-inp");const name=inp.value.trim();if(!name)return;
+      const base=apiBase();const token=await getToken();if(!token)return;
+      try{
+        await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});
+        invalidateLabTeams();haptic(50);renderSocialTeam();
+        showToast(lang==="da"?"Holdet er oprettet — del koden med kollegerne 🎉":"Team created — share the code with your colleagues 🎉");
+      }catch(e){}
+    });
+  }
+
+  // ── Velkomst-ceremonien ──
+  async function showTeamWelcome(code){
+    const ov=$("#teamWelcome");if(!ov)return;
+    let team=null,members=[];
+    try{
+      const base=apiBase();const token=await getToken();
+      const r=await fetch(base+"/api/teams/mine",{headers:{"Authorization":"Bearer "+token}});
+      const d=await r.json();
+      const hit=(d.teams||[]).find(x=>x.team.invite_code===code)||(d.teams||[])[0];
+      if(hit){team=hit.team;members=hit.members||[];}
+    }catch(e){}
+    if(!team)return;
+    ov.style.background=teamGrad(team.name);
+    $("#twKicker").textContent=lang==="da"?"Velkommen til":"Welcome to";
+    $("#twName").textContent=team.name;
+    $("#twSub").textContent=lang==="da"?members.length+" på holdet · I deler rangliste og opskrifter":members.length+" on the team · shared leaderboard and recipes";
+    $("#twSkip").textContent=lang==="da"?"Tryk for at fortsætte":"Tap to continue";
+    const avs=$("#twAvs");
+    avs.innerHTML=members.slice(0,7).map((m,k)=>'<span class="tw-av" style="animation-delay:'+(0.35+k*0.12)+'s">'+esc(_initial(m.nickname))+'</span>').join("");
+    ov.classList.remove("out");ov.classList.add("on");
+    haptic(60);setTimeout(()=>haptic(30),450);
+    return new Promise(resolve=>{
+      let done=false;
+      function close(){if(done)return;done=true;ov.classList.add("out");setTimeout(()=>{ov.classList.remove("on","out");resolve();},420);}
+      ov.addEventListener("click",close,{once:true});
+      setTimeout(close,4200);
+    });
   }
 
   async function renderChallenge(){
@@ -4489,6 +4629,27 @@
       return [...new Set([...phrases,...labels,...subs])];
     });}catch(e){console.error("attachAC",e);}
     setTimeout(maybeShowOnboarding, 600);
+    // Deep link: ?join=KODE åbner Hold-fanen med koden udfyldt
+    try{
+      const _jc=new URLSearchParams(location.search).get("join");
+      if(_jc&&/^[a-zA-Z0-9]{6}$/.test(_jc)){
+        history.replaceState(null,"",location.pathname);
+        setTimeout(()=>{
+          goToTeams();
+          let tries=0;
+          const fill=setInterval(()=>{
+            const boxes=document.querySelectorAll(".otp-box");
+            if(boxes.length===6){
+              clearInterval(fill);
+              const code=_jc.toUpperCase();
+              boxes.forEach((b,k)=>{if(k<5){b.value=code[k];b.classList.add("filled");}});
+              boxes[5].value=code[5];
+              boxes[5].dispatchEvent(new Event("input",{bubbles:true}));
+            }else if(++tries>40)clearInterval(fill);
+          },150);
+        },800);
+      }
+    }catch(e){}
     setTimeout(()=>{
       (state.customCats||[]).filter(c=>c.iconPending&&c.name).forEach(c=>generateCatIcon(c.id,c.name));
     },1500);
