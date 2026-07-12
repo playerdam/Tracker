@@ -14,6 +14,14 @@
 //            GET  /api/health
 
 const express = require("express");
+let webpush = null;
+try { webpush = require("web-push"); } catch (e) {}
+const VAPID_PUBLIC = process.env.VAPID_PUBLIC_KEY || "";
+const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || "";
+if (webpush && VAPID_PUBLIC && VAPID_PRIVATE) {
+  webpush.setVapidDetails("mailto:fdnnielsen@gmail.com", VAPID_PUBLIC, VAPID_PRIVATE);
+}
+const pushEnabled = () => !!(webpush && VAPID_PUBLIC && VAPID_PRIVATE);
 const cors    = require("cors");
 const path    = require("path");
 
@@ -141,7 +149,7 @@ app.get("/terms", (_req, res) => res.sendFile(path.join(__dirname, "app", "terms
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "craft-track" }));
 
 app.get("/api/config", (_req, res) => {
-  res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON });
+  res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON, vapidKey: pushEnabled() ? VAPID_PUBLIC : null });
 });
 
 // ---- Brugerprofil: opret (upsert) + hent ----
@@ -344,6 +352,25 @@ app.post("/api/teams", async (req, res) => {
       body: JSON.stringify({ user_id: userId, team_id: team.id }),
       headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
     });
+    // Hold = gensidig tillid: auto-follow begge veje + giv holdet besked
+    try {
+      const mates = (await sb(`team_members?team_id=eq.${team.id}&select=user_id`) || [])
+        .map(m => m.user_id).filter(id2 => id2 !== userId);
+      if (mates.length) {
+        const rows = mates.flatMap(mid => [
+          { follower_id: userId, following_id: mid, status: "accepted" },
+          { follower_id: mid, following_id: userId, status: "accepted" },
+        ]);
+        await sb("follows?on_conflict=follower_id,following_id", {
+          method: "POST",
+          headers: { "Prefer": "resolution=merge-duplicates,return=representation" },
+          body: JSON.stringify(rows),
+        });
+        const me = await sb(`users?id=eq.${userId}&select=nickname,username`);
+        const who = (me && me[0] && (me[0].nickname || me[0].username)) || "En ny kollega";
+        sendPushTo(mates, { title: team.name, body: who + " er kommet på holdet 👋" });
+      }
+    } catch (e) { console.error("team auto-follow:", e.message); }
     res.json({ id: team.id, name: team.name, invite_code: team.invite_code });
   } catch (err) {
     console.error("teams/create:", err.message);
@@ -558,6 +585,73 @@ app.post("/api/client-error", (req, res) => {
   const { msg = "", src = "", line = 0, stack = "", ua = "" } = req.body || {};
   console.error("[client-error]", String(msg).slice(0, 300), "|", String(src).slice(0, 200) + ":" + parseInt(line, 10), "|", String(ua).slice(0, 120), "\n", String(stack).slice(0, 500));
   res.json({ ok: true });
+});
+
+// ---- Push-notifikationer ----
+async function sendPushTo(userIds, payload) {
+  if (!pushEnabled() || !userIds.length) return;
+  try {
+    const subs = await sb(`push_subs?user_id=in.(${userIds.join(",")})&select=endpoint,keys,user_id`) || [];
+    const body = JSON.stringify(payload);
+    await Promise.all(subs.map(async (sub) => {
+      try {
+        await webpush.sendNotification({ endpoint: sub.endpoint, keys: sub.keys }, body);
+      } catch (err) {
+        if (err.statusCode === 404 || err.statusCode === 410) {
+          try { await sb(`push_subs?endpoint=eq.${encodeURIComponent(sub.endpoint)}`, { method: "DELETE" }); } catch (e) {}
+        }
+      }
+    }));
+  } catch (e) { console.error("push:", e.message); }
+}
+
+app.post("/api/push/subscribe", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { endpoint, keys } = req.body || {};
+    if (!endpoint || !keys) return res.status(400).json({ error: "invalid" });
+    await sb("push_subs?on_conflict=endpoint", {
+      method: "POST",
+      headers: { "Prefer": "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify({ endpoint, user_id: userId, keys }),
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Lab Pro venteliste ----
+app.post("/api/pro/waitlist", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    await sb("pro_waitlist?on_conflict=user_id", {
+      method: "POST",
+      headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
+      body: JSON.stringify({ user_id: userId }),
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Produktanalytik (anonyme feature-events) ----
+app.post("/api/events", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    if (rateLimited("events", userId, 30, 300000)) return res.json({ ok: true });
+    let { events } = req.body || {};
+    if (!Array.isArray(events)) return res.status(400).json({ error: "invalid" });
+    events = events.slice(0, 40);
+    const rows = events
+      .filter(e => e && typeof e.e === "string" && e.e.length <= 40)
+      .map(e => ({ user_id: userId, event: e.e.slice(0, 40), meta: (e.m && typeof e.m === "object") ? e.m : null }));
+    if (rows.length) await sb("app_events", { method: "POST", body: JSON.stringify(rows) });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
 });
 
 // ---- State backup (taellere, vine, vagter - hele klient-staten) ----
@@ -843,6 +937,15 @@ app.post("/api/like/:entryId", async (req, res) => {
     const { entryId } = req.params;
     await sb("likes", { method: "POST", body: JSON.stringify({ user_id: userId, entry_id: entryId }) });
     const rows = await sb(`likes?entry_id=eq.${entryId}&select=user_id`) || [];
+    try {
+      const entry = await sb(`log_entries?id=eq.${entryId}&select=user_id`);
+      const ownerId = entry && entry[0] && entry[0].user_id;
+      if (ownerId && ownerId !== userId) {
+        const me = await sb(`users?id=eq.${userId}&select=nickname,username`);
+        const who = (me && me[0] && (me[0].nickname || me[0].username)) || "Nogen";
+        sendPushTo([ownerId], { title: "Craft Tracker", body: who + " likede din post ❤️" });
+      }
+    } catch (e) {}
     res.json({ likes: rows.length });
   } catch (err) {
     if (err.message && err.message.includes("duplicate")) {
@@ -884,6 +987,15 @@ app.post("/api/comments/:entryId", async (req, res) => {
     const text = (req.body.text || "").trim().slice(0, 280);
     if (!text) return res.status(400).json({ error: "Tom kommentar" });
     await sb("comments", { method: "POST", body: JSON.stringify({ user_id: userId, entry_id: entryId, text }) });
+    try {
+      const entry = await sb(`log_entries?id=eq.${entryId}&select=user_id`);
+      const ownerId = entry && entry[0] && entry[0].user_id;
+      if (ownerId && ownerId !== userId) {
+        const me = await sb(`users?id=eq.${userId}&select=nickname,username`);
+        const who = (me && me[0] && (me[0].nickname || me[0].username)) || "Nogen";
+        sendPushTo([ownerId], { title: "Craft Tracker", body: who + ': "' + text.slice(0, 80) + '"' });
+      }
+    } catch (e) {}
     const rows = await sb(`comments?entry_id=eq.${entryId}&order=created_at.asc&select=id,text,created_at,users!user_id(nickname)`) || [];
     res.json({ comments: rows.map(c => ({ id: c.id, text: c.text, createdAt: c.created_at, nickname: c.users?.nickname || null })) });
   } catch (err) {

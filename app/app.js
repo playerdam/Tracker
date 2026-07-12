@@ -812,7 +812,41 @@
       pushState();
     }catch(e){}
   }
-  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){if(_pushTimer)pushState();flushDeferredSync();}});
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){if(_pushTimer)pushState();flushDeferredSync();flushEvents();}});
+
+  // ── Produktanalytik: anonyme feature-events, batched ──
+  let _evQueue=[],_evTimer=null;
+  function track(e,m){
+    _evQueue.push({e,m:m||undefined});
+    if(_evQueue.length>=20)flushEvents();
+    else if(!_evTimer)_evTimer=setTimeout(flushEvents,30000);
+  }
+  async function flushEvents(){
+    if(_evTimer){clearTimeout(_evTimer);_evTimer=null;}
+    if(!_evQueue.length)return;
+    const batch=_evQueue.splice(0,40);
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    try{fetch(base+"/api/events",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({events:batch})}).catch(()=>{});}catch(e){}
+  }
+
+  // ── Push: abonnér når tilladelsen er givet ──
+  function _vapidToKey(b64){
+    const pad="=".repeat((4-b64.length%4)%4);
+    const raw=atob((b64+pad).replace(/-/g,"+").replace(/_/g,"/"));
+    return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+  }
+  async function ensurePushSubscription(){
+    try{
+      if(!("Notification" in window)||Notification.permission!=="granted")return;
+      if(!cfg||!cfg.vapidKey||!("serviceWorker" in navigator))return;
+      const reg=await navigator.serviceWorker.ready;
+      let sub=await reg.pushManager.getSubscription();
+      if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:_vapidToKey(cfg.vapidKey)});
+      const base=apiBase();const token=await getToken();if(!base||!token)return;
+      const j=sub.toJSON();
+      await fetch(base+"/api/push/subscribe",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({endpoint:j.endpoint,keys:j.keys})});
+    }catch(e){}
+  }
   function normalize(s){
     s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,unit:c.unit||"stk",cat:(c.cat&&c.cat!=="andet")?c.cat:(CAT_BY_LABEL[(c.label||"").toLowerCase()]||c.cat||"andet"),subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
     s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0,type:w.type||"andet",imageUrl:w.imageUrl||null,about:w.about||"",fromLineup:w.fromLineup||false}));
@@ -1315,6 +1349,7 @@
     const inp=document.getElementById("vagtAddIn");
     const spin=document.getElementById("vagtAiSpin");const btn=document.getElementById("vagtAddBtn");
     let actions=confidentLocalActions(text)||[];
+    track(actions.length?"log_local":"log_ai");
     if(!actions.length){
       if(spin)spin.classList.add("on");if(btn)btn.disabled=true;if(inp)inp.disabled=true;
       try{actions=await parseLog(text);}catch(e){console.warn("vagt AI parse failed:",e);}
@@ -2249,6 +2284,7 @@
   })();
 
   async function doWineLabelScan(file,openFirst){
+    track("wine_scan");
     if(!file)return;
     const base=apiBase();const token=await getToken();if(!base||!token){showToast(t("wine_scan_err"));return;}
     const btns=[document.getElementById("waScanBtn"),document.getElementById("winePageScanBtn")];
@@ -2761,6 +2797,7 @@
     }
   });
   function switchTab(v){
+    track("tab",{t:v});
     if(v!=="vagt"&&vagtTimerInterval){clearInterval(vagtTimerInterval);vagtTimerInterval=null;}
     const _sb=document.getElementById("shiftBar"),_ss=document.getElementById("shiftStartBtn");
     if(_sb)_sb.style.display=v==="vagt"?"none":"";
@@ -2822,8 +2859,9 @@
 
   // ---- notification permission ----
   async function requestNotifPermission(){
-    if(!("Notification" in window)||Notification.permission!=="default")return;
-    await Notification.requestPermission();
+    if(!("Notification" in window))return;
+    if(Notification.permission==="default")await Notification.requestPermission();
+    if(Notification.permission==="granted")ensurePushSubscription();
   }
 
   // ---- social / leaderboard / challenge / team ----
@@ -2984,7 +3022,7 @@
         const r=await fetch(base+"/api/teams/join",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({code})});
         row.classList.remove("checking");
         if(!r.ok)throw new Error();
-        haptic(60);setHint("");invalidateLabTeams();
+        haptic(60);setHint("");invalidateLabTeams();track("team_join");
         await showTeamWelcome(code);
         renderSocialTeam();
       }catch(e){
@@ -3256,6 +3294,7 @@
       }
     });
     if(!Array.isArray(state.shiftHistory))state.shiftHistory=[];
+    track("shift_end",{min:Math.round(durationMs/60000)});
     state.shiftHistory.unshift({id:id(),startedAt:sh.startedAt,endedAt,durationMs,entries});
     if(state.shiftHistory.length>365)state.shiftHistory=state.shiftHistory.slice(0,365);
     save();
@@ -3340,6 +3379,7 @@
   }
 
   function startShift(){
+    track("shift_start");
     localStorage.setItem("mise_vagt_detail","1");
     const snap=state.counters.map(c=>({id:c.id,count:c.count,subs:c.subs.map(s=>({id:s.id,count:s.count}))}));
     saveShift({startedAt:new Date().toISOString(),snap});
@@ -4017,7 +4057,18 @@
     });
     var sdClose=$("#sdClose");if(sdClose)sdClose.addEventListener("click",function(){$("#sharedDishScrim").classList.remove("open");});
     var sdFork=$("#sdFork");if(sdFork)sdFork.addEventListener("click",forkSharedDish);
-    var labProOk=$("#labProOk");if(labProOk)labProOk.addEventListener("click",function(){$("#labProScrim").classList.remove("open");});
+    var labProOk=$("#labProOk");
+    if(labProOk)labProOk.addEventListener("click",async function(){
+      if(_proWaitJoined){$("#labProScrim").classList.remove("open");return;}
+      var base=apiBase();var token=await getToken();
+      if(base&&token){
+        try{await fetch(base+"/api/pro/waitlist",{method:"POST",headers:{"Authorization":"Bearer "+token}});}catch(e){}
+      }
+      _proWaitJoined=true;localStorage.setItem("mise_pro_waitlist","1");
+      track("pro_waitlist");haptic(40);
+      labProOk.textContent=lang==="da"?"Du er på listen ✓ — vi giver besked":"You\u2019re on the list ✓";
+      setTimeout(function(){$("#labProScrim").classList.remove("open");},1100);
+    });
     // Delings-chips
     var visBar=$("#deVisBar");
     if(visBar)visBar.addEventListener("click",function(e){
@@ -4579,6 +4630,7 @@
       if(teams2.length&&!_currentDish.teamId)_currentDish.teamId=teams2[0].id;
     }
     var firstPublish=vis==="public"&&cur!=="public";
+    track("dish_share",{v:vis});
     _currentDish.visibility=vis;
     updateVisChips(vis);markDirty();saveDish(false);
     var local=_labDishes.find(function(d){return d.id===_currentDish.id;});
@@ -4606,7 +4658,9 @@
       scrim.classList.add("open");
     });
   }
+  var _proWaitJoined=localStorage.getItem("mise_pro_waitlist")==="1";
   function openLabPro(){
+    track("pro_wall");
     var t1=$("#labProTitle");if(t1)t1.textContent="Lab Pro";
     var sub=$("#labProSub");if(sub)sub.textContent=lang==="da"?"Du har nået grænsen for delte retter på gratis-planen":"You\u2019ve reached the free plan\u2019s sharing limit";
     var feats=$("#labProFeats");
@@ -4615,7 +4669,10 @@
       ["📖",lang==="da"?"Ubegrænset offentlig kogebog":"Unlimited public cookbook"],
       ["🤖",lang==="da"?"AI-opsummeringer af service-noter":"AI service-note summaries"],
     ].map(function(f){return '<div class="labpro-feat"><span class="labpro-feat-ic">'+f[0]+'</span><span>'+f[1]+'</span></div>';}).join("");
-    var ok=$("#labProOk");if(ok)ok.textContent=lang==="da"?"Kommer snart — vi giver besked!":"Coming soon — we\u2019ll let you know!";
+    var ok=$("#labProOk");
+    if(ok)ok.textContent=_proWaitJoined
+      ?(lang==="da"?"Du er på listen ✓":"You\u2019re on the list ✓")
+      :(lang==="da"?"Skriv mig op — giv besked når Pro lander":"Sign me up — tell me when Pro lands");
     $("#labProScrim").classList.add("open");
   }
   // ── Service-noter ──
@@ -4707,6 +4764,8 @@
       const subs=state.counters.flatMap(c=>c.subs.map(s=>tLabel(s.name)));
       return [...new Set([...phrases,...labels,...subs])];
     });}catch(e){console.error("attachAC",e);}
+    track("app_open");
+    setTimeout(()=>ensurePushSubscription(),3000);
     setTimeout(maybeShowOnboarding, 600);
     // Deep link: ?join=KODE åbner Hold-fanen med koden udfyldt
     try{
