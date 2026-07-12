@@ -404,9 +404,37 @@ app.delete("/api/teams/:id/leave", async (req, res) => {
 });
 
 // ---- Parse fritekst ----
+// ---- State backup (taellere, vine, vagter - hele klient-staten) ----
+app.get("/api/state", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const rows = await sb(`user_state?user_id=eq.${userId}&select=data,updated_at`);
+    res.json(rows && rows[0] ? rows[0] : { data: null, updated_at: null });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+app.post("/api/state", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    const { data } = req.body || {};
+    if (!data || typeof data !== "object") return res.status(400).json({ error: "data mangler" });
+    const updated_at = new Date().toISOString();
+    await sb("user_state?on_conflict=user_id", {
+      method: "POST",
+      headers: { "Prefer": "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify({ user_id: userId, data, updated_at }),
+    });
+    res.json({ ok: true, updated_at });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
 app.post("/api/parse-log", async (req, res) => {
   try {
-    const { text, counters = [], wines = [] } = req.body || {};
+    const { text, counters = [], wines = [], lang = "da" } = req.body || {};
     if (!text || !String(text).trim()) return res.json({ actions: [] });
 
     const content =
@@ -419,7 +447,7 @@ app.post("/api/parse-log", async (req, res) => {
       'Feltet "cat" SKAL være præcis ét af disse id\'er: "aabnet-mad" (åbnet mad/råvarer: østers, dåser, konserves), "aabnet-drikke" (åbnet drikkevarer: vin, øl, flasker, champagne), "snittet" (snittet/skåret/hakket råvarer), "tilberedt" (lavet/tilberedt mad & drikke: retter, pizzaer, kaffe, cocktails, saucer), "serveret" (serveret/leveret til gæster: couverter, retter, borde), "andet" (alt der ikke passer). Vælg ud fra hvad brugeren GJORDE ved objektet.\n' +
       'VIGTIGT: Nævner brugeren en bestemt type/sort/variant af det der tælles, SKAL den i feltet "sub". Brug stavemåden fra "muligeTyper" hvis typen står der.\n' +
       'Match KUN til en eksisterende tæller hvis OBJEKTET/PRODUKTET passer til tællerens emne. Verbets lighed er IKKE nok — "snittet 500 dumle" må IKKE matche "Løg snittet". delta kan være negativt.\n' +
-      'Er objektet nyt, returner det ALLIGEVEL som en counter-handling med et kortfattet dansk navn. Returnér kun {"actions":[]} for rent ikke-trackbare sætninger.';
+      'Er objektet nyt, returner det ALLIGEVEL som en counter-handling med et kortfattet navn på brugerens sprog (' + (lang === "en" ? "engelsk" : "dansk") + '). Returnér kun {"actions":[]} for rent ikke-trackbare sætninger.';
 
     const out = await callClaude({
       model: PARSE_MODEL,

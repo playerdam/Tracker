@@ -78,10 +78,8 @@
     <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
     <span id="qlogSpin" hidden><span class="spin"></span></span>
     <div class="upload-bar" id="uploadBar" style="display:none"><div class="upload-bar-fill" id="uploadBarFill"></div></div>
+    <button class="btn ghost btn-sm" id="stationBack" style="margin-bottom:10px">‹</button>
     <div id="counterGrid"></div>
-    <button class="station-fab" id="stationFab" aria-label="Log">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-    </button>
   </section>
 
   <section class="view" id="view-log"></section>
@@ -431,6 +429,7 @@
   <p id="catOvSub" style="font-size:12px;color:var(--faint);margin:2px 0 12px"></p>
   <div id="catOvList" style="max-height:56vh;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
   <div class="catov-total" id="catOvTotal"></div>
+  <button class="btn ghost" id="catOvManage" style="width:100%;margin-top:12px"></button>
 </div></div>
 
 <div class="scrim" id="shiftEditScrim"><div class="modal" style="max-height:80vh;overflow-y:auto">

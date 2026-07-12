@@ -9,8 +9,8 @@
   // ---- i18n ----
   const LANGS={
     da:{
-      tagline:"track your career",total_label:"i alt",
-      tab_station:"Stationen",tab_wine:"Vinen",
+      tagline:"track your career",total_label:"karriere",
+      tab_station:"Stationen",tab_wine:"Vin",tab_vagt:"Vagt",tab_lab:"Lab",
       view_grid:"Gitteroversigt",view_list:"Listevisning",
       qlog_ph:"Skriv hvad du har lavet — fx åbnet 500 Gillardeau østers",
       loading:"Indlæser…",
@@ -56,7 +56,7 @@
       auth_create:"Opret konto",auth_to_login:"Log ind",
       auth_forgot:"Glemt adgangskode?",auth_forgot_sent:"Tjek din email for et nulstillingslink",
       auth_signout:"Log ud",
-      tab_social:"Leaderboard",
+      tab_social:"Rangliste",
       challenge_title:"Ugens udfordring",challenge_days:"dage tilbage",challenge_ends:"{0} dage tilbage",
       lb_title:"Ugentlig rangliste",lb_week:"uge fra",lb_anon:"Anonym",lb_you:"dig",lb_empty:"Ingen data endnu",
       stab_global:"🌍 Global",stab_team:"👥 Hold",stab_challenge:"🏆 Ugens",
@@ -81,7 +81,7 @@
       professions:["Commis de cuisine","Chef de partie","Sous chef","Køkkenchef","Konditor","Serveringsmedarbejder","Sommelier","Bar","Andet"],
       streak_day:"1 dag i træk",streak_days:"{0} dage i træk",
       offline_pending:"{0} afventende sync",
-      tab_feed:"Social",
+      tab_feed:"Feed",
       feed_tab_mine:"Mit feed",feed_tab_discover:"Discover",
       feed_empty:"Følg nogen for at se deres aktivitet her",
       feed_empty_own:"Du har ikke postet noget endnu",
@@ -162,8 +162,8 @@
       img_only:"Kun billeder (JPEG, PNG, WebP)",
     },
     en:{
-      tagline:"track your career",total_label:"total",
-      tab_station:"Station",tab_wine:"Wine",
+      tagline:"track your career",total_label:"career",
+      tab_station:"Station",tab_wine:"Wine",tab_vagt:"Shift",tab_lab:"Lab",
       view_grid:"Grid view",view_list:"List view",
       qlog_ph:"Log what you've done — e.g. opened 500 Gillardeau oysters",
       loading:"Loading…",
@@ -234,7 +234,7 @@
       professions:["Commis de cuisine","Chef de partie","Sous chef","Head chef","Pastry chef","Service staff","Sommelier","Bar","Other"],
       streak_day:"1 day in a row",streak_days:"{0} days in a row",
       offline_pending:"{0} pending sync",
-      tab_feed:"Social",
+      tab_feed:"Feed",
       feed_tab_mine:"My feed",feed_tab_discover:"Discover",
       lab_sub:"Experiment with your dishes",
       lab_new:"New experiment",
@@ -469,7 +469,8 @@
       ?"Ved at fortsætte accepterer du vores <a href=\"https://tracker-production-1a62.up.railway.app/privacy.html\">privatlivspolitik</a> og <a href=\"https://tracker-production-1a62.up.railway.app/terms.html\">vilkår</a>"
       :"By continuing you accept our <a href=\"https://tracker-production-1a62.up.railway.app/privacy.html\">privacy policy</a> and <a href=\"https://tracker-production-1a62.up.railway.app/terms.html\">terms</a>";
     // Bottom nav — The Lab stays "The Lab" in both languages
-    const bLab=$("#bnav-lbl-lab");if(bLab)bLab.textContent="The Lab";
+    const bLab=$("#bnav-lbl-lab");if(bLab)bLab.textContent=t("tab_lab");
+    const bVagt=$("#bnav-lbl-vagt");if(bVagt)bVagt.textContent=t("tab_vagt");
     // qlog hint (initial HTML)
     const qlogHintEl=$("#qlogOvHint");if(qlogHintEl)qlogHintEl.textContent=t("qlog_hint");
     // Visit App
@@ -781,7 +782,28 @@
   }
 
   async function load(){try{const v=localStorage.getItem(STORE_KEY);if(v)return normalize(JSON.parse(v));}catch(e){}return clone(DEFAULTS);}
-  async function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){console.error(e);}}
+  async function save(){try{state._updatedAt=Date.now();localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){console.error(e);}schedulePushState();}
+  // ── Server-backup af state (punkt: localStorage er ikke en database) ──
+  let _pushTimer=null;
+  function schedulePushState(){if(!session)return;clearTimeout(_pushTimer);_pushTimer=setTimeout(pushState,4000);}
+  async function pushState(){
+    if(_pushTimer){clearTimeout(_pushTimer);_pushTimer=null;}
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    try{await fetch(base+"/api/state",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({data:state})});}catch(e){}
+  }
+  async function pullState(){
+    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    try{
+      const r=await fetchWithTimeout(base+"/api/state",{headers:{"Authorization":"Bearer "+token}},5000);
+      if(!r.ok)return;
+      const d=await r.json();
+      const remoteTs=d&&d.data&&d.data._updatedAt?d.data._updatedAt:0;
+      const localTs=state._updatedAt||0;
+      if(d&&d.data&&remoteTs>localTs){state=normalize(d.data);localStorage.setItem(STORE_KEY,JSON.stringify(state));}
+      else if(localTs&&localTs>remoteTs){pushState();}
+    }catch(e){}
+  }
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){if(_pushTimer)pushState();flushDeferredSync();}});
   function normalize(s){
     s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,unit:c.unit||"stk",cat:(c.cat&&c.cat!=="andet")?c.cat:(CAT_BY_LABEL[(c.label||"").toLowerCase()]||c.cat||"andet"),subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
     s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0,type:w.type||"andet",imageUrl:w.imageUrl||null,about:w.about||"",fromLineup:w.fromLineup||false}));
@@ -1292,7 +1314,7 @@
     actions.forEach(a=>applyOne(a,summary,syncItems));
     if(inp)inp.value="";
     save();renderVagt();renderCounters();renderCareer();
-    if(summary.length){showToast(t("toast_logged")+summary.join(", "));addLogEntry(summary.join(" · "),null);haptic(40);syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta,null,false,summary.join(" · ")));}
+    if(summary.length){showToast(t("toast_logged")+summary.join(", "));addLogEntry(summary.join(" · "),null);haptic(40);deferSync(syncItems,null,summary.join(" · "));}
     checkBadges();checkRecords();
   }
 
@@ -1350,7 +1372,7 @@
     +'</button>';
     const minisHtml=topCats.length?'<div class="vd2-minis">'+topCats.map(x=>{
       const len=+(mc*Math.min(1,x.tot/maxTot)).toFixed(2);
-      return '<div class="vd2-mini">'
+      return '<div class="vd2-mini" role="img" aria-label="'+esc(x.label)+': '+fmtNum(x.tot)+'">'
         +'<div class="vd2-mini-ringwrap">'
           +'<svg class="vd2-mini-svg" viewBox="0 0 60 60">'
             +'<circle class="vd2-mini-track" cx="30" cy="30" r="'+mr+'"/>'
@@ -1365,7 +1387,7 @@
     const calSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>';
     container.innerHTML='<div class="vd2-hero">'
       +'<div class="vd2-top">'
-        +'<div class="vd-ring-wrap">'
+        +'<div class="vd-ring-wrap" role="img" aria-label="'+fmtNum(grandTotal)+' '+(lang==="da"?"tællinger":"counts")+'">'
           +'<svg class="vd-ring-svg" viewBox="0 0 120 120">'
             +'<defs><linearGradient id="vdGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFB36B"/><stop offset="100%" stop-color="#FF6B8A"/></linearGradient></defs>'
             +'<circle class="vd-ring-track" cx="60" cy="60" r="'+r+'"/>'
@@ -1373,13 +1395,13 @@
           +'</svg>'
           +'<div class="vd-ring-center">'
             +'<span class="vd-ring-num" id="vd-ring-num" data-raw="'+grandTotal+'">'+fmtNum(grandTotal)+'</span>'
-            +'<span class="vd-ring-lbl">'+(shift?(lang==="da"?"denne vagt":"this shift"):(lang==="da"?"i alt":"total"))+'</span>'
+            +'<span class="vd-ring-lbl">'+(shift?(lang==="da"?"denne vagt":"this shift"):(lang==="da"?"tællinger":"counts"))+'</span>'
             +goalLine
           +'</div>'
         +'</div>'
         +'<div class="vd2-tiles">'
           +'<div class="vd2-tile"><div class="vd2-tile-ico" style="background:rgba(255,179,107,.16);color:#FFB36B">'+clockSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+fmtWorkTime(totalWorkMs())+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Arbejdstid":"Work time")+'</div></div></div>'
-          +'<div class="vd2-tile"><div class="vd2-tile-ico" style="background:rgba(92,184,167,.16);color:#5CB8A7">'+calSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+_shiftsThisWeek()+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Vagter denne uge":"Shifts this week")+'</div></div></div>'
+          +'<div class="vd2-tile"><div class="vd2-tile-ico" style="background:rgba(92,184,167,.16);color:#5CB8A7">'+calSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+_shiftsThisWeek()+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Vagter denne uge":"Shifts this week")+(calcStreak()>=2?" · 🔥"+calcStreak():"")+'</div></div></div>'
         +'</div>'
       +'</div>'
       +minisHtml
@@ -1410,6 +1432,8 @@
     });
     const tot=document.getElementById("catOvTotal");
     if(tot)tot.innerHTML='<span>'+(lang==="da"?"I alt":"Total")+'</span><span class="catov-total-val">'+fmtNum(grand)+'</span>';
+    const mng=document.getElementById("catOvManage");
+    if(mng){mng.textContent=lang==="da"?"Administrér tællere":"Manage counters";mng.onclick=()=>{scrim.classList.remove("open");switchTab("station");};}
     scrim.classList.add("open");
   }
 
@@ -1650,8 +1674,9 @@
     if(e.target.closest("#catalogBtn")){openCatalog();return;}
     const catAdd=e.target.closest("[data-cat-add]");if(catAdd){openCounterModal(null,catAdd.dataset.catAdd);return;}
   });
-  const stationFab=$("#stationFab");if(stationFab)stationFab.addEventListener("click",()=>openQlogOverlay());
 
+  const stationBack=$("#stationBack");
+  if(stationBack){stationBack.textContent=lang==="da"?"‹ Tilbage til Vagt":"‹ Back to Shift";stationBack.addEventListener("click",()=>switchTab("vagt"));}
   $("#btnGrid").addEventListener("click",()=>{listView=false;localStorage.setItem("mise_listview","0");renderCounters();});
   $("#btnList").addEventListener("click",()=>{listView=true;localStorage.setItem("mise_listview","1");renderCounters();});
 
@@ -1819,7 +1844,7 @@
   function matchWine(w,q){if(!q)return true;return [w.name,w.producer,w.land,w.region,w.grape,w.vint].some(v=>(v||"").toLowerCase().includes(q));}
   function sumHtml(shown){let g=0,b=0;shown.forEach(w=>{g+=w.glasses;b+=w.bottles;});return '<b>'+shown.length+'</b> '+(lang==="en"?(shown.length===1?"wine":"wines"):"vine")+'&nbsp;·&nbsp; <b>'+g+'</b> '+t("glasses").toLowerCase()+'&nbsp;·&nbsp; <b>'+b+'</b> '+t("bottles").toLowerCase();}
   function makeWRow(w){
-    const parts=[];[w.producer,w.region,w.land,w.grape].forEach(v=>{if(v)parts.push(esc(v));});
+    const parts=[];if(w.type&&w.type!=="andet")parts.push(esc(t("wine_type_"+w.type)));[w.producer,w.region,w.land,w.grape].forEach(v=>{if(v)parts.push(esc(v));});
     const metaMid=parts.join('<span class="sep">·</span>');
     const vintHtml=w.vint?'<span class="vint">'+esc(w.vint)+'</span>':'<span class="novint" data-act="edit">'+esc(t("add_vintage"))+'</span>';
     const meta=vintHtml+(parts.length?'<span class="sep">·</span>'+metaMid:'');
@@ -1867,7 +1892,7 @@
       const col=(WTYPE_COLORS[x.w.type]||WTYPE_COLORS.andet)[0];
       const len=+(mc*Math.min(1,x.tot/maxTot)).toFixed(2);
       const nm=x.w.name||x.w.producer||x.w.grape||(lang==="da"?"Uden navn":"Unnamed");
-      return '<div class="vd2-mini">'
+      return '<div class="vd2-mini" role="img" aria-label="'+esc(nm)+': '+fmtNum(x.tot)+'">'
         +'<div class="vd2-mini-ringwrap">'
           +'<svg class="vd2-mini-svg" viewBox="0 0 60 60"><circle class="vd2-mini-track" cx="30" cy="30" r="'+mr+'"/><circle class="vd2-mini-arc" cx="30" cy="30" r="'+mr+'" stroke="'+col+'" stroke-dasharray="'+len+' '+mc+'"/></svg>'
           +'<span class="vd2-mini-num">'+fmtNum(x.tot)+'</span>'
@@ -1885,7 +1910,7 @@
     +'</div>';
     el.innerHTML='<div class="vd2-hero">'
       +'<div class="vd2-top">'
-        +'<button class="vd-ring-wrap vd2-ring-btn" id="wineRingBtn" type="button">'
+        +'<button class="vd-ring-wrap vd2-ring-btn" id="wineRingBtn" type="button" aria-label="'+state.wines.length+' '+(lang==="da"?"vine":"wines")+' · '+esc(info.title)+'">'
           +'<svg class="vd-ring-svg" viewBox="0 0 120 120">'
             +'<defs><linearGradient id="vwGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFB36B"/><stop offset="100%" stop-color="#FF6B8A"/></linearGradient></defs>'
             +'<circle class="vd-ring-track" cx="60" cy="60" r="'+r+'"/>'
@@ -2458,7 +2483,7 @@
     const counters=state.counters.map(c=>({label:c.label,subs:c.subs.map(s=>s.name),muligeTyper:c.suggest||[]}));
     const wines=state.wines.map(w=>w.name).filter(Boolean);
     const _ctrl=new AbortController();const _to=setTimeout(()=>_ctrl.abort(),8000);
-    try{const res=await fetch(base+"/api/parse-log",{signal:_ctrl.signal,method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,counters,wines})});clearTimeout(_to);if(!res.ok)throw new Error("Backend "+res.status);const data=await res.json();return Array.isArray(data.actions)?data.actions:[];}
+    try{const res=await fetch(base+"/api/parse-log",{signal:_ctrl.signal,method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,counters,wines,lang})});clearTimeout(_to);if(!res.ok)throw new Error("Backend "+res.status);const data=await res.json();return Array.isArray(data.actions)?data.actions:[];}
     catch(e){clearTimeout(_to);throw e;}
   }
   function findCounter(name){const n=(name||"").toLowerCase();return state.counters.find(c=>c.label.toLowerCase()===n)||state.counters.find(c=>c.label.toLowerCase().includes(n)||n.includes(c.label.toLowerCase()));}
@@ -2546,12 +2571,26 @@
     return actions;
   }
   let toastTimer=null,undoSnapshot=null;
+  // Feed-sync venter til fortryd-vinduet er lukket, så Fortryd også gælder serveren
+  let _deferredSync=null,_deferredSyncTimer=null;
+  function deferSync(items,imageUrl,summary){
+    flushDeferredSync();
+    if(!items||!items.length)return;
+    _deferredSync={items,imageUrl,summary};
+    _deferredSyncTimer=setTimeout(flushDeferredSync,6600);
+  }
+  function flushDeferredSync(){
+    if(_deferredSyncTimer){clearTimeout(_deferredSyncTimer);_deferredSyncTimer=null;}
+    const d=_deferredSync;_deferredSync=null;
+    if(d)d.items.forEach(x=>syncLogEntry(x.categoryLabel,x.delta,d.imageUrl,false,d.summary));
+  }
+  function cancelDeferredSync(){if(_deferredSyncTimer){clearTimeout(_deferredSyncTimer);_deferredSyncTimer=null;}_deferredSync=null;}
   function showToast(msg){
     clearTimeout(toastTimer);$("#toastMsg").textContent=msg;
     const toast=$("#toast");toast.classList.add("show");
     toastTimer=setTimeout(()=>toast.classList.remove("show"),6500);
   }
-  $("#toastUndo").addEventListener("click",()=>{if(undoSnapshot){state=undoSnapshot;undoSnapshot=null;save();renderCounters();renderWines();renderCareer();}$("#toast").classList.remove("show");});
+  $("#toastUndo").addEventListener("click",()=>{cancelDeferredSync();if(undoSnapshot){state=undoSnapshot;undoSnapshot=null;save();renderCounters();renderWines();renderCareer();renderVagt();}$("#toast").classList.remove("show");});
   async function runQuickLog(){
     const input=$("#qlogInput");const text=input.value.trim();if(!text)return;
     $("#qlogSpin").hidden=false;input.disabled=true;
@@ -2574,7 +2613,7 @@
     showToast(msg);
     if(summary.length){addLogEntry(summary.join(" · "),imageUrl);haptic(40);}
     const logSummary=summary.join(" · ");
-    if(syncItems&&syncItems.length)syncItems.forEach(s=>syncLogEntry(s.categoryLabel,s.delta,imageUrl,false,logSummary));
+    deferSync(syncItems,imageUrl,logSummary);
     checkBadges();checkRecords();
     $("#qlogInput").focus();
   }
@@ -2685,7 +2724,6 @@
       ["station","vin","social","feed","lab","vagt"].forEach(n=>{const ve=document.getElementById("view-"+n);if(ve)ve.classList.toggle("active",v===n);});
       $("#viewToggle").style.display="none";
       const aiBar=document.getElementById("stAiBar");if(aiBar)aiBar.classList.toggle("on",v==="station");
-      const fab=document.getElementById("stationFab");if(fab)fab.style.display=v==="station"?"none":"";
       if(v==="vagt")renderVagt();
       if(v==="social")loadSocial();
       if(v==="feed"){loadFeed(false,window._activeFeedTab?window._activeFeedTab()==="mine":true);loadFollowRequests();}
@@ -2725,11 +2763,7 @@
     return streak;
   }
   function renderStreak(){
-    const el=$("#streakLbl");if(!el)return;
-    const s=calcStreak();
-    if(s<=1){el.textContent="";return;}
-    el.textContent=s===1?t("streak_day"):t("streak_days",s);
-    el.classList.toggle("hot",s>=7);
+    const el=$("#streakLbl");if(el)el.textContent="";
   }
 
   // ---- smart qlog suggestions ----
@@ -3057,8 +3091,11 @@
     });
   }
 
+  let _usernameSetupPending=false;
   async function maybeShowUsernameSetup(username){
     if(username)return;
+    const ob=$("#onboardOverlay");
+    if(ob&&ob.style.display==="flex"&&!ob.classList.contains("hidden")){_usernameSetupPending=true;return;}
     const scrim=$("#usernameSetupScrim");if(!scrim)return;
     $("#usernameSetupInput").value="";
     $("#usernameSetupStatus").textContent="";$("#usernameSetupStatus").className="username-status";
@@ -3409,7 +3446,7 @@
     save();renderLogView();
     $("#shiftScrim").classList.remove("open");
     recordShiftEnd(getShift());saveShift(null);renderShiftBar();renderVagt();
-    showToast(lang==="da"?"Vagt postet til feed!":"Shift posted to feed!");
+    showToast(lang==="da"?"Vagt postet til feed!":"Shift posted to feed!");setTimeout(()=>requestNotifPermission(),1500);
     feedCursor=null;
     const feedView=$("#view-feed");if(feedView&&feedView.classList.contains("active"))loadFeed(false,true);
   }
@@ -3436,7 +3473,7 @@
         if(state.log.length>2000)state.log.length=2000;
         save();renderLogView();
       }
-      recordShiftEnd(getShift());saveShift(null);renderShiftBar();renderVagt();$("#shiftScrim").classList.remove("open");showToast(lang==="da"?"Vagt afsluttet":"Shift ended");
+      recordShiftEnd(getShift());saveShift(null);renderShiftBar();renderVagt();$("#shiftScrim").classList.remove("open");showToast(lang==="da"?"Vagt afsluttet":"Shift ended");setTimeout(()=>requestNotifPermission(),1500);
     });
     const feedPostBtn=$("#shiftFeedPost");if(feedPostBtn)feedPostBtn.addEventListener("click",postShift);
     const discardBtn=$("#shiftDiscard");
@@ -3789,7 +3826,7 @@
     if(btn)btn.addEventListener("click",()=>{
       localStorage.setItem("mise_onboarded","1");
       o.classList.add("hidden");
-      setTimeout(()=>{o.style.display="none";},320);
+      setTimeout(()=>{o.style.display="none";if(_usernameSetupPending){_usernameSetupPending=false;maybeShowUsernameSetup(null);}},320);
     });
   }
 
@@ -4634,7 +4671,6 @@
       return [...new Set([...phrases,...labels,...subs])];
     });}catch(e){console.error("attachAC",e);}
     setTimeout(maybeShowOnboarding, 600);
-    setTimeout(()=>requestNotifPermission(),4000);
     setTimeout(()=>{
       (state.customCats||[]).filter(c=>c.iconPending&&c.name).forEach(c=>generateCatIcon(c.id,c.name));
     },1500);
@@ -4664,6 +4700,7 @@
     catch(e){console.error("CT:initAuth threw",e);showAuthScreen();return;}
     console.log("CT:authed="+authed);
     if(authed){
+      try{await pullState();}catch(e){console.error("CT:pullState",e);}
       try{startApp();}catch(e){console.error("CT:startApp threw",e);}
     }else{
       showAuthScreen();

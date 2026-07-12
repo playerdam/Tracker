@@ -1131,7 +1131,7 @@
   .st-r-edit:active{color:var(--text);background:var(--surface-2);transform:scale(.78);transition:transform .06s}
   .st-r-minus{appearance:none;background:var(--surface-2);border:1.5px solid var(--border);width:36px;height:36px;border-radius:10px;color:var(--dim);font-size:20px;cursor:pointer;display:grid;place-items:center;flex:none;-webkit-tap-highlight-color:transparent;transition:.1s}
   .st-r-minus:active{background:var(--border);transform:scale(.82);transition:transform .06s}
-  .st-r-num{font-family:"Fraunces",serif;font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--dim);line-height:1;width:88px;flex:none;text-align:right;letter-spacing:-.02em;cursor:pointer;transition:color .2s;overflow:hidden}
+  .st-r-num{font-family:"Fraunces",serif;font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--dim);line-height:1;width:96px;flex:none;text-align:right;letter-spacing:-.02em;cursor:pointer;transition:color .2s;overflow:hidden}
   .st-r.has-count .st-r-num{color:var(--accent)}
   .st-r.has-count .st-r-name{color:var(--text)}
   @keyframes numPop{0%{transform:scale(1)}35%{transform:scale(1.18)}100%{transform:scale(1)}}

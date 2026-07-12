@@ -1,4 +1,4 @@
-const CACHE = 'craft-tracker-v4';
+const CACHE = 'craft-tracker-v5';
 const SHELL = ['/', '/mise.html', '/styles.css', '/app.js'];
 
 self.addEventListener('install', e => {
