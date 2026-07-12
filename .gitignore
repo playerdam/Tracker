@@ -8,3 +8,5 @@ mobile/www/
 mobile/ios/App/Pods/
 mobile/ios/App/App/public/
 mobile/ios/DerivedData/
+test-results/
+playwright-report/

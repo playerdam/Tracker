@@ -6,6 +6,20 @@
   const hasStore=false;
   const $=s=>document.querySelector(s);
 
+  // ── Crash-telemetri: vi vil VIDE det når appen fejler hos brugerne ──
+  let _errSent=0;
+  function _reportError(msg,src,line,stack){
+    if(_errSent>=5)return;_errSent++;
+    try{
+      fetch(apiBase()+"/api/client-error",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json"},body:JSON.stringify({
+        msg:String(msg||"").slice(0,300),src:String(src||"").slice(0,200),line:line||0,
+        stack:String(stack||"").slice(0,500),ua:(navigator.userAgent||"").slice(0,120)
+      })}).catch(()=>{});
+    }catch(e){}
+  }
+  window.addEventListener("error",e=>_reportError(e.message,e.filename,e.lineno,e.error&&e.error.stack));
+  window.addEventListener("unhandledrejection",e=>_reportError("unhandledrejection: "+((e.reason&&e.reason.message)||e.reason),"",0,e.reason&&e.reason.stack));
+
   // ---- i18n ----
   const LANGS={
     da:{
@@ -745,10 +759,45 @@
   // ── Server-backup af state (punkt: localStorage er ikke en database) ──
   let _pushTimer=null;
   function schedulePushState(){if(!session)return;clearTimeout(_pushTimer);_pushTimer=setTimeout(pushState,4000);}
+  let _lastPushHash="";
+  function _stateHash(){const c={...state};delete c._updatedAt;return JSON.stringify(c);}
   async function pushState(){
     if(_pushTimer){clearTimeout(_pushTimer);_pushTimer=null;}
+    const h=_stateHash();
+    if(h===_lastPushHash)return;
     const base=apiBase();const token=await getToken();if(!base||!token)return;
-    try{await fetch(base+"/api/state",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({data:state})});}catch(e){}
+    try{
+      const r=await fetch(base+"/api/state",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({data:state})});
+      if(r.ok)_lastPushHash=h;
+    }catch(e){}
+  }
+  // Union-merge pr. element: to enheder kan logge hver for sig uden at
+  // overskrive hinandens aften. Tie/uden-timestamp → lokal vinder.
+  function _mergeById(localArr,remoteArr,score){
+    const map=new Map();
+    (remoteArr||[]).forEach(x=>{if(x&&x.id)map.set(x.id,x);});
+    (localArr||[]).forEach(x=>{
+      if(!x||!x.id)return;
+      const r=map.get(x.id);
+      if(!r||score(x)>=score(r))map.set(x.id,x);
+    });
+    return [...map.values()];
+  }
+  function mergeStates(local,remote){
+    const m={};
+    // Tællere: højeste total vinder (counts går praktisk talt aldrig ned)
+    m.counters=_mergeById(local.counters,remote.counters,c=>counterTotal(c));
+    m.wines=_mergeById(local.wines,remote.wines,w=>(w.glasses||0)+(w.bottles||0));
+    m.shiftHistory=_mergeById(local.shiftHistory,remote.shiftHistory,x=>new Date(x.endedAt||x.startedAt||0).getTime()||0)
+      .sort((a,b)=>new Date(b.startedAt)-new Date(a.startedAt)).slice(0,365);
+    const logKey=e=>e.ts+"|"+(e.text||"");
+    const logMap=new Map();
+    [...(remote.log||[]),...(local.log||[])].forEach(e=>{if(e&&e.ts)logMap.set(logKey(e),e);});
+    m.log=[...logMap.values()].sort((a,b)=>b.ts-a.ts).slice(0,2000);
+    m.customCats=_mergeById(local.customCats,remote.customCats,()=>1);
+    m.labelI18n=Object.assign({},remote.labelI18n||{},local.labelI18n||{});
+    m._updatedAt=Math.max(local._updatedAt||0,remote._updatedAt||0);
+    return normalize(m);
   }
   async function pullState(){
     const base=apiBase();const token=await getToken();if(!base||!token)return;
@@ -756,10 +805,11 @@
       const r=await fetchWithTimeout(base+"/api/state",{headers:{"Authorization":"Bearer "+token}},5000);
       if(!r.ok)return;
       const d=await r.json();
-      const remoteTs=d&&d.data&&d.data._updatedAt?d.data._updatedAt:0;
+      if(!d||!d.data){if(state._updatedAt)pushState();return;}
       const localTs=state._updatedAt||0;
-      if(d&&d.data&&remoteTs>localTs){state=normalize(d.data);localStorage.setItem(STORE_KEY,JSON.stringify(state));}
-      else if(localTs&&localTs>remoteTs){pushState();}
+      state=localTs?mergeStates(state,normalize(d.data)):normalize(d.data);
+      localStorage.setItem(STORE_KEY,JSON.stringify(state));
+      pushState();
     }catch(e){}
   }
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){if(_pushTimer)pushState();flushDeferredSync();}});
@@ -1264,11 +1314,13 @@
     text=(text||"").trim();if(!text)return;
     const inp=document.getElementById("vagtAddIn");
     const spin=document.getElementById("vagtAiSpin");const btn=document.getElementById("vagtAddBtn");
-    if(spin)spin.classList.add("on");if(btn)btn.disabled=true;if(inp)inp.disabled=true;
-    let actions=[];
-    try{actions=await parseLog(text);}catch(e){console.warn("vagt AI parse failed:",e);}
-    if(!actions.length)actions=localParse(text);
-    if(spin)spin.classList.remove("on");if(btn)btn.disabled=false;if(inp){inp.disabled=false;}
+    let actions=confidentLocalActions(text)||[];
+    if(!actions.length){
+      if(spin)spin.classList.add("on");if(btn)btn.disabled=true;if(inp)inp.disabled=true;
+      try{actions=await parseLog(text);}catch(e){console.warn("vagt AI parse failed:",e);}
+      if(!actions.length)actions=localParse(text);
+      if(spin)spin.classList.remove("on");if(btn)btn.disabled=false;if(inp){inp.disabled=false;}
+    }
     if(!actions.length){showToast(lang==="da"?"Forstod ikke — prøv igen":"Couldn't parse — try again");if(inp)inp.focus();return;}
     undoSnapshot=clone(state);
     const summary=[],syncItems=[];
@@ -1448,7 +1500,13 @@
       (sc.subs||[]).forEach(ss=>snapMap[sc.id].subs[ss.id]=ss.count);
     });
 
-    const sorted=[...state.counters].sort((a,b)=>counterTotal(b)-counterTotal(a));
+    const _snapTot={};
+    if(snap)snap.forEach(sc=>{_snapTot[sc.id]=(sc.count||0)+(sc.subs||[]).reduce((a,x)=>a+(x.count||0),0);});
+    const _delta=c=>counterTotal(c)-(_snapTot[c.id]||0);
+    const sorted=[...state.counters].sort((a,b)=>{
+      if(snap){const d=_delta(b)-_delta(a);if(d)return d;}
+      return counterTotal(b)-counterTotal(a);
+    });
     sorted.forEach(c=>{
       if(c.subs.length){
         const grp=document.createElement("div");grp.className="vr-grp";
@@ -2448,6 +2506,21 @@
     try{const res=await fetch(base+"/api/parse-log",{signal:_ctrl.signal,method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({text,counters,wines,lang})});clearTimeout(_to);if(!res.ok)throw new Error("Backend "+res.status);const data=await res.json();return Array.isArray(data.actions)?data.actions:[];}
     catch(e){clearTimeout(_to);throw e;}
   }
+  // Optimistisk parsing: matcher teksten KUN eksisterende tællere/vine lokalt,
+  // anvendes den øjeblikkeligt uden AI-kald. Nye ting går stadig til AI.
+  function confidentLocalActions(text){
+    let actions=[];
+    try{actions=localParse(text);}catch(e){return null;}
+    if(!actions.length)return null;
+    for(const a of actions){
+      if(a.kind==="counter"){if(!findCounter(a.counter))return null;}
+      else if(a.kind==="wine"){
+        const nm=(a.wine||"").toLowerCase();
+        if(!state.wines.some(x=>x.name&&x.name.toLowerCase()===nm))return null;
+      }else return null;
+    }
+    return actions;
+  }
   function findCounter(name){
     const n=(name||"").toLowerCase();if(!n)return null;
     const forms=c=>{const l=c.label.toLowerCase();return [l,(_LBL_DA2EN[l]||"").toLowerCase(),(_LBL_EN2DA[l]||"").toLowerCase()].filter(Boolean);};
@@ -2565,13 +2638,15 @@
   $("#toastUndo").addEventListener("click",()=>{cancelDeferredSync();if(undoSnapshot){state=undoSnapshot;undoSnapshot=null;save();renderCounters();renderWines();renderCareer();renderVagt();}$("#toast").classList.remove("show");});
   async function runQuickLog(){
     const input=$("#qlogInput");const text=input.value.trim();if(!text)return;
-    $("#qlogSpin").hidden=false;input.disabled=true;
     let imageUrl=null;
-    if(pendingPhotoDataUrl)imageUrl=await uploadPendingPhoto();
-    let actions=[];
-    try{actions=await parseLog(text);}catch(e){console.warn("AI parse unavailable:",e);}
-    if(!actions.length)actions=localParse(text);
-    $("#qlogSpin").hidden=true;input.disabled=false;
+    if(pendingPhotoDataUrl){$("#qlogSpin").hidden=false;imageUrl=await uploadPendingPhoto();$("#qlogSpin").hidden=true;}
+    let actions=confidentLocalActions(text)||[];
+    if(!actions.length){
+      $("#qlogSpin").hidden=false;input.disabled=true;
+      try{actions=await parseLog(text);}catch(e){console.warn("AI parse unavailable:",e);}
+      if(!actions.length)actions=localParse(text);
+      $("#qlogSpin").hidden=true;input.disabled=false;
+    }
     if(!actions.length){showToast(t("toast_unknown"));input.focus();return;}
     undoSnapshot=clone(state);
     const summary=[],ask=[],syncItems=[];
@@ -3265,6 +3340,7 @@
   }
 
   function startShift(){
+    localStorage.setItem("mise_vagt_detail","1");
     const snap=state.counters.map(c=>({id:c.id,count:c.count,subs:c.subs.map(s=>({id:s.id,count:s.count}))}));
     saveShift({startedAt:new Date().toISOString(),snap});
     renderShiftBar();
@@ -3414,11 +3490,13 @@
   async function runShiftLogAdd(text){
     text=(text||"").trim();if(!text)return;
     const inp=$("#shiftLogIn"),spin=$("#shiftLogSpin"),btn=$("#shiftLogAdd");
-    if(spin)spin.classList.add("on");if(btn)btn.disabled=true;if(inp)inp.disabled=true;
-    let actions=[];
-    try{actions=await parseLog(text);}catch(e){console.warn("shift log parse failed:",e);}
-    if(!actions.length)actions=localParse(text);
-    if(spin)spin.classList.remove("on");if(btn)btn.disabled=false;if(inp)inp.disabled=false;
+    let actions=confidentLocalActions(text)||[];
+    if(!actions.length){
+      if(spin)spin.classList.add("on");if(btn)btn.disabled=true;if(inp)inp.disabled=true;
+      try{actions=await parseLog(text);}catch(e){console.warn("shift log parse failed:",e);}
+      if(!actions.length)actions=localParse(text);
+      if(spin)spin.classList.remove("on");if(btn)btn.disabled=false;if(inp)inp.disabled=false;
+    }
     if(!actions.length){showToast(lang==="da"?"Forstod ikke — prøv igen":"Couldn\u2019t parse — try again");if(inp)inp.focus();return;}
     undoSnapshot=clone(state);
     const summary=[],syncItems=[];

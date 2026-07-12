@@ -551,6 +551,15 @@ app.post("/api/lab/notes-summary", async (req, res) => {
   }
 });
 
+// ---- Crash-telemetri fra klienten (ingen auth: skal virke når alt andet fejler) ----
+app.post("/api/client-error", (req, res) => {
+  const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "?").split(",")[0].trim();
+  if (rateLimited("cerr", ip, 10, 3600000)) return res.status(429).json({ ok: false });
+  const { msg = "", src = "", line = 0, stack = "", ua = "" } = req.body || {};
+  console.error("[client-error]", String(msg).slice(0, 300), "|", String(src).slice(0, 200) + ":" + parseInt(line, 10), "|", String(ua).slice(0, 120), "\n", String(stack).slice(0, 500));
+  res.json({ ok: true });
+});
+
 // ---- State backup (taellere, vine, vagter - hele klient-staten) ----
 app.get("/api/state", async (req, res) => {
   try {
