@@ -25,8 +25,6 @@
   <div class="header-right">
     <div class="offline-dot" id="offlineDot" title=""></div>
     <button id="profileBtn" class="profile-btn" style="display:none" title="Profil"><span id="profileInitial">?</span></button>
-    <button id="signOutBtn" class="auth-signout-btn"></button>
-    <button id="langBtn" class="lang-btn">EN</button>
     <div class="career"><div class="num" id="careerNum">0</div><div class="lbl" id="totalLbl"></div><div class="streak" id="streakLbl"></div></div>
   </div>
 </header>
@@ -589,6 +587,7 @@
     <button class="btn primary" id="profileSave"></button>
     <button class="btn ghost" id="profileClose"></button>
   </div>
+  <button class="btn ghost" id="signOutBtn" style="width:100%;margin-top:14px;color:var(--faint);border-color:transparent"></button>
 </div></div>
 
 <div class="scrim" id="usernameSetupScrim"><div class="modal">
@@ -619,6 +618,10 @@
     <button class="log-drawer-close" id="logDrawerClose" aria-label="Luk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <div class="log-drawer-body">
+    <button class="va-drawer-link" id="langDrawerLink">
+      <span class="va-drawer-link-icon">🌐</span>
+      <span class="va-drawer-link-label" id="langDrawerLbl">English</span>
+    </button>
     <button class="va-drawer-link" id="themeDrawerLink">
       <span class="va-drawer-link-icon" id="themeDrawerIcon">🌙</span>
       <span class="va-drawer-link-label" id="themeDrawerLbl">Mørkt tema</span>

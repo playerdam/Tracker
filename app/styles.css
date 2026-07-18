@@ -1107,7 +1107,7 @@
   .vd2-timer{font-family:"Fraunces",serif;font-size:25px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.02em;color:#fff}
   /* Section headers */
   .vd2-sec{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px}
-  .vd2-sec-title{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+  .vd2-sec-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
   .vd2-sec-btn{appearance:none;background:none;border:none;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;padding:4px 2px;-webkit-tap-highlight-color:transparent}
   /* Activity cards */
   .vd2-shift{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:12px 13px;margin-bottom:9px;display:flex;gap:12px;align-items:center;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;font-family:inherit;touch-action:manipulation;transition:background .08s}

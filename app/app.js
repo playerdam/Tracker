@@ -313,7 +313,7 @@
   function t(key,...args){let s=(LANGS[lang]&&LANGS[lang][key])||LANGS.da[key]||key;args.forEach((a,i)=>s=s.replace("{"+i+"}",a));return s;}
   function translateUI(){
     document.documentElement.lang=lang;
-    $("#langBtn").textContent=lang==="da"?"EN":"DA";
+    const langDl=$("#langDrawerLbl");if(langDl)langDl.textContent=lang==="da"?"English":"Dansk";
     const tglEl=$("#tagline");if(tglEl)tglEl.textContent=t("tagline");
     $("#totalLbl").textContent=t("total_label");
     $("#tab-station").textContent=t("tab_station");
@@ -358,7 +358,7 @@
     $("#toastUndo").textContent=t("undo");
     $("#authEmailLbl").textContent=t("auth_email");
     $("#authPwLbl").textContent=t("auth_pw");
-    $("#signOutBtn").textContent=t("auth_signout");
+    const _so=$("#signOutBtn");if(_so)_so.textContent=t("auth_signout");
     renderStreak();
     const tSocial=$("#tab-social");if(tSocial)tSocial.textContent=t("tab_social");
     const tFeed=$("#tab-feed");if(tFeed)tFeed.textContent=t("tab_feed");
@@ -473,7 +473,7 @@
     const lineupClose=$("#lineupClose");if(lineupClose)lineupClose.textContent=lang==="da"?"Luk":"Close";
   }
   function setLang(l){lang=l;localStorage.setItem("mise_lang",l);translateUI();renderCounters();renderWines();renderLogView();renderVagt();}
-  $("#langBtn").addEventListener("click",()=>setLang(lang==="da"?"en":"da"));
+  var _langLink=$("#langDrawerLink");if(_langLink)_langLink.addEventListener("click",()=>{setLang(lang==="da"?"en":"da");haptic(15);});
 
   // Translations for default counter/sub labels — user-created labels stay as-is
   const LABEL_TRANSLATIONS={
@@ -673,14 +673,14 @@
   function showAuthScreen(){
     $("#authScreen").style.display="flex";
     $("#mainWrap").style.display="none";
-    $("#signOutBtn").style.display="none";
+    {const _so2=$("#signOutBtn");if(_so2)_so2.style.display="none";}
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.style.display="none";
   }
 
   function hideAuthScreen(){
     $("#authScreen").style.display="none";
     $("#mainWrap").style.display="";
-    $("#signOutBtn").style.display="";
+    {const _so3=$("#signOutBtn");if(_so3)_so3.style.display="";}
     const pb=$("#profileBtn");if(pb)pb.style.display="";
   }
 
@@ -741,7 +741,7 @@
       hideAuthScreen();startApp();
     });
     [emailEl,pwEl].forEach(el=>el.addEventListener("keydown",e=>{if(e.key==="Enter")submitBtn.click();}));
-    $("#signOutBtn").addEventListener("click",()=>{session=null;localStorage.removeItem("mise_session");showAuthScreen();});
+    {const _so4=$("#signOutBtn");if(_so4)_so4.addEventListener("click",()=>{session=null;localStorage.removeItem("mise_session");$("#profileScrim").classList.remove("open");showAuthScreen();});}
     updateMode();
   }
 
@@ -1265,7 +1265,7 @@
     grid.appendChild(detHdr);
     const detBody=document.createElement("div");detBody.className="st-detail-body"+(detOpen?"":" stdb-h");
     grid.appendChild(detBody);
-    detHdr.addEventListener("click",()=>{const o=detHdr.classList.toggle("stdo");detBody.classList.toggle("stdb-h",!o);localStorage.setItem("mise_detail_open",o?"1":"0");});
+    detHdr.addEventListener("click",()=>{const o=detHdr.classList.toggle("stdo");if(o){detBody.classList.remove("stdb-h");_animOpen(detBody);}else _animClose(detBody,()=>detBody.classList.add("stdb-h"));localStorage.setItem("mise_detail_open",o?"1":"0");haptic(10);});
 
     activeCats.forEach(cat=>{
       const counters=groups[cat.id]||[];
@@ -1366,6 +1366,27 @@
     _tick();vagtTimerInterval=setInterval(_tick,1000);
   }
 
+  // Højde-animeret fold ud/ind — indhold glider, teleporterer ikke
+  function _animOpen(el){
+    el.style.display="";el.style.overflow="hidden";el.style.height="0px";
+    requestAnimationFrame(()=>{
+      el.style.transition="height .22s ease";el.style.height=el.scrollHeight+"px";
+      setTimeout(()=>{el.style.height="";el.style.transition="";el.style.overflow="";},240);
+    });
+  }
+  function _animClose(el,after){
+    el.style.overflow="hidden";el.style.height=el.scrollHeight+"px";
+    requestAnimationFrame(()=>{
+      el.style.transition="height .2s ease";el.style.height="0px";
+      setTimeout(()=>{el.style.transition="";el.style.height="";el.style.overflow="";if(after)after();},220);
+    });
+  }
+  function _updateVagtAfterLog(){
+    const shift=getShift();
+    _buildVagtDashboard(document.getElementById("vagtDash"),shift);
+    const rows=document.getElementById("vagtRows");
+    if(rows){rows.innerHTML="";_buildVagtRows(rows,shift?shift.snap:null,true);}
+  }
   async function runVagtAdd(text){
     text=(text||"").trim();if(!text)return;
     const inp=document.getElementById("vagtAddIn");
@@ -1383,7 +1404,8 @@
     const summary=[],syncItems=[];
     actions.forEach(a=>applyOne(a,summary,syncItems));
     if(inp)inp.value="";
-    save();renderVagt();renderCounters();renderCareer();
+    save();_updateVagtAfterLog();renderCounters();renderCareer();
+    if(inp)inp.focus();
     if(summary.length){showToast(t("toast_logged")+summary.join(", "));addLogEntry(summary.join(" · "),null);haptic(40);deferSync(syncItems,null,summary.join(" · "));}
     checkBadges();checkRecords();
   }
@@ -1544,7 +1566,7 @@
     if(!container)return;
     const hist=state.shiftHistory||[];
     const seeAllLbl=_vagtShowAllShifts?(lang==="da"?"Vis færre":"Show less"):(lang==="da"?"Vis alle":"View all")+" ("+hist.length+")";
-    container.innerHTML='<div class="vd2-sec"><span class="vd2-sec-title">'+(lang==="da"?"Aktivitet":"Activity")+'</span>'
+    container.innerHTML='<div class="vd2-sec"><span class="vd2-sec-title">'+(lang==="da"?"Aktivitet":"Activity")+(hist.length?' · '+hist.length:'')+'</span>'
       +(hist.length>3?'<button class="vd2-sec-btn" id="vagtSeeAll">'+seeAllLbl+'</button>':'')
       +'</div>';
     if(!hist.length){
@@ -1699,17 +1721,11 @@
         +'<div class="vd2-act-sub">'+(lang==="da"?"Klar til service?":"Ready for service?")+'</div></div>'
         +'</button>';
     }
-    const logCard='<button class="vd2-act vd2-act-log" id="vagtLogCard">'
-      +'<div class="vd2-act-ico">'+sparkSvg+'</div>'
-      +'<div><div class="vd2-act-title">'+(lang==="da"?"Log noget":"Log something")+'</div>'
-      +'<div class="vd2-act-sub">'+(lang==="da"?"Skriv hvad du lavede":"Write what you did")+'</div></div>'
-      +'</button>';
-
+    const detailsBlock=state.counters.length?'<div id="vagtDetWrap"></div><div id="vagtRows" class="stdb-h vrows"></div>':'';
     el.innerHTML='<div id="vagtDash"></div>'
-      +'<div class="vd2-actions">'+shiftCard+logCard+'</div>'
+      +'<div class="vd2-actions" style="grid-template-columns:1fr">'+shiftCard+'</div>'
       +addBlock
-      +'<div id="vagtActivity"></div>'
-      +(state.counters.length?'<div id="vagtDetWrap"></div><div id="vagtRows" class="stdb-h vrows"></div>':'');
+      +(shift?detailsBlock+'<div id="vagtActivity"></div>':'<div id="vagtActivity"></div>'+detailsBlock);
 
     _buildVagtDashboard(document.getElementById("vagtDash"),shift);
     _buildVagtActivity(document.getElementById("vagtActivity"));
@@ -1723,15 +1739,17 @@
       detHdr.innerHTML='<div class="st-detail-line"></div><span class="st-detail-lbl">'+(lang==="da"?"Detaljer":"Details")+'</span><span class="st-detail-chev">›</span><div class="st-detail-line"></div>';
       if(detWrap)detWrap.appendChild(detHdr);
       if(rows&&detOpen)rows.classList.remove("stdb-h");
-      detHdr.addEventListener("click",()=>{const o=detHdr.classList.toggle("stdo");if(rows)rows.classList.toggle("stdb-h",!o);localStorage.setItem("mise_vagt_detail",o?"1":"0");});
+      detHdr.addEventListener("click",()=>{
+        const o=detHdr.classList.toggle("stdo");
+        if(rows){if(o){rows.classList.remove("stdb-h");_animOpen(rows);}else _animClose(rows,()=>rows.classList.add("stdb-h"));}
+        localStorage.setItem("mise_vagt_detail",o?"1":"0");haptic(10);
+      });
       _buildVagtRows(rows,shift?shift.snap:null,true);
     }
 
     // ── Wiring ──
     const sc=document.getElementById("vagtShiftCard");
     if(sc)sc.addEventListener("click",()=>{if(getShift())openShiftModal();else{startShift();renderVagt();haptic(30);}});
-    const lc=document.getElementById("vagtLogCard");
-    if(lc)lc.addEventListener("click",()=>{const ai=document.getElementById("vagtAddIn");if(ai){ai.scrollIntoView({block:"center",behavior:"smooth"});ai.focus();}});
     if(shift)startVagtTimer(shift);
 
     const inp=document.getElementById("vagtAddIn"),btn=document.getElementById("vagtAddBtn");
@@ -2910,7 +2928,14 @@
     if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
   }
   document.querySelectorAll(".tab").forEach(tb=>tb.addEventListener("click",()=>switchTab(tb.dataset.view)));
-  document.querySelectorAll(".bnav-btn").forEach(btn=>btn.addEventListener("click",()=>switchTab(btn.dataset.tab)));
+  document.querySelectorAll(".bnav-btn").forEach(btn=>btn.addEventListener("click",()=>{
+    if(btn.classList.contains("active")){
+      const sc=document.getElementById("appScroll");
+      if(sc)sc.scrollTo({top:0,behavior:"smooth"});
+      return;
+    }
+    switchTab(btn.dataset.tab);
+  }));
 
   function openLogDrawer(){renderLogView();renderShiftLog();$("#logDrawer").classList.add("open");$("#logScrim").classList.add("open");}
   function goToTeams(){switchTab("social");setTimeout(()=>_switchSocialTab("team"),60);}
@@ -3651,7 +3676,7 @@
     const summary=[],syncItems=[];
     actions.forEach(a=>applyOne(a,summary,syncItems));
     if(inp)inp.value="";
-    save();renderVagt();renderCounters();renderCareer();
+    save();_updateVagtAfterLog();renderCounters();renderCareer();
     if(summary.length){addLogEntry(summary.join(" · "),null);haptic(40);deferSync(syncItems,null,summary.join(" · "));}
     checkBadges();checkRecords();
     _renderShiftStep1Totals();
@@ -4294,7 +4319,14 @@
     });
     // Section accordions
     document.querySelectorAll(".ds .ds-hd").forEach(function(hd){
-      hd.addEventListener("click",function(){hd.closest(".ds").classList.toggle("open");});
+      hd.addEventListener("click",function(){
+        const sec=hd.closest(".ds");const bd=sec.querySelector(".ds-bd");
+        const opening=!sec.classList.contains("open");
+        if(opening){sec.classList.add("open");if(bd)_animOpen(bd);}
+        else if(bd)_animClose(bd,()=>sec.classList.remove("open"));
+        else sec.classList.remove("open");
+        haptic(10);
+      });
     });
     // Ingredient add
     var ingAddBtn=$("#ingAddBtn");
