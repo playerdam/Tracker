@@ -1442,7 +1442,7 @@
     +'</button>';
     const minisHtml=topCats.length?'<div class="vd2-minis">'+topCats.map(x=>{
       const len=+(mc*Math.min(1,x.tot/maxTot)).toFixed(2);
-      return '<button class="vd2-mini vd2-mini-tap" data-ring-id="'+esc(x.id)+'" aria-label="'+esc(x.label)+': '+fmtNum(x.tot)+'. '+(lang==="da"?"Tryk for +1":"Tap for +1")+'">'
+      return '<button class="vd2-mini vd2-mini-tap" data-ring-id="'+esc(x.id)+'" aria-label="'+esc(x.label)+': '+fmtNum(x.tot)+'. '+(lang==="da"?"Tryk for overblik":"Tap for overview")+'">'
         +'<div class="vd2-mini-ringwrap">'
           +'<svg class="vd2-mini-svg" viewBox="0 0 60 60">'
             +'<circle class="vd2-mini-track" cx="30" cy="30" r="'+mr+'"/>'
@@ -1478,22 +1478,9 @@
     +'</div>';
     const allBtn=document.getElementById("vagtAllCats");
     if(allBtn)allBtn.addEventListener("click",openCatOverview);
-    // Ringene ER logging-flader: tap = +1, long-press = mængde
+    // Ringene åbner det totale overblik — logging sker i Detaljer og tekstfeltet
     container.querySelectorAll("[data-ring-id]").forEach(btn=>{
-      const c=state.counters.find(x=>x.id===btn.dataset.ringId);if(!c)return;
-      const simple=!c.subs.length&&(!c.unit||c.unit==="stk");
-      btn.addEventListener("click",()=>{
-        if(btn._lp){btn._lp=false;return;}
-        if(simple){bumpVagtRow(c.id,1);}
-        else openNumtray((lang==="da"?"Tilføj ":"Add ")+tLabel(c.label),"",val=>{
-          if(val>0){
-            if(c.subs.length){let su=c.subs.find(x=>x.name==="Uden type");if(!su){su={id:id(),name:"Uden type",count:0};c.subs.push(su);}su.count+=val;}
-            else c.count=parseFloat((c.count+val).toFixed(2));
-            save();renderVagt();renderCounters();renderCareer();haptic();
-          }
-        });
-      });
-      if(simple)bindLongPress(btn,()=>{btn._lp=true;openNumtray((lang==="da"?"Tilføj ":"Add ")+tLabel(c.label),"",val=>{if(val>0)bumpVagtRow(c.id,val);});});
+      btn.addEventListener("click",()=>{openCatOverview();haptic(15);});
     });
   }
 
