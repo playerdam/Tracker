@@ -2368,14 +2368,26 @@
       const dataUrl=await resizeImage(file,1400);if(!dataUrl)throw new Error("image-fail");
       const r=await fetch(base+"/api/visits/wine-from-label",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl,lang})});
       const d=await r.json();if(!r.ok||(!d.name&&!d.producer))throw new Error(d.error||"empty");
-      if(openFirst)openWineSheet(null,"edit");
-      _waFromScan=true;
-      const _f=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.value=val;};
-      _f("waName",d.name);_f("waProducer",d.producer);_f("waVint",d.vintage);_f("waLand",d.land);_f("waRegion",d.region);_f("waAbout",d.about);
-      if(d.grape)_waSetGrapes(d.grape.split(",").map(s=>s.trim()).filter(Boolean));else _waSetGrapes([]);
-      if(d.type)document.querySelectorAll(".wa-type-btn").forEach(b=>b.classList.toggle("active",b.dataset.wtype===d.type));
-      _waPhotoDataUrl=dataUrl;_waPhotoExistingUrl=null;_waSetPhotoPreview(dataUrl);
-      setTimeout(()=>{const el=document.getElementById("waName");if(el)el.focus();},60);
+      // Overblikket først: upload foto, gem vinen, vis det flotte view — Rediger udfylder resten
+      let imageUrl=null;
+      try{
+        const ur=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl})});
+        const ud=await ur.json();imageUrl=ud.url||null;
+      }catch(e){}
+      const data={name:d.name||"",producer:d.producer||"",land:d.land||"",region:d.region||"",grape:d.grape||"",vint:d.vintage||"",imageUrl,type:d.type||"andet",about:d.about||"",glasses:0,bottles:1};
+      _waWineId=null;_waFromScan=false;
+      const match=state.wines.find(w=>wineSimilar({name:data.name,producer:data.producer},w));
+      if(match){
+        _pendingWineData=Object.assign(data,{_match:match});
+        const dn=match.name||(match.producer+(match.vint?" "+match.vint:""))||"ukendt vin";
+        document.getElementById("wineDupTitle").textContent=lang==="da"?"Kender vi den her?":"Know this one?";
+        document.getElementById("wineDupBody").textContent=(lang==="da"?"Ligner det ikke ":"Looks like ")+('"'+dn+'"')+(lang==="da"?"? Du kan tilføje til den i stedet for at oprette en kopi.":" you already have? Add to it instead of creating a duplicate.");
+        document.getElementById("wineDupMerge").textContent=lang==="da"?"Ja, tilføj til den":"Yes, add to it";
+        document.getElementById("wineDupNew").textContent=lang==="da"?"Nej, opret ny":"No, create new";
+        document.getElementById("wineDupScrim").classList.add("open");
+      }else{
+        doWineCommit(data,null);
+      }
     }catch(e){showToast(t("wine_scan_err"));}
     finally{btns.forEach(b=>{if(b)b.classList.remove("loading");});lbls.forEach(l=>{if(l)l.textContent=t("wine_scan");});}
   }
@@ -2590,14 +2602,14 @@
       const w=state.wines.find(x=>x.id===_waWineId);
       if(w){Object.assign(w,{name,producer,land,region,grape,vint,imageUrl,type,about});resultWine=w;}
     } else {
-      const nw={id:id(),name,producer,land,region,grape,vint,glasses:0,bottles:0,imageUrl,type,about};
+      const nw={id:id(),name,producer,land,region,grape,vint,glasses:data.glasses||0,bottles:data.bottles||0,imageUrl,type,about};
       state.wines.unshift(nw);resultWine=nw;
     }
     save();renderWines();renderCareer();
     const newXp=computeXP();const newLvl=getLevelInfo(newXp).title;
     if(newLvl!==prevLvl)showToast("🏆 "+newLvl+"!");
     else if(newXp>prevXp)showToast("+"+(newXp-prevXp)+" XP");
-    if(resultWine){_waWineId=resultWine.id;_waShowView(resultWine);}else closeWineSheet();
+    if(resultWine){openWineSheet(resultWine.id,"view");}else closeWineSheet();
   }
   document.getElementById("wineDupMerge").addEventListener("click",()=>{if(!_pendingWineData)return;doWineCommit(_pendingWineData,_pendingWineData._match);_pendingWineData=null;document.getElementById("wineDupScrim").classList.remove("open");});
   document.getElementById("wineDupNew").addEventListener("click",()=>{if(!_pendingWineData)return;const d=_pendingWineData;_pendingWineData=null;document.getElementById("wineDupScrim").classList.remove("open");doWineCommit(d,null);});

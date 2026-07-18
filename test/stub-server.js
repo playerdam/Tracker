@@ -18,6 +18,8 @@ app.post("/api/client-error", (_q, r) => r.json({ ok: true }));
 app.post("/api/events", (_q, r) => r.json({ ok: true }));
 app.post("/api/push/subscribe", (_q, r) => r.json({ ok: true }));
 app.post("/api/pro/waitlist", (_q, r) => r.json({ ok: true }));
+app.post("/api/visits/wine-from-label", (_q, r) => r.json({ name: "Barolo Cannubi", producer: "Damilano", vintage: "2018", land: "Italien", region: "Piemonte", grape: "Nebbiolo", type: "rod", about: "Klassisk Barolo fra Cannubi-marken." }));
+app.post("/api/upload-photo", (_q, r) => r.json({ url: null }));
 app.use(express.static(path.join(__dirname, "..", "app")));
 app.get("/", (_q, r) => r.sendFile(path.join(__dirname, "..", "app", "mise.html")));
 app.listen(3199, () => console.log("stub on 3199"));
