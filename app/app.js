@@ -2821,6 +2821,22 @@
 
   function openLogDrawer(){renderLogView();renderShiftLog();$("#logDrawer").classList.add("open");$("#logScrim").classList.add("open");}
   function goToTeams(){switchTab("social");setTimeout(()=>_switchSocialTab("team"),60);}
+  // ── Manuel dark mode: lys er standard, kontakten bor i menuen ──
+  function _applyTheme(theme){
+    document.documentElement.dataset.theme=theme;
+    const meta=document.getElementById("themeColorMeta");
+    if(meta)meta.setAttribute("content",theme==="dark"?"#171114":"#8A2E3F");
+    const ico=$("#themeDrawerIcon"),lbl=$("#themeDrawerLbl");
+    if(ico)ico.textContent=theme==="dark"?"☀️":"🌙";
+    if(lbl)lbl.textContent=theme==="dark"?(lang==="da"?"Lyst tema":"Light theme"):(lang==="da"?"Mørkt tema":"Dark theme");
+  }
+  _applyTheme(localStorage.getItem("mise_theme")||"light");
+  var _themeLink=$("#themeDrawerLink");
+  if(_themeLink)_themeLink.addEventListener("click",()=>{
+    const next=(localStorage.getItem("mise_theme")||"light")==="dark"?"light":"dark";
+    localStorage.setItem("mise_theme",next);
+    _applyTheme(next);haptic(20);track("theme",{t:next});
+  });
   var _teamDrawerLink=$("#teamDrawerLink");if(_teamDrawerLink)_teamDrawerLink.addEventListener("click",()=>{closeLogDrawer();goToTeams();});
   function closeLogDrawer(){$("#logDrawer").classList.remove("open");$("#logScrim").classList.remove("open");}
   var _burgerBtn=$("#burgerBtn");if(_burgerBtn)_burgerBtn.addEventListener("click",openLogDrawer);

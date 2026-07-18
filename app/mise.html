@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Craft Tracker</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#8A2E3F">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#171114">
+<meta name="theme-color" id="themeColorMeta" content="#8A2E3F">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("mise_theme")||"light";}catch(e){}</script>
 <link rel="apple-touch-icon" href="/icons/icon.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -611,6 +611,10 @@
     <button class="log-drawer-close" id="logDrawerClose" aria-label="Luk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <div class="log-drawer-body">
+    <button class="va-drawer-link" id="themeDrawerLink">
+      <span class="va-drawer-link-icon" id="themeDrawerIcon">🌙</span>
+      <span class="va-drawer-link-label" id="themeDrawerLbl">Mørkt tema</span>
+    </button>
     <button class="va-drawer-link" id="teamDrawerLink">
       <span class="va-drawer-link-icon">👥</span>
       <span class="va-drawer-link-label" id="teamTitle"></span>

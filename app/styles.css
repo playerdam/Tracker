@@ -8,28 +8,26 @@
     --r:12px;--r-sm:8px;
   }
 
-  /* ── Dark mode: natte-appen til natte-arbejdet ── */
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#171114;--surface:#211A1E;--surface-2:#2B2227;
-      --text:#F1E8E3;--dim:#B3A29B;--faint:#7E6E68;
-      --border:#362B30;--border-2:#4A3B41;
-      --accent:#E07A8E;--accent-h:#EC93A5;--accent-soft:rgba(224,122,142,.14);--ring:rgba(224,122,142,.28);
-      --shadow:0 1px 3px rgba(0,0,0,.4);
-    }
-    #authScreen{background:linear-gradient(160deg,var(--bg) 0%,#241318 100%) !important}
-    #onboardOverlay{background:linear-gradient(160deg,var(--bg) 0%,#2B1A20 100%) !important}
-    .lab-seg-btn.active{box-shadow:0 1px 4px rgba(0,0,0,.4)}
-    .bnav-badge{border-color:var(--surface)}
-    .st-sub-row{background:rgba(255,255,255,.02)}
-    .tcard-tear::before,.tcard-tear::after{background:var(--bg)}
-    .vd2-act-shift{box-shadow:0 6px 18px rgba(0,0,0,.4)}
-    .otp-box.filled{background:rgba(224,122,142,.1)}
-    #appHeader{background:rgba(23,17,20,.97) !important;border-bottom-color:rgba(255,255,255,.07) !important}
-    .bottom-nav{background:rgba(28,21,25,.88);border-top-color:rgba(255,255,255,.07)}
-    .de-hdr{background:rgba(23,17,20,.94)}
-    .qlog-ov-bar{background:rgba(40,31,36,.9);box-shadow:0 8px 32px rgba(0,0,0,.5)}
+  /* ── Dark mode: manuel kontakt (data-theme på <html>), lys er standard ── */
+  :root[data-theme="dark"]{
+    --bg:#171114;--surface:#211A1E;--surface-2:#2B2227;
+    --text:#F1E8E3;--dim:#B3A29B;--faint:#7E6E68;
+    --border:#362B30;--border-2:#4A3B41;
+    --accent:#E07A8E;--accent-h:#EC93A5;--accent-soft:rgba(224,122,142,.14);--ring:rgba(224,122,142,.28);
+    --shadow:0 1px 3px rgba(0,0,0,.4);
   }
+  [data-theme="dark"] #authScreen{background:linear-gradient(160deg,var(--bg) 0%,#241318 100%) !important}
+  [data-theme="dark"] #onboardOverlay{background:linear-gradient(160deg,var(--bg) 0%,#2B1A20 100%) !important}
+  [data-theme="dark"] .lab-seg-btn.active{box-shadow:0 1px 4px rgba(0,0,0,.4)}
+  [data-theme="dark"] .bnav-badge{border-color:var(--surface)}
+  [data-theme="dark"] .st-sub-row{background:rgba(255,255,255,.02)}
+  [data-theme="dark"] .tcard-tear::before,[data-theme="dark"] .tcard-tear::after{background:var(--bg)}
+  [data-theme="dark"] .vd2-act-shift{box-shadow:0 6px 18px rgba(0,0,0,.4)}
+  [data-theme="dark"] .otp-box.filled{background:rgba(224,122,142,.1)}
+  [data-theme="dark"] #appHeader{background:rgba(23,17,20,.97) !important;border-bottom-color:rgba(255,255,255,.07) !important}
+  [data-theme="dark"] .bottom-nav{background:rgba(28,21,25,.88);border-top-color:rgba(255,255,255,.07)}
+  [data-theme="dark"] .de-hdr{background:rgba(23,17,20,.94)}
+  [data-theme="dark"] .qlog-ov-bar{background:rgba(40,31,36,.9);box-shadow:0 8px 32px rgba(0,0,0,.5)}
 
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--text)}
