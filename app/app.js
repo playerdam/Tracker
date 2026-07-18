@@ -1484,6 +1484,34 @@
     });
   }
 
+  function openWineOverview(){
+    const scrim=document.getElementById("catOvScrim");if(!scrim)return;
+    const items=state.wines.map(w=>({
+      label:(w.name||w.producer||(lang==="da"?"Uden navn":"Unnamed"))+(w.vint?" "+w.vint:""),
+      tot:(w.glasses||0)+(w.bottles||0),
+      col:(WTYPE_COLORS[w.type]||WTYPE_COLORS.andet)
+    })).sort((a,b)=>b.tot-a.tot);
+    const title=document.getElementById("catOvTitle");if(title)title.textContent=lang==="da"?"Alle vine":"All wines";
+    const sub=document.getElementById("catOvSub");if(sub)sub.textContent=lang==="da"?"Serveringer (glas + flasker)":"Servings (glasses + bottles)";
+    const list=document.getElementById("catOvList");if(!list)return;
+    const max=Math.max(1,...items.map(x=>x.tot));
+    const grand=items.reduce((s2,x)=>s2+x.tot,0);
+    list.innerHTML="";
+    items.forEach(x=>{
+      const row=document.createElement("div");row.className="catov-row";
+      row.innerHTML='<div class="catov-ico" style="background:'+x.col[1]+';color:'+x.col[0]+'"><span class="catov-initial">'+esc((x.label||"?").charAt(0).toUpperCase())+'</span></div>'
+        +'<div class="catov-mid">'
+          +'<div class="catov-name">'+esc(x.label)+'</div>'
+          +'<div class="catov-bar"><div class="catov-fill" style="width:'+Math.round(100*x.tot/max)+'%;background:'+x.col[0]+'"></div></div>'
+        +'</div>'
+        +'<div class="catov-val">'+fmtNum(x.tot)+'</div>';
+      list.appendChild(row);
+    });
+    const tot=document.getElementById("catOvTotal");
+    if(tot)tot.innerHTML='<span>'+(lang==="da"?"I alt":"Total")+'</span><span class="catov-total-val">'+fmtNum(grand)+'</span>';
+    const mng=document.getElementById("catOvManage");if(mng)mng.style.display="none";
+    scrim.classList.add("open");
+  }
   function openCatOverview(){
     const scrim=document.getElementById("catOvScrim");if(!scrim)return;
     const shift=getShift();const sm=_vagtSnapMap(shift);
@@ -1507,7 +1535,7 @@
     const tot=document.getElementById("catOvTotal");
     if(tot)tot.innerHTML='<span>'+(lang==="da"?"I alt":"Total")+'</span><span class="catov-total-val">'+fmtNum(grand)+'</span>';
     const mng=document.getElementById("catOvManage");
-    if(mng){mng.textContent=lang==="da"?"Administrér tællere":"Manage counters";mng.onclick=()=>{scrim.classList.remove("open");switchTab("station");};}
+    if(mng){mng.style.display="";mng.textContent=lang==="da"?"Administrér tællere":"Manage counters";mng.onclick=()=>{scrim.classList.remove("open");switchTab("station");};}
     scrim.classList.add("open");
   }
 
@@ -1972,13 +2000,13 @@
       const col=(WTYPE_COLORS[x.w.type]||WTYPE_COLORS.andet)[0];
       const len=+(mc*Math.min(1,x.tot/maxTot)).toFixed(2);
       const nm=x.w.name||x.w.producer||x.w.grape||(lang==="da"?"Uden navn":"Unnamed");
-      return '<div class="vd2-mini" role="img" aria-label="'+esc(nm)+': '+fmtNum(x.tot)+'">'
+      return '<button class="vd2-mini vd2-mini-tap" data-wine-ring aria-label="'+esc(nm)+': '+fmtNum(x.tot)+'. '+(lang==="da"?"Tryk for overblik":"Tap for overview")+'">'
         +'<div class="vd2-mini-ringwrap">'
           +'<svg class="vd2-mini-svg" viewBox="0 0 60 60"><circle class="vd2-mini-track" cx="30" cy="30" r="'+mr+'"/><circle class="vd2-mini-arc" cx="30" cy="30" r="'+mr+'" stroke="'+col+'" stroke-dasharray="'+len+' '+mc+'"/></svg>'
           +'<span class="vd2-mini-num">'+fmtNum(x.tot)+'</span>'
         +'</div>'
         +'<span class="vd2-mini-lbl">'+esc(nm)+'</span>'
-      +'</div>';
+      +'</button>';
     }).join("")
     +'<button class="vd2-mini vd2-mini-all" id="wineRankBtn" aria-label="Achievements">'
       +'<div class="vd2-mini-ringwrap">'
@@ -2011,6 +2039,7 @@
     +'</div>';
     const ringBtn=document.getElementById("wineRingBtn");if(ringBtn)ringBtn.addEventListener("click",openAchievements);
     const rankBtn=document.getElementById("wineRankBtn");if(rankBtn)rankBtn.addEventListener("click",openAchievements);
+    el.querySelectorAll("[data-wine-ring]").forEach(b=>b.addEventListener("click",()=>{openWineOverview();haptic(15);}));
     function openStatsModal(title,html){
       const modal=document.getElementById("wStatsModal");
       const listEl=document.getElementById("wStatsList");
