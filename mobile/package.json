@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@capacitor/core": "^7.6.6",
+    "@capacitor/haptics": "^7.0.5",
     "@capacitor/ios": "^7.6.6"
   },
   "devDependencies": {

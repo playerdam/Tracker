@@ -1065,6 +1065,8 @@
   .vd2-mini-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-size:13px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
   .vd2-mini-num.tick{animation:numPop .22s cubic-bezier(.34,1.4,.64,1)}
   .vd2-mini-lbl{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.6);max-width:100%;text-align:center;line-height:1.25;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  .vd2-mini-tap{appearance:none;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform .12s;touch-action:manipulation;user-select:none}
+  .vd2-mini-tap:active{transform:scale(.88)}
   .vd2-mini-all{appearance:none;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform .1s}
   .vd2-mini-all:active{transform:scale(.92)}
   .vd2-mini-track.dashed{stroke-dasharray:3.5 4.5;stroke:rgba(255,255,255,.28)}

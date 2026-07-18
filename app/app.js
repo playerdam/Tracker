@@ -20,6 +20,20 @@
   window.addEventListener("error",e=>_reportError(e.message,e.filename,e.lineno,e.error&&e.error.stack));
   window.addEventListener("unhandledrejection",e=>_reportError("unhandledrejection: "+((e.reason&&e.reason.message)||e.reason),"",0,e.reason&&e.reason.stack));
 
+  // ── Dynamic Type: respektér iOS' tekststørrelse (skalér forsigtigt) ──
+  (function(){
+    try{
+      const probe=document.createElement("div");
+      probe.style.cssText="font:-apple-system-body;position:absolute;visibility:hidden";
+      probe.textContent="x";
+      document.documentElement.appendChild(probe);
+      const sz=parseFloat(getComputedStyle(probe).fontSize)||17;
+      probe.remove();
+      const scale=Math.min(sz/17,1.3);
+      if(scale>1.03)document.body.style.zoom=scale;
+    }catch(e){}
+  })();
+
   // ---- i18n ----
   const LANGS={
     da:{
@@ -1290,7 +1304,15 @@
     const gt=state.counters.reduce((s,c)=>s+counterTotal(c),0);
     const dn=document.getElementById("stDonutNum");if(dn)dn.textContent=gt;
   }
-  function haptic(ms){if(navigator.vibrate)navigator.vibrate(ms||30);}
+  // Ægte haptik på iOS via Capacitor; web/Android falder tilbage til vibrate
+  function haptic(ms){
+    ms=ms||30;
+    try{
+      const H=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Haptics;
+      if(H){H.impact({style:ms<=15?"LIGHT":ms<=45?"MEDIUM":"HEAVY"});return;}
+    }catch(e){}
+    if(navigator.vibrate)navigator.vibrate(ms);
+  }
   function tickEl(el){if(!el)return;el.classList.remove("tick");void el.offsetWidth;el.classList.add("tick");}
   function animateCount(el,from,to){
     if(!el)return;
@@ -1420,7 +1442,7 @@
     +'</button>';
     const minisHtml=topCats.length?'<div class="vd2-minis">'+topCats.map(x=>{
       const len=+(mc*Math.min(1,x.tot/maxTot)).toFixed(2);
-      return '<div class="vd2-mini" role="img" aria-label="'+esc(x.label)+': '+fmtNum(x.tot)+'">'
+      return '<button class="vd2-mini vd2-mini-tap" data-ring-id="'+esc(x.id)+'" aria-label="'+esc(x.label)+': '+fmtNum(x.tot)+'. '+(lang==="da"?"Tryk for +1":"Tap for +1")+'">'
         +'<div class="vd2-mini-ringwrap">'
           +'<svg class="vd2-mini-svg" viewBox="0 0 60 60">'
             +'<circle class="vd2-mini-track" cx="30" cy="30" r="'+mr+'"/>'
@@ -1429,7 +1451,7 @@
           +'<span class="vd2-mini-num" id="vdstat-'+x.id+'" data-raw="'+x.tot+'">'+fmtNum(x.tot)+'</span>'
         +'</div>'
         +'<span class="vd2-mini-lbl">'+esc(x.label)+'</span>'
-      +'</div>';
+      +'</button>';
     }).join("")+allSlot+'</div>':'';
     const clockSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>';
     const calSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>';
@@ -1456,6 +1478,23 @@
     +'</div>';
     const allBtn=document.getElementById("vagtAllCats");
     if(allBtn)allBtn.addEventListener("click",openCatOverview);
+    // Ringene ER logging-flader: tap = +1, long-press = mængde
+    container.querySelectorAll("[data-ring-id]").forEach(btn=>{
+      const c=state.counters.find(x=>x.id===btn.dataset.ringId);if(!c)return;
+      const simple=!c.subs.length&&(!c.unit||c.unit==="stk");
+      btn.addEventListener("click",()=>{
+        if(btn._lp){btn._lp=false;return;}
+        if(simple){bumpVagtRow(c.id,1);}
+        else openNumtray((lang==="da"?"Tilføj ":"Add ")+tLabel(c.label),"",val=>{
+          if(val>0){
+            if(c.subs.length){let su=c.subs.find(x=>x.name==="Uden type");if(!su){su={id:id(),name:"Uden type",count:0};c.subs.push(su);}su.count+=val;}
+            else c.count=parseFloat((c.count+val).toFixed(2));
+            save();renderVagt();renderCounters();renderCareer();haptic();
+          }
+        });
+      });
+      if(simple)bindLongPress(btn,()=>{btn._lp=true;openNumtray((lang==="da"?"Tilføj ":"Add ")+tLabel(c.label),"",val=>{if(val>0)bumpVagtRow(c.id,val);});});
+    });
   }
 
   function openCatOverview(){
@@ -2790,6 +2829,44 @@
   }
 
   document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s){if(s._askSkip)s._askSkip();else s.classList.remove("open");}}));
+
+  // ── Drag-to-dismiss: greb-håndtaget øverst på sheets er nu ægte ──
+  (function(){
+    let drag=null;
+    document.addEventListener("touchstart",e=>{
+      if(window.innerWidth>600)return;
+      const scrim=e.target.closest(".scrim.open");if(!scrim)return;
+      const modal=e.target.closest(".modal");if(!modal)return;
+      const r=modal.getBoundingClientRect();
+      const y=e.touches[0].clientY;
+      if(y-r.top>56)return; // kun i håndtags-zonen — indre scroll forbliver urørt
+      drag={scrim,modal,startY:y,cur:0,t0:Date.now()};
+      modal.style.transition="none";
+    },{passive:true});
+    document.addEventListener("touchmove",e=>{
+      if(!drag)return;
+      const dy=Math.max(0,e.touches[0].clientY-drag.startY);
+      drag.cur=dy;
+      drag.modal.style.transform="translateY("+dy+"px)";
+    },{passive:true});
+    document.addEventListener("touchend",()=>{
+      if(!drag)return;
+      const {scrim,modal,cur,t0}=drag;drag=null;
+      const fast=cur>40&&(Date.now()-t0)<260;
+      modal.style.transition="transform .28s cubic-bezier(.22,1,.36,1)";
+      if(cur>120||fast){
+        modal.style.transform="translateY(110%)";
+        setTimeout(()=>{
+          if(scrim._askSkip)scrim._askSkip();else scrim.classList.remove("open");
+          modal.style.transition="";modal.style.transform="";
+        },240);
+        haptic(15);
+      }else{
+        modal.style.transform="";
+        setTimeout(()=>{modal.style.transition="";},300);
+      }
+    },{passive:true});
+  })();
   document.addEventListener("keydown",e=>{
     if(e.key==="Escape"){
       if(numtray.classList.contains("open")){closeNumtray();return;}
@@ -3564,6 +3641,68 @@
     _renderShiftStep1Totals();
     if(inp)inp.focus();
   }
+  // Delbart vagt-kort: mørk gradient, tallene i Fraunces, klar til Stories
+  async function shareShiftCard(){
+    const shift=getShift();if(!shift)return;
+    track("share_card");
+    const changes=_shiftChanges(shift).sort((a,b)=>b.delta-a.delta);
+    const durationMs=Date.now()-new Date(shift.startedAt).getTime();
+    try{await document.fonts.load('600 120px Fraunces');await document.fonts.load('700 64px Fraunces');}catch(e){}
+    const W=1080,H=1350;
+    const cv=document.createElement("canvas");cv.width=W;cv.height=H;
+    const ctx=cv.getContext("2d");
+    const g=ctx.createLinearGradient(0,0,W,H);
+    g.addColorStop(0,"#2E0E15");g.addColorStop(.55,"#54202E");g.addColorStop(1,"#7A2A3C");
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle="rgba(255,255,255,.06)";
+    ctx.beginPath();ctx.arc(W-80,120,260,0,7);ctx.fill();
+    const dateStr=new Date().toLocaleDateString(lang==="da"?"da-DK":"en-GB",{weekday:"long",day:"numeric",month:"long"});
+    ctx.fillStyle="rgba(255,255,255,.65)";
+    ctx.font="700 40px Inter, sans-serif";ctx.textAlign="center";
+    ctx.fillText(dateStr.toUpperCase(),W/2,150);
+    ctx.fillStyle="#fff";
+    ctx.font="600 150px Fraunces, serif";
+    ctx.fillText(fmtDuration(durationMs),W/2,330);
+    ctx.font="700 34px Inter, sans-serif";ctx.fillStyle="rgba(255,255,255,.55)";
+    ctx.fillText((lang==="da"?"PÅ VAGT":"ON SHIFT"),W/2,390);
+    let y=520;
+    ctx.textAlign="left";
+    changes.slice(0,5).forEach(c=>{
+      ctx.fillStyle="#FFB36B";
+      ctx.font="700 64px Fraunces, serif";
+      ctx.fillText("+"+fmtCount(c.delta),120,y);
+      ctx.fillStyle="rgba(255,255,255,.9)";
+      ctx.font="500 44px Inter, sans-serif";
+      ctx.fillText(c.label.slice(0,26),320,y-4);
+      y+=110;
+    });
+    if(!changes.length){
+      ctx.fillStyle="rgba(255,255,255,.7)";ctx.font="500 44px Inter, sans-serif";ctx.textAlign="center";
+      ctx.fillText(lang==="da"?"En stille vagt — de findes også":"A quiet one — those exist too",W/2,600);
+      ctx.textAlign="left";
+    }
+    const total=changes.reduce((a,c)=>a+c.delta,0);
+    if(total>0){
+      ctx.strokeStyle="rgba(255,255,255,.18)";ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(120,y+10);ctx.lineTo(W-120,y+10);ctx.stroke();
+      ctx.fillStyle="#FF6B8A";ctx.font="600 96px Fraunces, serif";
+      ctx.fillText(fmtNum(total),120,y+140);
+      ctx.fillStyle="rgba(255,255,255,.6)";ctx.font="700 34px Inter, sans-serif";
+      ctx.fillText((lang==="da"?"I ALT":"TOTAL"),320,y+130);
+    }
+    ctx.fillStyle="rgba(255,255,255,.5)";
+    ctx.font="700 36px Inter, sans-serif";ctx.textAlign="center";
+    ctx.fillText("Craft Tracker",W/2,H-70);
+    const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
+    if(!blob)return;
+    const file=new File([blob],"vagt.png",{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file]});return;}catch(e){if(e&&e.name==="AbortError")return;}
+    }
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="vagt.png";a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  }
+
   // Trin 2: opsummering + post
   function _showShiftSummaryStep(){
     const shift=getShift();if(!shift)return;
@@ -3663,6 +3802,8 @@
       recordShiftEnd(getShift());saveShift(null);renderShiftBar();renderVagt();$("#shiftScrim").classList.remove("open");showToast(lang==="da"?"Vagt afsluttet":"Shift ended");setTimeout(()=>requestNotifPermission(),1500);
     });
     const feedPostBtn=$("#shiftFeedPost");if(feedPostBtn)feedPostBtn.addEventListener("click",postShift);
+    const shareImgBtn=$("#shiftShareImg");
+    if(shareImgBtn){shareImgBtn.textContent="📸 "+(lang==="da"?"Del som billede":"Share as image");shareImgBtn.addEventListener("click",shareShiftCard);}
     const slAdd=$("#shiftLogAdd"),slIn=$("#shiftLogIn");
     if(slAdd&&slIn)slAdd.addEventListener("click",()=>runShiftLogAdd(slIn.value));
     if(slIn)slIn.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runShiftLogAdd(slIn.value);}});
@@ -4010,6 +4151,38 @@
     const cInput=$("#commentInput");if(cInput)cInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendComment();}});
   }
 
+  const ROLE_PACKS=[
+    {id:"tjener",emoji:"🤵",da:"Tjener",en:"Waiter",items:["preset_cover","preset_bottle","preset_coffee","preset_tableset","preset_bill"]},
+    {id:"kok",emoji:"👨‍🍳",da:"Kok",en:"Chef",items:["preset_main","preset_starter","preset_dessert","preset_mise","preset_sauce"]},
+    {id:"bartender",emoji:"🍸",da:"Bartender",en:"Bartender",items:["preset_cocktail","preset_bottle","preset_welcome","preset_snaps","preset_coffee_art"]},
+    {id:"sommelier",emoji:"🍷",da:"Sommelier",en:"Sommelier",items:["preset_wine_present","preset_champagne","preset_wine_rec","preset_bottle","preset_oyster"]},
+  ];
+  function maybeShowRolePicker(){
+    if(state.counters.length){_afterRolePicker();return;}
+    const scrim=$("#roleScrim");if(!scrim){_afterRolePicker();return;}
+    const t1=$("#roleTitle");if(t1)t1.textContent=lang==="da"?"Hvad laver du?":"What do you do?";
+    const sub=$("#roleSub");if(sub)sub.textContent=lang==="da"?"Vi sætter dine første tællere op — du kan altid ændre dem senere":"We\u2019ll set up your first counters — you can change them anytime";
+    const list=$("#roleList");if(!list){_afterRolePicker();return;}
+    list.innerHTML=ROLE_PACKS.map(r=>'<button class="btn ghost role-btn" data-role="'+r.id+'" style="width:100%;margin-bottom:8px;justify-content:flex-start;font-size:15px;padding:14px 16px">'+r.emoji+'  '+(lang==="da"?r.da:r.en)+'</button>').join("");
+    const skip=$("#roleSkip");if(skip){skip.textContent=lang==="da"?"Spring over":"Skip";skip.onclick=()=>{scrim.classList.remove("open");_afterRolePicker();};}
+    list.querySelectorAll("[data-role]").forEach(b=>b.addEventListener("click",()=>{
+      const pack=ROLE_PACKS.find(r=>r.id===b.dataset.role);if(!pack)return;
+      pack.items.forEach(pid=>{
+        const item=CATALOG.find(c=>c.id===pid);if(!item)return;
+        if(state.counters.some(c=>c.id===item.id))return;
+        const label=lang==="en"?item.en:item.da;
+        state.counters.push({id:item.id,label,count:0,unit:"stk",cat:item.cat,subs:[],suggest:seedFor(label)});
+      });
+      save();renderVagt();renderCounters();renderCareer();
+      track("role_pack",{r:pack.id});haptic(40);
+      showToast(lang==="da"?"Dine tællere er klar — god service! 🎉":"Your counters are ready — have a great service! 🎉");
+      scrim.classList.remove("open");_afterRolePicker();
+    }));
+    scrim.classList.add("open");
+  }
+  function _afterRolePicker(){
+    if(_usernameSetupPending){_usernameSetupPending=false;maybeShowUsernameSetup(null);}
+  }
   function maybeShowOnboarding(){
     if(localStorage.getItem("mise_onboarded"))return;
     const o=$("#onboardOverlay");if(!o)return;
@@ -4018,7 +4191,7 @@
     if(btn)btn.addEventListener("click",()=>{
       localStorage.setItem("mise_onboarded","1");
       o.classList.add("hidden");
-      setTimeout(()=>{o.style.display="none";if(_usernameSetupPending){_usernameSetupPending=false;maybeShowUsernameSetup(null);}},320);
+      setTimeout(()=>{o.style.display="none";maybeShowRolePicker();},320);
     });
   }
 
