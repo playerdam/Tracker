@@ -914,7 +914,8 @@
   .modal-text-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
 
   /* ---- Bottom nav (mobile) ---- */
-  .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:96;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.08)}
+  .bottom-nav{display:block;position:fixed;bottom:0;left:0;right:0;z-index:96;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.08)}
+  @media (min-width:601px){.bnav-inner{max-width:760px;margin:0 auto}}
   .bnav-inner{display:flex;justify-content:space-around;align-items:center;padding:8px 5% max(env(safe-area-inset-bottom,4px),8px)}
   .bnav-btn{appearance:none;background:none;border:none;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;color:var(--faint);transition:.15s}
   .bnav-btn.active{color:var(--accent)}
