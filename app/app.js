@@ -391,7 +391,7 @@
     const bHist=$("#bnav-lbl-history");if(bHist)bHist.textContent=lang==="da"?"Historik":"History";
     const bStats=$("#bnav-lbl-stats");if(bStats)bStats.textContent="Stats";
     const bProf=$("#bnav-lbl-profile");if(bProf)bProf.textContent=lang==="da"?"Profil":"Profile";
-    const hLogT=$("#historyLogTitle");if(hLogT)hLogT.textContent=lang==="da"?"Aktivitetslog":"Activity log";
+    const hLogT=$("#historyOutsideTitle");if(hLogT)hLogT.textContent=lang==="da"?"Uden for vagt":"Outside a shift";
     const sCatT=$("#statsCatTitle");if(sCatT)sCatT.textContent=lang==="da"?"Kategorier":"Categories";
     const sAskT=$("#statsAskTitle");if(sAskT)sAskT.textContent=lang==="da"?"Spørg om dine stats":"Ask about your stats";
     const sAskI=$("#statsAskInput");if(sAskI)sAskI.placeholder=lang==="da"?"fx: Hvornår havde jeg min længste vagt?":"e.g. When was my longest shift?";
@@ -1204,10 +1204,34 @@
     const h=Math.floor(min/60);
     return lang==="da"?"for "+h+" time"+(h===1?"":"r")+" siden":h+" hour"+(h===1?"":"s")+" ago";
   }
+  function _logItemHtml(e,timeStr){
+    const meta=_logCatMeta(e.cat);
+    return '<div class="logtl-item">'
+      +'<div class="logtl-ico" style="background:'+meta.c[1]+';color:'+meta.c[0]+'">'+meta.emoji+'</div>'
+      +'<div class="logtl-body">'
+        +'<div class="logtl-time">'+esc(timeStr)+'</div>'
+        +'<div class="logtl-text">'+esc(e.text)+'</div>'
+        +(e.img?'<img class="logtl-photo" src="'+esc(e.img)+'" loading="lazy">':'')
+      +'</div>'
+    +'</div>';
+  }
+  function _shiftRange(s){return{start:new Date(s.startedAt).getTime(),end:s.endedAt?new Date(s.endedAt).getTime():Date.now()};}
+  function _entriesForShift(s){
+    const r=_shiftRange(s);
+    return (state.log||[]).filter(e=>e.ts>=r.start&&e.ts<=r.end);
+  }
+  function _entriesOutsideShifts(){
+    const ranges=(state.shiftHistory||[]).map(_shiftRange);
+    const live=getShift();if(live)ranges.push(_shiftRange(live));
+    return (state.log||[]).filter(e=>!ranges.some(r=>e.ts>=r.start&&e.ts<=r.end));
+  }
+  // "Uden for vagt" — log-indgange der ikke hører til nogen registreret vagt
   function renderLogView(){
-    const el=$("#logView");if(!el)return;
-    const entries=state.log||[];
-    if(!entries.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">'+(lang==="da"?"Ingen indgange endnu":"No entries yet")+'</div><div class="empty-state-sub">'+esc(t("log_empty"))+'</div></div>';return;}
+    const el=$("#logView");const wrap=document.getElementById("historyOutsideWrap");
+    if(!el)return;
+    const entries=_entriesOutsideShifts();
+    if(!entries.length){if(wrap)wrap.style.display="none";el.innerHTML="";return;}
+    if(wrap)wrap.style.display="";
     const now=new Date();
     const todayKey=now.getFullYear()+"-"+(now.getMonth()+1)+"-"+now.getDate();
     const days=[],dayMap={};
@@ -1224,16 +1248,8 @@
     });
     el.innerHTML=days.map(day=>{
       const items=day.entries.map(e=>{
-        const meta=_logCatMeta(e.cat);
         const timeStr=day.isToday?_relTime(e.ts):new Date(e.ts).toLocaleTimeString(lang==="da"?"da-DK":"en-GB",{hour:"2-digit",minute:"2-digit"});
-        return '<div class="logtl-item">'
-          +'<div class="logtl-ico" style="background:'+meta.c[1]+';color:'+meta.c[0]+'">'+meta.emoji+'</div>'
-          +'<div class="logtl-body">'
-            +'<div class="logtl-time">'+esc(timeStr)+'</div>'
-            +'<div class="logtl-text">'+esc(e.text)+'</div>'
-            +(e.img?'<img class="logtl-photo" src="'+esc(e.img)+'" loading="lazy">':'')
-          +'</div>'
-        +'</div>';
+        return _logItemHtml(e,timeStr);
       }).join("");
       return '<div class="logtl-day"><div class="logtl-date">'+esc(day.label)+'</div>'+items+'</div>';
     }).join("");
@@ -1634,6 +1650,7 @@
   }
 
   let _vagtShowAllShifts=false;
+  let _expandedShiftIds=new Set();
   function _buildVagtActivity(container){
     if(!container)return;
     const hist=state.shiftHistory||[];
@@ -1657,8 +1674,10 @@
       const t2=s.endedAt?new Date(s.endedAt).toLocaleTimeString(loc,{hour:"2-digit",minute:"2-digit"}):"";
       const totItems=Math.round((s.entries||[]).reduce((a,e)=>a+(e.delta>0&&(!e.unit||e.unit==="stk")?e.delta:0),0));
       const top=(s.entries||[]).filter(e=>e.delta>0).sort((a,b)=>b.delta-a.delta).slice(0,2);
-      const card=document.createElement("button");card.className="vd2-shift";
-      card.innerHTML='<div class="vd2-shift-ico">'+briefSvg+'</div>'
+      const isOpen=_expandedShiftIds.has(s.id);
+      const card=document.createElement("div");card.className="vd2-shift-card"+(isOpen?" open":"");
+      const head=document.createElement("button");head.className="vd2-shift";
+      head.innerHTML='<div class="vd2-shift-ico">'+briefSvg+'</div>'
         +'<div class="vd2-shift-body">'
           +'<div class="vd2-shift-date">'+esc(dateStr)+'</div>'
           +'<div class="vd2-shift-time">'+esc(t1+(t2?"–"+t2:""))+'</div>'
@@ -1668,12 +1687,25 @@
             +top.map(e=>'<span class="vd2-chip">'+esc(fmtCount(e.delta,e.unit)+" "+e.label)+'</span>').join("")
           +'</div>'
         +'</div>'
-        +'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><polyline points="9 18 15 12 9 6"/></svg>';
-      card.addEventListener("click",()=>openShiftEdit(i));
+        +'<svg class="vd2-shift-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><polyline points="9 18 15 12 9 6"/></svg>';
+      head.addEventListener("click",()=>{
+        if(isOpen)_expandedShiftIds.delete(s.id);else _expandedShiftIds.add(s.id);
+        _buildVagtActivity(container);
+      });
+      const body=document.createElement("div");body.className="vd2-shift-expand";
+      const shiftEntries=_entriesForShift(s).slice().reverse();
+      const itemsHtml=shiftEntries.length
+        ?shiftEntries.map(e=>_logItemHtml(e,new Date(e.ts).toLocaleTimeString(loc,{hour:"2-digit",minute:"2-digit"}))).join("")
+        :'<p class="muted" style="padding:2px 2px 8px">'+(lang==="da"?"Ingen logs i denne vagt":"No logs in this shift")+'</p>';
+      body.innerHTML=itemsHtml+'<button class="vd2-shift-editbtn" data-idx="'+i+'">'+(lang==="da"?"✏ Rediger vagt":"✏ Edit shift")+'</button>';
+      card.appendChild(head);card.appendChild(body);
       container.appendChild(card);
     });
     const seeAll=document.getElementById("vagtSeeAll");
     if(seeAll)seeAll.addEventListener("click",()=>{_vagtShowAllShifts=!_vagtShowAllShifts;_buildVagtActivity(container);});
+    container.querySelectorAll(".vd2-shift-editbtn").forEach(btn=>{
+      btn.addEventListener("click",e=>{e.stopPropagation();openShiftEdit(+btn.dataset.idx);});
+    });
   }
 
   // ── Stats: karriere-hero med timer-ring ──
@@ -3668,7 +3700,7 @@
   document.getElementById("shiftEditDelete").addEventListener("click",()=>{
     if(_editShiftIdx===null)return;
     state.shiftHistory.splice(_editShiftIdx,1);
-    save();_buildVagtActivity(document.getElementById("historyShifts"));closeShiftEdit();
+    save();_buildVagtActivity(document.getElementById("historyShifts"));renderLogView();closeShiftEdit();
     showToast(lang==="da"?"Vagt slettet":"Shift deleted");
   });
 

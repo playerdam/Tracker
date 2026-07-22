@@ -969,8 +969,15 @@
   .vd2-sec-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
   .vd2-sec-btn{appearance:none;background:none;border:none;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;padding:4px 2px;-webkit-tap-highlight-color:transparent}
   /* Activity cards */
-  .vd2-shift{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:12px 13px;margin-bottom:9px;display:flex;gap:12px;align-items:center;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;font-family:inherit;touch-action:manipulation;transition:background .08s}
+  .vd2-shift-card{margin-bottom:9px}
+  .vd2-shift{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:12px 13px;margin-bottom:0;display:flex;gap:12px;align-items:center;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;font-family:inherit;touch-action:manipulation;transition:background .08s}
   .vd2-shift:active{background:var(--surface-2)}
+  .vd2-shift-card.open .vd2-shift{border-radius:20px 20px 0 0;border-bottom-color:transparent}
+  .vd2-shift-chev{transition:transform .2s;flex:none}
+  .vd2-shift-card.open .vd2-shift-chev{transform:rotate(90deg)}
+  .vd2-shift-expand{display:none;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 20px 20px;padding:14px 13px 6px}
+  .vd2-shift-card.open .vd2-shift-expand{display:block}
+  .vd2-shift-editbtn{appearance:none;background:none;border:none;color:var(--accent);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;padding:6px 0 8px;-webkit-tap-highlight-color:transparent}
   .vd2-shift-ico{width:42px;height:42px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
   .vd2-shift-ico svg{width:19px;height:19px}
   .vd2-shift-body{flex:1;min-width:0}
