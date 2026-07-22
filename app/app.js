@@ -3494,15 +3494,30 @@
       const workplace=($("#suWorkplace").value||"").trim();
       const roleLbl=_roleLabel(_suSelectedRole||"chef").name;
       const base=apiBase();const token=await getToken();
-      if(base&&token){
-        try{
-          const r=await fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({username,workplace,profession:roleLbl})});
-          const d=await r.json();
+      if(!base||!token){
+        btn.disabled=false;
+        showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
+        return;
+      }
+      try{
+        const r=await fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({username,workplace,profession:roleLbl})});
+        const d=await r.json();
+        if(!r.ok||d.error){
+          btn.disabled=false;
           if(d.error==="username_taken"){
-            btn.disabled=false;$("#suStep1").style.display="";$("#suStep2").style.display="none";
-            const s=$("#suUsernameStatus");s.textContent=t("username_taken");s.className="username-status err";return;
+            $("#suStep1").style.display="";$("#suStep2").style.display="none";
+            const s=$("#suUsernameStatus");s.textContent=t("username_taken");s.className="username-status err";
+          }else{
+            console.error("su/save failed",r.status,d.error);
+            showToast(lang==="da"?"Kunne ikke gemme — prøv igen":"Couldn't save — try again");
           }
-        }catch(e){}
+          return;
+        }
+      }catch(e){
+        btn.disabled=false;
+        console.error("su/save network error",e.message);
+        showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
+        return;
       }
       // Seed startertællere for den valgte rolle (kun hvis brugeren ikke har nogen endnu)
       const pack=ROLE_META.find(r=>r.id===_suSelectedRole);
@@ -3534,14 +3549,24 @@
       const prof=($("#profileProf").value||"").trim();
       const username=($("#profileUsername").value||"").trim();
       const base=apiBase();const token=await getToken();
-      if(base&&token){
-        try{
-          const body={nickname:nick,profession:prof};
-          if(username)body.username=username;
-          const r=await fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});
-          const d=await r.json();
-          if(d.error==="username_taken"){const s=$("#profileUsernameStatus");s.textContent=t("username_taken");s.className="username-status err";return;}
-        }catch(e){}
+      if(!base||!token){
+        showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
+        return;
+      }
+      try{
+        const body={nickname:nick,profession:prof};
+        if(username)body.username=username;
+        const r=await fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});
+        const d=await r.json();
+        if(!r.ok||d.error){
+          if(d.error==="username_taken"){const s=$("#profileUsernameStatus");s.textContent=t("username_taken");s.className="username-status err";}
+          else{console.error("profile/save failed",r.status,d.error);showToast(lang==="da"?"Kunne ikke gemme — prøv igen":"Couldn't save — try again");}
+          return;
+        }
+      }catch(e){
+        console.error("profile/save network error",e.message);
+        showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
+        return;
       }
       $("#profileScrim").classList.remove("open");
     });
