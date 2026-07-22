@@ -1172,13 +1172,14 @@
   }
 
   // ---- log ----
-  function addLogEntry(msg,imageUrl){
+  function addLogEntry(msg,imageUrl,cat){
     const now=new Date();
     const time=now.getHours().toString().padStart(2,"0")+":"+now.getMinutes().toString().padStart(2,"0");
     logHistory.unshift({time,msg});if(logHistory.length>8)logHistory.pop();renderLogFeed();
     if(!Array.isArray(state.log))state.log=[];
     const entry={ts:now.getTime(),text:msg};
     if(imageUrl)entry.img=imageUrl;
+    if(cat)entry.cat=cat;
     state.log.unshift(entry);
     if(state.log.length>2000)state.log.length=2000;
     save();renderLogView();
@@ -1188,24 +1189,54 @@
     feed.hidden=false;
     feed.innerHTML=logHistory.map(e=>'<div class="logentry"><span class="log-time">'+esc(e.time)+'</span><span class="log-text">'+esc(e.msg)+'</span></div>').join("");
   }
+  function _logCatMeta(cat){
+    const map={
+      "aabnet-mad":{emoji:"📦",i:0},"aabnet-drikke":{emoji:"🍷",i:3},"snittet":{emoji:"🔪",i:4},
+      "tilberedt":{emoji:"🍳",i:2},"serveret":{emoji:"🍽",i:5},"andet":{emoji:"✨",i:1},"wine":{emoji:"🍷",i:3},
+    };
+    const m=map[cat]||map.andet;
+    return {emoji:m.emoji,c:VD_COLORS[m.i]};
+  }
+  function _relTime(ts){
+    const min=Math.floor((Date.now()-ts)/60000);
+    if(min<1)return lang==="da"?"lige nu":"just now";
+    if(min<60)return lang==="da"?"for "+min+" min siden":min+" min ago";
+    const h=Math.floor(min/60);
+    return lang==="da"?"for "+h+" time"+(h===1?"":"r")+" siden":h+" hour"+(h===1?"":"s")+" ago";
+  }
   function renderLogView(){
     const el=$("#logView");if(!el)return;
     const entries=state.log||[];
     if(!entries.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">'+(lang==="da"?"Ingen indgange endnu":"No entries yet")+'</div><div class="empty-state-sub">'+esc(t("log_empty"))+'</div></div>';return;}
+    const now=new Date();
+    const todayKey=now.getFullYear()+"-"+(now.getMonth()+1)+"-"+now.getDate();
     const days=[],dayMap={};
     entries.forEach(e=>{
       const d=new Date(e.ts);
       const key=d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
       if(!dayMap[key]){
+        const isToday=key===todayKey;
         const loc=lang==="en"?"en-GB":"da-DK";
-        const label=d.toLocaleDateString(loc,{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-        dayMap[key]={label,entries:[]};days.push(dayMap[key]);
+        const label=isToday?(lang==="da"?"I dag":"Today"):d.toLocaleDateString(loc,{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+        dayMap[key]={label,isToday,entries:[]};days.push(dayMap[key]);
       }
-      const hh=new Date(e.ts).getHours().toString().padStart(2,"0");
-      const mm=new Date(e.ts).getMinutes().toString().padStart(2,"0");
-      dayMap[key].entries.push({t:hh+":"+mm,text:e.text,img:e.img||null});
+      dayMap[key].entries.push(e);
     });
-    el.innerHTML=days.map(day=>'<div class="logview-day"><div class="logview-date">'+esc(day.label)+'</div>'+day.entries.map(e=>'<div class="logview-entry"><span class="logview-time">'+esc(e.t)+'</span><span class="logview-text">'+esc(e.text)+'</span>'+(e.img?'<img class="logview-photo" src="'+esc(e.img)+'" loading="lazy">':'')+'</div>').join("")+'</div>').join("");
+    el.innerHTML=days.map(day=>{
+      const items=day.entries.map(e=>{
+        const meta=_logCatMeta(e.cat);
+        const timeStr=day.isToday?_relTime(e.ts):new Date(e.ts).toLocaleTimeString(lang==="da"?"da-DK":"en-GB",{hour:"2-digit",minute:"2-digit"});
+        return '<div class="logtl-item">'
+          +'<div class="logtl-ico" style="background:'+meta.c[1]+';color:'+meta.c[0]+'">'+meta.emoji+'</div>'
+          +'<div class="logtl-body">'
+            +'<div class="logtl-time">'+esc(timeStr)+'</div>'
+            +'<div class="logtl-text">'+esc(e.text)+'</div>'
+            +(e.img?'<img class="logtl-photo" src="'+esc(e.img)+'" loading="lazy">':'')
+          +'</div>'
+        +'</div>';
+      }).join("");
+      return '<div class="logtl-day"><div class="logtl-date">'+esc(day.label)+'</div>'+items+'</div>';
+    }).join("");
   }
 
   // ---- autocomplete ----
@@ -2703,7 +2734,7 @@
     if(a.cat&&(VALID_CAT_IDS.has(a.cat)||(state.customCats||[]).some(cc=>cc.id===a.cat)))return a.cat;
     return CAT_BY_LABEL[(a.counter||"").toLowerCase()]||"andet";
   }
-  function applyOne(a,summary,syncItems){
+  function applyOne(a,summary,syncItems,cats){
     if(a.kind==="counter"){
       const delta=parseInt(a.delta,10)||0;if(delta===0)return;
       let c=findCounter(a.counter);
@@ -2718,8 +2749,10 @@
       else if(c.subs.length){let s=c.subs.find(x=>x.name==="Uden type");if(!s){s={id:id(),name:"Uden type",count:0};c.subs.push(s);}s.count=Math.max(0,s.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
       else{c.count=Math.max(0,c.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
       if(syncItems)syncItems.push({categoryLabel:c.label,delta});
+      if(cats)cats.push(c.cat||"andet");
     }else if(a.kind==="wine"){
       const delta=parseInt(a.delta,10)||0;if(delta===0)return;
+      if(cats)cats.push("wine");
       const measure=a.measure==="bottles"?"bottles":a.measure==="opened"?"opened":"glasses";
       const nm=(a.wine||"").toLowerCase();
       let w=state.wines.find(x=>x.name.toLowerCase()===nm)||state.wines.find(x=>x.name&&(x.name.toLowerCase().includes(nm)||nm.includes(x.name.toLowerCase())));
@@ -2814,24 +2847,24 @@
     }
     if(!actions.length){showToast(t("toast_unknown"));input.focus();return;}
     undoSnapshot=clone(state);
-    const summary=[],ask=[],syncItems=[];
-    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems);});
+    const summary=[],ask=[],syncItems=[],cats=[];
+    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems,cats);});
     input.value="";save();renderCounters();renderWines();renderCareer();
-    if(!ask.length){finishLog(summary,syncItems,imageUrl);return;}
-    processAsk(ask,0,summary,syncItems,imageUrl);
+    if(!ask.length){finishLog(summary,syncItems,imageUrl,cats);return;}
+    processAsk(ask,0,summary,syncItems,imageUrl,cats);
   }
-  function finishLog(summary,syncItems,imageUrl){
+  function finishLog(summary,syncItems,imageUrl,cats){
     const msg=summary.length?(t("toast_logged")+summary.join(", ")):t("toast_nothing");
     showToast(msg);
-    if(summary.length){addLogEntry(summary.join(" · "),imageUrl);haptic(40);}
+    if(summary.length){addLogEntry(summary.join(" · "),imageUrl,cats&&cats[0]);haptic(40);}
     const logSummary=summary.join(" · ");
     deferSync(syncItems,imageUrl,logSummary);
     checkBadges();checkRecords();
     if(summary.length)maybeNudgeShiftStart();
     $("#qlogInput").focus();
   }
-  function processAsk(ask,i,summary,syncItems,imageUrl){if(i>=ask.length){finishLog(summary,syncItems,imageUrl);return;}openAsk(ask[i],()=>processAsk(ask,i+1,summary,syncItems,imageUrl),summary,syncItems,imageUrl);}
-  function openAsk(item,next,summary,syncItems,imageUrl){
+  function processAsk(ask,i,summary,syncItems,imageUrl,cats){if(i>=ask.length){finishLog(summary,syncItems,imageUrl,cats);return;}openAsk(ask[i],()=>processAsk(ask,i+1,summary,syncItems,imageUrl,cats),summary,syncItems,imageUrl,cats);}
+  function openAsk(item,next,summary,syncItems,imageUrl,cats){
     const delta=parseInt(item.delta,10)||0;
     const detectedName=item.counter||"Ny ting";
     $("#askText").innerHTML='<b>'+esc((delta>0?"+":"")+delta+" "+detectedName)+'</b> '+esc(t("ask_no_match"));
@@ -2844,8 +2877,8 @@
     $("#askAdd").onclick=()=>{
       const name=(nameInput.value||"").trim()||detectedName;
       const mode=document.querySelector('input[name="askmode"]:checked').value;
-      if(mode==="sub"){const parent=state.counters.find(c=>c.id===sel.value);if(parent)addToSub(parent,name,delta,summary);}
-      else{const c={id:id(),label:name,count:0,subs:[],suggest:seedFor(name)};state.counters.push(c);requestLabelTranslation(name);const subName=(item.sub||"").trim();if(subName)addToSub(c,subName,delta,summary);else{c.count=Math.max(0,delta);summary.push((delta>0?"+":"")+delta+" "+c.label);if(syncItems)syncItems.push({categoryLabel:name,delta});}}
+      if(mode==="sub"){const parent=state.counters.find(c=>c.id===sel.value);if(parent){addToSub(parent,name,delta,summary);if(cats)cats.push(parent.cat||"andet");}}
+      else{const c={id:id(),label:name,count:0,cat:"andet",subs:[],suggest:seedFor(name)};state.counters.push(c);requestLabelTranslation(name);const subName=(item.sub||"").trim();if(subName)addToSub(c,subName,delta,summary);else{c.count=Math.max(0,delta);summary.push((delta>0?"+":"")+delta+" "+c.label);if(syncItems)syncItems.push({categoryLabel:name,delta});}if(cats)cats.push("andet");}
       save();renderCounters();renderWines();renderCareer();scrim._askSkip=null;scrim.classList.remove("open");next();
     };
     $("#askSkip").onclick=()=>{if(scrim._askSkip)scrim._askSkip();};
@@ -2865,11 +2898,11 @@
     if(spin)spin.classList.remove("on");if(send)send.disabled=false;inp.disabled=false;
     if(!actions.length){showToast(t("toast_unknown"));inp.focus();return;}
     undoSnapshot=clone(state);
-    const summary=[],ask=[],syncItems=[];
-    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems);});
+    const summary=[],ask=[],syncItems=[],cats=[];
+    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems,cats);});
     inp.value="";save();renderCounters();renderWines();renderCareer();
-    if(!ask.length){finishLog(summary,syncItems,null);return;}
-    processAsk(ask,0,summary,syncItems,null);
+    if(!ask.length){finishLog(summary,syncItems,null,cats);return;}
+    processAsk(ask,0,summary,syncItems,null,cats);
   }
   const _stAiSend=document.getElementById("stAiSend");
   if(_stAiSend)_stAiSend.addEventListener("click",runAiBar);
@@ -3829,11 +3862,11 @@
     }
     if(!actions.length){showToast(lang==="da"?"Forstod ikke — prøv igen":"Couldn\u2019t parse — try again");if(inp)inp.focus();return;}
     undoSnapshot=clone(state);
-    const summary=[],syncItems=[];
-    actions.forEach(a=>applyOne(a,summary,syncItems));
+    const summary=[],syncItems=[],cats=[];
+    actions.forEach(a=>applyOne(a,summary,syncItems,cats));
     if(inp)inp.value="";
     save();_updateVagtAfterLog();renderCounters();renderCareer();
-    if(summary.length){addLogEntry(summary.join(" · "),null);haptic(40);deferSync(syncItems,null,summary.join(" · "));}
+    if(summary.length){addLogEntry(summary.join(" · "),null,cats[0]);haptic(40);deferSync(syncItems,null,summary.join(" · "));}
     checkBadges();checkRecords();
     _renderShiftStep1Totals();
     if(inp)inp.focus();
