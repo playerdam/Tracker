@@ -1475,6 +1475,7 @@
   function _updateVagtAfterLog(){
     const shift=getShift();
     _buildVagtDashboard(document.getElementById("vagtDash"),shift);
+    _buildVagtQuickStats(document.getElementById("vagtQuick"),shift);
     const rows=document.getElementById("vagtRows");
     if(rows){rows.innerHTML="";_buildVagtRows(rows,shift?shift.snap:null,true);}
   }
@@ -1519,57 +1520,30 @@
     const shift=getShift();const sm=_vagtSnapMap(shift);
     const totals=_vagtCounterTotals(sm);
     const grand=totals.reduce((s,x)=>s+x.tot,0);
-    const maxTot=Math.max(1,...totals.map(x=>x.tot));
-    const mc=+(2*Math.PI*25).toFixed(2);
     totals.forEach(x=>{
       const sv=document.getElementById("vdstat-"+x.id);
       if(sv){const prev=readNum(sv);if(prev!==x.tot){animateCount(sv,prev,x.tot);tickEl(sv);}}
-      const marc=document.getElementById("vdmini-arc-"+x.id);
-      if(marc)marc.setAttribute("stroke-dasharray",+(mc*Math.min(1,x.tot/maxTot)).toFixed(2)+" "+mc);
     });
     const rn=document.getElementById("vd-ring-num");
     if(rn){const prev=readNum(rn);if(prev!==grand){animateCount(rn,prev,grand);tickEl(rn);}}
     const arc=document.getElementById("vd-ring-arc");
     if(arc){const r=52,circ=+(2*Math.PI*r).toFixed(2);arc.setAttribute("stroke-dasharray",+(circ*_vagtRingPct(grand,shift)).toFixed(2)+" "+circ);}
+    // Ranking kan skifte ved bump — genopbyg quick-stats så top-5 altid er korrekt
+    _buildVagtQuickStats(document.getElementById("vagtQuick"),shift);
   }
 
+  // ── ét roligt hero: kun ringen er "vigtigst" ──
   function _buildVagtDashboard(container,shift){
     if(!container)return;
     const sm=_vagtSnapMap(shift);
     const grandTotal=Math.round(_vagtGrand(sm));
     const r=52,circ=+(2*Math.PI*r).toFixed(2);
     const arcLen=+(circ*_vagtRingPct(grandTotal,shift)).toFixed(2);
-    const best=_bestShiftTotal();
-    const goalLine=shift&&best>0?'<span class="vd-ring-goal">'+(lang==="da"?"Rekord: ":"Best: ")+fmtNum(best)+'</span>':'';
-    const totals=_vagtCounterTotals(sm);
-    const topCats=[...totals].sort((a,b)=>b.tot-a.tot).slice(0,5);
-    const hiddenN=totals.length-topCats.length;
-    const maxTot=Math.max(1,...totals.map(x=>x.tot));
-    const mr=25,mc=+(2*Math.PI*mr).toFixed(2);
-    const allSlot='<button class="vd2-mini vd2-mini-all" id="vagtAllCats" aria-label="'+(lang==="da"?"Alle kategorier":"All categories")+'">'
-      +'<div class="vd2-mini-ringwrap">'
-        +'<svg class="vd2-mini-svg" viewBox="0 0 60 60"><circle class="vd2-mini-track dashed" cx="30" cy="30" r="'+mr+'"/></svg>'
-        +'<span class="vd2-mini-num">'+(hiddenN>0?"+"+hiddenN:"···")+'</span>'
-      +'</div>'
-      +'<span class="vd2-mini-lbl">'+(lang==="da"?"Alle":"All")+'</span>'
-    +'</button>';
-    const minisHtml=topCats.length?'<div class="vd2-minis">'+topCats.map(x=>{
-      const len=+(mc*Math.min(1,x.tot/maxTot)).toFixed(2);
-      return '<button class="vd2-mini vd2-mini-tap" data-ring-id="'+esc(x.id)+'" aria-label="'+esc(x.label)+': '+fmtNum(x.tot)+'. '+(lang==="da"?"Tryk for overblik":"Tap for overview")+'">'
-        +'<div class="vd2-mini-ringwrap">'
-          +'<svg class="vd2-mini-svg" viewBox="0 0 60 60">'
-            +'<circle class="vd2-mini-track" cx="30" cy="30" r="'+mr+'"/>'
-            +'<circle class="vd2-mini-arc" id="vdmini-arc-'+x.id+'" cx="30" cy="30" r="'+mr+'" stroke="'+x.color+'" stroke-dasharray="'+len+' '+mc+'"/>'
-          +'</svg>'
-          +'<span class="vd2-mini-num" id="vdstat-'+x.id+'" data-raw="'+x.tot+'">'+fmtNum(x.tot)+'</span>'
-        +'</div>'
-        +'<span class="vd2-mini-lbl">'+esc(x.label)+'</span>'
-      +'</button>';
-    }).join("")+allSlot+'</div>':'';
-    const clockSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>';
-    const calSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>';
+    const streak=calcStreak();
+    const captionParts=[fmtWorkTime(totalWorkMs())+" "+(lang==="da"?"i alt":"total")];
+    if(streak>=2)captionParts.push("🔥 "+(lang==="da"?streak+" dage i træk":streak+" day streak"));
     container.innerHTML='<div class="vd2-hero">'
-      +'<div class="vd2-top">'
+      +'<div class="vd2-hero-solo">'
         +'<div class="vd-ring-wrap" role="img" aria-label="'+fmtNum(grandTotal)+' '+(lang==="da"?"tællinger":"counts")+'">'
           +'<svg class="vd-ring-svg" viewBox="0 0 120 120">'
             +'<defs><linearGradient id="vdGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFB36B"/><stop offset="100%" stop-color="#FF6B8A"/></linearGradient></defs>'
@@ -1579,19 +1553,35 @@
           +'<div class="vd-ring-center">'
             +'<span class="vd-ring-num" id="vd-ring-num" data-raw="'+grandTotal+'">'+fmtNum(grandTotal)+'</span>'
             +'<span class="vd-ring-lbl">'+(shift?(lang==="da"?"denne vagt":"this shift"):(lang==="da"?"tællinger":"counts"))+'</span>'
-            +goalLine
           +'</div>'
         +'</div>'
-        +'<div class="vd2-tiles">'
-          +'<div class="vd2-tile"><div class="vd2-tile-ico" style="background:rgba(255,179,107,.16);color:#FFB36B">'+clockSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+fmtWorkTime(totalWorkMs())+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Arbejdstid":"Work time")+'</div></div></div>'
-          +'<div class="vd2-tile"><div class="vd2-tile-ico" style="background:rgba(92,184,167,.16);color:#5CB8A7">'+calSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+_shiftsThisWeek()+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Vagter denne uge":"Shifts this week")+(calcStreak()>=2?" · 🔥"+calcStreak():"")+'</div></div></div>'
-        +'</div>'
+        +'<div class="vd2-caption">'+captionParts.join(" · ")+'</div>'
       +'</div>'
-      +minisHtml
     +'</div>';
+  }
+
+  // ── Rolig quick-stat grid: samme data som før, ingen ringe der konkurrerer om opmærksomhed ──
+  function _buildVagtQuickStats(container,shift){
+    if(!container)return;
+    const sm=_vagtSnapMap(shift);
+    const totals=_vagtCounterTotals(sm);
+    const topCats=[...totals].sort((a,b)=>b.tot-a.tot).slice(0,5);
+    const hiddenN=totals.length-topCats.length;
+    if(!topCats.length){container.innerHTML="";return;}
+    const moreTile='<button class="vd2-qtile vd2-qtile-more" id="vagtAllCats" aria-label="'+(lang==="da"?"Alle kategorier":"All categories")+'">'
+      +'<div class="vd2-qtile-ico">'+(hiddenN>0?"+"+hiddenN:"···")+'</div>'
+      +'<div class="vd2-qtile-txt"><div class="vd2-qtile-lbl">'+(lang==="da"?"Alle kategorier":"All categories")+'</div></div>'
+    +'</button>';
+    container.innerHTML='<div class="vd2-qgrid">'+topCats.map((x,i)=>{
+      const col=VD_COLORS[i%VD_COLORS.length];
+      return '<button class="vd2-qtile" data-ring-id="'+esc(x.id)+'" aria-label="'+esc(x.label)+': '+fmtNum(x.tot)+'. '+(lang==="da"?"Tryk for overblik":"Tap for overview")+'">'
+        +'<div class="vd2-qtile-ico" style="background:'+col[1]+';color:'+col[0]+'">'+esc((x.label||"?").charAt(0).toUpperCase())+'</div>'
+        +'<div class="vd2-qtile-txt"><div class="vd2-qtile-val" id="vdstat-'+x.id+'" data-raw="'+x.tot+'">'+fmtNum(x.tot)+'</div><div class="vd2-qtile-lbl">'+esc(x.label)+'</div></div>'
+      +'</button>';
+    }).join("")+moreTile+'</div>';
     const allBtn=document.getElementById("vagtAllCats");
     if(allBtn)allBtn.addEventListener("click",openCatOverview);
-    // Ringene åbner det totale overblik — logging sker i Detaljer og tekstfeltet
+    // Kortene åbner det totale overblik — logging sker i Detaljer og tekstfeltet
     container.querySelectorAll("[data-ring-id]").forEach(btn=>{
       btn.addEventListener("click",()=>{openCatOverview();haptic(15);});
     });
@@ -1812,35 +1802,54 @@
         +'<div class="vd2-act-sub">'+(lang==="da"?"Klar til service?":"Ready for service?")+'</div></div>'
         +'</button>';
     }
-    const detailsBlock=state.counters.length?'<div id="vagtDetWrap"></div><div id="vagtRows" class="stdb-h vrows"></div>':'';
+    // Ét toggle: Aktivitet ELLER Detaljer — aldrig begge samtidig
+    const hasDetails=state.counters.length>0;
+    const secToggle=hasDetails?'<div class="lab-seg" id="vagtSecToggle">'
+      +'<button class="lab-seg-btn" data-sec="activity">'+(lang==="da"?"Aktivitet":"Activity")+'</button>'
+      +'<button class="lab-seg-btn" data-sec="details">'+(lang==="da"?"Detaljer":"Details")+'</button>'
+      +'</div>':'';
     el.innerHTML='<div id="vagtDash"></div>'
+      +'<div id="vagtQuick"></div>'
       +'<div class="vd2-actions" style="grid-template-columns:1fr">'+shiftCard+'</div>'
       +addBlock
-      +(shift?detailsBlock+'<div id="vagtActivity"></div>':'<div id="vagtActivity"></div>'+detailsBlock);
+      +secToggle
+      +'<div id="vagtActivity"></div>'
+      +(hasDetails?'<div id="vagtRows" class="vrows" style="display:none"></div>':'');
 
     _buildVagtDashboard(document.getElementById("vagtDash"),shift);
+    _buildVagtQuickStats(document.getElementById("vagtQuick"),shift);
     _buildVagtActivity(document.getElementById("vagtActivity"));
 
-    // ── Details toggle + counter rows ──
-    if(state.counters.length){
-      const detWrap=document.getElementById("vagtDetWrap");
+    // ── Aktivitet/Detaljer-toggle ──
+    if(hasDetails){
       const rows=document.getElementById("vagtRows");
-      const detOpen=localStorage.getItem("mise_vagt_detail")!=="0";
-      const detHdr=document.createElement("div");detHdr.className="st-detail-hdr"+(detOpen?" stdo":"");
-      detHdr.innerHTML='<div class="st-detail-line"></div><span class="st-detail-lbl">'+(lang==="da"?"Detaljer":"Details")+'</span><span class="st-detail-chev">›</span><div class="st-detail-line"></div>';
-      if(detWrap)detWrap.appendChild(detHdr);
-      if(rows&&detOpen)rows.classList.remove("stdb-h");
-      detHdr.addEventListener("click",()=>{
-        const o=detHdr.classList.toggle("stdo");
-        if(rows){if(o){rows.classList.remove("stdb-h");_animOpen(rows);}else _animClose(rows,()=>rows.classList.add("stdb-h"));}
-        localStorage.setItem("mise_vagt_detail",o?"1":"0");haptic(10);
-      });
       _buildVagtRows(rows,shift?shift.snap:null,true);
+      const stored=localStorage.getItem("mise_vagt_sec")||"activity";
+      const actEl=document.getElementById("vagtActivity");
+      function showSec(sec){
+        document.querySelectorAll("#vagtSecToggle .lab-seg-btn").forEach(b=>b.classList.toggle("active",b.dataset.sec===sec));
+        if(actEl)actEl.style.display=sec==="activity"?"":"none";
+        if(rows)rows.style.display=sec==="details"?"":"none";
+      }
+      showSec(stored);
+      document.getElementById("vagtSecToggle").addEventListener("click",e=>{
+        const btn=e.target.closest("[data-sec]");if(!btn)return;
+        localStorage.setItem("mise_vagt_sec",btn.dataset.sec);
+        showSec(btn.dataset.sec);haptic(10);
+      });
     }
 
     // ── Wiring ──
     const sc=document.getElementById("vagtShiftCard");
-    if(sc)sc.addEventListener("click",()=>{if(getShift())openShiftModal();else{startShift();renderVagt();haptic(30);}});
+    if(sc)sc.addEventListener("click",()=>{
+      if(getShift()){openShiftModal();return;}
+      // Kort ceremoni før vagten starter — matcher mockuppets "Starting your shift…"
+      sc.disabled=true;
+      const savedHtml=sc.innerHTML;
+      sc.innerHTML='<div class="vd2-act-starting"><div class="vd2-act-spin"></div><span class="vd2-act-starting-lbl">'+(lang==="da"?"Starter vagt…":"Starting your shift…")+'</span></div>';
+      haptic(20);
+      setTimeout(()=>{startShift();renderVagt();haptic(40);},850);
+    });
     if(shift)startVagtTimer(shift);
 
     const inp=document.getElementById("vagtAddIn"),btn=document.getElementById("vagtAddBtn");

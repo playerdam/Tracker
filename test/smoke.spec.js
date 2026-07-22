@@ -22,7 +22,8 @@ test("app booter, logger og navigerer uden JS-fejl", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#vagtDash .vd2-hero")).toBeVisible({ timeout: 15000 });
 
-  // Bump en tæller i detaljer — ringen skal følge med
+  // Skift til Detaljer (Aktivitet/Detaljer er ét toggle) og bump en tæller — ringen skal følge med
+  await page.locator('[data-sec="details"]').click();
   await page.locator(".vr-plus").first().click();
   await expect(page.locator("#vd-ring-num")).toHaveText("11");
 
