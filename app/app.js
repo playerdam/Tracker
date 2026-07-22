@@ -1670,6 +1670,8 @@
   }
 
   function _buildVagtRows(rows,snap,editable){
+    if(!rows)return;
+    rows.innerHTML="";
     const snapMap={};
     if(snap)snap.forEach(sc=>{
       snapMap[sc.id]={count:sc.count,subs:{}};
@@ -1723,11 +1725,11 @@
         const tot=snapBase!==null?document.createElement("span"):null;
         if(tot){tot.className="vr-total";tot.textContent=fmtCount(c.count,unit);}
         if(editable){
-          let unitLbl=null;
-          if(isWeight){
-            unitLbl=document.createElement("button");unitLbl.type="button";unitLbl.className="vr-unit";unitLbl.textContent=unit;
-            unitLbl.addEventListener("click",e=>{e.stopPropagation();openUnitDropdown(unitLbl,c.unit||"stk",picked=>{c.unit=picked;unitLbl.textContent=picked;save();});});
-          }
+          const unitLbl=document.createElement("button");unitLbl.type="button";unitLbl.className="vr-unit";unitLbl.textContent=unit;
+          unitLbl.addEventListener("click",e=>{e.stopPropagation();openUnitDropdown(unitLbl,c.unit||"stk",picked=>{
+            c.unit=picked;unitLbl.textContent=picked;save();
+            _buildVagtRows(rows,snap,editable);
+          });});
           const minus=document.createElement("button");minus.className="vr-minus";minus.setAttribute("aria-label","minus");minus.innerHTML="&minus;";
           const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
           minus.addEventListener("click",e=>{e.stopPropagation();bumpVagtRow(c.id,-1);});
