@@ -103,7 +103,7 @@
       tab_social:"Rangliste",
       challenge_title:"Ugens udfordring",challenge_days:"dage tilbage",challenge_ends:"{0} dage tilbage",
       lb_title:"Ugentlig rangliste",lb_week:"uge fra",lb_anon:"Anonym",lb_you:"dig",lb_empty:"Ingen data endnu",
-      stab_global:"🌍 Global",stab_team:"👥 Hold",stab_challenge:"🏆 Ugens",
+      stab_global:"🌍 Global",stab_challenge:"🏆 Ugens",
       lb_period_week:"Uge",lb_period_month:"Måned",lb_period_all:"Altid",
       lb_total_pts:"pt i alt",team_lb_title:"Dit hold",team_no_team:"Ikke på et hold endnu",
       team_title:"Hold",team_create_ph:"fx Noma Kitchen",team_create_btn:"Opret hold",
@@ -111,9 +111,9 @@
       team_create_or_join:"Opret et hold eller tilslut dig ét med en invite-kode.",
       team_not_found:"Hold ikke fundet",team_copy:"Kopier",team_copied:"Kopieret",
       team_this_week:"Denne uge",
-      profile_title:"Min profil",profile_username_lbl:"Brugernavn",profile_nick_lbl:"Kaldenavn",profile_nick_ph:"fx Simon",
+      profile_username_lbl:"Brugernavn",profile_nick_lbl:"Kaldenavn",profile_nick_ph:"fx Simon",
       profile_prof_lbl:"Profession",profile_prof_default:"Vælg profession",
-      profile_save:"Gem",profile_close:"Luk",
+      profile_save:"Gem",
       username_checking:"Tjekker…",username_ok:"Ledigt",username_taken:"Optaget",username_invalid:"Kun bogstaver, tal og _ (3-30 tegn)",
       username_setup_title:"Vælg et brugernavn",username_setup_hint:"Dit brugernavn bruges når andre søger efter dig. Du kan altid ændre det senere.",
       username_setup_save:"Gem brugernavn",username_setup_skip:"Springe over",
@@ -253,7 +253,7 @@
       tab_social:"Leaderboard",
       challenge_title:"Weekly challenge",challenge_days:"days left",challenge_ends:"{0} days left",
       lb_title:"Weekly leaderboard",lb_week:"week from",lb_anon:"Anonymous",lb_you:"you",lb_empty:"No data yet",
-      stab_global:"🌍 Global",stab_team:"👥 Teams",stab_challenge:"🏆 Weekly",
+      stab_global:"🌍 Global",stab_challenge:"🏆 Weekly",
       lb_period_week:"Week",lb_period_month:"Month",lb_period_all:"All time",
       lb_total_pts:"pts total",team_lb_title:"Your team",team_no_team:"Not on a team yet",
       team_title:"Team",team_create_ph:"e.g. Noma Kitchen",team_create_btn:"Create team",
@@ -261,9 +261,9 @@
       team_create_or_join:"Create a team or join one with an invite code.",
       team_not_found:"Team not found",team_copy:"Copy",team_copied:"Copied",
       team_this_week:"This week",
-      profile_title:"My profile",profile_username_lbl:"Username",profile_nick_lbl:"Nickname",profile_nick_ph:"e.g. Simon",
+      profile_username_lbl:"Username",profile_nick_lbl:"Nickname",profile_nick_ph:"e.g. Simon",
       profile_prof_lbl:"Profession",profile_prof_default:"Select profession",
-      profile_save:"Save",profile_close:"Close",
+      profile_save:"Save",
       username_checking:"Checking…",username_ok:"Available",username_taken:"Taken",username_invalid:"Letters, numbers and _ only (3-30 chars)",
       username_setup_title:"Choose a username",username_setup_hint:"Your username lets others find and follow you. You can change it later.",
       username_setup_save:"Save username",username_setup_skip:"Skip for now",
@@ -418,11 +418,12 @@
     const lbTitle=$("#lbTitle");if(lbTitle)lbTitle.textContent=t("lb_title");
     const teamTitle=$("#teamTitle");if(teamTitle)teamTitle.textContent=t("team_title");
     const pSave=$("#profileSave");if(pSave)pSave.textContent=t("profile_save");
-    const pClose=$("#profileClose");if(pClose)pClose.textContent=t("profile_close");
     const pNick=$("#profileNick");if(pNick)pNick.placeholder=t("profile_nick_ph");
     const pNickLbl=$("#profileNickLbl");if(pNickLbl)pNickLbl.textContent=t("profile_nick_lbl");
     const pUsernameLbl=$("#profileUsernameLbl");if(pUsernameLbl)pUsernameLbl.textContent=t("profile_username_lbl");
     const pProfLbl=$("#profileProfLbl");if(pProfLbl)pProfLbl.textContent=t("profile_prof_lbl");
+    const pAcctT=$("#profileAccountTitle");if(pAcctT)pAcctT.textContent=lang==="da"?"Konto":"Account";
+    const pPrefsT=$("#profilePrefsTitle");if(pPrefsT)pPrefsT.textContent=lang==="da"?"Indstillinger":"Preferences";
     // Auth: splash + form
     const aTag=$("#authSplashTag");if(aTag)aTag.innerHTML=esc(t("auth_splash_tag")).replace(/\n/g,"<br>");
     const aGet=$("#authGetStarted");if(aGet)aGet.textContent=t("auth_get_started");
@@ -833,7 +834,7 @@
       hideAuthScreen();startApp();
     });
     [emailEl,pwEl].forEach(el=>el.addEventListener("keydown",e=>{if(e.key==="Enter")submitBtn.click();}));
-    {const _so4=$("#signOutBtn");if(_so4)_so4.addEventListener("click",()=>{session=null;localStorage.removeItem("mise_session");$("#profileScrim").classList.remove("open");showAuthScreen();});}
+    {const _so4=$("#signOutBtn");if(_so4)_so4.addEventListener("click",()=>{session=null;localStorage.removeItem("mise_session");showAuthScreen();});}
     updateMode();
   }
 
@@ -3037,7 +3038,7 @@
     if(_ss)_ss.style.display="none";
     function doSwitch(){
       document.querySelectorAll(".bnav-btn").forEach(x=>x.classList.toggle("active",x.dataset.tab===v));
-      ["station","vin","social","feed","lab","vagt","history","stats"].forEach(n=>{const ve=document.getElementById("view-"+n);if(ve)ve.classList.toggle("active",v===n);});
+      ["station","vin","social","feed","lab","vagt","history","stats","profile"].forEach(n=>{const ve=document.getElementById("view-"+n);if(ve)ve.classList.toggle("active",v===n);});
       const aiBar=document.getElementById("stAiBar");if(aiBar)aiBar.classList.toggle("on",v==="station");
       if(v==="vagt")renderVagt();
       if(v==="social")loadSocial();
@@ -3050,13 +3051,18 @@
         _buildStatsBadges(document.getElementById("statsBadges"));
         _buildVagtQuickStats(document.getElementById("statsQuick"),getShift());
       }
+      if(v==="profile"){
+        _loadProfileFields();
+        _buildProfileCareerStrip(document.getElementById("profileCareerStrip"));
+        renderSocialTeam();
+        loadFollowRequests();
+      }
       window.scrollTo({top:0,behavior:"instant"});
     }
     if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
   }
   document.querySelectorAll(".bnav-btn").forEach(btn=>btn.addEventListener("click",()=>{
     if(btn.dataset.action==="qlog"){haptic(20);openQlogOverlay();return;}
-    if(btn.dataset.action==="profile"){haptic(15);openProfile();return;}
     if(btn.classList.contains("active")){
       const sc=document.getElementById("appScroll");
       if(sc)sc.scrollTo({top:0,behavior:"smooth"});
@@ -3066,7 +3072,7 @@
   }));
 
   function openLogDrawer(){$("#logDrawer").classList.add("open");$("#logScrim").classList.add("open");}
-  function goToTeams(){switchTab("social");setTimeout(()=>_switchSocialTab("team"),60);}
+  function goToTeams(){switchTab("profile");}
   // ── Manuel dark mode: lys er standard, kontakten bor i menuen ──
   function _applyTheme(theme){
     document.documentElement.dataset.theme=theme;
@@ -3083,7 +3089,6 @@
     localStorage.setItem("mise_theme",next);
     _applyTheme(next);haptic(20);track("theme",{t:next});
   });
-  var _teamDrawerLink=$("#teamDrawerLink");if(_teamDrawerLink)_teamDrawerLink.addEventListener("click",()=>{closeLogDrawer();goToTeams();});
   function _drawerGoTab(v){closeLogDrawer();switchTab(v);}
   var _mVin=$("#menuDrawerVin");if(_mVin)_mVin.addEventListener("click",()=>_drawerGoTab("vin"));
   var _mSoc=$("#menuDrawerSocial");if(_mSoc)_mSoc.addEventListener("click",()=>_drawerGoTab("social"));
@@ -3398,9 +3403,8 @@
   function _switchSocialTab(tab){
     _activeSocialTab=tab;
     document.querySelectorAll(".social-tab").forEach(b=>b.classList.toggle("active",b.dataset.stab===tab));
-    ["global","team","challenge"].forEach(id=>{const el=document.getElementById("social-"+id);if(el)el.style.display=id===tab?"":"none";});
+    ["global","challenge"].forEach(id=>{const el=document.getElementById("social-"+id);if(el)el.style.display=id===tab?"":"none";});
     if(tab==="global")renderLeaderboard(_lbPeriod);
-    else if(tab==="team")renderSocialTeam();
     else if(tab==="challenge")renderChallenge();
   }
   async function loadSocial(){
@@ -3412,7 +3416,6 @@
     const lbPM=document.getElementById("lbPeriodMonth");if(lbPM)lbPM.textContent=t("lb_period_month");
     const lbPA=document.getElementById("lbPeriodAll");if(lbPA)lbPA.textContent=t("lb_period_all");
     const stabG=document.getElementById("stab-global");if(stabG)stabG.textContent=t("stab_global");
-    const stabT=document.getElementById("stab-team");if(stabT)stabT.textContent=t("stab_team");
     const stabC=document.getElementById("stab-challenge");if(stabC)stabC.textContent=t("stab_challenge");
     _switchSocialTab(_activeSocialTab);
   }
@@ -3430,26 +3433,33 @@
     el.textContent=first;
   }
 
-  async function openProfile(){
-    const scrim=$("#profileScrim");if(!scrim)return;
+  async function _loadProfileFields(){
     const base=apiBase();const token=await getToken();
-    const profSel=$("#profileProf");populateProfSelect(profSel);
-    if(base&&token){
-      try{
-        const res=await fetch(base+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token}});
-        if(!res.ok)throw new Error("HTTP "+res.status);
-        const d=await res.json();
-        if(d.nickname)$("#profileNick").value=d.nickname;
-        if(d.profession)profSel.value=d.profession;
-        const uInput=$("#profileUsername");
-        if(uInput)uInput.value=d.username||"";
-        $("#profileUsernameStatus").textContent="";$("#profileUsernameStatus").className="username-status";
-        setProfileInitial(d.nickname,d.username);
-      }catch(e){
-        showToast(lang==="da"?"Kunne ikke hente din profil — prøv igen":"Couldn't load your profile — try again");
-      }
+    const profSel=$("#profileProf");if(profSel)populateProfSelect(profSel);
+    if(!base||!token)return;
+    try{
+      const res=await fetch(base+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token}});
+      if(!res.ok)throw new Error("HTTP "+res.status);
+      const d=await res.json();
+      const nickInp=$("#profileNick");if(d.nickname&&nickInp)nickInp.value=d.nickname;
+      if(d.profession&&profSel)profSel.value=d.profession;
+      const uInput=$("#profileUsername");
+      if(uInput)uInput.value=d.username||"";
+      const uStatus=$("#profileUsernameStatus");if(uStatus){uStatus.textContent="";uStatus.className="username-status";}
+      setProfileInitial(d.nickname,d.username);
+    }catch(e){
+      showToast(lang==="da"?"Kunne ikke hente din profil — prøv igen":"Couldn't load your profile — try again");
     }
-    scrim.classList.add("open");
+  }
+  function _buildProfileCareerStrip(container){
+    if(!container)return;
+    const streak=calcStreak();
+    const earned=getBadgesEarned().length;
+    container.innerHTML='<div class="pcs-stat"><span class="pcs-val">'+fmtNum(career())+'</span><span class="pcs-lbl">'+(lang==="da"?"Karriere":"Career")+'</span></div>'
+      +'<div class="pcs-div"></div>'
+      +'<div class="pcs-stat"><span class="pcs-val">'+fmtNum(streak)+'</span><span class="pcs-lbl">'+(lang==="da"?"Dage i træk":"Day streak")+'</span></div>'
+      +'<div class="pcs-div"></div>'
+      +'<div class="pcs-stat"><span class="pcs-val">'+earned+'/'+BADGE_DEFS.length+'</span><span class="pcs-lbl">'+(lang==="da"?"Achievements":"Achievements")+'</span></div>';
   }
   let _usernameCheckTimer=null;
   function setupUsernameInput(inputId,statusId,onValid){
@@ -3593,7 +3603,9 @@
 
   function setupProfileModal(){
     const profileBtn=$("#profileBtn");
-    if(profileBtn)profileBtn.addEventListener("click",()=>openProfile());
+    if(profileBtn)profileBtn.addEventListener("click",()=>switchTab("profile"));
+    const careerStrip=$("#profileCareerStrip");
+    if(careerStrip)careerStrip.addEventListener("click",()=>switchTab("stats"));
     let profileUsernameValid=true;
     setupUsernameInput("profileUsername","profileUsernameStatus",v=>{profileUsernameValid=v;});
     const saveBtn=$("#profileSave");
@@ -3621,10 +3633,8 @@
         showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
         return;
       }
-      $("#profileScrim").classList.remove("open");
+      showToast(lang==="da"?"Profil gemt":"Profile saved");
     });
-    const closeBtn=$("#profileClose");
-    if(closeBtn)closeBtn.addEventListener("click",()=>$("#profileScrim").classList.remove("open"));
   }
 
   // ---- shift ----
@@ -4165,6 +4175,8 @@
       if(badge)badge.classList.toggle("show",reqs.length>0);
       const badge2=$("#feedBadge2");
       if(badge2)badge2.classList.toggle("show",reqs.length>0);
+      const badge3=$("#profileBadge");
+      if(badge3)badge3.classList.toggle("show",reqs.length>0);
       if(!reqs.length){banner.style.display="none";return;}
       banner.style.display="";
       banner.innerHTML='<div class="follow-req-banner"><div class="follow-req-head"><span class="follow-req-title">'+esc(t("follow_req_title"))+'</span><span style="font-size:12px;color:var(--dim)">'+reqs.length+'</span></div>'
@@ -5196,6 +5208,7 @@
       return [...new Set([...phrases,...labels,...subs])];
     });}catch(e){console.error("attachAC",e);}
     track("app_open");
+    try{loadFollowRequests();}catch(e){console.error("loadFollowRequests",e);}
     setTimeout(()=>ensurePushSubscription(),3000);
     // Deep link: ?join=KODE åbner Hold-fanen med koden udfyldt
     try{

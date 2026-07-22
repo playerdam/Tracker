@@ -51,10 +51,11 @@ test("app booter, logger og navigerer uden JS-fejl", async ({ page }) => {
   await page.locator("#qlogOverlayClose").click();
   await expect(page.locator("#qlogOverlay")).not.toHaveClass(/open/);
 
-  // Profil-knappen åbner profilmodal
-  await page.locator('.bnav-btn[data-action="profile"]').click();
-  await expect(page.locator("#profileScrim")).toHaveClass(/open/);
-  await page.keyboard.press("Escape");
+  // Profil-fanen viser konto, hold og indstillinger
+  await page.locator('.bnav-btn[data-tab="profile"]').click();
+  await expect(page.locator("#view-profile")).toHaveClass(/active/);
+  await expect(page.locator("#profileCareerStrip")).toBeVisible();
+  await expect(page.locator("#socialTeamContent")).toBeVisible();
 
   // Burgermenuen skal kunne åbnes og navigere til de flyttede faner (Vin, Rangliste, Feed, Lab)
   await page.locator("#burgerBtn").click();

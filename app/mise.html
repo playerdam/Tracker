@@ -85,6 +85,37 @@
     <div id="statsQuick"></div>
   </section>
 
+  <section class="view" id="view-profile">
+    <button type="button" class="profile-career-strip" id="profileCareerStrip"></button>
+
+    <div id="followRequestsBanner" style="display:none"></div>
+
+    <div class="vd2-sec"><span class="vd2-sec-title" id="profileAccountTitle">Konto</span></div>
+    <div class="field">
+      <label id="profileUsernameLbl"></label>
+      <div class="username-wrap"><span class="username-at">@</span><input id="profileUsername" maxlength="30" autocomplete="off" spellcheck="false" inputmode="url"></div>
+      <div class="username-status" id="profileUsernameStatus"></div>
+    </div>
+    <div class="field"><label id="profileNickLbl"></label><input id="profileNick" maxlength="30" autocomplete="off"></div>
+    <div class="field"><label id="profileProfLbl"></label><select id="profileProf" class="prof-select"></select></div>
+    <button class="btn primary" id="profileSave" style="width:100%;margin-top:4px"></button>
+
+    <div class="vd2-sec" style="margin-top:22px"><span class="vd2-sec-title" id="teamTitle">Hold</span></div>
+    <div id="socialTeamContent"></div>
+
+    <div class="vd2-sec" style="margin-top:22px"><span class="vd2-sec-title" id="profilePrefsTitle">Indstillinger</span></div>
+    <button class="va-drawer-link" id="langDrawerLink">
+      <span class="va-drawer-link-icon">🌐</span>
+      <span class="va-drawer-link-label" id="langDrawerLbl">English</span>
+    </button>
+    <button class="va-drawer-link" id="themeDrawerLink">
+      <span class="va-drawer-link-icon" id="themeDrawerIcon">🌙</span>
+      <span class="va-drawer-link-label" id="themeDrawerLbl">Mørkt tema</span>
+    </button>
+
+    <button class="btn ghost" id="signOutBtn" style="width:100%;margin-top:22px;color:var(--faint);border-color:transparent"></button>
+  </section>
+
   <section class="view" id="view-station">
     <!-- Hidden for JS compat -->
     <input id="qlogInput" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px" autocomplete="off">
@@ -102,7 +133,6 @@
   <section class="view" id="view-social">
     <div class="social-tabs">
       <button class="social-tab active" data-stab="global" id="stab-global">🌍 Global</button>
-      <button class="social-tab" data-stab="team" id="stab-team">👥 Hold</button>
       <button class="social-tab" data-stab="challenge" id="stab-challenge">🏆 Ugens</button>
     </div>
     <div id="social-global">
@@ -113,16 +143,12 @@
       </div>
       <div id="lbContent"></div>
     </div>
-    <div id="social-team" style="display:none">
-      <div id="socialTeamContent"></div>
-    </div>
     <div id="social-challenge" style="display:none">
       <div id="challengeContent"></div>
     </div>
   </section>
 
   <section class="view" id="view-feed">
-    <div id="followRequestsBanner" style="display:none"></div>
     <div class="feed-segtabs">
       <button class="feed-segtab active" id="feedTabMine"></button>
       <button class="feed-segtab" id="feedTabDiscover"></button>
@@ -667,21 +693,6 @@
   </div>
 </div>
 
-<div class="scrim" id="profileScrim"><div class="modal">
-  <h2 id="profileTitle"></h2>
-  <div class="field">
-    <label id="profileUsernameLbl"></label>
-    <div class="username-wrap"><span class="username-at">@</span><input id="profileUsername" maxlength="30" autocomplete="off" spellcheck="false" inputmode="url"></div>
-    <div class="username-status" id="profileUsernameStatus"></div>
-  </div>
-  <div class="field"><label id="profileNickLbl"></label><input id="profileNick" maxlength="30" autocomplete="off"></div>
-  <div class="field"><label id="profileProfLbl"></label><select id="profileProf" class="prof-select"></select></div>
-  <div class="mactions" style="margin-top:16px">
-    <button class="btn primary" id="profileSave"></button>
-    <button class="btn ghost" id="profileClose"></button>
-  </div>
-  <button class="btn ghost" id="signOutBtn" style="width:100%;margin-top:14px;color:var(--faint);border-color:transparent"></button>
-</div></div>
 
 <div class="scrim" id="catPickerScrim"><div class="modal">
   <h2 id="catPickerTitle"></h2>
@@ -718,20 +729,6 @@
       <span class="va-drawer-link-label" id="menuDrawerLabLbl">The Lab</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
-    <div class="drawer-div"></div>
-    <button class="va-drawer-link" id="teamDrawerLink">
-      <span class="va-drawer-link-icon">👥</span>
-      <span class="va-drawer-link-label" id="teamTitle"></span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-    <button class="va-drawer-link" id="langDrawerLink">
-      <span class="va-drawer-link-icon">🌐</span>
-      <span class="va-drawer-link-label" id="langDrawerLbl">English</span>
-    </button>
-    <button class="va-drawer-link" id="themeDrawerLink">
-      <span class="va-drawer-link-icon" id="themeDrawerIcon">🌙</span>
-      <span class="va-drawer-link-label" id="themeDrawerLbl">Mørkt tema</span>
-    </button>
   </div>
 </div>
 
@@ -752,8 +749,8 @@
       <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="14"/></svg>
       <span class="bnav-label" id="bnav-lbl-stats">Stats</span>
     </button>
-    <button class="bnav-btn" data-action="profile" id="bnav-profile">
-      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+    <button class="bnav-btn" data-tab="profile" id="bnav-profile">
+      <span class="bnav-icon-wrap"><svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg><span class="bnav-badge" id="profileBadge"></span></span>
       <span class="bnav-label" id="bnav-lbl-profile">Profil</span>
     </button>
   </div>

@@ -992,6 +992,12 @@
   .vd2-hero-solo{display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1}
   .vd2-caption{font-size:12px;font-weight:600;color:rgba(255,255,255,.65);margin-top:10px}
   .vd2-caption b{color:#fff;font-weight:800}
+  .profile-career-strip{appearance:none;width:100%;display:flex;align-items:center;background:linear-gradient(150deg,#2E0E15 0%,#54202E 52%,#7A2A3C 100%);border:none;border-radius:20px;padding:16px 8px;margin-bottom:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 10px 28px rgba(74,22,34,.28)}
+  .profile-career-strip:active{transform:scale(.98);transition:transform .08s}
+  .pcs-stat{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+  .pcs-val{font-family:"Fraunces",serif;font-size:19px;font-weight:700;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
+  .pcs-lbl{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+  .pcs-div{width:1px;height:28px;background:rgba(255,255,255,.18);flex:none}
   .vd2-qgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}
   .vd2-qtile{appearance:none;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s;text-align:left;font-family:inherit}
   .vd2-qtile:active{transform:scale(.96)}
