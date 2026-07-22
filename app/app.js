@@ -119,9 +119,7 @@
       username_setup_save:"Gem brugernavn",username_setup_skip:"Springe over",
       follow_req_title:"Følgeanmodninger",follow_req_accept:"Godkend",follow_req_reject:"Afvis",
       feed_requested:"Anmodet",
-      profile_badges:"Badges",profile_badges_none:"Ingen badges endnu — begynd at logge!",
-      profile_records:"Personlige rekorder",profile_records_none:"Ingen rekorder endnu",
-      new_badge:"Nyt badge",new_record_msg:"Ny rekord",
+      new_badge:"Nyt badge",
       professions:["Kok","Tjener","Bartender","Barista","Sommelier","Andet"],
       streak_day:"1 dag i træk",streak_days:"{0} dage i træk",
       offline_pending:"{0} afventende sync",
@@ -271,9 +269,7 @@
       username_setup_save:"Save username",username_setup_skip:"Skip for now",
       follow_req_title:"Follow requests",follow_req_accept:"Accept",follow_req_reject:"Decline",
       feed_requested:"Requested",
-      profile_badges:"Badges",profile_badges_none:"No badges yet — start logging!",
-      profile_records:"Personal records",profile_records_none:"No records yet",
-      new_badge:"New badge",new_record_msg:"New record",
+      new_badge:"New badge",
       professions:["Chef","Waiter / Waitress","Bartender","Barista","Sommelier","Other"],
       streak_day:"1 day in a row",streak_days:"{0} days in a row",
       offline_pending:"{0} pending sync",
@@ -348,13 +344,9 @@
     const langDl=$("#langDrawerLbl");if(langDl)langDl.textContent=lang==="da"?"English":"Dansk";
     const tglEl=$("#tagline");if(tglEl)tglEl.textContent=t("tagline");
     $("#totalLbl").textContent=t("total_label");
-    $("#tab-station").textContent=t("tab_station");
-    $("#tab-vin").textContent=t("tab_wine");
     $("#loading").textContent=t("loading");
     $("#qlogInput").placeholder=t("qlog_ph");
     const _stAiI=document.getElementById("stAiInp");if(_stAiI)_stAiI.placeholder=lang==="da"?"Log hvad du lavede…":"Log what you did…";
-    $("#btnGrid").title=t("view_grid");
-    $("#btnList").title=t("view_list");
     $("#wineSearch").placeholder=t("wine_search_ph");
     $("#counterQLabel").textContent=t("counter_q");
     $("#counterCatLbl").textContent=t("counter_cat_lbl");
@@ -392,9 +384,6 @@
     $("#authPwLbl").textContent=t("auth_pw");
     const _so=$("#signOutBtn");if(_so)_so.textContent=t("auth_signout");
     renderStreak();
-    const tSocial=$("#tab-social");if(tSocial)tSocial.textContent=t("tab_social");
-    const tFeed=$("#tab-feed");if(tFeed)tFeed.textContent=t("tab_feed");
-    const bSt=$("#bnav-lbl-station");if(bSt)bSt.textContent=t("tab_station");
     const mVin=$("#menuDrawerVinLbl");if(mVin)mVin.textContent=t("tab_wine");
     const mSoc=$("#menuDrawerSocialLbl");if(mSoc)mSoc.textContent=t("tab_social");
     const mFeed=$("#menuDrawerFeedLbl");if(mFeed)mFeed.textContent=t("tab_feed");
@@ -434,8 +423,6 @@
     const pNickLbl=$("#profileNickLbl");if(pNickLbl)pNickLbl.textContent=t("profile_nick_lbl");
     const pUsernameLbl=$("#profileUsernameLbl");if(pUsernameLbl)pUsernameLbl.textContent=t("profile_username_lbl");
     const pProfLbl=$("#profileProfLbl");if(pProfLbl)pProfLbl.textContent=t("profile_prof_lbl");
-    const pBadgesLbl=$("#profileBadgesLbl");if(pBadgesLbl)pBadgesLbl.textContent=t("profile_badges");
-    const pRecLbl=$("#profileRecordsLbl");if(pRecLbl)pRecLbl.textContent=t("profile_records");
     // Auth: splash + form
     const aTag=$("#authSplashTag");if(aTag)aTag.innerHTML=esc(t("auth_splash_tag")).replace(/\n/g,"<br>");
     const aGet=$("#authGetStarted");if(aGet)aGet.textContent=t("auth_get_started");
@@ -666,7 +653,6 @@
   const DEFAULTS={counters:[],wines:[],log:[],shiftHistory:[],labelI18n:{}};
 
   let state={counters:[],wines:[],log:[],customCats:[]},mem=null,wineFilter="";
-  let listView=localStorage.getItem("mise_listview")==="1";
   let activeCat=localStorage.getItem("mise_active_cat")||"";
   let activeWineType=localStorage.getItem("mise_wine_type")||"alle";
 
@@ -1164,14 +1150,9 @@
     if(newOnes.length){saveBadgesEarned(earned);newOnes.forEach((b,i)=>setTimeout(()=>showBadgeToast(b),i*3200));}
   }
   function showBadgeToast(b){
-    const toast=$("#badgeToast");if(!toast)return;
     const name=lang==="en"?b.en:b.da;
-    $("#badgeToastIcon").textContent=b.icon;
-    $("#badgeToastLbl").textContent=t("new_badge");
-    $("#badgeToastName").textContent=name;
-    toast.classList.add("show");
+    showToast(b.icon+" "+t("new_badge")+": "+name);
     haptic(60);
-    setTimeout(()=>toast.classList.remove("show"),3000);
     if(Notification&&Notification.permission==="granted"){
       try{new Notification(b.icon+" "+t("new_badge"),{body:name,icon:"/icons/icon.svg",silent:true});}catch(e){}
     }
@@ -1307,41 +1288,6 @@
     const frag=document.createDocumentFragment();
     if(c.subs.length){frag.appendChild(makeSubGroup(c));}else{frag.appendChild(makeSimpleRow(c));}
     return frag;
-  }
-  function makeCounterCard(c,recs){
-    const isCat=c.subs.length>0;
-    const card=document.createElement("div");card.className="ccard"+(isCat?" cat":"");card.dataset.id=c.id;
-    const ph=(c.suggest&&c.suggest.length)?(t("sub_ph").replace("Skriv","fx").replace("Type","e.g.")+" "+c.suggest[0]):t("sub_ph");
-    const bigAct=isCat?"":"data-act=\"editnum\"";
-    const total=counterTotal(c);const rec=recs[c.label]||total;
-    const barPct=rec>0?Math.min(100,Math.round((total/rec)*100)):0;
-    let html='<button class="kebab" data-act="edit" aria-label="Edit">&#8943;</button><div class="clabel">'+esc(tLabel(c.label))+'</div><div class="cbig" '+bigAct+'>'+total+'</div>';
-    if(isCat){
-      html+='<div class="sublist">';
-      c.subs.forEach(sub=>{html+='<div class="subrow" data-sid="'+sub.id+'"><span class="subname">'+esc(tLabel(sub.name))+'</span><div class="subctrl"><button class="sbtn" data-act="subdec">&#8722;</button><span class="subcount" data-act="subeditnum">'+sub.count+'</span><button class="sbtn plus" data-act="subinc">+</button></div></div>';});
-      html+='</div>';
-    }else{
-      html+='<div class="cstep"><button class="step minus" data-act="dec">&#8722;</button><button class="step plus" data-act="inc">+</button></div>';
-    }
-    html+='<div class="ccard-bar"><div class="ccard-bar-fill" style="width:'+barPct+'%"></div></div>';
-    html+='<button class="addtype" data-act="addtype">'+esc(t("add_sub"))+'</button><div class="addtype-box"><input class="subadd-input" placeholder="'+esc(ph)+'" maxlength="40" autocomplete="off"></div>';
-    card.innerHTML=html;
-    attachAC(card.querySelector(".subadd-input"),()=>uniq([...c.suggest,...c.subs.map(s=>s.name)]));
-    const plusBtn=card.querySelector('.step.plus[data-act="inc"]');
-    if(plusBtn)bindLongPress(plusBtn,()=>{openNumtray(t("numtray_add")+" "+c.label,"",val=>{if(val>0)bumpSimple(card,val);});});
-    card.querySelectorAll('.sbtn.plus[data-act="subinc"]').forEach(btn=>{
-      const sid=btn.closest(".subrow").dataset.sid;const s=c.subs.find(x=>x.id===sid);if(!s)return;
-      bindLongPress(btn,()=>{openNumtray(t("numtray_add")+" "+s.name,"",val=>{if(val>0)bumpSub(card,sid,val);});});
-    });
-    if(!isCat){
-      let _tx=0;
-      card.addEventListener("touchstart",e=>{_tx=e.touches[0].clientX;},{passive:true});
-      card.addEventListener("touchend",e=>{
-        const dx=e.changedTouches[0].clientX-_tx;
-        if(dx>52&&!e.target.closest("button")){bumpSimple(card,1);card.classList.add("swipe-flash");setTimeout(()=>card.classList.remove("swipe-flash"),350);}
-      },{passive:true});
-    }
-    return card;
   }
   function renderCounters(){
     const grid=$("#counterGrid");grid.className="st-v3";grid.innerHTML="";
@@ -1482,14 +1428,6 @@
     }
     requestAnimationFrame(step);
   }
-  function updateCardBar(card,c){
-    const bar=card.querySelector(".ccard-bar-fill");if(!bar)return;
-    const total=counterTotal(c);const rec=getRecords()[c.label]||total;
-    const pct=rec>0?Math.min(100,Math.round((total/rec)*100)):0;
-    bar.style.width=pct+"%";
-  }
-  function bumpSimple(card,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c||c.subs.length)return;const prev=c.count;c.count=Math.max(0,c.count+d);const n=card.querySelector(".cbig");animateCount(n,prev,c.count);if(d>0){tickEl(n);haptic();}updateCardBar(card,c);updateCatHeader(c.cat||"andet");renderCareer();save();}
-  function bumpSub(card,sid,d){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c)return;const s=c.subs.find(x=>x.id===sid);if(!s)return;const prev=s.count;s.count=Math.max(0,s.count+d);const p=card.querySelector('.subrow[data-sid="'+sid+'"] .subcount');if(p){animateCount(p,prev,s.count);if(d>0){tickEl(p);haptic();}}const tv=card.querySelector(".cbig");if(tv){const prevT=counterTotal(c)-d;animateCount(tv,Math.max(0,prevT),counterTotal(c));if(d>0)tickEl(tv);}updateCardBar(card,c);updateCatHeader(c.cat||"andet");renderCareer();save();}
   function bumpSt(cid,d){
     const c=state.counters.find(x=>x.id===cid);if(!c||c.subs.length)return;
     const prev=c.count;c.count=Math.max(0,c.count+d);
@@ -1900,9 +1838,6 @@
 
   const stationBack=$("#stationBack");
   if(stationBack){stationBack.textContent=lang==="da"?"‹ Tilbage til Vagt":"‹ Back to Shift";stationBack.addEventListener("click",()=>switchTab("vagt"));}
-  $("#btnGrid").addEventListener("click",()=>{listView=false;localStorage.setItem("mise_listview","0");renderCounters();});
-  $("#btnList").addEventListener("click",()=>{listView=true;localStorage.setItem("mise_listview","1");renderCounters();});
-
   let editC=null;
   function openCounterModal(cid,defaultCat){
     editC=cid;const c=cid?state.counters.find(x=>x.id===cid):null;
@@ -3036,10 +2971,8 @@
     if(_sb)_sb.style.display=v==="vagt"?"none":"";
     if(_ss)_ss.style.display="none";
     function doSwitch(){
-      document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.view===v));
       document.querySelectorAll(".bnav-btn").forEach(x=>x.classList.toggle("active",x.dataset.tab===v));
       ["station","vin","social","feed","lab","vagt","history","stats"].forEach(n=>{const ve=document.getElementById("view-"+n);if(ve)ve.classList.toggle("active",v===n);});
-      $("#viewToggle").style.display="none";
       const aiBar=document.getElementById("stAiBar");if(aiBar)aiBar.classList.toggle("on",v==="station");
       if(v==="vagt")renderVagt();
       if(v==="social")loadSocial();
@@ -3056,7 +2989,6 @@
     }
     if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
   }
-  document.querySelectorAll(".tab").forEach(tb=>tb.addEventListener("click",()=>switchTab(tb.dataset.view)));
   document.querySelectorAll(".bnav-btn").forEach(btn=>btn.addEventListener("click",()=>{
     if(btn.dataset.action==="qlog"){haptic(20);openQlogOverlay();return;}
     if(btn.dataset.action==="profile"){haptic(15);openProfile();return;}
@@ -3328,10 +3260,13 @@
       const inp=div.querySelector(".stac-name-inp");const name=inp.value.trim();if(!name)return;
       const base=apiBase();const token=await getToken();if(!token)return;
       try{
-        await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});
+        const r=await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});
+        if(!r.ok){showToast(lang==="da"?"Kunne ikke oprette hold — prøv igen":"Couldn't create team — try again");return;}
         invalidateLabTeams();haptic(50);renderSocialTeam();
         showToast(lang==="da"?"Holdet er oprettet — del koden med kollegerne 🎉":"Team created — share the code with your colleagues 🎉");
-      }catch(e){}
+      }catch(e){
+        showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
+      }
     });
   }
 
@@ -3437,6 +3372,7 @@
     if(base&&token){
       try{
         const res=await fetch(base+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token}});
+        if(!res.ok)throw new Error("HTTP "+res.status);
         const d=await res.json();
         if(d.nickname)$("#profileNick").value=d.nickname;
         if(d.profession)profSel.value=d.profession;
@@ -3444,31 +3380,11 @@
         if(uInput)uInput.value=d.username||"";
         $("#profileUsernameStatus").textContent="";$("#profileUsernameStatus").className="username-status";
         setProfileInitial(d.nickname,d.username);
-      }catch(e){}
+      }catch(e){
+        showToast(lang==="da"?"Kunne ikke hente din profil — prøv igen":"Couldn't load your profile — try again");
+      }
     }
     scrim.classList.add("open");
-  }
-  function renderBadgeGrid(){
-    const grid=$("#badgeGrid");if(!grid)return;
-    const earned=getBadgesEarned();
-    const items=BADGE_DEFS.map(b=>{
-      const has=earned.includes(b.id);
-      const name=lang==="en"?b.en:b.da;
-      return '<div class="badge-item'+(has?"":" badge-locked")+'" title="'+esc(name)+'">'+'<div class="badge-icon">'+b.icon+'</div>'+'<div class="badge-label">'+esc(name)+'</div></div>';
-    }).join("");
-    grid.innerHTML=items||'<p class="muted">'+esc(t("profile_badges_none"))+'</p>';
-  }
-  function renderRecordsList(){
-    const el=$("#recordsList");if(!el)return;
-    const records=getRecords();
-    const keys=Object.keys(records);
-    if(!keys.length){el.innerHTML='<p class="muted">'+esc(t("profile_records_none"))+'</p>';return;}
-    el.innerHTML=keys.map(k=>{
-      const r=records[k];
-      const label=state.counters.find(c=>c.id===k);
-      const name=label?tLabel(label.label):(r.label||k);
-      return '<div class="records-item"><span class="records-lbl">'+esc(name)+'</span><span class="records-val">'+r.val+'</span></div>';
-    }).join("");
   }
   let _usernameCheckTimer=null;
   function setupUsernameInput(inputId,statusId,onValid){
@@ -4254,16 +4170,14 @@
   }
 
   async function toggleFollow(userId,currentStatus){
-    const base=apiBase();const token=await getToken();if(!base||!token)return;
+    const base=apiBase();const token=await getToken();if(!base||!token)return false;
     try{
-      if(currentStatus==="accepted"||currentStatus==="pending"){
-        await fetch(base+"/api/follow/"+userId,{method:"DELETE",headers:{"Authorization":"Bearer "+token}});
-        delete _followingCache[userId];
-      }else{
-        await fetch(base+"/api/follow",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({targetId:userId})});
-        _followingCache[userId]="pending";
-      }
-    }catch(e){}
+      const unfollowing=currentStatus==="accepted"||currentStatus==="pending";
+      const r=unfollowing
+        ?await fetch(base+"/api/follow/"+userId,{method:"DELETE",headers:{"Authorization":"Bearer "+token}})
+        :await fetch(base+"/api/follow",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({targetId:userId})});
+      return r.ok;
+    }catch(e){return false;}
   }
 
   function followBtnLabel(status){
@@ -4321,12 +4235,15 @@
     try{
       const res=await fetch(base+"/api/comments/"+activeCommentEntry,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({text})});
       const d=await res.json();
+      if(!res.ok){showToast(lang==="da"?"Kunne ikke sende — prøv igen":"Couldn't send — try again");input.disabled=false;input.focus();return;}
       renderComments($("#commentList"),d.comments||[]);
       input.value="";
       // update comment count in feed
       const countEl=document.querySelector('[data-comments="'+activeCommentEntry+'"] .comment-count');
       if(countEl)countEl.textContent=(d.comments||[]).length;
-    }catch(e){}
+    }catch(e){
+      showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
+    }
     input.disabled=false;input.focus();
   }
 
@@ -4368,8 +4285,14 @@
         const curStatus=followBtn.dataset.followStatus||"none";
         const newStatus=(curStatus==="none")?"pending":"none";
         updateFollowBtn(followBtn,newStatus);
+        const prevCache=_followingCache[uid];
         _followingCache[uid]=newStatus==="none"?undefined:newStatus;
-        await toggleFollow(uid,curStatus);
+        const ok=await toggleFollow(uid,curStatus);
+        if(!ok){
+          updateFollowBtn(followBtn,curStatus);
+          _followingCache[uid]=prevCache;
+          showToast(lang==="da"?"Kunne ikke opdatere — prøv igen":"Couldn't update — try again");
+        }
         return;
       }
       // like
@@ -4392,8 +4315,14 @@
         const curStatus=followBtn.dataset.followStatus||"none";
         const newStatus=(curStatus==="none")?"pending":"none";
         updateFollowBtn(followBtn,newStatus);
+        const prevCache=_followingCache[uid];
         _followingCache[uid]=newStatus==="none"?undefined:newStatus;
-        await toggleFollow(uid,curStatus);
+        const ok=await toggleFollow(uid,curStatus);
+        if(!ok){
+          updateFollowBtn(followBtn,curStatus);
+          _followingCache[uid]=prevCache;
+          showToast(lang==="da"?"Kunne ikke opdatere — prøv igen":"Couldn't update — try again");
+        }
       });
     }
 
@@ -5194,7 +5123,6 @@
     try{setupFeed();}catch(e){console.error("setupFeed",e);}
     try{setupLab();}catch(e){console.error("setupLab",e);}
     try{updateOfflineDot();}catch(e){}
-    $("#viewToggle").style.display="none";
     const profileBtn=$("#profileBtn");if(profileBtn)profileBtn.style.display="";
     try{attachAC($("#qlogInput"),()=>{
       const phrases=recentLogPhrases();
