@@ -38,7 +38,7 @@
   const LANGS={
     da:{
       tagline:"track your career",total_label:"karriere",
-      tab_station:"Stationen",tab_wine:"Vin",tab_vagt:"Vagt",tab_lab:"Lab",
+      tab_station:"Stationen",tab_wine:"Vin",tab_vagt:"Overblik",tab_lab:"Lab",
       view_grid:"Gitteroversigt",view_list:"Listevisning",
       qlog_ph:"Skriv hvad du har lavet — fx åbnet 500 Gillardeau østers",
       loading:"Indlæser…",
@@ -190,7 +190,7 @@
     },
     en:{
       tagline:"track your career",total_label:"career",
-      tab_station:"Station",tab_wine:"Wine",tab_vagt:"Shift",tab_lab:"Lab",
+      tab_station:"Station",tab_wine:"Wine",tab_vagt:"Overview",tab_lab:"Lab",
       view_grid:"Grid view",view_list:"List view",
       qlog_ph:"Log what you've done — e.g. opened 500 Gillardeau oysters",
       loading:"Loading…",
@@ -395,9 +395,16 @@
     const tSocial=$("#tab-social");if(tSocial)tSocial.textContent=t("tab_social");
     const tFeed=$("#tab-feed");if(tFeed)tFeed.textContent=t("tab_feed");
     const bSt=$("#bnav-lbl-station");if(bSt)bSt.textContent=t("tab_station");
-    const bVin=$("#bnav-lbl-vin");if(bVin)bVin.textContent=t("tab_wine");
-    const bSoc=$("#bnav-lbl-social");if(bSoc)bSoc.textContent=t("tab_social");
-    const bFeed=$("#bnav-lbl-feed");if(bFeed)bFeed.textContent=t("tab_feed");
+    const mVin=$("#menuDrawerVinLbl");if(mVin)mVin.textContent=t("tab_wine");
+    const mSoc=$("#menuDrawerSocialLbl");if(mSoc)mSoc.textContent=t("tab_social");
+    const mFeed=$("#menuDrawerFeedLbl");if(mFeed)mFeed.textContent=t("tab_feed");
+    const mLab=$("#menuDrawerLabLbl");if(mLab)mLab.textContent=t("tab_lab");
+    const bHist=$("#bnav-lbl-history");if(bHist)bHist.textContent=lang==="da"?"Historik":"History";
+    const bStats=$("#bnav-lbl-stats");if(bStats)bStats.textContent="Stats";
+    const bProf=$("#bnav-lbl-profile");if(bProf)bProf.textContent=lang==="da"?"Profil":"Profile";
+    const hLogT=$("#historyLogTitle");if(hLogT)hLogT.textContent=lang==="da"?"Aktivitetslog":"Activity log";
+    const sDetT=$("#statsDetailsTitle");if(sDetT)sDetT.textContent=lang==="da"?"Detaljer":"Details";
+    const dTitle=$("#logDrawerTitle");if(dTitle)dTitle.textContent=lang==="da"?"Menu":"Menu";
     const fSearch=$("#feedSearch");if(fSearch)fSearch.placeholder=t("feed_search_ph");
     const ftMine=$("#feedTabMine");if(ftMine)ftMine.textContent=t("feed_tab_mine");
     const ftDiscover=$("#feedTabDiscover");if(ftDiscover)ftDiscover.textContent=t("feed_tab_discover");
@@ -1479,29 +1486,6 @@
     const rows=document.getElementById("vagtRows");
     if(rows){rows.innerHTML="";_buildVagtRows(rows,shift?shift.snap:null,true);}
   }
-  async function runVagtAdd(text){
-    text=(text||"").trim();if(!text)return;
-    const inp=document.getElementById("vagtAddIn");
-    const spin=document.getElementById("vagtAiSpin");const btn=document.getElementById("vagtAddBtn");
-    let actions=confidentLocalActions(text)||[];
-    track(actions.length?"log_local":"log_ai");
-    if(!actions.length){
-      if(spin)spin.classList.add("on");if(btn)btn.disabled=true;if(inp)inp.disabled=true;
-      try{actions=await parseLog(text);}catch(e){console.warn("vagt AI parse failed:",e);}
-      if(!actions.length)actions=localParse(text);
-      if(spin)spin.classList.remove("on");if(btn)btn.disabled=false;if(inp){inp.disabled=false;}
-    }
-    if(!actions.length){showToast(lang==="da"?"Forstod ikke — prøv igen":"Couldn't parse — try again");if(inp)inp.focus();return;}
-    undoSnapshot=clone(state);
-    const summary=[],syncItems=[];
-    actions.forEach(a=>applyOne(a,summary,syncItems));
-    if(inp)inp.value="";
-    save();_updateVagtAfterLog();renderCounters();renderCareer();
-    if(inp)inp.focus();
-    if(summary.length){showToast(t("toast_logged")+summary.join(", "));addLogEntry(summary.join(" · "),null);haptic(40);deferSync(syncItems,null,summary.join(" · "));}
-    checkBadges();checkRecords();
-  }
-
   function _vagtSnapMap(shift){const m={};if(shift&&shift.snap)shift.snap.forEach(sc=>{m[sc.id]={count:sc.count||0,subs:{}};(sc.subs||[]).forEach(ss=>m[sc.id].subs[ss.id]=ss.count||0);});return m;}
   function _vagtDispVal(c,snapMap){const sb=snapMap[c.id]?snapMap[c.id].count||0:0;return Math.max(0,counterTotal(c)-sb);}
 
@@ -1647,7 +1631,7 @@
     if(!container)return;
     const hist=state.shiftHistory||[];
     const seeAllLbl=_vagtShowAllShifts?(lang==="da"?"Vis færre":"Show less"):(lang==="da"?"Vis alle":"View all")+" ("+hist.length+")";
-    container.innerHTML='<div class="vd2-sec"><span class="vd2-sec-title">'+(lang==="da"?"Aktivitet":"Activity")+(hist.length?' · '+hist.length:'')+'</span>'
+    container.innerHTML='<div class="vd2-sec"><span class="vd2-sec-title">'+(lang==="da"?"Vagtlog":"Shift log")+(hist.length?' · '+hist.length:'')+'</span>'
       +(hist.length>3?'<button class="vd2-sec-btn" id="vagtSeeAll">'+seeAllLbl+'</button>':'')
       +'</div>';
     if(!hist.length){
@@ -1773,19 +1757,8 @@
     const shift=getShift();
     if(!shift&&vagtTimerInterval){clearInterval(vagtTimerInterval);vagtTimerInterval=null;}
 
-    // ── Add row ──
-    const sendSvg='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
-    const addBlock='<div class="vagt-add-row">'
-      +'<input class="vagt-add-in" id="vagtAddIn" placeholder="'
-      +esc(lang==="da"?"Skriv hvad du lavede…":"Write what you did…")
-      +'" maxlength="200" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">'
-      +'<div class="vagt-ai-spin" id="vagtAiSpin"></div>'
-      +'<button class="vagt-add-btn" id="vagtAddBtn" aria-label="Log">'+sendSvg+'</button>'
-      +'</div>';
-
-    // ── Action cards ──
+    // ── Action card: Start/Live vagt — Overblikkets eneste knap ──
     const playSvg='<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="7 4 20 12 7 20 7 4"/></svg>';
-    const sparkSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4"/><path d="M13 3l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>';
     let shiftCard;
     if(shift){
       shiftCard='<button class="vd2-act vd2-act-shift live" id="vagtShiftCard">'
@@ -1802,42 +1775,12 @@
         +'<div class="vd2-act-sub">'+(lang==="da"?"Klar til service?":"Ready for service?")+'</div></div>'
         +'</button>';
     }
-    // Ét toggle: Aktivitet ELLER Detaljer — aldrig begge samtidig
-    const hasDetails=state.counters.length>0;
-    const secToggle=hasDetails?'<div class="lab-seg" id="vagtSecToggle">'
-      +'<button class="lab-seg-btn" data-sec="activity">'+(lang==="da"?"Aktivitet":"Activity")+'</button>'
-      +'<button class="lab-seg-btn" data-sec="details">'+(lang==="da"?"Detaljer":"Details")+'</button>'
-      +'</div>':'';
     el.innerHTML='<div id="vagtDash"></div>'
       +'<div id="vagtQuick"></div>'
-      +'<div class="vd2-actions" style="grid-template-columns:1fr">'+shiftCard+'</div>'
-      +addBlock
-      +secToggle
-      +'<div id="vagtActivity"></div>'
-      +(hasDetails?'<div id="vagtRows" class="vrows" style="display:none"></div>':'');
+      +'<div class="vd2-actions" style="grid-template-columns:1fr">'+shiftCard+'</div>';
 
     _buildVagtDashboard(document.getElementById("vagtDash"),shift);
     _buildVagtQuickStats(document.getElementById("vagtQuick"),shift);
-    _buildVagtActivity(document.getElementById("vagtActivity"));
-
-    // ── Aktivitet/Detaljer-toggle ──
-    if(hasDetails){
-      const rows=document.getElementById("vagtRows");
-      _buildVagtRows(rows,shift?shift.snap:null,true);
-      const stored=localStorage.getItem("mise_vagt_sec")||"activity";
-      const actEl=document.getElementById("vagtActivity");
-      function showSec(sec){
-        document.querySelectorAll("#vagtSecToggle .lab-seg-btn").forEach(b=>b.classList.toggle("active",b.dataset.sec===sec));
-        if(actEl)actEl.style.display=sec==="activity"?"":"none";
-        if(rows)rows.style.display=sec==="details"?"":"none";
-      }
-      showSec(stored);
-      document.getElementById("vagtSecToggle").addEventListener("click",e=>{
-        const btn=e.target.closest("[data-sec]");if(!btn)return;
-        localStorage.setItem("mise_vagt_sec",btn.dataset.sec);
-        showSec(btn.dataset.sec);haptic(10);
-      });
-    }
 
     // ── Wiring ──
     const sc=document.getElementById("vagtShiftCard");
@@ -1845,18 +1788,11 @@
       if(getShift()){openShiftModal();return;}
       // Kort ceremoni før vagten starter — matcher mockuppets "Starting your shift…"
       sc.disabled=true;
-      const savedHtml=sc.innerHTML;
       sc.innerHTML='<div class="vd2-act-starting"><div class="vd2-act-spin"></div><span class="vd2-act-starting-lbl">'+(lang==="da"?"Starter vagt…":"Starting your shift…")+'</span></div>';
       haptic(20);
       setTimeout(()=>{startShift();renderVagt();haptic(40);},850);
     });
     if(shift)startVagtTimer(shift);
-
-    const inp=document.getElementById("vagtAddIn"),btn=document.getElementById("vagtAddBtn");
-    if(inp){
-      if(btn)btn.addEventListener("click",()=>runVagtAdd(inp.value));
-      inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runVagtAdd(inp.value);}});
-    }
   }
 
   function bumpVagtRow(cid,d){
@@ -3040,19 +2976,23 @@
     function doSwitch(){
       document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.view===v));
       document.querySelectorAll(".bnav-btn").forEach(x=>x.classList.toggle("active",x.dataset.tab===v));
-      ["station","vin","social","feed","lab","vagt"].forEach(n=>{const ve=document.getElementById("view-"+n);if(ve)ve.classList.toggle("active",v===n);});
+      ["station","vin","social","feed","lab","vagt","history","stats"].forEach(n=>{const ve=document.getElementById("view-"+n);if(ve)ve.classList.toggle("active",v===n);});
       $("#viewToggle").style.display="none";
       const aiBar=document.getElementById("stAiBar");if(aiBar)aiBar.classList.toggle("on",v==="station");
       if(v==="vagt")renderVagt();
       if(v==="social")loadSocial();
       if(v==="feed"){loadFeed(false,window._activeFeedTab?window._activeFeedTab()==="mine":true);loadFollowRequests();}
       if(v==="lab")renderLabSeg();
+      if(v==="history"){_buildVagtActivity(document.getElementById("historyShifts"));renderLogView();}
+      if(v==="stats"){_buildVagtQuickStats(document.getElementById("statsQuick"),getShift());_buildVagtRows(document.getElementById("statsRows"),(getShift()||{}).snap,true);}
       window.scrollTo({top:0,behavior:"instant"});
     }
     if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
   }
   document.querySelectorAll(".tab").forEach(tb=>tb.addEventListener("click",()=>switchTab(tb.dataset.view)));
   document.querySelectorAll(".bnav-btn").forEach(btn=>btn.addEventListener("click",()=>{
+    if(btn.dataset.action==="qlog"){haptic(20);openQlogOverlay();return;}
+    if(btn.dataset.action==="profile"){haptic(15);openProfile();return;}
     if(btn.classList.contains("active")){
       const sc=document.getElementById("appScroll");
       if(sc)sc.scrollTo({top:0,behavior:"smooth"});
@@ -3061,7 +3001,7 @@
     switchTab(btn.dataset.tab);
   }));
 
-  function openLogDrawer(){renderLogView();renderShiftLog();$("#logDrawer").classList.add("open");$("#logScrim").classList.add("open");}
+  function openLogDrawer(){$("#logDrawer").classList.add("open");$("#logScrim").classList.add("open");}
   function goToTeams(){switchTab("social");setTimeout(()=>_switchSocialTab("team"),60);}
   // ── Manuel dark mode: lys er standard, kontakten bor i menuen ──
   function _applyTheme(theme){
@@ -3080,6 +3020,11 @@
     _applyTheme(next);haptic(20);track("theme",{t:next});
   });
   var _teamDrawerLink=$("#teamDrawerLink");if(_teamDrawerLink)_teamDrawerLink.addEventListener("click",()=>{closeLogDrawer();goToTeams();});
+  function _drawerGoTab(v){closeLogDrawer();switchTab(v);}
+  var _mVin=$("#menuDrawerVin");if(_mVin)_mVin.addEventListener("click",()=>_drawerGoTab("vin"));
+  var _mSoc=$("#menuDrawerSocial");if(_mSoc)_mSoc.addEventListener("click",()=>_drawerGoTab("social"));
+  var _mFeed=$("#menuDrawerFeed");if(_mFeed)_mFeed.addEventListener("click",()=>_drawerGoTab("feed"));
+  var _mLab=$("#menuDrawerLab");if(_mLab)_mLab.addEventListener("click",()=>_drawerGoTab("lab"));
   function closeLogDrawer(){$("#logDrawer").classList.remove("open");$("#logScrim").classList.remove("open");}
   var _burgerBtn=$("#burgerBtn");if(_burgerBtn)_burgerBtn.addEventListener("click",openLogDrawer);
   var _drawerClose=$("#logDrawerClose");if(_drawerClose)_drawerClose.addEventListener("click",closeLogDrawer);
@@ -3636,29 +3581,6 @@
     const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
     return h+"t "+m+"m";
   }
-  function renderShiftLog(){
-    const headEl=document.getElementById("shiftLogHead");
-    const el=document.getElementById("shiftLogList");if(!el)return;
-    const hist=state.shiftHistory||[];
-    if(headEl)headEl.textContent=lang==="da"?"Vagtlog":"Shift log";
-    if(!hist.length){el.innerHTML='<p style="font-size:13px;color:var(--faint);padding:4px 0 12px">'+(lang==="da"?"Ingen vagter endnu":"No shifts yet")+'</p>';return;}
-    el.innerHTML="";
-    hist.forEach((s,i)=>{
-      const d=new Date(s.startedAt);
-      const dateStr=d.toLocaleDateString(lang==="da"?"da-DK":"en-GB",{weekday:"short",day:"numeric",month:"short"});
-      const timeStr=d.toLocaleTimeString(lang==="da"?"da-DK":"en-GB",{hour:"2-digit",minute:"2-digit"});
-      const top=(s.entries||[]).filter(e=>e.delta>0).slice(0,3).map(e=>fmtCount(e.delta,e.unit)+" "+e.label).join(", ");
-      const btn=document.createElement("button");btn.className="shift-log-item";
-      btn.innerHTML='<div class="shift-log-info">'
-        +'<div class="shift-log-date">'+esc(dateStr+" · "+timeStr)+'</div>'
-        +'<div class="shift-log-dur">'+fmtWorkTime(s.durationMs)+'</div>'
-        +(top?'<div class="shift-log-summary">'+esc(top)+'</div>':"")
-        +'</div>'
-        +'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-      btn.addEventListener("click",()=>openShiftEdit(i));
-      el.appendChild(btn);
-    });
-  }
   let _editShiftIdx=null;
   function openShiftEdit(idx){
     _editShiftIdx=idx;
@@ -3693,14 +3615,14 @@
       else{c.count=parseFloat((c.count+diff).toFixed(2));}
       e.delta=newDelta;e.endCount=e.snapCount+newDelta;
     });
-    save();renderVagt();renderCounters();renderCareer();renderShiftLog();closeShiftEdit();
+    save();renderVagt();renderCounters();renderCareer();_buildVagtActivity(document.getElementById("historyShifts"));closeShiftEdit();
     showToast(lang==="da"?"Vagt opdateret":"Shift updated");
   });
   document.getElementById("shiftEditCancel").addEventListener("click",closeShiftEdit);
   document.getElementById("shiftEditDelete").addEventListener("click",()=>{
     if(_editShiftIdx===null)return;
     state.shiftHistory.splice(_editShiftIdx,1);
-    save();renderShiftLog();closeShiftEdit();
+    save();_buildVagtActivity(document.getElementById("historyShifts"));closeShiftEdit();
     showToast(lang==="da"?"Vagt slettet":"Shift deleted");
   });
 
@@ -4140,6 +4062,8 @@
       const reqs=d.requests||[];
       const badge=$("#feedBadge");
       if(badge)badge.classList.toggle("show",reqs.length>0);
+      const badge2=$("#feedBadge2");
+      if(badge2)badge2.classList.toggle("show",reqs.length>0);
       if(!reqs.length){banner.style.display="none";return;}
       banner.style.display="";
       banner.innerHTML='<div class="follow-req-banner"><div class="follow-req-head"><span class="follow-req-title">'+esc(t("follow_req_title"))+'</span><span style="font-size:12px;color:var(--dim)">'+reqs.length+'</span></div>'

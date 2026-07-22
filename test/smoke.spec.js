@@ -22,19 +22,49 @@ test("app booter, logger og navigerer uden JS-fejl", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#vagtDash .vd2-hero")).toBeVisible({ timeout: 15000 });
 
-  // Skift til Detaljer (Aktivitet/Detaljer er ét toggle) og bump en tæller — ringen skal følge med
-  await page.locator('[data-sec="details"]').click();
+  // Stats-fanen har de redigerbare tæller-rækker — bump en tæller og se ringen på Overblik følge med
+  await page.locator('.bnav-btn[data-tab="stats"]').click();
+  await page.waitForTimeout(250);
   await page.locator(".vr-plus").first().click();
+  await page.locator('.bnav-btn[data-tab="vagt"]').click();
   await expect(page.locator("#vd-ring-num")).toHaveText("11");
 
-  // Alle faner skal kunne åbnes
-  for (const tab of ["vin", "social", "feed", "lab", "vagt"]) {
-    await page.locator(`.bnav-btn[data-tab="${tab}"]`).click();
-    await page.waitForTimeout(250);
-  }
-  await expect(page.locator("#view-vagt")).toHaveClass(/active/);
+  // Historik-fanen skal kunne åbnes
+  await page.locator('.bnav-btn[data-tab="history"]').click();
+  await page.waitForTimeout(250);
+  await expect(page.locator("#view-history")).toHaveClass(/active/);
 
-  // Start vagt → afslut-flowets trin 1 åbner
+  // "+"-knappen åbner AI-logoverlay
+  await page.locator('.bnav-btn[data-action="qlog"]').click();
+  await expect(page.locator("#qlogOverlay")).toHaveClass(/open/);
+  await page.locator("#qlogOverlayClose").click();
+  await expect(page.locator("#qlogOverlay")).not.toHaveClass(/open/);
+
+  // Profil-knappen åbner profilmodal
+  await page.locator('.bnav-btn[data-action="profile"]').click();
+  await expect(page.locator("#profileScrim")).toHaveClass(/open/);
+  await page.keyboard.press("Escape");
+
+  // Burgermenuen skal kunne åbnes og navigere til de flyttede faner (Vin, Rangliste, Feed, Lab)
+  await page.locator("#burgerBtn").click();
+  await expect(page.locator("#logDrawer")).toHaveClass(/open/);
+  await page.locator("#logDrawerClose").click();
+  await expect(page.locator("#logDrawer")).not.toHaveClass(/open/);
+
+  for (const [btnId, viewId] of [
+    ["#menuDrawerVin", "#view-vin"],
+    ["#menuDrawerSocial", "#view-social"],
+    ["#menuDrawerFeed", "#view-feed"],
+    ["#menuDrawerLab", "#view-lab"],
+  ]) {
+    await page.locator("#burgerBtn").click();
+    await page.locator(btnId).click();
+    await page.waitForTimeout(250);
+    await expect(page.locator(viewId)).toHaveClass(/active/);
+  }
+
+  // Tilbage til Overblik → Start vagt → afslut-vagt-flowets trin 1 åbner
+  await page.locator('.bnav-btn[data-tab="vagt"]').click();
   await page.locator("#vagtShiftCard").click();
   await expect(page.locator("#vagtShiftCard .vd2-timer")).toBeVisible();
   await page.locator("#vagtShiftCard").click();
