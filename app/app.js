@@ -404,6 +404,7 @@
     const bProf=$("#bnav-lbl-profile");if(bProf)bProf.textContent=lang==="da"?"Profil":"Profile";
     const hLogT=$("#historyLogTitle");if(hLogT)hLogT.textContent=lang==="da"?"Aktivitetslog":"Activity log";
     const sDetT=$("#statsDetailsTitle");if(sDetT)sDetT.textContent=lang==="da"?"Detaljer":"Details";
+    const sCatT=$("#statsCatTitle");if(sCatT)sCatT.textContent=lang==="da"?"Kategorier":"Categories";
     const dTitle=$("#logDrawerTitle");if(dTitle)dTitle.textContent=lang==="da"?"Menu":"Menu";
     const fSearch=$("#feedSearch");if(fSearch)fSearch.placeholder=t("feed_search_ph");
     const ftMine=$("#feedTabMine");if(ftMine)ftMine.textContent=t("feed_tab_mine");
@@ -1099,6 +1100,12 @@
     {id:"career_10k",  icon:"🏆", da:"10.000 i karriere",en:"10k in career",  check:(s,e)=>career()>=10000},
     {id:"cat_3",       icon:"🗂", da:"3 kategorier",     en:"3 categories",   check:(s,e)=>s.counters&&s.counters.length>=3},
     {id:"cat_10",      icon:"📁", da:"10 kategorier",    en:"10 categories",  check:(s,e)=>s.counters&&s.counters.length>=10},
+    {id:"shift_1",     icon:"🎬", da:"Første vagt",      en:"First shift",    check:(s,e)=>(s.shiftHistory||[]).length>=1},
+    {id:"shifts_10",   icon:"📅", da:"10 vagter",        en:"10 shifts",      check:(s,e)=>(s.shiftHistory||[]).length>=10},
+    {id:"shifts_50",   icon:"🗓", da:"50 vagter",        en:"50 shifts",      check:(s,e)=>(s.shiftHistory||[]).length>=50},
+    {id:"hours_50",    icon:"⏱", da:"50 timer",         en:"50 hours",       check:(s,e)=>totalWorkMs()>=50*3600000},
+    {id:"hours_200",   icon:"⏳", da:"200 timer",        en:"200 hours",      check:(s,e)=>totalWorkMs()>=200*3600000},
+    {id:"streak_7",    icon:"🔥", da:"7 dage i træk",    en:"7 day streak",   check:(s,e)=>calcStreak()>=7},
   ];
   function getBadgesEarned(){try{return JSON.parse(localStorage.getItem("mise_badges")||"[]");}catch(e){return [];}}
   function saveBadgesEarned(arr){localStorage.setItem("mise_badges",JSON.stringify(arr));}
@@ -1752,6 +1759,70 @@
         row.appendChild(nm);row.appendChild(ctrl);rows.appendChild(row);
       }
     });
+  }
+
+  // ── Stats: karriere-hero med timer-ring ──
+  function _buildStatsHero(container){
+    if(!container)return;
+    const hrs=totalWorkMs()/3600000;
+    const shifts=(state.shiftHistory||[]).length;
+    const streak=calcStreak();
+    const r=52,circ=+(2*Math.PI*r).toFixed(2);
+    const lap=100,within=hrs%lap;
+    const pct=hrs>0?(within===0?1:within/lap):0;
+    const arcLen=+(circ*pct).toFixed(2);
+    const captionParts=[shifts+" "+(lang==="da"?(shifts===1?"vagt":"vagter"):(shifts===1?"shift":"shifts"))];
+    if(streak>=2)captionParts.push("🔥 "+(lang==="da"?streak+" dage i træk":streak+" day streak"));
+    container.innerHTML='<div class="vd2-hero">'
+      +'<div class="vd2-hero-solo">'
+        +'<div class="vd-ring-wrap" role="img" aria-label="'+Math.floor(hrs)+' '+(lang==="da"?"timer i alt":"hours total")+'">'
+          +'<svg class="vd-ring-svg" viewBox="0 0 120 120">'
+            +'<defs><linearGradient id="vsGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFB36B"/><stop offset="100%" stop-color="#FF6B8A"/></linearGradient></defs>'
+            +'<circle class="vd-ring-track" cx="60" cy="60" r="'+r+'"/>'
+            +'<circle class="vd-ring-arc" cx="60" cy="60" r="'+r+'" style="stroke:url(#vsGrad)" stroke-dasharray="'+arcLen+' '+circ+'"/>'
+          +'</svg>'
+          +'<div class="vd-ring-center">'
+            +'<span class="vd-ring-num">'+Math.floor(hrs)+'t</span>'
+            +'<span class="vd-ring-lbl">'+(lang==="da"?"timer i alt":"hours total")+'</span>'
+          +'</div>'
+        +'</div>'
+        +'<div class="vd2-caption">'+captionParts.join(" · ")+'</div>'
+      +'</div>'
+    +'</div>';
+  }
+
+  // ── Stats: highlight-tiles (snit, længste, kategorier, aktive dage) ──
+  function _buildStatsHighlights(container){
+    if(!container)return;
+    const hist=state.shiftHistory||[];
+    const avgMs=hist.length?hist.reduce((a,s)=>a+s.durationMs,0)/hist.length:0;
+    const longestMs=hist.length?Math.max(...hist.map(s=>s.durationMs)):0;
+    const tiles=[
+      {ico:"📊",col:VD_COLORS[2],val:hist.length?fmtWorkTime(avgMs):"—",lbl:lang==="da"?"Snit/vagt":"Avg/shift"},
+      {ico:"🏅",col:VD_COLORS[3],val:hist.length?fmtWorkTime(longestMs):"—",lbl:lang==="da"?"Længste vagt":"Longest shift"},
+      {ico:"🗂",col:VD_COLORS[4],val:fmtNum(state.counters.length),lbl:lang==="da"?"Kategorier":"Categories"},
+      {ico:"📆",col:VD_COLORS[5],val:fmtNum(totalActiveDays()),lbl:lang==="da"?"Dage aktiv":"Active days"},
+    ];
+    container.innerHTML='<div class="vd2-qgrid">'+tiles.map(x=>
+      '<div class="vd2-qtile" style="cursor:default">'
+        +'<div class="vd2-qtile-ico" style="background:'+x.col[1]+';color:'+x.col[0]+'">'+x.ico+'</div>'
+        +'<div class="vd2-qtile-txt"><div class="vd2-qtile-val">'+x.val+'</div><div class="vd2-qtile-lbl">'+x.lbl+'</div></div>'
+      +'</div>'
+    ).join("")+'</div>';
+  }
+
+  // ── Stats: achievements-grid ──
+  function _buildStatsBadges(container){
+    if(!container)return;
+    const earned=getBadgesEarned();
+    const n=BADGE_DEFS.filter(b=>earned.includes(b.id)).length;
+    const title=document.getElementById("statsAchTitle");
+    if(title)title.textContent=(lang==="da"?"Achievements":"Achievements")+" · "+n+"/"+BADGE_DEFS.length;
+    container.innerHTML=BADGE_DEFS.map(b=>{
+      const has=earned.includes(b.id);
+      const name=lang==="en"?b.en:b.da;
+      return '<div class="badge-item'+(has?"":" badge-locked")+'" title="'+esc(name)+'"><div class="badge-icon">'+b.icon+'</div><div class="badge-label">'+esc(name)+'</div></div>';
+    }).join("");
   }
 
   function renderVagt(){
@@ -2986,7 +3057,13 @@
       if(v==="feed"){loadFeed(false,window._activeFeedTab?window._activeFeedTab()==="mine":true);loadFollowRequests();}
       if(v==="lab")renderLabSeg();
       if(v==="history"){_buildVagtActivity(document.getElementById("historyShifts"));renderLogView();}
-      if(v==="stats"){_buildVagtQuickStats(document.getElementById("statsQuick"),getShift());_buildVagtRows(document.getElementById("statsRows"),(getShift()||{}).snap,true);}
+      if(v==="stats"){
+        _buildStatsHero(document.getElementById("statsHero"));
+        _buildStatsHighlights(document.getElementById("statsHighlights"));
+        _buildStatsBadges(document.getElementById("statsBadges"));
+        _buildVagtQuickStats(document.getElementById("statsQuick"),getShift());
+        _buildVagtRows(document.getElementById("statsRows"),(getShift()||{}).snap,true);
+      }
       window.scrollTo({top:0,behavior:"instant"});
     }
     if(document.startViewTransition){document.startViewTransition(doSwitch);}else{doSwitch();}
@@ -3047,6 +3124,11 @@
       else if(i>0)break;
     }
     return streak;
+  }
+  function totalActiveDays(){
+    if(!state.log||!state.log.length)return 0;
+    const days=new Set(state.log.map(e=>{const d=new Date(e.ts);return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}));
+    return days.size;
   }
   function renderStreak(){
     const el=$("#streakLbl");if(el)el.textContent="";
