@@ -349,6 +349,10 @@
   .stepblock{display:flex;flex-direction:column;align-items:center;gap:2px}
   .steplabel{font-size:9px;color:var(--faint);font-weight:700;letter-spacing:.03em;text-transform:uppercase;line-height:1}
   .stepctrl{display:flex;align-items:center;gap:4px}
+  .wstep-grp{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .wstep-grp-lbl{font-size:8px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+  .wstep-row{display:flex;align-items:center;gap:8px}
+  .wstep-div{width:1px;align-self:stretch;background:var(--border);margin:0 4px}
   .tnum{font-family:"Fraunces",serif;font-weight:600;font-size:16px;min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
   .tnum.tick{animation:pop .3s ease}
   .wedit{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:5px;transition:.12s;flex-shrink:0}

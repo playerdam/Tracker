@@ -701,7 +701,8 @@ app.post("/api/parse-log", async (req, res) => {
       'Brugerens tekst: "' + text + '"\n\n' +
       'Returnér {"actions":[...]}. Hver handling er én af:\n' +
       '{"kind":"counter","counter":"<tæller-navn>","counter_da":"<navnet på dansk>","counter_en":"<the name in English>","sub":"<underkategori eller tom streng>","delta":<heltal>,"cat":"<kategori-id>"}\n' +
-      '{"kind":"wine","wine":"<vinnavn>","measure":"glasses"|"bottles","delta":<heltal>,"producer":"","country":"","region":"","grape":""}\n\n' +
+      '{"kind":"wine","wine":"<vinnavn>","measure":"glasses"|"bottles"|"opened","delta":<heltal>,"producer":"","country":"","region":"","grape":""}\n\n' +
+      'For vin: skeln KLART mellem at ÅBNE en flaske (measure "opened" — brugeren "åbnede"/"tog hul på" en flaske uden nødvendigvis at drikke den) og at DRIKKE/SERVERE den (measure "glasses" for enkeltglas, "bottles" for hele flasker drukket/skænket). "Åbnede en flaske X" => opened. "Drak/serverede/skænkede X glas/flasker Y" => glasses/bottles.\n' +
       'Feltet "cat" SKAL være præcis ét af disse id\'er: "aabnet-mad" (åbnet mad/råvarer: østers, dåser, konserves), "aabnet-drikke" (åbnet drikkevarer: vin, øl, flasker, champagne), "snittet" (snittet/skåret/hakket råvarer), "tilberedt" (lavet/tilberedt mad & drikke: retter, pizzaer, kaffe, cocktails, saucer), "serveret" (serveret/leveret til gæster: couverter, retter, borde), "andet" (alt der ikke passer). Vælg ud fra hvad brugeren GJORDE ved objektet.\n' +
       'VIGTIGT: Nævner brugeren en bestemt type/sort/variant af det der tælles, SKAL den i feltet "sub". Brug stavemåden fra "muligeTyper" hvis typen står der.\n' +
       'Match KUN til en eksisterende tæller hvis OBJEKTET/PRODUKTET passer til tællerens emne. Verbets lighed er IKKE nok — "snittet 500 dumle" må IKKE matche "Løg snittet". delta kan være negativt.\n' +

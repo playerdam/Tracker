@@ -954,7 +954,7 @@
   }
   function normalize(s){
     s.counters=(s.counters||[]).map(c=>({id:c.id||id(),label:c.label||"",count:c.count||0,unit:c.unit||"stk",cat:(c.cat&&c.cat!=="andet")?c.cat:(CAT_BY_LABEL[(c.label||"").toLowerCase()]||c.cat||"andet"),subs:Array.isArray(c.subs)?c.subs.map(x=>({id:x.id||id(),name:x.name||"",count:x.count||0})):[],suggest:(Array.isArray(c.suggest)&&c.suggest.length)?c.suggest:seedFor(c.label)}));
-    s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0,type:w.type||"andet",imageUrl:w.imageUrl||null,about:w.about||"",fromLineup:w.fromLineup||false}));
+    s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0,opened:w.opened||0,type:w.type||"andet",imageUrl:w.imageUrl||null,about:w.about||"",fromLineup:w.fromLineup||false}));
     s.log=Array.isArray(s.log)?s.log.filter(e=>e&&e.ts&&e.text):[];
     s.customCats=Array.isArray(s.customCats)?s.customCats.map(c=>({id:c.id||id(),name:c.name||"",icon:c.icon||"",iconPending:!!c.iconPending})):[];
     s.shiftHistory=Array.isArray(s.shiftHistory)?s.shiftHistory:[];
@@ -2068,7 +2068,7 @@
 
   // ---- wines ----
   function matchWine(w,q){if(!q)return true;return [w.name,w.producer,w.land,w.region,w.grape,w.vint].some(v=>(v||"").toLowerCase().includes(q));}
-  function sumHtml(shown){let g=0,b=0;shown.forEach(w=>{g+=w.glasses;b+=w.bottles;});return '<b>'+shown.length+'</b> '+(lang==="en"?(shown.length===1?"wine":"wines"):"vine")+'&nbsp;·&nbsp; <b>'+g+'</b> '+t("glasses").toLowerCase()+'&nbsp;·&nbsp; <b>'+b+'</b> '+t("bottles").toLowerCase();}
+  function sumHtml(shown){let g=0,b=0,o=0;shown.forEach(w=>{g+=w.glasses;b+=w.bottles;o+=w.opened||0;});return '<b>'+shown.length+'</b> '+(lang==="en"?(shown.length===1?"wine":"wines"):"vine")+'&nbsp;·&nbsp; <b>'+g+'</b> '+t("glasses").toLowerCase()+'&nbsp;·&nbsp; <b>'+b+'</b> '+t("bottles").toLowerCase()+'&nbsp;·&nbsp; <b>'+o+'</b> '+(lang==="da"?"åbnet":"opened");}
   function makeWRow(w){
     const parts=[];if(w.type&&w.type!=="andet")parts.push(esc(t("wine_type_"+w.type)));[w.producer,w.region,w.land,w.grape].forEach(v=>{if(v)parts.push(esc(v));});
     const metaMid=parts.join('<span class="sep">·</span>');
@@ -2082,8 +2082,14 @@
     const lineupTag=w.fromLineup?'<span class="wrow-lineup-tag">lineup</span>':'';
     row.innerHTML=photoHtml+'<div class="winfo" data-act="about"><div class="wname">'+esc(disp)+lineupTag+'</div><div class="wmeta">'+meta+'</div></div>'+
       '<div class="wsteps">'+
-      '<div class="stepblock"><div class="steplabel">'+esc(t("glasses"))+'</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
-      '<div class="stepblock"><div class="steplabel">'+esc(t("bottles"))+'</div><div class="stepctrl"><button class="sbtn" data-act="b-">−</button><span class="tnum" data-k="bottles">'+w.bottles+'</span><button class="sbtn plus" data-act="b+">+</button></div></div>'+
+      '<div class="wstep-grp"><span class="wstep-grp-lbl">'+(lang==="da"?"Åbnet":"Opened")+'</span>'
+        +'<div class="stepblock"><div class="stepctrl"><button class="sbtn" data-act="o-">−</button><span class="tnum" data-k="opened">'+(w.opened||0)+'</span><button class="sbtn plus" data-act="o+">+</button></div></div></div>'+
+      '<div class="wstep-div"></div>'+
+      '<div class="wstep-grp"><span class="wstep-grp-lbl">'+(lang==="da"?"Drukket":"Drunk")+'</span>'
+        +'<div class="wstep-row">'
+        +'<div class="stepblock"><div class="steplabel">'+esc(t("glasses"))+'</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
+        '<div class="stepblock"><div class="steplabel">'+esc(t("bottles"))+'</div><div class="stepctrl"><button class="sbtn" data-act="b-">−</button><span class="tnum" data-k="bottles">'+w.bottles+'</span><button class="sbtn plus" data-act="b+">+</button></div></div>'
+        +'</div></div>'+
       '<button class="wedit" data-act="edit">⋯</button></div>';
     const wrap=document.createElement("div");wrap.className="wrow-wrap";
     const del=document.createElement("button");del.className="wrow-del";del.dataset.delId=w.id;
@@ -2110,6 +2116,7 @@
     const r=52,circ=+(2*Math.PI*r).toFixed(2);
     const arcLen=+(circ*Math.min(1,info.pct/100)).toFixed(2);
     const grapeSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="3"/><circle cx="15" cy="12" r="3"/><circle cx="12" cy="17" r="3"/><path d="M12 9V5l3-3"/></svg>';
+    const totalOpened=state.wines.reduce((s2,w)=>s2+(w.opened||0),0);
     // top-5 wines by servings, ring colored by wine type
     const tops=state.wines.map(w=>({w,tot:(w.glasses||0)+(w.bottles||0)})).sort((a,b)=>b.tot-a.tot).slice(0,5);
     const maxTot=Math.max(1,...tops.map(x=>x.tot));
@@ -2153,6 +2160,7 @@
           +(topGrape?'<button class="vd2-tile vd2-tile-btn" id="wStatGrapeTile" type="button"><div class="vd2-tile-ico" style="background:rgba(126,200,192,.16);color:#7EC8C0">'+grapeSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+esc(topGrape)+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Top drue":"Top grape")+'</div></div></button>':'')
         +'</div>'
       +'</div>'
+      +(totalOpened>0?'<div class="vd2-caption" style="text-align:center">'+fmtNum(totalOpened)+' '+(lang==="da"?"flasker \u00e5bnet i alt":"bottles opened total")+'</div>':'')
       +minis
     +'</div>';
     const ringBtn=document.getElementById("wineRingBtn");if(ringBtn)ringBtn.addEventListener("click",openAchievements);
@@ -2276,7 +2284,7 @@
     if(a==="about"){openWineSheet(w,"view");return;}
     if(a==="photo"){openWineSheet(w,"view");return;}
     if(a==="edit"){openWineSheet(w,"edit");return;}
-    let key,d;if(a==="g+"){key="glasses";d=1;}else if(a==="g-"){key="glasses";d=-1;}else if(a==="b+"){key="bottles";d=1;}else if(a==="b-"){key="bottles";d=-1;}else return;
+    let key,d;if(a==="g+"){key="glasses";d=1;}else if(a==="g-"){key="glasses";d=-1;}else if(a==="b+"){key="bottles";d=1;}else if(a==="b-"){key="bottles";d=-1;}else if(a==="o+"){key="opened";d=1;}else if(a==="o-"){key="opened";d=-1;}else return;
     w[key]=Math.max(0,(w[key]||0)+d);
     const n=row.querySelector('.tnum[data-k="'+key+'"]');n.textContent=w[key];if(d>0)tickEl(n);
     $("#wineSum").innerHTML=sumHtml(state.wines.filter(x=>matchWine(x,wineFilter.trim().toLowerCase())));
@@ -2319,7 +2327,8 @@
     vint:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
     type:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2h8l1 8c0 4-2.5 7-5 8-2.5-1-5-4-5-8z"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>',
     grape:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="9" cy="17" r="2"/><circle cx="15" cy="17" r="2"/><circle cx="12" cy="20" r="2"/><path d="M12 10V6"/><path d="M9 6c0-2 6-3 6 0"/></svg>',
-    count:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'
+    count:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+    opened:'<svg class="wabout-cell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 2h6v5l2 3v9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-9l2-3V2z"/><path d="M7 14h10"/><path d="M10 9l2 2 2-2" stroke-width="1.5"/></svg>'
   };
 
   function _waShowView(w){
@@ -2345,8 +2354,9 @@
     if(w.type&&w.type!=="andet")cells.push({icon:_waboutSVGS.type,label:lang==="da"?"Type":"Type",value:_wtypeLabel[w.type]||w.type});
     if(w.grape)cells.push({icon:_waboutSVGS.grape,label:lang==="da"?"Drue":"Grape",value:w.grape});
     if(w.imageUrl)cells.push({photo:w.imageUrl});
+    if((w.opened||0)>0)cells.push({icon:_waboutSVGS.opened,label:lang==="da"?"Åbnet":"Opened",value:fmtNum(w.opened)+" "+(lang==="da"?"fl.":"btl.")});
     const totG=(w.glasses||0)+(w.bottles||0)*6;
-    if(totG>0)cells.push({icon:_waboutSVGS.count,label:lang==="da"?"Glas total":"Total glasses",value:totG+((w.bottles||0)>0?" ("+w.bottles+" fl.)":"")});
+    if(totG>0)cells.push({icon:_waboutSVGS.count,label:lang==="da"?"Drukket":"Drunk",value:totG+((w.bottles||0)>0?" ("+w.bottles+" fl.)":"")});
     if(gridEl)gridEl.innerHTML=cells.map(c=>c.photo?`<div class="wabout-cell wabout-cell-photo"><img src="${esc(c.photo)}" class="wabout-photo-img" alt=""></div>`:`<div class="wabout-cell">${c.icon}<div class="wabout-cell-label">${esc(c.label)}</div><div class="wabout-cell-value">${esc(c.value)}</div></div>`).join("");
     const divEl=document.getElementById("wAboutDivider");if(divEl)divEl.style.display="";
     const bodyEl=document.getElementById("wAboutBody");
@@ -2474,7 +2484,7 @@
         const ur=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl})});
         const ud=await ur.json();imageUrl=ud.url||null;
       }catch(e){}
-      const data={name:d.name||"",producer:d.producer||"",land:d.land||"",region:d.region||"",grape:d.grape||"",vint:d.vintage||"",imageUrl,type:d.type||"andet",about:d.about||"",glasses:0,bottles:1};
+      const data={name:d.name||"",producer:d.producer||"",land:d.land||"",region:d.region||"",grape:d.grape||"",vint:d.vintage||"",imageUrl,type:d.type||"andet",about:d.about||"",glasses:0,bottles:0,opened:1};
       _waWineId=null;_waFromScan=false;
       const match=state.wines.find(w=>wineSimilar({name:data.name,producer:data.producer},w));
       if(match){
@@ -2503,7 +2513,7 @@
     if(_waPhotoDataUrl){const base=apiBase();const token=await getToken();if(base&&token){try{const r=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:_waPhotoDataUrl})});const d=await r.json();if(d.url)imageUrl=d.url;}catch(e){}}}
     const type=(document.querySelector(".wa-type-btn.active")||{}).dataset?.wtype||"andet";
     const fromScan=_waFromScan;_waFromScan=false;
-    const data={name,producer,land,region,grape,vint,imageUrl,type,about,glasses:0,bottles:fromScan?1:0};
+    const data={name,producer,land,region,grape,vint,imageUrl,type,about,glasses:0,bottles:0,opened:fromScan?1:0};
     if(!_waWineId){
       const match=state.wines.find(w=>wineSimilar({name,producer},w));
       if(match){
@@ -2535,7 +2545,7 @@
   let lineupWines=[],_lineupImageUrl=null;
   function openLineupWineView(w){
     const scrim=document.getElementById("lineupScrim");if(scrim)scrim.style.display="none";
-    const wine={id:id(),name:w.name||"",producer:w.producer||"",vint:w.vint||w.vintage||"",type:w.type||"andet",land:w.land||"",region:w.region||"",grape:w.grape||"",glasses:0,bottles:1,imageUrl:_lineupImageUrl||null,about:w.about||"",fromLineup:true};
+    const wine={id:id(),name:w.name||"",producer:w.producer||"",vint:w.vint||w.vintage||"",type:w.type||"andet",land:w.land||"",region:w.region||"",grape:w.grape||"",glasses:0,bottles:0,opened:1,imageUrl:_lineupImageUrl||null,about:w.about||"",fromLineup:true};
     state.wines.push(wine);save();renderWines();
     openWineSheet(wine,"view");
     const backBtn=document.getElementById("wAboutBackBtn");
@@ -2599,7 +2609,7 @@
   const lineupAddAllBtn=$("#lineupAddAll");if(lineupAddAllBtn)lineupAddAllBtn.addEventListener("click",()=>{
     const readable=lineupWines.filter(w=>w.readable!==false&&(w.name||w.producer));
     readable.forEach(w=>{
-      state.wines.push({id:id(),name:w.name||"",producer:w.producer||"",vint:w.vint||w.vintage||"",type:w.type||"andet",land:w.land||"",region:w.region||"",grape:w.grape||"",glasses:0,bottles:1,imageUrl:_lineupImageUrl||null,about:w.about||"",fromLineup:true});
+      state.wines.push({id:id(),name:w.name||"",producer:w.producer||"",vint:w.vint||w.vintage||"",type:w.type||"andet",land:w.land||"",region:w.region||"",grape:w.grape||"",glasses:0,bottles:0,opened:1,imageUrl:_lineupImageUrl||null,about:w.about||"",fromLineup:true});
     });
     save();renderWines();
     const s=$("#lineupScrim");if(s)s.style.display="none";
@@ -2695,6 +2705,7 @@
     if(mergeInto){
       mergeInto.glasses=(mergeInto.glasses||0)+data.glasses;
       mergeInto.bottles=(mergeInto.bottles||0)+data.bottles;
+      mergeInto.opened=(mergeInto.opened||0)+(data.opened||0);
       if(!mergeInto.imageUrl&&imageUrl)mergeInto.imageUrl=imageUrl;
       if(!mergeInto.about&&about)mergeInto.about=about;
       resultWine=mergeInto;
@@ -2777,12 +2788,13 @@
       if(syncItems)syncItems.push({categoryLabel:c.label,delta});
     }else if(a.kind==="wine"){
       const delta=parseInt(a.delta,10)||0;if(delta===0)return;
-      const measure=a.measure==="bottles"?"bottles":"glasses";
+      const measure=a.measure==="bottles"?"bottles":a.measure==="opened"?"opened":"glasses";
       const nm=(a.wine||"").toLowerCase();
       let w=state.wines.find(x=>x.name.toLowerCase()===nm)||state.wines.find(x=>x.name&&(x.name.toLowerCase().includes(nm)||nm.includes(x.name.toLowerCase())));
-      if(!w){w={id:id(),name:a.wine||"Ukendt vin",producer:a.producer||"",land:a.country||"",region:a.region||"",grape:a.grape||"",vint:"",glasses:0,bottles:0};state.wines.unshift(w);}
+      if(!w){w={id:id(),name:a.wine||"Ukendt vin",producer:a.producer||"",land:a.country||"",region:a.region||"",grape:a.grape||"",vint:"",glasses:0,bottles:0,opened:0};state.wines.unshift(w);}
       w[measure]=Math.max(0,(w[measure]||0)+delta);
-      summary.push((delta>0?"+":"")+delta+" "+(measure==="bottles"?t("bottles").toLowerCase():t("glasses").toLowerCase())+" "+w.name);
+      const measureLbl=measure==="bottles"?t("bottles").toLowerCase():measure==="opened"?(lang==="da"?"åbnet":"opened"):t("glasses").toLowerCase();
+      summary.push((delta>0?"+":"")+delta+" "+measureLbl+" "+w.name);
     }
   }
   const STOPVERBS=new Set(["jeg","har","i","dag","idag","åbnet","åbnede","åbent","snittet","skåret","skar","hakkede","hakket","serveret","serverede","stegt","stegte","grillet","grillede","lavet","lavede","poleret","polerede","drukket","smagt","smagte","tilberedt","tilberedte","til","en","et","af","med","og","stk","styk","styks","portioner","portion","glas","stykker","have","has","opened","open","cut","chopped","served","grilled","made","polished","drank","tasted","prepared","to","a","an","of","with","and","pcs","pieces","portions","glasses","i","ca","ca.","cirka","approximately","about","nogle","some","approximately"]);
@@ -2817,7 +2829,7 @@
       // 2. match wine names
       let wine=null;
       state.wines.forEach(w=>{if(w.name&&normLow.includes(w.name.toLowerCase())&&(!wine||w.name.length>wine.length))wine=w.name;});
-      if(wine){actions.push({kind:"wine",wine,measure:/flask|flaske|bottle/.test(normLow)?"bottles":"glasses",delta});return;}
+      if(wine){const _m=/åbn|\bopen/.test(normLow)?"opened":/flask|flaske|bottle/.test(normLow)?"bottles":"glasses";actions.push({kind:"wine",wine,measure:_m,delta});return;}
 
       // 3. match counter label words (stem-normalized)
       let cnt=null;
