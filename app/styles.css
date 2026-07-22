@@ -103,7 +103,7 @@
   /* ── Page 1: splash ── */
   .auth-splash{width:100%;height:100%;background:linear-gradient(160deg,#3B1420 0%,#5C1E2C 55%,#2A0F17 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px) + 48px) 32px max(32px,env(safe-area-inset-bottom,32px))}
   .auth-splash-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-  .auth-splash-icon{color:#E8C99A;opacity:.9;margin-bottom:22px}
+  .auth-splash-icon{color:#E8C99A;opacity:.9;margin-bottom:22px;display:flex;align-items:flex-end;justify-content:center;gap:16px}
   .auth-splash-word{font-family:"Fraunces",serif;font-size:34px;font-weight:700;letter-spacing:.06em;line-height:1.15;margin-bottom:22px}
   .auth-splash-tag{font-size:15px;color:rgba(255,255,255,.8);line-height:1.7}
   .auth-splash-bottom{flex:none}
