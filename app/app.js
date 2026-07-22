@@ -79,11 +79,27 @@
       wines_count:"{0} vine",summary_glasses:"glas",summary_bottles:"flasker",
       auth_email:"Email",auth_pw:"Adgangskode",
       auth_login:"Log ind",auth_signup:"Opret konto",
-      auth_sub_login:"Velkommen tilbage",auth_sub_signup:"Opret din konto",
+      auth_sub_login:"Log ind for at fortsætte",auth_sub_signup:"Lad os oprette din konto",
       auth_no_account:"Ingen konto?",auth_have_account:"Har du allerede en konto?",
       auth_create:"Opret konto",auth_to_login:"Log ind",
       auth_forgot:"Glemt adgangskode?",auth_forgot_sent:"Tjek din email for et nulstillingslink",
       auth_signout:"Log ud",
+      auth_splash_tag:"Track dit håndværk.\nFejr dit arbejde.\nVoks hver dag.",
+      auth_get_started:"Kom i gang",auth_go_login:"Log ind",
+      auth_h1_login:"Velkommen tilbage 👋",auth_h1_signup:"Opret din konto",
+      auth_or:"eller",auth_google:"Fortsæt med Google",auth_apple:"Fortsæt med Apple",
+      auth_oauth_err:"Kunne ikke logge ind — prøv igen",
+      su_title1:"Opret din konto",su_sub1:"Lad os lære dig at kende",
+      su_username_lbl:"Brugernavn",su_workplace_lbl:"Hvor arbejder du?",su_workplace_ph:"Restaurantens navn eller sted",su_workplace_hint:"fx The Rooftop, København",
+      su_role_lbl:"Rolle",su_continue:"Fortsæt",
+      su_title2:"Næsten der!",su_sub2:"Bekræft dine oplysninger",
+      su_row_user:"Brugernavn",su_row_work:"Arbejdsplads",su_row_role:"Rolle",su_edit:"Rediger",
+      su_save:"Gem og fortsæt",su_back:"Tilbage",su_username_needed:"Vælg et brugernavn først",
+      su_role_needed:"Vælg din rolle",
+      su_role_chef:"Kok",su_role_chef_sub:"Track køkken-prep",
+      su_role_waiter:"Tjener",su_role_waiter_sub:"Track service & borde",
+      su_role_bartender:"Bartender",su_role_bartender_sub:"Track drinks & bar",
+      su_role_barista:"Barista",su_role_barista_sub:"Track kaffe & drikke",
       tab_social:"Rangliste",
       challenge_title:"Ugens udfordring",challenge_days:"dage tilbage",challenge_ends:"{0} dage tilbage",
       lb_title:"Ugentlig rangliste",lb_week:"uge fra",lb_anon:"Anonym",lb_you:"dig",lb_empty:"Ingen data endnu",
@@ -106,7 +122,7 @@
       profile_badges:"Badges",profile_badges_none:"Ingen badges endnu — begynd at logge!",
       profile_records:"Personlige rekorder",profile_records_none:"Ingen rekorder endnu",
       new_badge:"Nyt badge",new_record_msg:"Ny rekord",
-      professions:["Commis de cuisine","Chef de partie","Sous chef","Køkkenchef","Konditor","Serveringsmedarbejder","Sommelier","Bar","Andet"],
+      professions:["Kok","Tjener","Bartender","Barista","Sommelier","Andet"],
       streak_day:"1 dag i træk",streak_days:"{0} dage i træk",
       offline_pending:"{0} afventende sync",
       tab_feed:"Feed",
@@ -215,11 +231,27 @@
       wines_count:"{0} wines",summary_glasses:"glasses",summary_bottles:"bottles",
       auth_email:"Email",auth_pw:"Password",
       auth_login:"Log in",auth_signup:"Create account",
-      auth_sub_login:"Welcome back",auth_sub_signup:"Create your account",
+      auth_sub_login:"Log in to continue",auth_sub_signup:"Let\u2019s create your account",
       auth_no_account:"No account?",auth_have_account:"Already have an account?",
       auth_create:"Create account",auth_to_login:"Log in",
       auth_forgot:"Forgot password?",auth_forgot_sent:"Check your email for a reset link",
       auth_signout:"Sign out",
+      auth_splash_tag:"Track your craft.\nCelebrate your work.\nGrow every day.",
+      auth_get_started:"Get started",auth_go_login:"Log in",
+      auth_h1_login:"Welcome back 👋",auth_h1_signup:"Create your account",
+      auth_or:"or",auth_google:"Continue with Google",auth_apple:"Continue with Apple",
+      auth_oauth_err:"Could not sign in — try again",
+      su_title1:"Create your account",su_sub1:"Let\u2019s get to know you",
+      su_username_lbl:"Username",su_workplace_lbl:"Where do you work?",su_workplace_ph:"Restaurant name or location",su_workplace_hint:"e.g. The Rooftop, Copenhagen",
+      su_role_lbl:"Role",su_continue:"Continue",
+      su_title2:"Almost there!",su_sub2:"Confirm your details",
+      su_row_user:"Username",su_row_work:"Workplace",su_row_role:"Role",su_edit:"Edit",
+      su_save:"Save & continue",su_back:"Back",su_username_needed:"Choose a username first",
+      su_role_needed:"Pick your role",
+      su_role_chef:"Chef",su_role_chef_sub:"Track kitchen prep",
+      su_role_waiter:"Waiter / Waitress",su_role_waiter_sub:"Track service & tables",
+      su_role_bartender:"Bartender",su_role_bartender_sub:"Track drinks & bar",
+      su_role_barista:"Barista",su_role_barista_sub:"Track coffee & drinks",
       tab_social:"Leaderboard",
       challenge_title:"Weekly challenge",challenge_days:"days left",challenge_ends:"{0} days left",
       lb_title:"Weekly leaderboard",lb_week:"week from",lb_anon:"Anonymous",lb_you:"you",lb_empty:"No data yet",
@@ -242,7 +274,7 @@
       profile_badges:"Badges",profile_badges_none:"No badges yet — start logging!",
       profile_records:"Personal records",profile_records_none:"No records yet",
       new_badge:"New badge",new_record_msg:"New record",
-      professions:["Commis de cuisine","Chef de partie","Sous chef","Head chef","Pastry chef","Service staff","Sommelier","Bar","Other"],
+      professions:["Chef","Waiter / Waitress","Bartender","Barista","Sommelier","Other"],
       streak_day:"1 day in a row",streak_days:"{0} days in a row",
       offline_pending:"{0} pending sync",
       tab_feed:"Feed",
@@ -389,10 +421,28 @@
     const pProfLbl=$("#profileProfLbl");if(pProfLbl)pProfLbl.textContent=t("profile_prof_lbl");
     const pBadgesLbl=$("#profileBadgesLbl");if(pBadgesLbl)pBadgesLbl.textContent=t("profile_badges");
     const pRecLbl=$("#profileRecordsLbl");if(pRecLbl)pRecLbl.textContent=t("profile_records");
-    const uSetupTitle=$("#usernameSetupTitle");if(uSetupTitle)uSetupTitle.textContent=t("username_setup_title");
-    const uSetupHint=$("#usernameSetupHint");if(uSetupHint)uSetupHint.textContent=t("username_setup_hint");
-    const uSetupSave=$("#usernameSetupSave");if(uSetupSave)uSetupSave.textContent=t("username_setup_save");
-    const uSetupSkip=$("#usernameSetupSkip");if(uSetupSkip)uSetupSkip.textContent=t("username_setup_skip");
+    // Auth: splash + form
+    const aTag=$("#authSplashTag");if(aTag)aTag.innerHTML=esc(t("auth_splash_tag")).replace(/\n/g,"<br>");
+    const aGet=$("#authGetStarted");if(aGet)aGet.textContent=t("auth_get_started");
+    const aGoLogin=$("#authGoLogin");if(aGoLogin)aGoLogin.textContent=t("auth_go_login");
+    const aDivLbl=$("#authDividerLbl");if(aDivLbl)aDivLbl.textContent=t("auth_or");
+    const aGoogleLbl=$("#authGoogleLbl");if(aGoogleLbl)aGoogleLbl.textContent=t("auth_google");
+    const aAppleLbl=$("#authAppleLbl");if(aAppleLbl)aAppleLbl.textContent=t("auth_apple");
+    // Signup-setup (rolle/workplace + bekræft)
+    const suUL=$("#suUsernameLbl");if(suUL)suUL.textContent=t("su_username_lbl");
+    const suWL=$("#suWorkplaceLbl");if(suWL)suWL.textContent=t("su_workplace_lbl");
+    const suWH=$("#suWorkplaceHint");if(suWH)suWH.textContent=t("su_workplace_hint");
+    const suWI=$("#suWorkplace");if(suWI)suWI.placeholder=t("su_workplace_ph");
+    const suRL=$("#suRoleLbl");if(suRL)suRL.textContent=t("su_role_lbl");
+    const suCont=$("#suContinue");if(suCont)suCont.textContent=t("su_continue");
+    const suT2=$("#suTitle2");if(suT2)suT2.textContent=t("su_title2");
+    const suS2=$("#suSub2");if(suS2)suS2.textContent=t("su_sub2");
+    const suRUL=$("#suRowUserLbl");if(suRUL)suRUL.textContent=t("su_row_user");
+    const suRWL=$("#suRowWorkLbl");if(suRWL)suRWL.textContent=t("su_row_work");
+    const suRRL=$("#suRowRoleLbl");if(suRRL)suRRL.textContent=t("su_row_role");
+    document.querySelectorAll(".su-edit").forEach(b=>b.textContent=t("su_edit"));
+    const suSaveBtn=$("#suSave");if(suSaveBtn)suSaveBtn.textContent=t("su_save");
+    const suBackBtn=$("#suBack");if(suBackBtn)suBackBtn.textContent=t("su_back");
     // The Lab
     const labNewLbl=$("#labNewBtnLbl");if(labNewLbl)labNewLbl.textContent=t("lab_new_dish");
     const labFAll=$("#labFilterAll");if(labFAll)labFAll.textContent=t("lab_filter_all");
@@ -675,6 +725,12 @@
     $("#mainWrap").style.display="none";
     {const _so2=$("#signOutBtn");if(_so2)_so2.style.display="none";}
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.style.display="none";
+    const splash=$("#authSplash"),form=$("#authFormWrap");
+    if(splash)splash.style.display="";if(form)form.style.display="none";
+    const suScrim=$("#signupSetupScrim");if(suScrim)suScrim.classList.remove("open");
+    authMode="login";
+    const errEl=$("#authErr"),infoEl=$("#authInfo");
+    if(errEl)errEl.style.display="none";if(infoEl)infoEl.style.display="none";
   }
 
   function hideAuthScreen(){
@@ -684,6 +740,25 @@
     const pb=$("#profileBtn");if(pb)pb.style.display="";
   }
 
+  function oauthSignIn(provider){
+    if(!cfg||!cfg.supabaseUrl){showToast(t("auth_oauth_err"));return;}
+    track("oauth_start",{p:provider});
+    const redirectTo=location.origin+location.pathname;
+    location.href=cfg.supabaseUrl+"/auth/v1/authorize?provider="+provider+"&redirect_to="+encodeURIComponent(redirectTo);
+  }
+  function _consumeOAuthHash(){
+    if(!location.hash||location.hash.indexOf("access_token=")<0)return false;
+    try{
+      const params=new URLSearchParams(location.hash.slice(1));
+      const access_token=params.get("access_token"),refresh_token=params.get("refresh_token"),expires_in=parseInt(params.get("expires_in"),10)||3600;
+      if(access_token){
+        saveSession({access_token,refresh_token,expires_in});
+        history.replaceState(null,"",location.pathname+location.search);
+        return true;
+      }
+    }catch(e){}
+    return false;
+  }
   function fetchWithTimeout(url,opts,ms){
     const ctl=new AbortController();
     const t=setTimeout(()=>ctl.abort(),ms);
@@ -702,6 +777,7 @@
     const emailEl=$("#authEmail"),pwEl=$("#authPw"),submitBtn=$("#authSubmit"),errEl=$("#authErr"),toggleLink=$("#authToggleLink"),forgotLink=$("#authForgot");
     function updateMode(){
       const isLogin=authMode==="login";
+      const h1=$("#authH1");if(h1)h1.textContent=isLogin?t("auth_h1_login"):t("auth_h1_signup");
       $("#authSub").textContent=isLogin?t("auth_sub_login"):t("auth_sub_signup");
       submitBtn.textContent=isLogin?t("auth_login"):t("auth_signup");
       $("#authToggleText").textContent=isLogin?t("auth_no_account"):t("auth_have_account");
@@ -711,6 +787,20 @@
       if(forgotLink)forgotLink.style.display=isLogin?"inline":"none";
       if(forgotLink)forgotLink.textContent=t("auth_forgot");
     }
+    function showForm(mode){
+      authMode=mode;updateMode();
+      const splash=$("#authSplash"),form=$("#authFormWrap");
+      if(splash)splash.style.display="none";if(form)form.style.display="";
+      setTimeout(()=>emailEl.focus(),260);
+    }
+    const getStartedBtn=$("#authGetStarted");if(getStartedBtn)getStartedBtn.addEventListener("click",()=>{track("auth_get_started");showForm("signup");});
+    const goLoginBtn=$("#authGoLogin");if(goLoginBtn)goLoginBtn.addEventListener("click",()=>showForm("login"));
+    const backBtn=$("#authBackBtn");if(backBtn)backBtn.addEventListener("click",()=>{
+      const splash=$("#authSplash"),form=$("#authFormWrap");
+      if(form)form.style.display="none";if(splash)splash.style.display="";
+    });
+    const gBtn=$("#authGoogleBtn");if(gBtn)gBtn.addEventListener("click",()=>oauthSignIn("google"));
+    const aBtn=$("#authAppleBtn");if(aBtn)aBtn.addEventListener("click",()=>oauthSignIn("apple"));
     if(forgotLink)forgotLink.addEventListener("click",async(e)=>{
       e.preventDefault();
       const email=emailEl.value.trim();
@@ -738,6 +828,7 @@
       }
       if(result){$("#authErr").textContent=result;$("#authErr").style.display="block";return;}
       try{await fetch(apiBase()+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});}catch(e){}
+      if(authMode==="signup"){maybeShowSignupSetup(null,"presignup");return;}
       hideAuthScreen();startApp();
     });
     [emailEl,pwEl].forEach(el=>el.addEventListener("keydown",e=>{if(e.key==="Enter")submitBtn.click();}));
@@ -3364,32 +3455,106 @@
     });
   }
 
-  let _usernameSetupPending=false;
-  async function maybeShowUsernameSetup(username){
-    if(username)return;
-    const ob=$("#onboardOverlay");
-    if(ob&&ob.style.display==="flex"&&!ob.classList.contains("hidden")){_usernameSetupPending=true;return;}
-    const scrim=$("#usernameSetupScrim");if(!scrim)return;
-    $("#usernameSetupInput").value="";
-    $("#usernameSetupStatus").textContent="";$("#usernameSetupStatus").className="username-status";
-    scrim.classList.add("open");
+  // ── Unified signup-setup: rolle/workplace (trin 1) → bekræft (trin 2) ──
+  const ROLE_META=[
+    {id:"chef",emoji:"👨‍🍳",color:"#1F7A4D",soft:"rgba(31,122,77,.14)",items:["preset_main","preset_starter","preset_dessert","preset_mise","preset_sauce"]},
+    {id:"waiter",emoji:"🤵",color:"#C9762F",soft:"rgba(201,118,47,.14)",items:["preset_cover","preset_bottle","preset_coffee","preset_tableset","preset_bill"]},
+    {id:"bartender",emoji:"🍸",color:"#2E6FA8",soft:"rgba(46,111,168,.14)",items:["preset_cocktail","preset_bottle","preset_welcome","preset_snaps","preset_coffee_art"]},
+    {id:"barista",emoji:"☕",color:"#8A2E3F",soft:"rgba(138,46,63,.14)",items:["preset_coffee_art","preset_coffee","preset_water","preset_cocktail","preset_welcome"]},
+  ];
+  function _roleLabel(id2){
+    const k="su_role_"+id2,ks="su_role_"+id2+"_sub";
+    return {name:t(k),sub:t(ks)};
   }
-
-  function setupUsernameSetupModal(){
-    let canSave=false;
-    setupUsernameInput("usernameSetupInput","usernameSetupStatus",v=>{canSave=v;});
-    $("#usernameSetupSave").addEventListener("click",async()=>{
-      const v=($("#usernameSetupInput").value||"").trim();
-      if(!canSave||!v)return;
-      const base=apiBase();const token=await getToken();if(!base||!token)return;
-      try{
-        const r=await fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({username:v})});
-        const d=await r.json();
-        if(d.ok){$("#usernameSetupScrim").classList.remove("open");}
-        else{const s=$("#usernameSetupStatus");s.textContent=t("username_taken");s.className="username-status err";}
-      }catch(e){}
+  let _suUsernameValid=false,_suSelectedRole=null,_suContext="presignup";
+  function _renderSuRoles(){
+    const list=$("#suRoleList");if(!list)return;
+    list.innerHTML=ROLE_META.map(r=>{
+      const lbl=_roleLabel(r.id);
+      return '<button type="button" class="su-role-row'+(_suSelectedRole===r.id?" active":"")+'" data-role="'+r.id+'">'
+        +'<div class="su-role-ico" style="background:'+r.soft+';color:'+r.color+'">'+r.emoji+'</div>'
+        +'<div class="su-role-txt"><div class="su-role-name">'+esc(lbl.name)+'</div><div class="su-role-sub">'+esc(lbl.sub)+'</div></div>'
+        +'<span class="su-role-chev">›</span>'
+      +'</button>';
+    }).join("");
+    list.querySelectorAll("[data-role]").forEach(b=>b.addEventListener("click",()=>{_suSelectedRole=b.dataset.role;_renderSuRoles();haptic(15);}));
+  }
+  function maybeShowSignupSetup(profile,context){
+    if(profile&&profile.username)return;
+    _suContext=context||"presignup";
+    const scrim=$("#signupSetupScrim");if(!scrim){if(_suContext==="presignup"){hideAuthScreen();startApp();}return;}
+    $("#suTitle1").textContent=t("su_title1");$("#suSub1").textContent=t("su_sub1");
+    $("#suUsername").value="";
+    $("#suWorkplace").value=(profile&&profile.workplace)||"";
+    _suSelectedRole=null;_suUsernameValid=false;
+    const roleMatch=ROLE_META.find(r=>_roleLabel(r.id).name===(profile&&profile.profession));
+    if(roleMatch)_suSelectedRole=roleMatch.id;
+    _renderSuRoles();
+    $("#suStep1").style.display="";$("#suStep2").style.display="none";
+    $("#suUsernameStatus").textContent="";$("#suUsernameStatus").className="username-status";
+    scrim.classList.add("open");
+    setTimeout(()=>{const el=$("#suUsername");if(el)el.focus();},250);
+  }
+  function _afterSignupSetup(){
+    if(_suContext==="presignup"){hideAuthScreen();startApp();}
+    else{
+      const initEl=$("#profileInitial");
+      const v=($("#suUsername").value||"").trim();
+      if(initEl&&v)initEl.textContent=v.charAt(0).toUpperCase();
+    }
+  }
+  function setupSignupSetupModal(){
+    setupUsernameInput("suUsername","suUsernameStatus",v=>{_suUsernameValid=v;});
+    $("#suContinue").addEventListener("click",()=>{
+      const v=($("#suUsername").value||"").trim();
+      if(!v||v.length<3||!_suUsernameValid){const s=$("#suUsernameStatus");s.textContent=t("su_username_needed");s.className="username-status err";$("#suUsername").focus();return;}
+      if(!_suSelectedRole){showToast(t("su_role_needed"));return;}
+      const lbl=_roleLabel(_suSelectedRole);
+      $("#suTitle2").textContent=t("su_title2");$("#suSub2").textContent=t("su_sub2");
+      $("#suAvatar").textContent=v.charAt(0).toUpperCase();
+      $("#suRowUserVal").textContent="@"+v;
+      $("#suRowWorkVal").textContent=($("#suWorkplace").value||"").trim()||"—";
+      $("#suRowRoleVal").textContent=lbl.name;
+      $("#suStep1").style.display="none";$("#suStep2").style.display="";
+      haptic(15);
     });
-    $("#usernameSetupSkip").addEventListener("click",()=>$("#usernameSetupScrim").classList.remove("open"));
+    document.querySelectorAll("[data-su-edit]").forEach(b=>b.addEventListener("click",()=>{
+      $("#suStep1").style.display="";$("#suStep2").style.display="none";
+    }));
+    $("#suBack").addEventListener("click",()=>{$("#suStep1").style.display="";$("#suStep2").style.display="none";});
+    $("#suSave").addEventListener("click",async()=>{
+      const btn=$("#suSave");btn.disabled=true;
+      const username=($("#suUsername").value||"").trim();
+      const workplace=($("#suWorkplace").value||"").trim();
+      const roleLbl=_roleLabel(_suSelectedRole||"chef").name;
+      const base=apiBase();const token=await getToken();
+      if(base&&token){
+        try{
+          const r=await fetch(base+"/api/user/update",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({username,workplace,profession:roleLbl})});
+          const d=await r.json();
+          if(d.error==="username_taken"){
+            btn.disabled=false;$("#suStep1").style.display="";$("#suStep2").style.display="none";
+            const s=$("#suUsernameStatus");s.textContent=t("username_taken");s.className="username-status err";return;
+          }
+        }catch(e){}
+      }
+      // Seed startertællere for den valgte rolle (kun hvis brugeren ikke har nogen endnu)
+      const pack=ROLE_META.find(r=>r.id===_suSelectedRole);
+      if(pack&&!state.counters.length){
+        pack.items.forEach(pid=>{
+          const item=CATALOG.find(c=>c.id===pid);if(!item)return;
+          const label=lang==="en"?item.en:item.da;
+          state.counters.push({id:item.id,label,count:0,unit:"stk",cat:item.cat,subs:[],suggest:seedFor(label)});
+        });
+        save();
+        track("role_pack",{r:_suSelectedRole});
+      }
+      btn.disabled=false;
+      $("#signupSetupScrim").classList.remove("open");
+      showToast(lang==="da"?"Din konto er klar — god service! 🎉":"Your account is ready — have a great service! 🎉");
+      haptic(40);
+      _afterSignupSetup();
+    });
   }
 
   function setupProfileModal(){
@@ -4204,50 +4369,6 @@
     const cInput=$("#commentInput");if(cInput)cInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendComment();}});
   }
 
-  const ROLE_PACKS=[
-    {id:"tjener",emoji:"🤵",da:"Tjener",en:"Waiter",items:["preset_cover","preset_bottle","preset_coffee","preset_tableset","preset_bill"]},
-    {id:"kok",emoji:"👨‍🍳",da:"Kok",en:"Chef",items:["preset_main","preset_starter","preset_dessert","preset_mise","preset_sauce"]},
-    {id:"bartender",emoji:"🍸",da:"Bartender",en:"Bartender",items:["preset_cocktail","preset_bottle","preset_welcome","preset_snaps","preset_coffee_art"]},
-    {id:"sommelier",emoji:"🍷",da:"Sommelier",en:"Sommelier",items:["preset_wine_present","preset_champagne","preset_wine_rec","preset_bottle","preset_oyster"]},
-  ];
-  function maybeShowRolePicker(){
-    if(state.counters.length){_afterRolePicker();return;}
-    const scrim=$("#roleScrim");if(!scrim){_afterRolePicker();return;}
-    const t1=$("#roleTitle");if(t1)t1.textContent=lang==="da"?"Hvad laver du?":"What do you do?";
-    const sub=$("#roleSub");if(sub)sub.textContent=lang==="da"?"Vi sætter dine første tællere op — du kan altid ændre dem senere":"We\u2019ll set up your first counters — you can change them anytime";
-    const list=$("#roleList");if(!list){_afterRolePicker();return;}
-    list.innerHTML=ROLE_PACKS.map(r=>'<button class="btn ghost role-btn" data-role="'+r.id+'" style="width:100%;margin-bottom:8px;justify-content:flex-start;font-size:15px;padding:14px 16px">'+r.emoji+'  '+(lang==="da"?r.da:r.en)+'</button>').join("");
-    const skip=$("#roleSkip");if(skip){skip.textContent=lang==="da"?"Spring over":"Skip";skip.onclick=()=>{scrim.classList.remove("open");_afterRolePicker();};}
-    list.querySelectorAll("[data-role]").forEach(b=>b.addEventListener("click",()=>{
-      const pack=ROLE_PACKS.find(r=>r.id===b.dataset.role);if(!pack)return;
-      pack.items.forEach(pid=>{
-        const item=CATALOG.find(c=>c.id===pid);if(!item)return;
-        if(state.counters.some(c=>c.id===item.id))return;
-        const label=lang==="en"?item.en:item.da;
-        state.counters.push({id:item.id,label,count:0,unit:"stk",cat:item.cat,subs:[],suggest:seedFor(label)});
-      });
-      save();renderVagt();renderCounters();renderCareer();
-      track("role_pack",{r:pack.id});haptic(40);
-      showToast(lang==="da"?"Dine tællere er klar — god service! 🎉":"Your counters are ready — have a great service! 🎉");
-      scrim.classList.remove("open");_afterRolePicker();
-    }));
-    scrim.classList.add("open");
-  }
-  function _afterRolePicker(){
-    if(_usernameSetupPending){_usernameSetupPending=false;maybeShowUsernameSetup(null);}
-  }
-  function maybeShowOnboarding(){
-    if(localStorage.getItem("mise_onboarded"))return;
-    const o=$("#onboardOverlay");if(!o)return;
-    o.style.display="flex";
-    const btn=$("#onboardDone");
-    if(btn)btn.addEventListener("click",()=>{
-      localStorage.setItem("mise_onboarded","1");
-      o.classList.add("hidden");
-      setTimeout(()=>{o.style.display="none";maybeShowRolePicker();},320);
-    });
-  }
-
   // ---- The Lab ----
   var _labDishes=[];var _labFilter="all";var _currentDish=null;var _dishDirty=false;var _saveTimer=null;
   var _labSeg="mine";var _myLabTeams=null;var _sharedDish=null;
@@ -5000,7 +5121,7 @@
     try{renderLogView();}catch(e){console.error("renderLogView",e);}
     try{setupPhoto();}catch(e){console.error("setupPhoto",e);}
     try{setupProfileModal();}catch(e){console.error("setupProfileModal",e);}
-    try{setupUsernameSetupModal();}catch(e){console.error("setupUsernameSetupModal",e);}
+    try{setupSignupSetupModal();}catch(e){console.error("setupSignupSetupModal",e);}
     try{setupShift();}catch(e){console.error("setupShift",e);}
     try{setupFeed();}catch(e){console.error("setupFeed",e);}
     try{setupLab();}catch(e){console.error("setupLab",e);}
@@ -5015,7 +5136,6 @@
     });}catch(e){console.error("attachAC",e);}
     track("app_open");
     setTimeout(()=>ensurePushSubscription(),3000);
-    setTimeout(maybeShowOnboarding, 600);
     // Deep link: ?join=KODE åbner Hold-fanen med koden udfyldt
     try{
       const _jc=new URLSearchParams(location.search).get("join");
@@ -5046,7 +5166,7 @@
         const r=await fetch(base+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token}});
         const d=await r.json();
         setProfileInitial(d.nickname,d.username);
-        if(!d.username)maybeShowUsernameSetup(null);
+        if(!d.username)maybeShowSignupSetup(d,"safetynet");
       }catch(e){}
     },1000);
   }
@@ -5061,6 +5181,7 @@
     $("#loading").style.display="none";
     try{translateUI();}catch(e){console.error("CT:translateUI",e);}
     try{setupAuthForm();}catch(e){console.error("CT:setupAuthForm",e);}
+    try{_consumeOAuthHash();}catch(e){console.error("CT:oauthHash",e);}
     let authed=false;
     try{authed=await initAuth();}
     catch(e){console.error("CT:initAuth threw",e);showAuthScreen();return;}

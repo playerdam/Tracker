@@ -161,9 +161,9 @@ app.post("/api/user/profile", async (req, res) => {
       body: JSON.stringify({ id: userId }),
       headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
     });
-    const rows = await sb(`users?id=eq.${userId}&select=nickname,profession,username`);
+    const rows = await sb(`users?id=eq.${userId}&select=nickname,profession,username,workplace`);
     const u = (rows || [])[0] || {};
-    res.json({ ok: true, nickname: u.nickname || null, profession: u.profession || null, username: u.username || null });
+    res.json({ ok: true, nickname: u.nickname || null, profession: u.profession || null, username: u.username || null, workplace: u.workplace || null });
   } catch (err) {
     console.error("user/profile:", err.message);
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
@@ -174,8 +174,9 @@ app.post("/api/user/profile", async (req, res) => {
 app.post("/api/user/update", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
-    const { nickname, profession, username } = req.body || {};
+    const { nickname, profession, username, workplace } = req.body || {};
     const patch = { nickname: nickname || null, profession: profession || null };
+    if (workplace !== undefined) patch.workplace = (workplace || "").trim().slice(0, 60) || null;
     if (username !== undefined) {
       const u = (username || "").trim().toLowerCase();
       if (u && !/^[a-z0-9_]{3,30}$/.test(u)) return res.status(400).json({ error: "invalid_username" });
