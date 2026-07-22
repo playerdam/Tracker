@@ -403,10 +403,10 @@
     const bStats=$("#bnav-lbl-stats");if(bStats)bStats.textContent="Stats";
     const bProf=$("#bnav-lbl-profile");if(bProf)bProf.textContent=lang==="da"?"Profil":"Profile";
     const hLogT=$("#historyLogTitle");if(hLogT)hLogT.textContent=lang==="da"?"Aktivitetslog":"Activity log";
-    const sDetT=$("#statsDetailsTitle");if(sDetT)sDetT.textContent=lang==="da"?"Detaljer":"Details";
     const sCatT=$("#statsCatTitle");if(sCatT)sCatT.textContent=lang==="da"?"Kategorier":"Categories";
     const sAskT=$("#statsAskTitle");if(sAskT)sAskT.textContent=lang==="da"?"Spørg om dine stats":"Ask about your stats";
     const sAskI=$("#statsAskInput");if(sAskI)sAskI.placeholder=lang==="da"?"fx: Hvornår havde jeg min længste vagt?":"e.g. When was my longest shift?";
+    const sToA=$("#statsToAchieveLbl");if(sToA)sToA.textContent=lang==="da"?"At opnå":"To achieve";
     const dTitle=$("#logDrawerTitle");if(dTitle)dTitle.textContent=lang==="da"?"Menu":"Menu";
     const fSearch=$("#feedSearch");if(fSearch)fSearch.placeholder=t("feed_search_ph");
     const ftMine=$("#feedTabMine");if(ftMine)ftMine.textContent=t("feed_tab_mine");
@@ -973,26 +973,6 @@
     return s;
   }
   function counterTotal(c){return c.subs.length?c.subs.reduce((a,b)=>a+b.count,0):c.count;}
-  let _unitDd=null;
-  function closeUnitDropdown(){if(_unitDd){_unitDd.remove();_unitDd=null;document.removeEventListener("click",closeUnitDropdown,true);}}
-  function openUnitDropdown(anchor,current,onPick){
-    closeUnitDropdown();
-    const dd=document.createElement("div");dd.className="unit-dd";_unitDd=dd;
-    ["stk","kg","liter"].forEach(u=>{
-      const btn=document.createElement("button");btn.className="unit-dd-opt"+(u===current?" selected":"");
-      btn.textContent=u;
-      btn.addEventListener("click",e=>{e.stopPropagation();onPick(u);closeUnitDropdown();});
-      dd.appendChild(btn);
-    });
-    document.body.appendChild(dd);
-    const r=anchor.getBoundingClientRect();
-    const ddW=100,ddH=dd.offsetHeight||120;
-    let top=r.bottom+6,left=r.left;
-    if(top+ddH>window.innerHeight-20)top=r.top-ddH-6;
-    if(left+ddW>window.innerWidth-8)left=window.innerWidth-ddW-8;
-    dd.style.top=top+"px";dd.style.left=left+"px";
-    setTimeout(()=>document.addEventListener("click",closeUnitDropdown,true),0);
-  }
   function fmtNum(n){return Math.round(n).toLocaleString(lang==="da"?"da-DK":"en-GB");}
   function readNum(el){if(!el)return 0;if(el.dataset&&el.dataset.raw!==undefined)return +el.dataset.raw||0;return parseInt(String(el.textContent).replace(/[^\d-]/g,""),10)||0;}
   function fmtCount(val,unit){
@@ -1554,8 +1534,6 @@
     const shift=getShift();
     _buildVagtDashboard(document.getElementById("vagtDash"),shift);
     _buildVagtQuickStats(document.getElementById("vagtQuick"),shift);
-    const rows=document.getElementById("vagtRows");
-    if(rows){rows.innerHTML="";_buildVagtRows(rows,shift?shift.snap:null,true);}
   }
   function _vagtSnapMap(shift){const m={};if(shift&&shift.snap)shift.snap.forEach(sc=>{m[sc.id]={count:sc.count||0,subs:{}};(sc.subs||[]).forEach(ss=>m[sc.id].subs[ss.id]=ss.count||0);});return m;}
   function _vagtDispVal(c,snapMap){const sb=snapMap[c.id]?snapMap[c.id].count||0:0;return Math.max(0,counterTotal(c)-sb);}
@@ -1569,22 +1547,6 @@
   // Each tracked counter is a "category" in the hero rings and overview
   function _vagtCounterTotals(sm){
     return state.counters.map((c,i)=>({id:c.id,label:tLabel(c.label),color:VD_COLORS[i%VD_COLORS.length][0],soft:VD_COLORS[i%VD_COLORS.length][1],tot:Math.round(_vagtDispVal(c,sm))}));
-  }
-
-  function _updateVagtDashboard(){
-    const shift=getShift();const sm=_vagtSnapMap(shift);
-    const totals=_vagtCounterTotals(sm);
-    const grand=totals.reduce((s,x)=>s+x.tot,0);
-    totals.forEach(x=>{
-      const sv=document.getElementById("vdstat-"+x.id);
-      if(sv){const prev=readNum(sv);if(prev!==x.tot){animateCount(sv,prev,x.tot);tickEl(sv);}}
-    });
-    const rn=document.getElementById("vd-ring-num");
-    if(rn){const prev=readNum(rn);if(prev!==grand){animateCount(rn,prev,grand);tickEl(rn);}}
-    const arc=document.getElementById("vd-ring-arc");
-    if(arc){const r=52,circ=+(2*Math.PI*r).toFixed(2);arc.setAttribute("stroke-dasharray",+(circ*_vagtRingPct(grand,shift)).toFixed(2)+" "+circ);}
-    // Ranking kan skifte ved bump — genopbyg quick-stats så top-5 altid er korrekt
-    _buildVagtQuickStats(document.getElementById("vagtQuick"),shift);
   }
 
   // ── ét roligt hero: kun ringen er "vigtigst" ──
@@ -1740,91 +1702,6 @@
     if(seeAll)seeAll.addEventListener("click",()=>{_vagtShowAllShifts=!_vagtShowAllShifts;_buildVagtActivity(container);});
   }
 
-  function _buildVagtRows(rows,snap,editable){
-    if(!rows)return;
-    rows.innerHTML="";
-    const snapMap={};
-    if(snap)snap.forEach(sc=>{
-      snapMap[sc.id]={count:sc.count,subs:{}};
-      (sc.subs||[]).forEach(ss=>snapMap[sc.id].subs[ss.id]=ss.count);
-    });
-
-    const _snapTot={};
-    if(snap)snap.forEach(sc=>{_snapTot[sc.id]=(sc.count||0)+(sc.subs||[]).reduce((a,x)=>a+(x.count||0),0);});
-    const _delta=c=>counterTotal(c)-(_snapTot[c.id]||0);
-    const sorted=[...state.counters].sort((a,b)=>{
-      if(snap){const d=_delta(b)-_delta(a);if(d)return d;}
-      return counterTotal(b)-counterTotal(a);
-    });
-    sorted.forEach(c=>{
-      if(c.subs.length){
-        const grp=document.createElement("div");grp.className="vr-grp";
-        const gn=document.createElement("span");gn.className="vr-grp-name";gn.textContent=tLabel(c.label);
-        const gt=document.createElement("span");gt.className="vr-grp-tot";gt.id="vr-tot-"+c.id;gt.textContent=fmtNum(counterTotal(c));
-        grp.appendChild(gn);grp.appendChild(gt);rows.appendChild(grp);
-        c.subs.forEach(s=>{
-          const snapBase=snap?(snapMap[c.id]?snapMap[c.id].subs[s.id]||0:0):null;
-          const dispVal=snapBase!==null?Math.max(0,s.count-snapBase):s.count;
-          const row=document.createElement("div");row.className="vr"+(editable?"":" locked");row.dataset.cid=c.id;row.dataset.sid=s.id;
-          const nm=document.createElement("span");nm.className="vr-name sub";nm.textContent=tLabel(s.name);
-          const ctrl=document.createElement("div");ctrl.className="vr-ctrl";
-          const tot=snapBase!==null?document.createElement("span"):null;
-          if(tot){tot.className="vr-total";tot.textContent=s.count;}
-          if(editable){
-            const minus=document.createElement("button");minus.className="vr-minus";minus.setAttribute("aria-label","minus");minus.innerHTML="&minus;";
-            const num=document.createElement("span");num.className="vr-num sub-num";num.textContent=dispVal;
-            const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
-            minus.addEventListener("click",e=>{e.stopPropagation();bumpVagtSub(c.id,s.id,-1);});
-            plus.addEventListener("click",e=>{e.stopPropagation();bumpVagtSub(c.id,s.id,1);});
-            num.addEventListener("click",e=>{e.stopPropagation();const sb=snapBase||0;openNumtray(t("numtray_set",s.name),dispVal,val=>{if(val>=0){s.count=sb+val;save();renderCareer();num.textContent=val;if(tot)tot.textContent=s.count;const tt=document.getElementById("vr-tot-"+c.id);if(tt)tt.textContent=counterTotal(c);}});});
-            ctrl.appendChild(minus);ctrl.appendChild(num);ctrl.appendChild(plus);
-          } else {
-            const num=document.createElement("span");num.className="vr-num sub-num";num.textContent=dispVal;
-            ctrl.appendChild(num);
-          }
-          if(tot)ctrl.appendChild(tot);
-          row.appendChild(nm);row.appendChild(ctrl);rows.appendChild(row);
-        });
-      } else {
-        const snapBase=snap?(snapMap[c.id]?snapMap[c.id].count||0:0):null;
-        const dispVal=snapBase!==null?Math.max(0,c.count-snapBase):c.count;
-        const unit=c.unit||"stk";const isWeight=unit!=="stk";
-        const row=document.createElement("div");row.className="vr"+(editable?"":" locked");row.dataset.cid=c.id;
-        const nm=document.createElement("span");nm.className="vr-name";nm.textContent=tLabel(c.label);
-        const ctrl=document.createElement("div");ctrl.className="vr-ctrl";
-        const num=document.createElement("span");num.className="vr-num";num.textContent=fmtCount(dispVal,unit);
-        const tot=snapBase!==null?document.createElement("span"):null;
-        if(tot){tot.className="vr-total";tot.textContent=fmtCount(c.count,unit);}
-        if(editable){
-          const unitLbl=document.createElement("button");unitLbl.type="button";unitLbl.className="vr-unit";unitLbl.textContent=unit;
-          unitLbl.addEventListener("click",e=>{e.stopPropagation();openUnitDropdown(unitLbl,c.unit||"stk",picked=>{
-            c.unit=picked;unitLbl.textContent=picked;save();
-            _buildVagtRows(rows,snap,editable);
-          });});
-          const minus=document.createElement("button");minus.className="vr-minus";minus.setAttribute("aria-label","minus");minus.innerHTML="&minus;";
-          const plus=document.createElement("button");plus.className="vr-plus";plus.setAttribute("aria-label","plus");plus.textContent="+";
-          minus.addEventListener("click",e=>{e.stopPropagation();bumpVagtRow(c.id,-1);});
-          plus.addEventListener("click",e=>{
-            e.stopPropagation();
-            if(isWeight){const sb=snapBase||0;openNumtray((lang==="da"?"Tilføj ":"Add ")+unit,"",val=>{if(val>0){c.count=parseFloat((c.count+val).toFixed(2));save();renderCareer();num.textContent=fmtCount(c.count-sb,unit);if(tot)tot.textContent=fmtCount(c.count,unit);}});}
-            else bumpVagtRow(c.id,1);
-          });
-          num.addEventListener("click",e=>{e.stopPropagation();const sb=snapBase||0;openNumtray(t("numtray_set",c.label),dispVal,val=>{if(val>=0){c.count=parseFloat((sb+val).toFixed(2));save();renderCareer();num.textContent=fmtCount(val,unit);if(tot)tot.textContent=fmtCount(c.count,unit);}});});
-          if(!isWeight){
-            row.addEventListener("click",()=>{if(row._lp){row._lp=false;return;}bumpVagtRow(c.id,1);});
-            bindLongPress(row,()=>openNumtray(t("numtray_add")+" "+tLabel(c.label),"",val=>{if(val>0)bumpVagtRow(c.id,val);}));
-          }
-          ctrl.appendChild(minus);ctrl.appendChild(num);if(unitLbl)ctrl.appendChild(unitLbl);ctrl.appendChild(plus);
-        } else {
-          const lockIcon=document.createElement("span");lockIcon.className="vr-lock";lockIcon.textContent="🔒";
-          ctrl.appendChild(num);ctrl.appendChild(lockIcon);
-        }
-        if(tot)ctrl.appendChild(tot);
-        row.appendChild(nm);row.appendChild(ctrl);rows.appendChild(row);
-      }
-    });
-  }
-
   // ── Stats: karriere-hero med timer-ring ──
   function _buildStatsHero(container){
     if(!container)return;
@@ -1876,17 +1753,34 @@
   }
 
   // ── Stats: achievements-grid ──
+  function _badgeTile(b,has){
+    const name=lang==="en"?b.en:b.da;
+    return '<div class="badge-item'+(has?"":" badge-locked")+'" title="'+esc(name)+'"><div class="badge-icon">'+b.icon+'</div><div class="badge-label">'+esc(name)+'</div></div>';
+  }
   function _buildStatsBadges(container){
     if(!container)return;
     const earned=getBadgesEarned();
-    const n=BADGE_DEFS.filter(b=>earned.includes(b.id)).length;
+    const got=BADGE_DEFS.filter(b=>earned.includes(b.id));
+    const missing=BADGE_DEFS.filter(b=>!earned.includes(b.id));
     const title=document.getElementById("statsAchTitle");
-    if(title)title.textContent=(lang==="da"?"Achievements":"Achievements")+" · "+n+"/"+BADGE_DEFS.length;
-    container.innerHTML=BADGE_DEFS.map(b=>{
-      const has=earned.includes(b.id);
-      const name=lang==="en"?b.en:b.da;
-      return '<div class="badge-item'+(has?"":" badge-locked")+'" title="'+esc(name)+'"><div class="badge-icon">'+b.icon+'</div><div class="badge-label">'+esc(name)+'</div></div>';
-    }).join("");
+    if(title)title.textContent="Achievements · "+got.length+"/"+BADGE_DEFS.length;
+    const emptyMsg=lang==="da"?'Ingen achievements optjent endnu — fold "At opnå" ud for at se hvad du kan gå efter':'No achievements yet — expand "To achieve" to see what\'s up for grabs';
+    container.innerHTML=got.length?got.map(b=>_badgeTile(b,true)).join(""):'<p class="muted">'+esc(emptyMsg)+'</p>';
+    const toAch=document.getElementById("statsToAchieve");
+    if(toAch)toAch.innerHTML=missing.map(b=>_badgeTile(b,false)).join("");
+    const lbl=document.getElementById("statsToAchieveLbl");
+    if(lbl)lbl.textContent=(lang==="da"?"At opnå":"To achieve")+" · "+missing.length;
+  }
+  let _statsToAchieveOpen=false;
+  function setupStatsToAchieveToggle(){
+    const btn=$("#statsToAchieveToggle"),body=$("#statsToAchieve");
+    if(!btn||!body)return;
+    btn.addEventListener("click",()=>{
+      _statsToAchieveOpen=!_statsToAchieveOpen;
+      btn.classList.toggle("open",_statsToAchieveOpen);
+      body.style.display=_statsToAchieveOpen?"":"none";
+      haptic(10);
+    });
   }
 
   // ── Stats: "spørg om dine stats" — kompakt datasæt til AI-svar ──
@@ -1990,41 +1884,6 @@
       setTimeout(()=>{startShift();renderVagt();haptic(40);},850);
     });
     if(shift)startVagtTimer(shift);
-  }
-
-  function bumpVagtRow(cid,d){
-    const c=state.counters.find(x=>x.id===cid);if(!c||c.subs.length)return;
-    const shift=getShift();
-    const snapBase=shift?(shift.snap||[]).find(x=>x.id===cid):null;
-    const base=snapBase?snapBase.count||0:0;
-    const unit=c.unit||"stk";
-    const prevDisp=Math.max(0,c.count-base);
-    c.count=Math.max(base,parseFloat((c.count+d).toFixed(2)));
-    const dispVal=c.count-base;
-    const el=document.querySelector('.vr[data-cid="'+cid+'"] .vr-num');
-    if(el){if(unit==="stk"){animateCount(el,prevDisp,dispVal);}else{el.textContent=fmtCount(dispVal,unit);}if(d>0){tickEl(el);haptic();}}
-    const totEl=document.querySelector('.vr[data-cid="'+cid+'"] .vr-total');
-    if(totEl)totEl.textContent=fmtCount(c.count,unit);
-    updateCatHeader(c.cat||"andet");_updateVagtDashboard();renderCareer();save();
-  }
-
-  function bumpVagtSub(cid,sid,d){
-    const c=state.counters.find(x=>x.id===cid);if(!c)return;
-    const s=c.subs.find(x=>x.id===sid);if(!s)return;
-    const shift=getShift();
-    const snapC=shift?(shift.snap||[]).find(x=>x.id===cid):null;
-    const base=snapC?(snapC.subs||[]).find(x=>x.id===sid):null;
-    const baseVal=base?base.count||0:0;
-    const prevDisp=Math.max(0,s.count-baseVal);
-    s.count=Math.max(baseVal,s.count+d);
-    const dispVal=s.count-baseVal;
-    const el=document.querySelector('.vr[data-cid="'+cid+'"][data-sid="'+sid+'"] .vr-num');
-    if(el){animateCount(el,prevDisp,dispVal);if(d>0){tickEl(el);haptic();}}
-    const totEl=document.querySelector('.vr[data-cid="'+cid+'"][data-sid="'+sid+'"] .vr-total');
-    if(totEl)totEl.textContent=s.count;
-    const grpTot=document.getElementById("vr-tot-"+cid);
-    if(grpTot)grpTot.textContent=counterTotal(c);
-    updateCatHeader(c.cat||"andet");_updateVagtDashboard();renderCareer();save();
   }
 
   $("#counterGrid").addEventListener("click",e=>{
@@ -3186,7 +3045,6 @@
         _buildStatsHighlights(document.getElementById("statsHighlights"));
         _buildStatsBadges(document.getElementById("statsBadges"));
         _buildVagtQuickStats(document.getElementById("statsQuick"),getShift());
-        _buildVagtRows(document.getElementById("statsRows"),(getShift()||{}).snap,false);
       }
       window.scrollTo({top:0,behavior:"instant"});
     }
@@ -5300,6 +5158,7 @@
     try{setupPhoto();}catch(e){console.error("setupPhoto",e);}
     try{setupProfileModal();}catch(e){console.error("setupProfileModal",e);}
     try{setupStatsAsk();}catch(e){console.error("setupStatsAsk",e);}
+    try{setupStatsToAchieveToggle();}catch(e){console.error("setupStatsToAchieveToggle",e);}
     try{setupSignupSetupModal();}catch(e){console.error("setupSignupSetupModal",e);}
     try{setupShift();}catch(e){console.error("setupShift",e);}
     try{setupFeed();}catch(e){console.error("setupFeed",e);}

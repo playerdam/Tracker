@@ -22,10 +22,14 @@ test("app booter, logger og navigerer uden JS-fejl", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#vagtDash .vd2-hero")).toBeVisible({ timeout: 15000 });
 
-  // Stats-fanen er rent overblik — ingen redigerbare rækker
+  // Stats-fanen er rent overblik — ingen Detaljer-sektion, achievements foldes ud on-demand
   await page.locator('.bnav-btn[data-tab="stats"]').click();
   await page.waitForTimeout(250);
-  await expect(page.locator("#statsRows .vr-plus")).toHaveCount(0);
+  await expect(page.locator("#statsRows")).toHaveCount(0);
+  await expect(page.locator("#statsToAchieve")).toBeHidden();
+  await page.locator("#statsToAchieveToggle").click();
+  await expect(page.locator("#statsToAchieve")).toBeVisible();
+  await expect(page.locator("#statsToAchieve .badge-item").first()).toBeVisible();
 
   // Tællere ændres nu kun via Administrér tællere (nået fra "Alle kategorier") — bump og se ringen på Overblik følge med
   await page.locator("#statsQuick .vd2-qtile-more").click();
