@@ -22,10 +22,17 @@ test("app booter, logger og navigerer uden JS-fejl", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#vagtDash .vd2-hero")).toBeVisible({ timeout: 15000 });
 
-  // Stats-fanen har de redigerbare tæller-rækker — bump en tæller og se ringen på Overblik følge med
+  // Stats-fanen er rent overblik — ingen redigerbare rækker
   await page.locator('.bnav-btn[data-tab="stats"]').click();
   await page.waitForTimeout(250);
-  await page.locator(".vr-plus").first().click();
+  await expect(page.locator("#statsRows .vr-plus")).toHaveCount(0);
+
+  // Tællere ændres nu kun via Administrér tællere (nået fra "Alle kategorier") — bump og se ringen på Overblik følge med
+  await page.locator("#statsQuick .vd2-qtile-more").click();
+  await page.waitForTimeout(200);
+  await page.locator("#catOvManage").click();
+  await page.waitForTimeout(250);
+  await page.locator(".st-cat-card-btn").first().click();
   await page.locator('.bnav-btn[data-tab="vagt"]').click();
   await expect(page.locator("#vd-ring-num")).toHaveText("11");
 

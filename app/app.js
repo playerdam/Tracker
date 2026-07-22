@@ -405,6 +405,8 @@
     const hLogT=$("#historyLogTitle");if(hLogT)hLogT.textContent=lang==="da"?"Aktivitetslog":"Activity log";
     const sDetT=$("#statsDetailsTitle");if(sDetT)sDetT.textContent=lang==="da"?"Detaljer":"Details";
     const sCatT=$("#statsCatTitle");if(sCatT)sCatT.textContent=lang==="da"?"Kategorier":"Categories";
+    const sAskT=$("#statsAskTitle");if(sAskT)sAskT.textContent=lang==="da"?"Spørg om dine stats":"Ask about your stats";
+    const sAskI=$("#statsAskInput");if(sAskI)sAskI.placeholder=lang==="da"?"fx: Hvornår havde jeg min længste vagt?":"e.g. When was my longest shift?";
     const dTitle=$("#logDrawerTitle");if(dTitle)dTitle.textContent=lang==="da"?"Menu":"Menu";
     const fSearch=$("#feedSearch");if(fSearch)fSearch.placeholder=t("feed_search_ph");
     const ftMine=$("#feedTabMine");if(ftMine)ftMine.textContent=t("feed_tab_mine");
@@ -1559,7 +1561,7 @@
     const topCats=[...totals].sort((a,b)=>b.tot-a.tot).slice(0,5);
     const hiddenN=totals.length-topCats.length;
     if(!topCats.length){container.innerHTML="";return;}
-    const moreTile='<button class="vd2-qtile vd2-qtile-more" id="vagtAllCats" aria-label="'+(lang==="da"?"Alle kategorier":"All categories")+'">'
+    const moreTile='<button class="vd2-qtile vd2-qtile-more" aria-label="'+(lang==="da"?"Alle kategorier":"All categories")+'">'
       +'<div class="vd2-qtile-ico">'+(hiddenN>0?"+"+hiddenN:"···")+'</div>'
       +'<div class="vd2-qtile-txt"><div class="vd2-qtile-lbl">'+(lang==="da"?"Alle kategorier":"All categories")+'</div></div>'
     +'</button>';
@@ -1567,10 +1569,10 @@
       const col=VD_COLORS[i%VD_COLORS.length];
       return '<button class="vd2-qtile" data-ring-id="'+esc(x.id)+'" aria-label="'+esc(x.label)+': '+fmtNum(x.tot)+'. '+(lang==="da"?"Tryk for overblik":"Tap for overview")+'">'
         +'<div class="vd2-qtile-ico" style="background:'+col[1]+';color:'+col[0]+'">'+esc((x.label||"?").charAt(0).toUpperCase())+'</div>'
-        +'<div class="vd2-qtile-txt"><div class="vd2-qtile-val" id="vdstat-'+x.id+'" data-raw="'+x.tot+'">'+fmtNum(x.tot)+'</div><div class="vd2-qtile-lbl">'+esc(x.label)+'</div></div>'
+        +'<div class="vd2-qtile-txt"><div class="vd2-qtile-val" data-cid="'+x.id+'" data-raw="'+x.tot+'">'+fmtNum(x.tot)+'</div><div class="vd2-qtile-lbl">'+esc(x.label)+'</div></div>'
       +'</button>';
     }).join("")+moreTile+'</div>';
-    const allBtn=document.getElementById("vagtAllCats");
+    const allBtn=container.querySelector(".vd2-qtile-more");
     if(allBtn)allBtn.addEventListener("click",openCatOverview);
     // Kortene åbner det totale overblik — logging sker i Detaljer og tekstfeltet
     container.querySelectorAll("[data-ring-id]").forEach(btn=>{
@@ -1823,6 +1825,66 @@
       const name=lang==="en"?b.en:b.da;
       return '<div class="badge-item'+(has?"":" badge-locked")+'" title="'+esc(name)+'"><div class="badge-icon">'+b.icon+'</div><div class="badge-label">'+esc(name)+'</div></div>';
     }).join("");
+  }
+
+  // ── Stats: "spørg om dine stats" — kompakt datasæt til AI-svar ──
+  function _buildStatsQuerySummary(){
+    const hist=state.shiftHistory||[];
+    const shifts=hist.slice(0,200).map(s=>({
+      date:new Date(s.startedAt).toISOString().slice(0,10),
+      start:new Date(s.startedAt).toTimeString().slice(0,5),
+      end:s.endedAt?new Date(s.endedAt).toTimeString().slice(0,5):null,
+      hours:+(s.durationMs/3600000).toFixed(2),
+    }));
+    const categories=state.counters.map(c=>({label:tLabel(c.label),total:counterTotal(c),unit:c.unit||"stk"}));
+    return {
+      todayISO:new Date().toISOString().slice(0,10),
+      totals:{
+        careerCount:career(),
+        totalHours:+(totalWorkMs()/3600000).toFixed(1),
+        shiftsCount:hist.length,
+        streakDays:calcStreak(),
+        activeDays:totalActiveDays(),
+      },
+      shifts,
+      categories,
+      badgesEarned:getBadgesEarned().map(id=>{const b=BADGE_DEFS.find(x=>x.id===id);return b?(lang==="da"?b.da:b.en):id;}),
+    };
+  }
+  function setupStatsAsk(){
+    const btn=$("#statsAskBtn"),inp=$("#statsAskInput"),ans=$("#statsAskAnswer");
+    if(!btn||!inp||!ans)return;
+    async function ask(){
+      const q=(inp.value||"").trim();if(!q||btn.disabled)return;
+      const base=apiBase();const token=await getToken();
+      if(!base||!token){
+        ans.style.display="";ans.className="stats-ask-answer err";
+        ans.textContent=lang==="da"?"Log ind for at spørge":"Log in to ask";
+        return;
+      }
+      btn.disabled=true;
+      ans.style.display="";ans.className="stats-ask-answer";
+      ans.textContent=lang==="da"?"Tænker…":"Thinking…";
+      try{
+        const summary=_buildStatsQuerySummary();
+        const r=await fetch(base+"/api/stats-query",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({question:q,summary})});
+        const d=await r.json();
+        if(!r.ok||d.error){
+          ans.className="stats-ask-answer err";
+          ans.textContent=d.error==="for mange kald — vent lidt"?(lang==="da"?"For mange spørgsmål — vent lidt":"Too many questions — wait a bit"):(lang==="da"?"Kunne ikke svare — prøv igen":"Couldn't answer — try again");
+          return;
+        }
+        ans.className="stats-ask-answer";
+        ans.textContent=d.answer||"";
+      }catch(e){
+        ans.className="stats-ask-answer err";
+        ans.textContent=lang==="da"?"Ingen forbindelse":"No connection";
+      }finally{
+        btn.disabled=false;
+      }
+    }
+    btn.addEventListener("click",ask);
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();ask();}});
   }
 
   function renderVagt(){
@@ -3062,7 +3124,7 @@
         _buildStatsHighlights(document.getElementById("statsHighlights"));
         _buildStatsBadges(document.getElementById("statsBadges"));
         _buildVagtQuickStats(document.getElementById("statsQuick"),getShift());
-        _buildVagtRows(document.getElementById("statsRows"),(getShift()||{}).snap,true);
+        _buildVagtRows(document.getElementById("statsRows"),(getShift()||{}).snap,false);
       }
       window.scrollTo({top:0,behavior:"instant"});
     }
@@ -5175,6 +5237,7 @@
     try{renderLogView();}catch(e){console.error("renderLogView",e);}
     try{setupPhoto();}catch(e){console.error("setupPhoto",e);}
     try{setupProfileModal();}catch(e){console.error("setupProfileModal",e);}
+    try{setupStatsAsk();}catch(e){console.error("setupStatsAsk",e);}
     try{setupSignupSetupModal();}catch(e){console.error("setupSignupSetupModal",e);}
     try{setupShift();}catch(e){console.error("setupShift",e);}
     try{setupFeed();}catch(e){console.error("setupFeed",e);}

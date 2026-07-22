@@ -517,6 +517,16 @@
   .records-lbl{font-size:13px;font-weight:600;color:var(--dim)}
   .records-val{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
   .muted{font-size:13px;color:var(--faint)}
+  .stats-ask{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:5px 5px 5px 14px;margin-bottom:10px}
+  .stats-ask-input{flex:1;border:none;background:none;color:var(--text);font-family:inherit;font-size:14px;padding:9px 0;min-width:0}
+  .stats-ask-input:focus{outline:none}
+  .stats-ask-input::placeholder{color:var(--faint)}
+  .stats-ask-btn{appearance:none;flex:none;width:34px;height:34px;border-radius:50%;border:none;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .stats-ask-btn:active{background:var(--accent-h);transform:scale(.92)}
+  .stats-ask-btn:disabled{opacity:.5;cursor:default}
+  .stats-ask-answer{background:var(--surface-2);border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.5;color:var(--text);margin-bottom:14px;animation:statsAskIn .25s ease}
+  .stats-ask-answer.err{color:var(--faint)}
+  @keyframes statsAskIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
   /* ---- Foto ---- */
   .qlog-cam{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;flex:none;padding:4px 8px;line-height:1;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:2px}

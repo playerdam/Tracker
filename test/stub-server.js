@@ -10,6 +10,7 @@ app.post("/api/user/update", (req, r) => { Object.assign(_demoProfile, req.body 
 app.get("/api/config", (_q, r) => r.json({}));
 app.get("/api/health", (_q, r) => r.json({ ok: true }));
 app.get("/api/state", (_q, r) => r.json({ data: null, updated_at: null }));
+app.post("/api/stats-query", (_q, r) => r.json({ answer: "Din længste vagt var ons. 8. jan. på 9t 0m." }));
 app.post("/api/state", (_q, r) => r.json({ ok: true, updated_at: new Date().toISOString() }));
 app.get("/api/teams/list", (_q, r) => r.json({ teams: [] }));
 app.get("/api/teams/mine", (_q, r) => r.json({ teams: [] }));

@@ -1,5 +1,5 @@
 // Craft Tracker backend
-// Endpoints: GET /api/config  POST /api/parse-log  POST /api/wine-search
+// Endpoints: GET /api/config  POST /api/parse-log  POST /api/wine-search  POST /api/stats-query
 //            POST /api/user/profile  POST /api/user/update
 //            GET  /api/users/check-username
 //            POST /api/log-entry     POST /api/upload-photo
@@ -718,6 +718,30 @@ app.post("/api/parse-log", async (req, res) => {
     res.json({ actions });
   } catch (err) {
     console.error("parse-log:", err.message);
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Stats-spørgsmål ----
+app.post("/api/stats-query", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    if (rateLimited("statsq", userId, 20, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
+    let { question, summary } = req.body || {};
+    if (!question || !String(question).trim()) return res.status(400).json({ error: "Spørgsmål mangler" });
+    question = String(question).slice(0, 300);
+    if (!summary || typeof summary !== "object") return res.status(400).json({ error: "Data mangler" });
+
+    const content = "Data (JSON):\n" + JSON.stringify(summary).slice(0, 14000) + "\n\nSpørgsmål: \"" + question + "\"";
+    const answer = await callClaude({
+      model: PARSE_MODEL,
+      system: "Du besvarer spørgsmål om en gastronomi-medarbejders personlige vagt- og tælle-historik i appen Craft Tracker. Du får et JSON-datasæt med deres vagter (dato, start/slut, timer), kategori-totaler, badges og streak. Svar KORT (1-2 sætninger) og konkret, og brug KUN de givne data — gæt eller opfind ALDRIG tal. Svar på samme sprog som spørgsmålet (dansk eller engelsk). Kræver svaret data der ikke findes i datasættet, så sig det ærligt i stedet for at gætte.",
+      content,
+      maxTokens: 300,
+    });
+    res.json({ answer: answer.trim() });
+  } catch (err) {
+    console.error("stats-query:", err.message);
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });
