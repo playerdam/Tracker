@@ -407,6 +407,11 @@
     const sAskT=$("#statsAskTitle");if(sAskT)sAskT.textContent=lang==="da"?"Spørg om dine stats":"Ask about your stats";
     const sAskI=$("#statsAskInput");if(sAskI)sAskI.placeholder=lang==="da"?"fx: Hvornår havde jeg min længste vagt?":"e.g. When was my longest shift?";
     const sToA=$("#statsToAchieveLbl");if(sToA)sToA.textContent=lang==="da"?"At opnå":"To achieve";
+    const snTitle=$("#shiftNudgeTitle");if(snTitle)snTitle.textContent=lang==="da"?"Ser ud til du er i gang":"Looks like you're working";
+    const snSub=$("#shiftNudgeSub");if(snSub)snSub.textContent=lang==="da"?"Ingen vagt kører — hvor længe har du arbejdet?":"No shift is running — how long have you been working?";
+    const snDismiss=$("#shiftNudgeDismiss");if(snDismiss)snDismiss.textContent=lang==="da"?"Nej tak":"No thanks";
+    const snChips={0:lang==="da"?"Lige nu":"Just now",15:"15 min",30:"30 min",60:lang==="da"?"1 time":"1 hour",90:lang==="da"?"1,5 time":"1.5 hours",120:lang==="da"?"2 timer":"2 hours"};
+    document.querySelectorAll(".shift-nudge-chip").forEach(btn=>{const v=snChips[btn.dataset.min];if(v)btn.textContent=v;});
     const dTitle=$("#logDrawerTitle");if(dTitle)dTitle.textContent=lang==="da"?"Menu":"Menu";
     const fSearch=$("#feedSearch");if(fSearch)fSearch.placeholder=t("feed_search_ph");
     const ftMine=$("#feedTabMine");if(ftMine)ftMine.textContent=t("feed_tab_mine");
@@ -2887,6 +2892,7 @@
     const logSummary=summary.join(" · ");
     deferSync(syncItems,imageUrl,logSummary);
     checkBadges();checkRecords();
+    if(summary.length)maybeNudgeShiftStart();
     $("#qlogInput").focus();
   }
   function processAsk(ask,i,summary,syncItems,imageUrl){if(i>=ask.length){finishLog(summary,syncItems,imageUrl);return;}openAsk(ask[i],()=>processAsk(ask,i+1,summary,syncItems,imageUrl),summary,syncItems,imageUrl);}
@@ -3642,10 +3648,10 @@
 
   // ---- shift ----
   const SHIFT_KEY="mise_shift";
-  let shiftTimerInterval=null,shiftPhotoDataUrl=null;
+  let shiftTimerInterval=null,shiftPhotoDataUrl=null,_shiftNudgeShown=false;
 
   function getShift(){try{return JSON.parse(localStorage.getItem(SHIFT_KEY)||"null");}catch(e){return null;}}
-  function saveShift(s){if(s)localStorage.setItem(SHIFT_KEY,JSON.stringify(s));else localStorage.removeItem(SHIFT_KEY);}
+  function saveShift(s){if(s)localStorage.setItem(SHIFT_KEY,JSON.stringify(s));else{localStorage.removeItem(SHIFT_KEY);_shiftNudgeShown=false;}}
   function recordShiftEnd(sh){
     if(!sh||!sh.startedAt)return;
     const endedAt=Date.now();
@@ -3723,12 +3729,35 @@
     return h?h+"t "+m+"min":m+"min";
   }
 
-  function startShift(){
-    track("shift_start");
+  function startShift(backdateMs){
+    track("shift_start",backdateMs?{backdateMin:Math.round(backdateMs/60000)}:undefined);
     localStorage.setItem("mise_vagt_detail","1");
     const snap=state.counters.map(c=>({id:c.id,count:c.count,subs:c.subs.map(s=>({id:s.id,count:s.count}))}));
-    saveShift({startedAt:new Date().toISOString(),snap});
+    saveShift({startedAt:new Date(Date.now()-(backdateMs||0)).toISOString(),snap});
+    _shiftNudgeShown=false;
     renderShiftBar();
+  }
+
+  // ── Glemte du at starte vagten? Spørg når der logges uden en aktiv vagt ──
+  function maybeNudgeShiftStart(){
+    if(getShift()||_shiftNudgeShown)return;
+    _shiftNudgeShown=true;
+    setTimeout(()=>{const scrim=$("#shiftNudgeScrim");if(scrim)scrim.classList.add("open");},700);
+  }
+  function setupShiftNudge(){
+    const scrim=$("#shiftNudgeScrim");if(!scrim)return;
+    scrim.querySelectorAll(".shift-nudge-chip").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const min=parseInt(btn.dataset.min,10)||0;
+        startShift(min*60000);
+        scrim.classList.remove("open");
+        renderVagt();
+        showToast(lang==="da"?"Vagt startet":"Shift started");
+        haptic(30);
+      });
+    });
+    const dismiss=$("#shiftNudgeDismiss");
+    if(dismiss)dismiss.addEventListener("click",()=>scrim.classList.remove("open"));
   }
 
   function renderShiftBar(){
@@ -5159,6 +5188,7 @@
     try{setupProfileModal();}catch(e){console.error("setupProfileModal",e);}
     try{setupStatsAsk();}catch(e){console.error("setupStatsAsk",e);}
     try{setupStatsToAchieveToggle();}catch(e){console.error("setupStatsToAchieveToggle",e);}
+    try{setupShiftNudge();}catch(e){console.error("setupShiftNudge",e);}
     try{setupSignupSetupModal();}catch(e){console.error("setupSignupSetupModal",e);}
     try{setupShift();}catch(e){console.error("setupShift",e);}
     try{setupFeed();}catch(e){console.error("setupFeed",e);}
