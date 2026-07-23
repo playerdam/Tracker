@@ -2086,7 +2086,8 @@
         +'<div class="stepblock"><div class="steplabel">'+esc(t("glasses"))+'</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
         '<div class="stepblock"><div class="steplabel">'+esc(t("bottles"))+'</div><div class="stepctrl"><button class="sbtn" data-act="b-">−</button><span class="tnum" data-k="bottles">'+w.bottles+'</span><button class="sbtn plus" data-act="b+">+</button></div></div>'
         +'</div></div>'+
-      '<button class="wedit" data-act="edit">⋯</button></div>';
+      '<button class="wedit" data-act="share" aria-label="Del til feed"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></button>'
+      +'<button class="wedit" data-act="edit">⋯</button></div>';
     const wrap=document.createElement("div");wrap.className="wrow-wrap";
     const del=document.createElement("button");del.className="wrow-del";del.dataset.delId=w.id;
     del.innerHTML='<span class="wrow-del-icon">🗑</span>'+(lang==="da"?"Slet":"Del");
@@ -2280,11 +2281,73 @@
     if(a==="about"){openWineSheet(w,"view");return;}
     if(a==="photo"){openWineSheet(w,"view");return;}
     if(a==="edit"){openWineSheet(w,"edit");return;}
+    if(a==="share"){openWineShareSheet(w);return;}
     let key,d;if(a==="g+"){key="glasses";d=1;}else if(a==="g-"){key="glasses";d=-1;}else if(a==="b+"){key="bottles";d=1;}else if(a==="b-"){key="bottles";d=-1;}else if(a==="o+"){key="opened";d=1;}else if(a==="o-"){key="opened";d=-1;}else return;
     w[key]=Math.max(0,(w[key]||0)+d);
     const n=row.querySelector('.tnum[data-k="'+key+'"]');n.textContent=w[key];if(d>0)tickEl(n);
     $("#wineSum").innerHTML=sumHtml(state.wines.filter(x=>matchWine(x,wineFilter.trim().toLowerCase())));
     renderCareer();save();
+  });
+
+  // ── Del vin til feed ──
+  let _wineShareWine=null,_wineShareFinalPhoto=null;
+  function _setWineSharePhotoUi(url){
+    const prev=$("#wineSharePhotoPreview"),rm=$("#wineSharePhotoRemove"),btn=$("#wineSharePhotoBtn");
+    if(url){prev.src=url;prev.style.display="";rm.style.display="";rm.textContent=lang==="da"?"Fjern billede":"Remove photo";btn.textContent=lang==="da"?"Skift billede":"Change photo";}
+    else{prev.style.display="none";rm.style.display="none";btn.textContent=lang==="da"?"+ Billede":"+ Photo";}
+  }
+  function openWineShareSheet(w){
+    _wineShareWine=w;_wineShareFinalPhoto=w.imageUrl||null;
+    const parts=[w.producer,w.region,w.land,w.vint].filter(Boolean);
+    $("#wineShareTitle").textContent=lang==="da"?"Del til feed":"Share to feed";
+    $("#wineShareSub").textContent=(w.name||w.producer||(lang==="da"?"Uden navn":"Unnamed"))+(parts.length?" — "+parts.join(" · "):"");
+    $("#wineShareCaptionLbl").textContent=lang==="da"?"Kommentar (valgfri)":"Caption (optional)";
+    $("#wineShareCaption").value="";
+    $("#wineShareSend").textContent=lang==="da"?"Del":"Share";
+    $("#wineShareCancel").textContent=lang==="da"?"Annuller":"Cancel";
+    _setWineSharePhotoUi(_wineShareFinalPhoto);
+    $("#wineShareScrim").classList.add("open");
+  }
+  function closeWineShareSheet(){$("#wineShareScrim").classList.remove("open");_wineShareWine=null;_wineShareFinalPhoto=null;}
+  $("#wineSharePhotoBtn").addEventListener("click",()=>$("#wineSharePhotoInput").click());
+  $("#wineSharePhotoInput").addEventListener("change",async()=>{
+    const inp=$("#wineSharePhotoInput");const file=inp.files[0];if(!file)return;
+    const url=await resizeImage(file,1200);
+    _wineShareFinalPhoto=url;_setWineSharePhotoUi(url);
+    inp.value="";
+  });
+  $("#wineSharePhotoRemove").addEventListener("click",()=>{_wineShareFinalPhoto=null;_setWineSharePhotoUi(null);});
+  $("#wineShareCancel").addEventListener("click",closeWineShareSheet);
+  $("#wineShareScrim").addEventListener("click",e=>{if(e.target===$("#wineShareScrim"))closeWineShareSheet();});
+  $("#wineShareSend").addEventListener("click",async()=>{
+    if(!_wineShareWine)return;
+    const w=_wineShareWine;
+    const btn=$("#wineShareSend");
+    const base=apiBase();const token=await getToken();
+    if(!base||!token){showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");return;}
+    btn.disabled=true;
+    try{
+      let imageUrl=null;
+      if(_wineShareFinalPhoto){
+        if(_wineShareFinalPhoto.startsWith("data:")){
+          const upRes=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:_wineShareFinalPhoto})});
+          const upD=await upRes.json();
+          imageUrl=upD.url||null;
+        }else{imageUrl=_wineShareFinalPhoto;}
+      }
+      const parts=[w.producer,w.region,w.land,w.vint].filter(Boolean);
+      const caption=($("#wineShareCaption").value||"").trim();
+      const summary=(caption||parts.join(" · ")).slice(0,200);
+      const wineName=w.name||w.producer||(lang==="da"?"Vin":"Wine");
+      const r=await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({categoryLabel:wineName,delta:1,imageUrl,summary})});
+      if(!r.ok){showToast(lang==="da"?"Kunne ikke dele — prøv igen":"Couldn't share — try again");btn.disabled=false;return;}
+      haptic(40);showToast(lang==="da"?"Delt til dit feed 🍷":"Shared to your feed 🍷");
+      closeWineShareSheet();
+      if(window._activeFeedTab&&window._activeFeedTab()==="mine")loadFeed(false,true);
+    }catch(e){
+      showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
+    }
+    btn.disabled=false;
   });
 
   // Swipe-to-delete on wine cards

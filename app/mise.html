@@ -626,6 +626,25 @@
   </div>
 </div></div>
 
+<div class="scrim" id="wineShareScrim"><div class="modal">
+  <h2 id="wineShareTitle" style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin:0 0 4px"></h2>
+  <p id="wineShareSub" style="font-size:13px;color:var(--dim);margin:0 0 16px;line-height:1.4"></p>
+  <div class="field">
+    <label id="wineShareCaptionLbl"></label>
+    <textarea id="wineShareCaption" rows="3" maxlength="200" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:11px 12px;resize:vertical"></textarea>
+  </div>
+  <div class="field" style="display:flex;align-items:center;gap:10px">
+    <img id="wineSharePhotoPreview" class="wa-photo-prev" alt="" style="display:none">
+    <button type="button" class="btn ghost btn-sm" id="wineSharePhotoBtn"></button>
+    <button type="button" class="wa-photo-rm" id="wineSharePhotoRemove" style="display:none"></button>
+  </div>
+  <input id="wineSharePhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
+  <div class="mactions" style="margin-top:16px">
+    <button class="btn primary" id="wineShareSend"></button>
+    <button class="btn ghost" id="wineShareCancel"></button>
+  </div>
+</div></div>
+
 <div class="scrim" id="askScrim"><div class="modal">
   <h2 id="askTitle"></h2>
   <p class="ask-text" id="askText"></p>
