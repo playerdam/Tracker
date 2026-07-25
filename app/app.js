@@ -177,7 +177,6 @@
       new_cat_title:"Ny kategori",new_cat_lbl:"Navn",new_cat_save:"Opret",new_cat_cancel:"Annullér",
       new_cat_hint:"Claude genererer automatisk et ikon i baggrunden.",
       new_cat_btn:"+ Ny kategori",
-      cat_picker_title:"Alle kategorier",cat_all_chip:"Alle",
       qlog_hint:"Enter for at logge",qlog_hint_full:"Enter for at logge · Esc for at lukke",
       catalog_title:"Katalog",cat_search_ph:"Søg i katalog...",new_cat_ph:"fx Anrettet, Sauce, Garnish...",
       onboard_sub:"Track din dag. Del med holdet.",onboard_btn:"Kom i gang",
@@ -327,7 +326,6 @@
       new_cat_title:"New category",new_cat_lbl:"Name",new_cat_save:"Create",new_cat_cancel:"Cancel",
       new_cat_hint:"Claude will automatically generate an icon in the background.",
       new_cat_btn:"+ New category",
-      cat_picker_title:"All categories",cat_all_chip:"All",
       qlog_hint:"Enter to log",qlog_hint_full:"Enter to log · Esc to close",
       catalog_title:"Catalogue",cat_search_ph:"Search catalogue...",new_cat_ph:"e.g. Plated, Sauce, Garnish...",
       onboard_sub:"Track your day. Share with the team.",onboard_btn:"Get started",
@@ -572,8 +570,6 @@
     if(state.customCats&&state.customCats.length)return state.customCats[0].id;
     return "andet";
   }
-  let expandedCats=new Set((()=>{try{return JSON.parse(localStorage.getItem("mise_expanded_cats")||"null");}catch(e){return null;}})()|| CATS.map(c=>c.id));
-  function saveExpandedCats(){localStorage.setItem("mise_expanded_cats",JSON.stringify([...expandedCats]));}
   const DOTS_ICON=CATS.find(c=>c.id==="andet").icon;
   function allCats(){
     return [...CATS,...(state.customCats||[]).map(c=>({id:c.id,da:c.name,en:c.name,icon:c.icon||DOTS_ICON,custom:true,iconPending:c.iconPending}))];
@@ -654,7 +650,6 @@
   const DEFAULTS={counters:[],wines:[],log:[],shiftHistory:[],labelI18n:{}};
 
   let state={counters:[],wines:[],log:[],customCats:[]},mem=null,wineFilter="";
-  let activeCat=localStorage.getItem("mise_active_cat")||"";
   let activeWineType=localStorage.getItem("mise_wine_type")||"alle";
 
   const WINE_FLAGS={"Frankrig":"🇫🇷","France":"🇫🇷","Italien":"🇮🇹","Italy":"🇮🇹","Spanien":"🇪🇸","Spain":"🇪🇸","Portugal":"🇵🇹","Tyskland":"🇩🇪","Germany":"🇩🇪","Østrig":"🇦🇹","Austria":"🇦🇹","USA":"🇺🇸","Australien":"🇦🇺","Australia":"🇦🇺","New Zealand":"🇳🇿","Sydafrika":"🇿🇦","South Africa":"🇿🇦","Chile":"🇨🇱","Argentina":"🇦🇷","Grækenland":"🇬🇷","Greece":"🇬🇷","Ungarn":"🇭🇺","Hungary":"🇭🇺","Georgien":"🇬🇪","Georgia":"🇬🇪","Libanon":"🇱🇧","Lebanon":"🇱🇧","Danmark":"🇩🇰","Denmark":"🇩🇰","Slovenien":"🇸🇮","Kroatien":"🇭🇷"};
@@ -675,7 +670,6 @@
     return"andet";
   }
 
-  function wineTypeLabel(type){return t("wine_type_"+type)||type;}
   const logHistory=[];
 
   // ---- Auth ----
@@ -1329,13 +1323,6 @@
     });
     return wrap;
   }
-  function makeTile(c){return makeSimpleRow(c);}
-  function makeSubCard(c){const frag=document.createDocumentFragment();frag.appendChild(document.createElement("div"));const g=makeSubGroup(c);frag.appendChild(g);return frag;}
-  function makeCounterRow(c){
-    const frag=document.createDocumentFragment();
-    if(c.subs.length){frag.appendChild(makeSubGroup(c));}else{frag.appendChild(makeSimpleRow(c));}
-    return frag;
-  }
   function renderCounters(){
     const grid=$("#counterGrid");grid.className="st-v3";grid.innerHTML="";
     let migrated=false;
@@ -1482,7 +1469,6 @@
     if(row){const el=row.querySelector(".st-r-num");animateCount(el,prev,c.count);if(d>0){tickEl(el);haptic();}row.classList.toggle("has-count",c.count>0);}
     updateCatHeader(c.cat||"andet");renderCareer();save();
   }
-  function bumpStRow(cid,d){bumpSt(cid,d);}
   function bumpStSub(cid,sid,d,htotEl){
     const c=state.counters.find(x=>x.id===cid);if(!c)return;
     const s=c.subs.find(x=>x.id===sid);if(!s)return;
@@ -1493,7 +1479,6 @@
     if(totEl){const prevT=counterTotal(c)-d;animateCount(totEl,Math.max(0,prevT),counterTotal(c));if(d>0)tickEl(totEl);}
     updateCatHeader(c.cat||"andet");renderCareer();save();
   }
-  function addType(card,name){const c=state.counters.find(x=>x.id===card.dataset.id);if(!c)return;name=name.trim();if(!name)return;const ex=c.subs.find(s=>s.name.toLowerCase()===name.toLowerCase());if(ex){ex.count++;}else{if(c.subs.length===0&&c.count>0){c.subs.push({id:id(),name:"Uden type",count:c.count});c.count=0;}c.subs.push({id:id(),name,count:0});if(!c.suggest.some(s=>s.toLowerCase()===name.toLowerCase()))c.suggest.push(name);}save();renderCounters();renderCareer();}
 
   // === VAGT VIEW ===
   let vagtTimerInterval=null;
@@ -1530,7 +1515,6 @@
 
   const VD_COLORS=[["#FFB36B","rgba(255,179,107,.14)"],["#FF6B8A","rgba(255,107,138,.14)"],["#E8875C","rgba(232,135,92,.14)"],["#C98BD9","rgba(201,139,217,.15)"],["#5CB8A7","rgba(92,184,167,.14)"],["#D4A94E","rgba(212,169,78,.15)"]];
   function _bestShiftTotal(){let best=0;(state.shiftHistory||[]).forEach(s=>{const tot=(s.entries||[]).reduce((a,e)=>a+(e.delta>0?e.delta:0),0);if(tot>best)best=tot;});return Math.round(best);}
-  function _shiftsThisWeek(){const now=new Date();const monday=new Date(now.getFullYear(),now.getMonth(),now.getDate()-((now.getDay()+6)%7));return(state.shiftHistory||[]).filter(s=>new Date(s.startedAt)>=monday).length+(getShift()?1:0);}
   function _vagtRingPct(grand,shift){if(shift){const best=_bestShiftTotal();return best>0?Math.min(1,grand/best):(grand>0?.65:0);}return grand>0?1:0;}
   function _vagtGrand(sm){return state.counters.reduce((s,c)=>s+_vagtDispVal(c,sm),0);}
 
@@ -1986,7 +1970,6 @@
     }else{
       const cat=item.cat||guessCategory(item.da);
       state.counters.push({id:item.id,label:lang==="en"?item.en:item.da,count:0,subs:[],suggest:seedFor(lang==="en"?item.en:item.da),cat});
-      activeCat=cat;localStorage.setItem("mise_active_cat",cat);
       save();renderCounters();renderCareer();
       closeCatalog();
       showToast((lang==="da"?item.da:item.en)+(lang==="da"?" tilføjet":" added"));
@@ -2004,29 +1987,6 @@
   }
   function closeNewCatModal(){$("#newCatScrim").classList.remove("open");}
 
-  function openCatPicker(cats,groups){
-    const scrim=$("#catPickerScrim");if(!scrim)return;
-    $("#catPickerTitle").textContent=t("cat_picker_title");
-    const g=$("#catPickerGrid");g.innerHTML="";
-    cats.forEach(cat=>{
-      const total=(groups[cat.id]||[]).reduce((s,c)=>s+counterTotal(c),0);
-      const item=document.createElement("div");item.className="cat-picker-item"+(cat.id===activeCat?" active":"");
-      const ring=document.createElement("div");ring.className="cat-picker-item-ring";
-      ring.innerHTML=cat.iconPending?'<div class="spin"></div>':cat.icon;
-      const name=document.createElement("div");name.className="cat-picker-item-name";name.textContent=lang==="en"?cat.en:cat.da;
-      const tot=document.createElement("div");tot.className="cat-picker-item-total";tot.textContent=total;
-      item.appendChild(ring);item.appendChild(name);item.appendChild(tot);
-      item.addEventListener("click",()=>{activeCat=cat.id;localStorage.setItem("mise_active_cat",cat.id);closeCatPicker();renderCounters();});
-      g.appendChild(item);
-    });
-    const newBtn=document.createElement("button");newBtn.className="cat-picker-new";newBtn.type="button";
-    newBtn.innerHTML='<span class="cat-picker-new-icon">+</span><span class="cat-picker-new-lbl">'+esc(t("new_cat_btn").replace("+ ",""))+'</span>';
-    newBtn.addEventListener("click",()=>{closeCatPicker();openNewCatModal();});
-    g.appendChild(newBtn);
-    scrim.classList.add("open");
-  }
-  function closeCatPicker(){$("#catPickerScrim").classList.remove("open");}
-  $("#catPickerScrim").addEventListener("click",e=>{if(e.target===$("#catPickerScrim"))closeCatPicker();});
   $("#newCatCancel").addEventListener("click",closeNewCatModal);
   $("#newCatScrim").addEventListener("click",e=>{if(e.target===$("#newCatScrim"))closeNewCatModal();});
   $("#newCatSave").addEventListener("click",()=>{
@@ -4996,7 +4956,6 @@
     }).join("");
   }
 
-  async function loadLabEntries(){renderLabSeg();}
   var _sharedCache=[];
   function renderLabSeg(){
     var filterRow=$("#labFilterRow");var newBtn=$("#labNewBtn");

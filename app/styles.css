@@ -858,23 +858,6 @@
   .feed-follow-btn:active,.shift-end-btn:active,.shift-start-btn:active{transform:scale(.94);transition:transform .06s}
   .addwine:active{transform:scale(.98);transition:transform .08s}
 
-  /* Category picker bottom sheet */
-  .cat-picker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
-  .cat-picker-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 6px;border-radius:var(--r);border:2px solid var(--border);background:var(--surface);cursor:pointer;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-  .cat-picker-item:active{transform:scale(.94);transition:transform .06s}
-  .cat-picker-item.active{border-color:var(--accent);background:var(--accent-soft)}
-  .cat-picker-item-ring{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
-  .cat-picker-item-ring svg{width:24px;height:24px;color:var(--accent)}
-  .cat-picker-item.active .cat-picker-item-ring{background:var(--accent)}
-  .cat-picker-item.active .cat-picker-item-ring svg{color:#fff}
-  .cat-picker-item-name{font-size:10px;font-weight:800;color:var(--dim);text-align:center;letter-spacing:.03em;line-height:1.2;text-transform:uppercase}
-  .cat-picker-item.active .cat-picker-item-name{color:var(--accent)}
-  .cat-picker-item-total{font-family:"Fraunces",serif;font-size:17px;font-weight:600;color:var(--text);line-height:1}
-  .cat-picker-new{display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 6px;border-radius:var(--r);border:1.5px dashed var(--border-2);background:none;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:.12s}
-  .cat-picker-new:active{transform:scale(.94);transition:transform .06s}
-  .cat-picker-new:hover{border-color:var(--accent);background:var(--accent-soft)}
-  .cat-picker-new-icon{font-size:22px;line-height:1}
-  .cat-picker-new-lbl{font-size:10px;font-weight:800;color:var(--faint);text-align:center;letter-spacing:.03em;text-transform:uppercase}
   .station-new-cat{appearance:none;background:none;border:1.5px dashed var(--border);border-radius:12px;width:100%;padding:13px;color:var(--dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:10px}
   .station-new-cat:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
   .station-new-cat:active{transform:scale(.98);transition:transform .06s}
