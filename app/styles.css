@@ -65,12 +65,10 @@
   .skel-row{height:44px;margin-bottom:4px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--border) 25%,var(--surface-2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
   .qlog{position:relative;display:flex;align-items:center;background:var(--surface);border:1.5px solid transparent;border-radius:16px;margin-bottom:14px;padding:0 16px;transition:box-shadow .2s,border-color .15s;box-shadow:var(--shadow)}
   .qlog:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring),var(--shadow)}
-  .qlog-ic{color:var(--dim);flex:none;transition:color .15s}
   .qlog:focus-within .qlog-ic{color:var(--accent)}
   .qlog input{flex:1;border:none;background:none;color:var(--text);font-family:inherit;font-size:12px;padding:15px 12px}
   .qlog input:focus{outline:none}
   .qlog input::placeholder{color:var(--faint)}
-  .qlog-spin{flex:none;padding-right:4px}
 
   .logfeed{margin-bottom:14px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border)}
   .logentry{display:flex;gap:10px;padding:7px 12px;font-size:13px;color:var(--dim);background:var(--surface)}
@@ -213,10 +211,6 @@
   .wach-badge.on .wach-badge-icon{filter:none;opacity:1}
   .wach-badge-name{font-size:10px;font-weight:700;color:var(--faint);line-height:1.3;letter-spacing:.01em}
   .wach-badge.on .wach-badge-name{color:var(--accent)}
-  .wabout-strip{width:100%;padding:0 2px 4px;margin-top:-4px}
-  .wabout-btn{appearance:none;border:1.5px solid var(--accent);background:none;color:var(--accent);font-family:inherit;font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;letter-spacing:.01em;display:inline-block;touch-action:manipulation}
-  .wabout-btn:active{background:var(--accent-soft)}
-  .wabout-btn.unknown{border-color:var(--border-2);color:var(--dim);font-weight:500}
   .wabout-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
   .wabout-card{background:var(--bg);border-radius:24px 24px 0 0;padding:0 0 calc(env(safe-area-inset-bottom,0px) + 16px);width:100%;max-width:480px;max-height:88vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.18);position:relative;animation:wAboutIn .22s cubic-bezier(.25,.46,.45,.94) both}
   @keyframes wAboutIn{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
@@ -255,11 +249,6 @@
   .wa-photo-wrap{display:flex;align-items:center;gap:10px}
   .wa-photo-prev{width:56px;height:56px;border-radius:8px;object-fit:cover;flex:none}
   .wa-photo-rm{appearance:none;border:none;background:none;color:var(--dim);font-size:13px;cursor:pointer;padding:0}
-  .wtype-picker{display:flex;gap:5px}
-  .wtype-btn{appearance:none;flex:1;padding:11px 4px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--dim);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.12s;text-align:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-  .wtype-btn:hover{border-color:var(--border-2);color:var(--text)}
-  .wtype-btn.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-  .wtype-btn:active{transform:scale(.92);transition:transform .06s}
   .winfo{flex:1 1 0;min-width:0}
   .wname{font-family:"Fraunces",serif;font-size:16px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .wmeta{font-size:12px;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -346,10 +335,7 @@
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
   /* ---- Social / Leaderboard ---- */
-  .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:24px 0 10px}
-  .sec-head:first-child{margin-top:0}
   .sec-title{font-family:"Fraunces",serif;font-size:17px;font-weight:600}
-  .sec-sub{font-size:12px;color:var(--faint);margin-left:8px}
   .lb-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:4px}
   .lb-row.lb-me{background:var(--accent-soft);border-color:rgba(138,46,63,.25);border-left-width:3px;border-left-color:var(--accent)}
   .lb-row.lb-me .lb-rank{color:var(--accent)}
@@ -361,7 +347,6 @@
   .lb-score{font-family:"Fraunces",serif;font-size:16px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
   .lb-section{margin-top:12px}
   .lb-empty{padding:28px 0;text-align:center;color:var(--faint);font-size:14px}
-  .social-empty{padding:28px 0;text-align:center;color:var(--faint);font-size:14px}
   .challenge-card{background:var(--accent-soft);border:1px solid rgba(138,46,63,.2);border-radius:var(--r);padding:16px 18px 14px;margin-bottom:6px}
   .challenge-cat{font-family:"Fraunces",serif;font-size:19px;font-weight:600;color:var(--accent);margin-bottom:2px}
   .challenge-sub{font-size:13px;color:var(--dim);margin-bottom:6px}
@@ -384,7 +369,6 @@
   /* ---- Profil modal ---- */
   .prof-select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:15px;padding:11px 12px}
   .prof-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
-  .subsection{font-size:11px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.07em;margin:20px 0 10px;padding-top:16px;border-top:1px solid var(--border)}
   .badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
   .badge-item{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 8px;text-align:center;transition:.15s}
   .badge-locked{opacity:.28;filter:grayscale(1)}
@@ -760,11 +744,6 @@
   .input::placeholder{color:var(--faint)}
 
   /* ---- Badge-toast ---- */
-  .badge-toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.85);background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px 40px;text-align:center;box-shadow:0 16px 64px rgba(0,0,0,.15);z-index:300;opacity:0;pointer-events:none;transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .22s}
-  .badge-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-  .badge-toast-icon{font-size:48px;line-height:1;margin-bottom:10px}
-  .badge-toast-lbl{font-size:11px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
-  .badge-toast-name{font-family:"Fraunces",serif;font-size:20px;font-weight:600;color:var(--accent)}
 
   /* ---- Modal spring entrance ---- */
   @keyframes modalIn{from{transform:translateY(18px) scale(.97);opacity:0}to{transform:none;opacity:1}}
@@ -822,7 +801,6 @@
   .bnav-fab:active{background:var(--accent-h);transform:scale(.92);transition:transform .08s}
   .bnav-fab .bnav-icon{width:22px;height:22px;margin:0 auto}
   [data-theme="dark"] .bnav-fab{border-color:var(--bg)}
-  .drawer-div{height:1px;background:rgba(255,255,255,.1);margin:4px 0 16px}
   @media (max-width:600px){
     .bottom-nav{display:block}
   }
@@ -861,9 +839,6 @@
   .station-new-cat{appearance:none;background:none;border:1.5px dashed var(--border);border-radius:12px;width:100%;padding:13px;color:var(--dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:10px}
   .station-new-cat:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
   .station-new-cat:active{transform:scale(.98);transition:transform .06s}
-  .station-catalog-btn{appearance:none;background:none;border:1.5px solid var(--border);border-radius:12px;width:100%;padding:13px;color:var(--dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:8px}
-  .station-catalog-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-  .station-catalog-btn:active{transform:scale(.98);transition:transform .06s}
 
   /* ---- Station v3: grouped list ---- */
   .st-v3{display:flex;flex-direction:column;gap:20px;padding-bottom:130px}
@@ -1079,8 +1054,6 @@
   .st-add-r{appearance:none;background:none;border:none;width:100%;padding:13px 18px;text-align:left;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;border-top:1px solid var(--border);-webkit-tap-highlight-color:transparent;transition:.1s}
   .st-add-r:active{background:var(--accent-soft)}
   /* FAB */
-  .station-fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(138,46,63,.35),0 1px 4px rgba(0,0,0,.12);-webkit-tap-highlight-color:transparent;z-index:50;transition:.12s}
-  .station-fab:active{transform:scale(.88);transition:transform .07s;background:var(--accent-h)}
   .catalog-modal{display:flex;flex-direction:column;max-height:90vh;padding:0;overflow:hidden}
   .catalog-head{padding:20px 20px 12px;flex:none}
   #catalogGrid{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 16px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
