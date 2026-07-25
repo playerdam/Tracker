@@ -767,12 +767,11 @@
     return fetch(url,{...opts,signal:ctl.signal}).finally(()=>clearTimeout(t));
   }
   async function initAuth(){
-    console.log("CT:initAuth start, session=",!!session);
-    try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},4000);cfg=await res.json();console.log("CT:config ok");}catch(e){console.warn("CT:config fail",e.message);}
-    if(!session){console.log("CT:no session");showAuthScreen();return false;}
-    if(Date.now()>session.expires_at-60000){console.log("CT:refreshing");const ok=await refreshSession();if(!ok){showAuthScreen();return false;}}
+    try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},4000);cfg=await res.json();}catch(e){console.warn("CT:config fail",e.message);}
+    if(!session){showAuthScreen();return false;}
+    if(Date.now()>session.expires_at-60000){const ok=await refreshSession();if(!ok){showAuthScreen();return false;}}
     try{await fetchWithTimeout(apiBase()+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}},4000);}catch(e){console.warn("CT:profile fail",e.message);}
-    console.log("CT:authed ok");hideAuthScreen();return true;
+    hideAuthScreen();return true;
   }
 
   function setupAuthForm(){
@@ -5242,7 +5241,6 @@
   window.addEventListener("resize",fixScrollPadding);
 
   function startApp(){
-    console.log("CT:startApp");
     $("#mainWrap").style.display="";
     try{fixScrollPadding();}catch(e){}
     document.getElementById("view-vagt").classList.add("active");
@@ -5309,11 +5307,8 @@
   }
 
   (async function(){
-    console.log("CT:IIFE start hasStore="+hasStore+" wstorage="+typeof window.storage);
     $("#mainWrap").style.display="none";
-    console.log("CT:before load");
     state=await load();
-    console.log("CT:after load counters="+state.counters.length);
     if(!Array.isArray(state.log))state.log=[];
     $("#loading").style.display="none";
     try{translateUI();}catch(e){console.error("CT:translateUI",e);}
@@ -5322,7 +5317,6 @@
     let authed=false;
     try{authed=await initAuth();}
     catch(e){console.error("CT:initAuth threw",e);showAuthScreen();return;}
-    console.log("CT:authed="+authed);
     if(authed){
       try{await pullState();}catch(e){console.error("CT:pullState",e);}
       try{startApp();}catch(e){console.error("CT:startApp threw",e);}
