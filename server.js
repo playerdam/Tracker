@@ -179,7 +179,7 @@ app.post("/api/user/update", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
     const { nickname, profession, username, workplace } = req.body || {};
-    const patch = { nickname: nickname || null, profession: profession || null };
+    const patch = { id: userId, nickname: nickname || null, profession: profession || null };
     if (workplace !== undefined) patch.workplace = (workplace || "").trim().slice(0, 60) || null;
     if (username !== undefined) {
       const u = (username || "").trim().toLowerCase();
@@ -190,7 +190,9 @@ app.post("/api/user/update", async (req, res) => {
       }
       patch.username = u || null;
     }
-    await sb(`users?id=eq.${userId}`, { method: "PATCH", body: JSON.stringify(patch) });
+    // Upsert (ikke PATCH): PATCH på en endnu-ikke-oprettet profil-række er en tavs
+    // no-op — så brugernavnet blev "gemt" uden at blive gemt. Upsert persisterer altid.
+    await sb("users", { method: "POST", body: JSON.stringify(patch), headers: { "Prefer": "resolution=merge-duplicates" } });
     res.json({ ok: true });
   } catch (err) {
     console.error("user/update:", err.message);

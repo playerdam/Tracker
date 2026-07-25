@@ -827,7 +827,7 @@
       hideAuthScreen();startApp();
     });
     [emailEl,pwEl].forEach(el=>el.addEventListener("keydown",e=>{if(e.key==="Enter")submitBtn.click();}));
-    {const _so4=$("#signOutBtn");if(_so4)_so4.addEventListener("click",()=>{session=null;localStorage.removeItem("mise_session");showAuthScreen();});}
+    {const _so4=$("#signOutBtn");if(_so4)_so4.addEventListener("click",()=>{session=null;localStorage.removeItem("mise_session");localStorage.removeItem(STORE_KEY);localStorage.removeItem("mise_shift");localStorage.removeItem("mise_state_owner");state=clone(DEFAULTS);showAuthScreen();});}
     updateMode();
   }
 
@@ -5277,6 +5277,17 @@
     try{authed=await initAuth();}
     catch(e){console.error("CT:initAuth threw",e);showAuthScreen();return;}
     if(authed){
+      // Multi-bruger-guard: hører den lokale state til en ANDEN bruger på denne
+      // enhed? Så ryd den, så hver konto starter rent (data hentes fra server).
+      try{
+        const _sub=getJwtSub();
+        const _owner=localStorage.getItem("mise_state_owner");
+        if(_sub&&_owner&&_owner!==_sub){
+          localStorage.removeItem(STORE_KEY);localStorage.removeItem("mise_shift");
+          state=clone(DEFAULTS);
+        }
+        if(_sub)localStorage.setItem("mise_state_owner",_sub);
+      }catch(e){console.error("CT:owner-guard",e);}
       try{await pullState();}catch(e){console.error("CT:pullState",e);}
       try{startApp();}catch(e){console.error("CT:startApp threw",e);}
     }else{
