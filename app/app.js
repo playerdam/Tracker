@@ -4928,7 +4928,7 @@
     var list=$("#labList");if(!list)return;
     list.innerHTML='<div style="display:flex;justify-content:center;padding:36px"><div class="lab-spinner"></div></div>';
     var base=apiBase();var token=await getToken();
-    if(!base||!token){list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🔬</div><div class="empty-state-title">'+(lang==="da"?"Ingen retter endnu":"No dishes yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tryk \"Ny ret\" for at starte":"Tap \"New dish\" to start")+'</div></div>';return;}
+    if(!base||!token){list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🍳</div><div class="empty-state-title">'+(lang==="da"?"Ingen retter endnu":"No dishes yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tryk \"Ny ret\" for at starte":"Tap \"New dish\" to start")+'</div></div>';return;}
     try{
       var r=await fetch(base+"/api/lab/dishes",{headers:{"Authorization":"Bearer "+token}});
       var d=await r.json();
@@ -4942,7 +4942,7 @@
     var statusLabels={idea:lang==="da"?"Idé":"Idea",testing:"Test",ready:lang==="da"?"Klar":"Ready",menu:lang==="da"?"På menu":"On menu"};
     var filtered=_labFilter==="all"?_labDishes:_labDishes.filter(function(d){return d.status===_labFilter;});
     if(!filtered.length){
-      list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🔬</div><div class="empty-state-title">'+(lang==="da"?"Ingen retter endnu":"No dishes yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tryk \"Ny ret\" for at starte":"Tap \"New dish\" to start")+'</div></div>';
+      list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🍳</div><div class="empty-state-title">'+(lang==="da"?"Ingen retter endnu":"No dishes yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tryk \"Ny ret\" for at starte":"Tap \"New dish\" to start")+'</div></div>';
       return;
     }
     list.innerHTML=filtered.map(function(dish){
