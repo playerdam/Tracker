@@ -465,6 +465,7 @@
     const dsTWine=$("#dsTitleWine");if(dsTWine)dsTWine.textContent=t("lab_sec_wine");
     const dsTTest=$("#dsTitleTest");if(dsTTest)dsTTest.textContent=t("lab_sec_tests");
     const dsTPhotos=$("#dsTitlePhotos");if(dsTPhotos)dsTPhotos.textContent=t("lab_sec_photos");
+    const deViewLbl=$("#deViewLbl");if(deViewLbl)deViewLbl.textContent=lang==="da"?"Se opskrift":"View recipe";
     const deLblSeason=$("#deLblSeason");if(deLblSeason)deLblSeason.textContent=t("lab_lbl_season");
     const deLblPortions=$("#deLblPortions");if(deLblPortions)deLblPortions.textContent=t("lab_lbl_portions");
     const deLblConcept=$("#deLblConcept");if(deLblConcept)deLblConcept.textContent=t("lab_lbl_concept");
@@ -4464,7 +4465,7 @@
 
   // ---- The Lab ----
   var _labDishes=[];var _labFilter="all";var _currentDish=null;var _dishDirty=false;var _saveTimer=null;
-  var _labSeg="mine";var _myLabTeams=null;var _sharedDish=null;
+  var _labSeg="mine";var _myLabTeams=null;var _sharedDish=null;var _viewMode="shared";
   var FREE_TEAM_SHARES=3,FREE_PUBLIC=2;
   function _dishStatusLabels(){return {idea:lang==="da"?"Idé":"Idea",testing:"Test",ready:lang==="da"?"Klar":"Ready",menu:lang==="da"?"På menu":"On menu"};}
   async function _labTeams(){
@@ -4535,6 +4536,8 @@
     var notesAiBtn=$("#notesAiBtn");if(notesAiBtn)notesAiBtn.addEventListener("click",summarizeServiceNotes);
     // Editor back
     var deBack=$("#deBack");if(deBack)deBack.addEventListener("click",closeDishEditor);
+    // Se opskrift (ren læse-visning af den nuværende ret)
+    var deViewBtn=$("#deViewBtn");if(deViewBtn)deViewBtn.addEventListener("click",function(){if(!_currentDish)return;_syncDishFields();openDishView(_currentDish);if(_dishDirty)saveDish(false);});
     // Editor save
     var deSaveBtn=$("#deSaveBtn");if(deSaveBtn)deSaveBtn.addEventListener("click",function(){saveDish(true);});
     // Status chips
@@ -4722,7 +4725,7 @@
     _currentDish=null;loadLabDishes();
   }
 
-  async function saveDish(showFeedback){
+  function _syncDishFields(){
     if(!_currentDish)return;
     var d=_currentDish.data=_currentDish.data||{};
     var deName=$("#deName");if(deName)_currentDish.name=deName.value||"Ny ret";
@@ -4737,6 +4740,11 @@
     d.technique=(document.getElementById("deTechnique")||{}).value||"";
     d.plating=(document.getElementById("dePlating")||{}).value||"";
     d.winePairing=(document.getElementById("deWine")||{}).value||"";
+  }
+  async function saveDish(showFeedback){
+    if(!_currentDish)return;
+    _syncDishFields();
+    var d=_currentDish.data;
     var base=apiBase();var token=await getToken();if(!base||!token)return;
     try{
       var putRes=await fetch(base+"/api/lab/dishes/"+_currentDish.id,{method:"PUT",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name:_currentDish.name,status:_currentDish.status,heroUrl:_currentDish.heroUrl||null,data:d,visibility:_currentDish.visibility||"private",teamId:_currentDish.teamId||null})});
@@ -5008,35 +5016,76 @@
       }).join("");
     }).join("");
   }
-  function openSharedDish(dish){
-    _sharedDish=dish;
-    var d=dish.data||{};
+  // Komplet, struktureret "se opskrift"-visning — bruges både til holdets delte
+  // retter og til ens egne (via "Se opskrift"-knappen i editoren).
+  function _dishBodyHtml(dish){
+    var d=dish.data||{};var da=lang==="da";var html="";
+    function sec(title,inner){return '<div class="sd-sec"><div class="sd-sec-title">'+esc(title)+'</div>'+inner+'</div>';}
+    var specs=[];
+    if(d.season)specs.push([da?"Sæson":"Season",d.season]);
+    if(d.portions)specs.push([da?"Portioner":"Portions",d.portions+" "+(d.portionUnit||"prs")]);
+    if(d.cookTime)specs.push([da?"Tilberedning":"Cook time",d.cookTime+" min"]);
+    if(d.restTime)specs.push([da?"Hviletid":"Rest time",d.restTime+" min"]);
+    if(d.mainTemp)specs.push([da?"Temperatur":"Temp",d.mainTemp+" °C"]);
+    if(d.platingTime)specs.push([da?"Anretningstid":"Plating time",d.platingTime+" min"]);
+    if(specs.length)html+='<div class="sd-spec">'+specs.map(function(s){return '<div class="sd-spec-cell"><div class="sd-spec-lbl">'+esc(s[0])+'</div><div class="sd-spec-val">'+esc(String(s[1]))+'</div></div>';}).join("")+'</div>';
+    if(d.concept||d.description)html+=sec(da?"Koncept & inspiration":"Concept",'<div class="sd-text">'+esc(d.description||d.concept)+'</div>');
+    if((d.ingredients||[]).length){
+      html+=sec((da?"Ingredienser":"Ingredients")+" ("+d.ingredients.length+")",
+        d.ingredients.map(function(i){return '<div class="sd-ing"><span class="sd-ing-amt">'+esc(((i.amount||"")+" "+(i.unit||"")).trim())+'</span><span>'+esc(i.name||"")+(i.prep?' <span class="sd-ing-prep">· '+esc(i.prep)+'</span>':'')+'</span></div>';}).join(""));
+    }
+    if((d.steps||[]).length){
+      html+=sec(da?"Fremgangsmåde":"Method",
+        d.steps.map(function(s,i){
+          var meta=[];if(s.temp)meta.push(esc(s.temp)+"°C");if(s.time)meta.push(esc(s.time)+" min");
+          return '<div class="sd-step"><div class="sd-step-num">'+(i+1)+'</div><div class="sd-step-body"><div class="sd-text">'+esc(s.text||s||"")+'</div>'+(meta.length?'<div class="sd-step-meta">'+meta.map(function(m){return '<span>'+m+'</span>';}).join("")+'</div>':'')+'</div></div>';
+        }).join(""));
+    }
+    if(d.technique)html+=sec(da?"Teknik":"Technique",'<div class="sd-text">'+esc(d.technique)+'</div>');
+    if(d.plating||d.platingUrl){
+      var pl=(d.platingUrl?'<img class="sd-plating-img" src="'+esc(d.platingUrl)+'" loading="lazy" alt="">':'')+(d.plating?'<div class="sd-text">'+esc(d.plating)+'</div>':'');
+      html+=sec(da?"Anretning":"Plating",pl);
+    }
+    if(d.winePairing)html+=sec(da?"Vinparring":"Wine pairing",'<div class="sd-text">'+esc(d.winePairing)+'</div>');
+    if((d.testRounds||[]).length){
+      html+=sec((da?"Testrunder":"Test rounds")+" ("+d.testRounds.length+")",
+        d.testRounds.map(function(r,i){
+          var stars=r.rating?' <span class="sd-stars">'+[1,2,3,4,5].map(function(n){return n<=r.rating?"★":"☆";}).join("")+'</span>':'';
+          var date=r.date?esc(r.date):((da?"Runde ":"Round ")+(i+1));
+          return '<div class="denote"><div class="denote-date">'+date+stars+'</div>'+(r.notes?'<div class="denote-text">'+esc(r.notes)+'</div>':'')+'</div>';
+        }).join(""));
+    }
+    if((d.serviceNotes||[]).length){
+      html+=sec((da?"Service-noter":"Service notes")+" ("+d.serviceNotes.length+")",
+        d.serviceNotes.slice(-8).reverse().map(function(n){return '<div class="denote"><div class="denote-date">'+esc(new Date(n.ts).toLocaleDateString(da?"da-DK":"en-GB",{day:"numeric",month:"short"}))+'</div><div class="denote-text">'+esc(n.text)+'</div></div>';}).join(""));
+    }
+    if((d.photos||[]).length){
+      html+=sec(da?"Billeder":"Photos",'<div class="sd-photos">'+d.photos.map(function(p){return '<img class="sd-photo" src="'+esc(p.url)+'" loading="lazy" alt="">';}).join("")+'</div>');
+    }
+    if(d.basedOn)html+='<p class="sd-based">'+(da?"Baseret på ":"Based on ")+esc(d.basedOn.name)+(d.basedOn.author?" ("+esc(d.basedOn.author)+")":"")+'</p>';
+    return html||'<p class="denotes-empty">'+(da?"Ingen detaljer endnu":"No details yet")+'</p>';
+  }
+  function _fillDishView(dish){
     var hero=$("#sdHero");if(hero){if(dish.heroUrl){hero.src=dish.heroUrl;hero.style.display="";}else hero.style.display="none";}
     var nm=$("#sdName");if(nm)nm.textContent=dish.name||"";
     var st=$("#sdStatus");if(st){st.className="dish-status dish-status-"+(dish.status||"idea");st.textContent=_dishStatusLabels()[dish.status||"idea"]||"";}
-    var au=$("#sdAuthor");if(au)au.textContent=(lang==="da"?"Af ":"By ")+(dish.author||"?");
-    var body=$("#sdBody");if(!body)return;
-    var html="";
-    if(d.concept||d.description)html+='<div class="sd-sec"><div class="sd-sec-title">'+(lang==="da"?"Koncept":"Concept")+'</div><div class="sd-text">'+esc(d.description||d.concept)+'</div></div>';
-    if((d.ingredients||[]).length){
-      html+='<div class="sd-sec"><div class="sd-sec-title">'+(lang==="da"?"Ingredienser":"Ingredients")+' ('+d.ingredients.length+')</div>'
-        +d.ingredients.map(function(i){return '<div class="sd-ing"><span class="sd-ing-amt">'+esc((i.amount||"")+" "+(i.unit||""))+'</span><span>'+esc(i.name||"")+(i.prep?' <span style="color:var(--faint)">· '+esc(i.prep)+'</span>':'')+'</span></div>';}).join("")+'</div>';
-    }
-    if((d.steps||[]).length){
-      html+='<div class="sd-sec"><div class="sd-sec-title">'+(lang==="da"?"Fremgangsmåde":"Method")+'</div>'
-        +d.steps.map(function(st2,i){return '<div class="sd-ing"><span class="sd-ing-amt">'+(i+1)+'.</span><span>'+esc(st2.text||st2||"")+'</span></div>';}).join("")+'</div>';
-    }
-    if(d.technique)html+='<div class="sd-sec"><div class="sd-sec-title">'+(lang==="da"?"Teknik":"Technique")+'</div><div class="sd-text">'+esc(d.technique)+'</div></div>';
-    if(d.plating)html+='<div class="sd-sec"><div class="sd-sec-title">'+(lang==="da"?"Anretning":"Plating")+'</div><div class="sd-text">'+esc(d.plating)+'</div></div>';
-    if(d.winePairing)html+='<div class="sd-sec"><div class="sd-sec-title">'+(lang==="da"?"Vinparring":"Wine pairing")+'</div><div class="sd-text">'+esc(d.winePairing)+'</div></div>';
-    if((d.serviceNotes||[]).length){
-      html+='<div class="sd-sec"><div class="sd-sec-title">'+(lang==="da"?"Service-noter":"Service notes")+' ('+d.serviceNotes.length+')</div>'
-        +d.serviceNotes.slice(-5).reverse().map(function(n){return '<div class="denote"><div class="denote-date">'+esc(new Date(n.ts).toLocaleDateString(lang==="da"?"da-DK":"en-GB",{day:"numeric",month:"short"}))+'</div><div class="denote-text">'+esc(n.text)+'</div></div>';}).join("")+'</div>';
-    }
-    if(d.basedOn)html+='<p class="sd-based">'+(lang==="da"?"Baseret på ":"Based on ")+esc(d.basedOn.name)+(d.basedOn.author?" ("+esc(d.basedOn.author)+")":"")+'</p>';
-    body.innerHTML=html||'<p class="denotes-empty">'+(lang==="da"?"Ingen detaljer endnu":"No details yet")+'</p>';
-    var fork=$("#sdFork");if(fork)fork.textContent=lang==="da"?"Gem min version":"Save my version";
-    var cls=$("#sdClose");if(cls)cls.textContent=lang==="da"?"Luk":"Close";
+    var body=$("#sdBody");if(body)body.innerHTML=_dishBodyHtml(dish);
+  }
+  function openSharedDish(dish){
+    _sharedDish=dish;_viewMode="shared";
+    _fillDishView(dish);
+    var au=$("#sdAuthor");if(au){au.style.display="";au.textContent=(lang==="da"?"Af ":"By ")+(dish.author||"?");}
+    var fork=$("#sdFork");if(fork){fork.style.display="";fork.style.flex="1";fork.textContent=lang==="da"?"Gem min version":"Save my version";fork.onclick=forkSharedDish;}
+    var cls=$("#sdClose");if(cls){cls.textContent=lang==="da"?"Luk":"Close";cls.style.flex="";}
+    $("#sharedDishScrim").classList.add("open");
+  }
+  // Ejerens egen "Se opskrift" — samme visning, uden fork/author.
+  function openDishView(dish){
+    _viewMode="own";
+    _fillDishView(dish);
+    var au=$("#sdAuthor");if(au)au.style.display="none";
+    var fork=$("#sdFork");if(fork)fork.style.display="none";
+    var cls=$("#sdClose");if(cls){cls.textContent=lang==="da"?"Luk":"Close";cls.style.flex="1";}
     $("#sharedDishScrim").classList.add("open");
   }
   async function forkSharedDish(){
