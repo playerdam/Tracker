@@ -394,6 +394,12 @@
     const sAskT=$("#statsAskTitle");if(sAskT)sAskT.textContent=lang==="da"?"Spørg om dine stats":"Ask about your stats";
     const sAskI=$("#statsAskInput");if(sAskI)sAskI.placeholder=lang==="da"?"fx: Hvornår havde jeg min længste vagt?":"e.g. When was my longest shift?";
     const sToA=$("#statsToAchieveLbl");if(sToA)sToA.textContent=lang==="da"?"At opnå":"To achieve";
+    // Paywall
+    const pwT=$("#paywallTitle");if(pwT)pwT.textContent=lang==="da"?"Lås alt op med Pro":"Unlock everything with Pro";
+    const pwS=$("#paywallSub");if(pwS)pwS.textContent=lang==="da"?"Få det fulde værktøj til dit håndværk.":"The full toolkit for your craft.";
+    const pwC=$("#paywallCta");if(pwC)pwC.textContent=lang==="da"?"Opgrader til Pro":"Upgrade to Pro";
+    const pwF=$("#paywallFine");if(pwF)pwF.textContent=lang==="da"?"Basics er altid gratis.":"Basics are always free.";
+    const pwFeats=$("#paywallFeats");if(pwFeats){const F=lang==="da"?[["🍷","Vin-styring — kælder, ratings, label-scanning"],["🍳","The Lab — opskriftsudvikling, hold-deling, kogebøger"],["✨","Smart AI-logning — skriv i naturligt sprog"],["📊","Spørg om dine stats i naturligt sprog"]]:[["🍷","Wine management — cellar, ratings, label scanning"],["🍳","The Lab — recipe development, team sharing, cookbooks"],["✨","Smart AI logging — write in natural language"],["📊","Ask about your stats in natural language"]];pwFeats.innerHTML=F.map(f=>'<li><span class="pf-ic">'+f[0]+'</span><span>'+esc(f[1])+'</span></li>').join("");}
     const snTitle=$("#shiftNudgeTitle");if(snTitle)snTitle.textContent=lang==="da"?"Ser ud til du er i gang":"Looks like you're working";
     const snSub=$("#shiftNudgeSub");if(snSub)snSub.textContent=lang==="da"?"Ingen vagt kører — hvor længe har du arbejdet?":"No shift is running — how long have you been working?";
     const snDismiss=$("#shiftNudgeDismiss");if(snDismiss)snDismiss.textContent=lang==="da"?"Nej tak":"No thanks";
@@ -652,6 +658,8 @@
 
   let state={counters:[],wines:[],log:[],customCats:[]},mem=null,wineFilter="";
   let activeWineType=localStorage.getItem("mise_wine_type")||"alle";
+  // Pro-rettighed (Vin, The Lab og alle AI-features). Sættes fra /api/user/profile.
+  let _isPro=false;
 
   const WINE_FLAGS={"Frankrig":"🇫🇷","France":"🇫🇷","Italien":"🇮🇹","Italy":"🇮🇹","Spanien":"🇪🇸","Spain":"🇪🇸","Portugal":"🇵🇹","Tyskland":"🇩🇪","Germany":"🇩🇪","Østrig":"🇦🇹","Austria":"🇦🇹","USA":"🇺🇸","Australien":"🇦🇺","Australia":"🇦🇺","New Zealand":"🇳🇿","Sydafrika":"🇿🇦","South Africa":"🇿🇦","Chile":"🇨🇱","Argentina":"🇦🇷","Grækenland":"🇬🇷","Greece":"🇬🇷","Ungarn":"🇭🇺","Hungary":"🇭🇺","Georgien":"🇬🇪","Georgia":"🇬🇪","Libanon":"🇱🇧","Lebanon":"🇱🇧","Danmark":"🇩🇰","Denmark":"🇩🇰","Slovenien":"🇸🇮","Kroatien":"🇭🇷"};
   const REGION_TO_LAND={"toscana":"Italien","tuscany":"Italien","piemonte":"Italien","piedmont":"Italien","veneto":"Italien","sicilia":"Italien","sicily":"Italien","lombardia":"Italien","lombardy":"Italien","emilia-romagna":"Italien","emilia romagna":"Italien","friuli":"Italien","puglia":"Italien","campania":"Italien","abruzzo":"Italien","umbria":"Italien","lazio":"Italien","marche":"Italien","brunello":"Italien","chianti":"Italien","barolo":"Italien","amarone":"Italien","bordeaux":"Frankrig","bourgogne":"Frankrig","burgundy":"Frankrig","champagne":"Frankrig","alsace":"Frankrig","loire":"Frankrig","rhône":"Frankrig","rhone":"Frankrig","provence":"Frankrig","languedoc":"Frankrig","roussillon":"Frankrig","côtes du rhône":"Frankrig","cotes du rhone":"Frankrig","médoc":"Frankrig","medoc":"Frankrig","saint-émilion":"Frankrig","pomerol":"Frankrig","rioja":"Spanien","ribera del duero":"Spanien","priorat":"Spanien","penedès":"Spanien","penedes":"Spanien","rias baixas":"Spanien","catalonia":"Spanien","catalunya":"Spanien","rueda":"Spanien","jumilla":"Spanien","douro":"Portugal","alentejo":"Portugal","vinho verde":"Portugal","dão":"Portugal","dao":"Portugal","setúbal":"Portugal","setubal":"Portugal","mosel":"Tyskland","rheingau":"Tyskland","pfalz":"Tyskland","nahe":"Tyskland","rheinhessen":"Tyskland","franken":"Tyskland","wachau":"Østrig","kamptal":"Østrig","burgenland":"Østrig","steiermark":"Østrig","napa valley":"USA","napa":"USA","sonoma":"USA","willamette valley":"USA","columbia valley":"USA","barossa valley":"Australien","barossa":"Australien","yarra valley":"Australien","mclaren vale":"Australien","coonawarra":"Australien","margaret river":"Australien","marlborough":"New Zealand","central otago":"New Zealand","hawke's bay":"New Zealand","stellenbosch":"Sydafrika","swartland":"Sydafrika","constantia":"Sydafrika","mendoza":"Argentina","patagonia":"Argentina","salta":"Argentina","maipo":"Chile","colchagua":"Chile","casablanca":"Chile","aconcagua":"Chile","nemea":"Grækenland","naoussa":"Grækenland","tokaj":"Ungarn","eger":"Ungarn","kakheti":"Georgien","bekaa valley":"Libanon"};
@@ -765,7 +773,7 @@
     try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},4000);cfg=await res.json();}catch(e){console.warn("CT:config fail",e.message);}
     if(!session){showAuthScreen();return false;}
     if(Date.now()>session.expires_at-60000){const ok=await refreshSession();if(!ok){showAuthScreen();return false;}}
-    try{await fetchWithTimeout(apiBase()+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}},4000);}catch(e){console.warn("CT:profile fail",e.message);}
+    try{const _pr=await fetchWithTimeout(apiBase()+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}},4000);const _pd=await _pr.json();_isPro=!!_pd.pro;}catch(e){console.warn("CT:profile fail",e.message);}
     hideAuthScreen();return true;
   }
 
@@ -1803,6 +1811,7 @@
     if(!btn||!inp||!ans)return;
     async function ask(){
       const q=(inp.value||"").trim();if(!q||btn.disabled)return;
+      if(!requirePro())return;  // Claude-feature → Pro
       const base=apiBase();const token=await getToken();
       if(!base||!token){
         ans.style.display="";ans.className="stats-ask-answer err";
@@ -2749,6 +2758,7 @@
 
   // ---- quick log ----
   async function parseLog(text){
+    if(!_isPro)return [];  // Gratis: spring AI over → kalderne falder tilbage til lokal parser
     const base=apiBase();if(!base)throw new Error("no-backend");
     const token=await getToken();if(!token)throw new Error("no-auth");
     const counters=state.counters.map(c=>({label:c.label,subs:c.subs.map(s=>s.name),muligeTyper:c.suggest||[]}));
@@ -3113,10 +3123,21 @@
     _applyTheme(next);haptic(20);track("theme",{t:next});
   });
   function _drawerGoTab(v){closeLogDrawer();switchTab(v);}
-  var _mVin=$("#menuDrawerVin");if(_mVin)_mVin.addEventListener("click",()=>_drawerGoTab("vin"));
+  // ── Pro-rettighed ──
+  function requirePro(){ if(_isPro)return true; openPaywall(); return false; }
+  function openPaywall(){ const s=$("#paywallScrim"); if(s)s.classList.add("open"); }
+  function closePaywall(){ const s=$("#paywallScrim"); if(s)s.classList.remove("open"); }
+  // Viser/skjuler PRO-mærker rundt i UI'et efter rettighed
+  function applyProState(){
+    document.querySelectorAll(".pro-pill").forEach(el=>{el.style.display=_isPro?"none":"";});
+  }
+  var _mVin=$("#menuDrawerVin");if(_mVin)_mVin.addEventListener("click",()=>{closeLogDrawer();if(requirePro())switchTab("vin");});
   var _mSoc=$("#menuDrawerSocial");if(_mSoc)_mSoc.addEventListener("click",()=>_drawerGoTab("social"));
   var _mFeed=$("#menuDrawerFeed");if(_mFeed)_mFeed.addEventListener("click",()=>_drawerGoTab("feed"));
-  var _mLab=$("#menuDrawerLab");if(_mLab)_mLab.addEventListener("click",()=>_drawerGoTab("lab"));
+  var _mLab=$("#menuDrawerLab");if(_mLab)_mLab.addEventListener("click",()=>{closeLogDrawer();if(requirePro())switchTab("lab");});
+  { const pc=$("#paywallClose"); if(pc)pc.addEventListener("click",closePaywall);
+    const ps=$("#paywallScrim"); if(ps)ps.addEventListener("click",e=>{if(e.target===ps)closePaywall();});
+    const pcta=$("#paywallCta"); if(pcta)pcta.addEventListener("click",()=>{ showToast(lang==="da"?"Køb åbner snart 🚀":"Purchases open soon 🚀"); }); }
   function closeLogDrawer(){$("#logDrawer").classList.remove("open");$("#logScrim").classList.remove("open");}
   var _burgerBtn=$("#burgerBtn");if(_burgerBtn)_burgerBtn.addEventListener("click",openLogDrawer);
   var _drawerClose=$("#logDrawerClose");if(_drawerClose)_drawerClose.addEventListener("click",closeLogDrawer);
@@ -3469,6 +3490,7 @@
       const uInput=$("#profileUsername");
       if(uInput)uInput.value=d.username||"";
       const uStatus=$("#profileUsernameStatus");if(uStatus){uStatus.textContent="";uStatus.className="username-status";}
+      _isPro=!!d.pro;applyProState();
       setProfileInitial(d.nickname,d.username);
     }catch(e){
       showToast(lang==="da"?"Kunne ikke hente din profil — prøv igen":"Couldn't load your profile — try again");
@@ -5251,6 +5273,7 @@
   function startApp(){
     $("#mainWrap").style.display="";
     try{fixScrollPadding();}catch(e){}
+    try{applyProState();}catch(e){}
     document.getElementById("view-vagt").classList.add("active");
     const _sb2=document.getElementById("shiftBar"),_ss2=document.getElementById("shiftStartBtn");
     if(_sb2)_sb2.style.display="none";if(_ss2)_ss2.style.display="none";
@@ -5308,6 +5331,7 @@
       try{
         const r=await fetch(base+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token}});
         const d=await r.json();
+        _isPro=!!d.pro;applyProState();
         setProfileInitial(d.nickname,d.username);
         if(!d.username)maybeShowSignupSetup(d,"safetynet");
       }catch(e){}

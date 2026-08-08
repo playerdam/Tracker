@@ -34,6 +34,7 @@ create table if not exists users (
   nickname   text,
   profession text,
   workplace  text,
+  pro_until  timestamptz,   -- Pro-abonnement udløber her; NULL = gratis-bruger
   created_at timestamptz default now()
 );
 create index if not exists users_username_lower_idx on users(lower(username));

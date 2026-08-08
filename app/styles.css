@@ -797,6 +797,18 @@
   .va-drawer-link-icon{font-size:20px;line-height:1;flex:none}
   .va-drawer-link-label{font-family:"Fraunces",serif;font-size:16px;font-weight:600;color:#EDE8E0;flex:1;text-align:left}
   .va-drawer-link svg{color:#6B5F55;flex:none}
+  .pro-pill{font-size:9px;font-weight:800;letter-spacing:.08em;color:#1a1410;background:linear-gradient(135deg,#E8C99A,#D4A94E);border-radius:6px;padding:2px 6px;flex:none}
+  /* ── Paywall ── */
+  .modal.paywall{position:relative;text-align:center;padding:32px 24px 24px;max-width:400px}
+  .paywall-close{position:absolute;top:12px;right:12px;appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;padding:6px;-webkit-tap-highlight-color:transparent}
+  .paywall-badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.1em;color:#1a1410;background:linear-gradient(135deg,#E8C99A,#D4A94E);border-radius:8px;padding:4px 12px;margin-bottom:14px}
+  .paywall-title{font-family:"Fraunces",serif;font-size:24px;font-weight:700;color:var(--text);margin:0 0 4px}
+  .paywall-sub{font-size:14px;color:var(--dim);margin:0 0 20px;line-height:1.5}
+  .paywall-feats{list-style:none;padding:0;margin:0 0 22px;display:flex;flex-direction:column;gap:13px;text-align:left}
+  .paywall-feats li{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text);line-height:1.35}
+  .pf-ic{font-size:20px;flex:none;width:26px;text-align:center}
+  .paywall-cta{width:100%;font-size:16px;padding:15px}
+  .paywall-fine{font-size:12px;color:var(--faint);margin:12px 0 0}
 
   /* ---- Restaurant visits (full-screen, exclusive dark) ---- */
   /* Palette: near-black bg, Craft Tracker red header, gold ratings, white text */

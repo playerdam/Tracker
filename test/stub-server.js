@@ -4,7 +4,7 @@ const path = require("path");
 const express = require(path.join(__dirname, "..", "node_modules", "express"));
 const app = express();
 app.use(express.json({ limit: "2mb" }));
-let _demoProfile = { username: "demo", nickname: "Demo", profession: null, workplace: null };
+let _demoProfile = { username: "demo", nickname: "Demo", profession: null, workplace: null, pro: true };
 app.post("/api/user/profile", (_q, r) => r.json(Object.assign({ ok: true }, _demoProfile)));
 app.post("/api/user/update", (req, r) => { Object.assign(_demoProfile, req.body || {}); r.json({ ok: true }); });
 app.get("/api/config", (_q, r) => r.json({}));

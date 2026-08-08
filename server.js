@@ -34,6 +34,10 @@ const SUPABASE_URL  = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY;
 const SUPABASE_ANON = process.env.SUPABASE_ANON_KEY || "";
 const PARSE_MODEL   = process.env.PARSE_MODEL || "claude-haiku-4-5-20251001";
+// Freemium-håndhævelse. OFF som standard: alle behandles som Pro (intet gates),
+// dvs. præcis nuværende adfærd. Sæt PRO_ENFORCE=1 på Railway når betaling (Fase 2)
+// er klar — så træder paywall + 402-gating i kraft.
+const PRO_ENFORCE   = process.env.PRO_ENFORCE === "1";
 const WINE_MODEL    = process.env.WINE_MODEL  || "claude-sonnet-4-6";
 
 // ---- Anthropic ----
@@ -108,6 +112,23 @@ async function verifyAuth(req) {
   return data.id;
 }
 
+// Pro-rettighed: true hvis brugeren har et aktivt abonnement (pro_until i fremtiden).
+async function isPro(userId) {
+  try {
+    const rows = await sb(`users?id=eq.${userId}&select=pro_until`);
+    const until = (rows || [])[0]?.pro_until;
+    return !!(until && new Date(until) > new Date());
+  } catch (e) { return false; }
+}
+
+// Guard til Pro-endpoints. Returnerer true hvis kaldet skal AFVISES (og sender 402).
+async function blockIfNotPro(userId, res) {
+  if (!PRO_ENFORCE) return false;        // Gating slukket → luk alle igennem
+  if (await isPro(userId)) return false;
+  res.status(402).json({ error: "pro_required" });
+  return true;
+}
+
 // Simpel in-memory rate limiter pr. bruger
 const _rateBuckets = new Map();
 function rateLimited(bucket, key, max, windowMs) {
@@ -153,21 +174,24 @@ app.get("/terms", (_req, res) => res.sendFile(path.join(__dirname, "app", "terms
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "craft-track" }));
 
 app.get("/api/config", (_req, res) => {
-  res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON, vapidKey: pushEnabled() ? VAPID_PUBLIC : null });
+  res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON, vapidKey: pushEnabled() ? VAPID_PUBLIC : null, proEnforced: PRO_ENFORCE });
 });
 
 // ---- Brugerprofil: opret (upsert) + hent ----
 app.post("/api/user/profile", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    // Nye brugere er gratis som standard (pro_until = null). Prøveperioden håndteres
+    // af Apples abonnement (introductory offer, Fase 2) → RevenueCat sætter pro_until.
     await sb("users", {
       method: "POST",
       body: JSON.stringify({ id: userId }),
       headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
     });
-    const rows = await sb(`users?id=eq.${userId}&select=nickname,profession,username,workplace`);
+    const rows = await sb(`users?id=eq.${userId}&select=nickname,profession,username,workplace,pro_until`);
     const u = (rows || [])[0] || {};
-    res.json({ ok: true, nickname: u.nickname || null, profession: u.profession || null, username: u.username || null, workplace: u.workplace || null });
+    const pro = PRO_ENFORCE ? !!(u.pro_until && new Date(u.pro_until) > new Date()) : true;
+    res.json({ ok: true, nickname: u.nickname || null, profession: u.profession || null, username: u.username || null, workplace: u.workplace || null, pro, proUntil: u.pro_until || null });
   } catch (err) {
     console.error("user/profile:", err.message);
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
@@ -499,6 +523,7 @@ app.delete("/api/teams/:id/leave", async (req, res) => {
 app.post("/api/translate-label", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("translate", userId, 60, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     const { label } = req.body || {};
     if (!label || typeof label !== "string" || label.length > 80)
@@ -540,6 +565,7 @@ async function fetchAuthors(rows) {
 app.get("/api/lab/kitchen", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     const teamIds = await userTeamIds(userId);
     if (!teamIds.length) return res.json({ dishes: [], noTeam: true });
     const rows = await sb(`lab_dishes?team_id=in.(${teamIds.join(",")})&visibility=in.(team,public)&order=updated_at.desc&limit=100&select=id,user_id,name,status,hero_url,data,visibility,team_id,updated_at`) || [];
@@ -557,6 +583,7 @@ app.get("/api/lab/kitchen", async (req, res) => {
 app.get("/api/lab/cookbooks", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     const follows = await sb(`follows?follower_id=eq.${userId}&select=following_id`) || [];
     const ids = [...new Set([userId, ...follows.map(f => f.following_id)])];
     const rows = await sb(`lab_dishes?user_id=in.(${ids.join(",")})&visibility=eq.public&order=updated_at.desc&limit=200&select=id,user_id,name,status,hero_url,data,visibility,updated_at`) || [];
@@ -571,6 +598,7 @@ app.get("/api/lab/cookbooks", async (req, res) => {
 app.post("/api/lab/notes-summary", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("notessum", userId, 20, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     const { name, notes = [], lang = "da" } = req.body || {};
     if (!Array.isArray(notes) || !notes.length) return res.status(400).json({ error: "no notes" });
@@ -695,6 +723,7 @@ app.post("/api/state", async (req, res) => {
 app.post("/api/parse-log", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("parse", userId, 30, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     let { text, counters = [], wines = [], lang = "da" } = req.body || {};
     if (!text || !String(text).trim()) return res.json({ actions: [] });
@@ -735,6 +764,7 @@ app.post("/api/parse-log", async (req, res) => {
 app.post("/api/stats-query", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("statsq", userId, 20, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     let { question, summary } = req.body || {};
     if (!question || !String(question).trim()) return res.status(400).json({ error: "Spørgsmål mangler" });
@@ -759,6 +789,7 @@ app.post("/api/stats-query", async (req, res) => {
 app.post("/api/wine-search", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("winesearch", userId, 20, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     let { query } = req.body || {};
     if (!query || String(query).trim().length < 2) return res.json({ wines: [] });
@@ -780,6 +811,7 @@ app.post("/api/wine-search", async (req, res) => {
 app.post("/api/gen-category-icon", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("genicon", userId, 20, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     const { name } = req.body || {};
     if (!name || typeof name !== "string" || name.trim().length < 1 || name.length > 60)
@@ -1043,6 +1075,7 @@ app.post("/api/comments/:entryId", async (req, res) => {
 app.post("/api/lab/analyze", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("labanalyze", userId, 15, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     const { dataUrl } = req.body || {};
     if (!dataUrl) return res.status(400).json({ error: "Ingen billede" });
@@ -1080,6 +1113,7 @@ app.post("/api/lab/analyze", async (req, res) => {
 app.post("/api/lab/entry", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     const { imageUrl, analysis } = req.body || {};
     if (!imageUrl || !analysis) return res.status(400).json({ error: "Mangler data" });
     await sb("lab_entries", { method: "POST", body: JSON.stringify({ user_id: userId, image_url: imageUrl, analysis: JSON.stringify(analysis) }) });
@@ -1093,6 +1127,7 @@ app.post("/api/lab/entry", async (req, res) => {
 app.get("/api/lab/entries", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     const rows = await sb(`lab_entries?user_id=eq.${userId}&order=created_at.desc&limit=50&select=id,image_url,analysis,created_at`) || [];
     const entries = rows.map(r => ({
       id: r.id,
@@ -1110,6 +1145,7 @@ app.get("/api/lab/entries", async (req, res) => {
 app.delete("/api/lab/entry/:id", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     await sb(`lab_entries?id=eq.${req.params.id}&user_id=eq.${userId}`, { method: "DELETE" });
     res.json({ ok: true });
   } catch (err) {
@@ -1121,6 +1157,7 @@ app.delete("/api/lab/entry/:id", async (req, res) => {
 app.get("/api/lab/dishes", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     const rows = await sb(`lab_dishes?user_id=eq.${userId}&order=updated_at.desc&limit=100&select=id,name,status,hero_url,data,visibility,team_id,created_at,updated_at`) || [];
     res.json({ dishes: rows.map(r => ({
       id: r.id, name: r.name, status: r.status, heroUrl: r.hero_url,
@@ -1134,6 +1171,7 @@ app.get("/api/lab/dishes", async (req, res) => {
 app.post("/api/lab/dishes", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     const { name = "Ny ret", status = "idea", heroUrl = null, data = {} } = req.body || {};
     const rows = await sb("lab_dishes", { method: "POST",
       body: JSON.stringify({ user_id: userId, name, status, hero_url: heroUrl, data })
@@ -1147,6 +1185,7 @@ app.post("/api/lab/dishes", async (req, res) => {
 app.put("/api/lab/dishes/:id", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     const patch = { updated_at: new Date().toISOString() };
     const { name, status, heroUrl, data, visibility, teamId } = req.body || {};
     if (name !== undefined) patch.name = name;
@@ -1175,6 +1214,7 @@ app.put("/api/lab/dishes/:id", async (req, res) => {
 app.delete("/api/lab/dishes/:id", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     await sb(`lab_dishes?id=eq.${req.params.id}&user_id=eq.${userId}`, { method: "DELETE" });
     res.json({ ok: true });
   } catch (err) { res.status(authErr(err.message) ? 401 : 500).json({ error: err.message }); }
@@ -1183,6 +1223,7 @@ app.delete("/api/lab/dishes/:id", async (req, res) => {
 app.post("/api/lab/dishes/ai", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("labai", userId, 20, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     let { dish, question } = req.body || {};
     if (!question || !String(question).trim()) return res.status(400).json({ error: "Mangler spørgsmål" });
@@ -1204,6 +1245,7 @@ app.post("/api/lab/dishes/ai", async (req, res) => {
 app.post("/api/shift/summary", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("shiftsum", userId, 20, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     let { changes = [], durationMs = 0, lang = "da" } = req.body || {};
     if (!Array.isArray(changes)) changes = [];
@@ -1227,6 +1269,7 @@ app.post("/api/shift/summary", async (req, res) => {
 app.post("/api/visits/wine-from-label", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("winelabel", userId, 15, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     const { dataUrl, lang = "da" } = req.body || {};
     if (!dataUrl) return res.status(400).json({ error: "Mangler billede" });
@@ -1292,6 +1335,7 @@ app.post("/api/visits/wine-from-label", async (req, res) => {
 app.post("/api/visits/wine-lineup", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("winelineup", userId, 10, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     const { dataUrl, lang = "da" } = req.body || {};
     if (!dataUrl) return res.status(400).json({ error: "Mangler billede" });
@@ -1358,6 +1402,7 @@ app.post("/api/visits/wine-lineup", async (req, res) => {
 app.post("/api/lab/dishes/description", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
+    if (await blockIfNotPro(userId, res)) return; // Pro-only
     if (rateLimited("dishdesc", userId, 20, 300000)) return res.status(429).json({ error: "for mange kald — vent lidt" });
     const { dish, lang = "da" } = req.body || {};
     if (!dish) return res.status(400).json({ error: "Mangler ret" });
