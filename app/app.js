@@ -769,11 +769,28 @@
     const t=setTimeout(()=>ctl.abort(),ms);
     return fetch(url,{...opts,signal:ctl.signal}).finally(()=>clearTimeout(t));
   }
+  // Henter /api/config robust — flere forsøg + længere timeout, så en langsom
+  // server-koldstart (Railway) ikke efterlader cfg tom og smider os ud af login.
+  async function loadConfig(tries){
+    for(let i=0;i<(tries||3);i++){
+      try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},8000);const j=await res.json();if(j&&j.supabaseUrl){cfg=j;return true;}}
+      catch(e){console.warn("CT:config try"+i,e.message);}
+      await new Promise(r=>setTimeout(r,600));
+    }
+    return false;
+  }
   async function initAuth(){
-    try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},4000);cfg=await res.json();}catch(e){console.warn("CT:config fail",e.message);}
+    await loadConfig(3);
     if(!session){showAuthScreen();return false;}
-    if(Date.now()>session.expires_at-60000){const ok=await refreshSession();if(!ok){showAuthScreen();return false;}}
-    try{const _pr=await fetchWithTimeout(apiBase()+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}},4000);const _pd=await _pr.json();_isPro=!!_pd.pro;}catch(e){console.warn("CT:profile fail",e.message);}
+    if(Date.now()>session.expires_at-60000){
+      const ok=await refreshSession();
+      // refreshSession rydder KUN session når refresh-token reelt er ugyldigt.
+      // Fejler den forbigående (netværk/koldstart) beholder vi login og bruger
+      // cached data — vi må ALDRIG smide en logget-ind bruger ud på en hikke.
+      if(!ok&&!session){showAuthScreen();return false;}
+      if(!ok)console.warn("CT:refresh udskudt (forbigående) — beholder session");
+    }
+    try{const _pr=await fetchWithTimeout(apiBase()+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}},6000);const _pd=await _pr.json();_isPro=!!_pd.pro;}catch(e){console.warn("CT:profile fail",e.message);}
     hideAuthScreen();return true;
   }
 
@@ -5331,8 +5348,10 @@
       try{
         const r=await fetch(base+"/api/user/profile",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token}});
         const d=await r.json();
+        if(!r.ok||!d||d.error)return;   // fejl/401 → rør IKKE profilen (undgå falsk brugernavn-prompt)
         _isPro=!!d.pro;applyProState();
         setProfileInitial(d.nickname,d.username);
+        // Vis kun brugernavn-opsætning når vi har et GYLDIGT svar der reelt mangler et.
         if(!d.username)maybeShowSignupSetup(d,"safetynet");
       }catch(e){}
     },1000);
