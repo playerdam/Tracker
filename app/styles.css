@@ -762,6 +762,11 @@
   .comment-time{font-size:11px;color:var(--faint);margin-top:2px}
   .comment-input-row{display:flex;gap:8px}
   .comment-input-row .input{flex:1;font-size:14px;padding:9px 12px}
+  /* Kommentar-modalen: input-rækken skal ALTID være synlig (pinned nederst),
+     listen scroller i pladsen ovenover. Ellers kan input skubbes ud af syne. */
+  #commentScrim .modal{display:flex;flex-direction:column}
+  #commentScrim .comment-list{flex:1 1 auto;max-height:none;min-height:48px}
+  #commentScrim .comment-input-row{flex:none}
 
   /* ---- Shared input class ---- */
   .input{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:16px;padding:11px 12px;width:100%}

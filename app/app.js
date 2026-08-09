@@ -4379,6 +4379,15 @@
     el.innerHTML=comments.map(c=>'<div class="comment-row"><div class="comment-nick">'+esc(c.nickname||t("lb_anon"))+'</div><div class="comment-text">'+esc(c.text)+'</div><div class="comment-time">'+esc(timeAgo(c.createdAt))+'</div></div>').join("");
     el.scrollTop=el.scrollHeight;
   }
+  // Løft kommentar-arket over tastaturet (som numtray'en), så skrivefeltet
+  // ikke gemmer sig bag iOS-tastaturet når man fokuserer det.
+  function syncCommentToViewport(){
+    const scrim=$("#commentScrim");if(!scrim)return;
+    if(!scrim.classList.contains("open")){scrim.style.paddingBottom="";return;}
+    const vv=window.visualViewport;if(!vv)return;
+    const keyboardH=Math.max(0,window.innerHeight-vv.height);
+    scrim.style.paddingBottom=keyboardH+"px";
+  }
 
   async function sendComment(){
     const input=$("#commentInput");const text=(input.value||"").trim();
@@ -4513,7 +4522,14 @@
 
     // comment send
     const sendBtn=$("#commentSend");if(sendBtn)sendBtn.addEventListener("click",sendComment);
-    const cInput=$("#commentInput");if(cInput)cInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendComment();}});
+    const cInput=$("#commentInput");
+    if(cInput){
+      cInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendComment();}});
+      // Tastatur-animation tager ~300ms på iOS — løft arket ad flere omgange
+      cInput.addEventListener("focus",()=>{[100,300,500].forEach(ms=>setTimeout(syncCommentToViewport,ms));});
+      cInput.addEventListener("blur",()=>setTimeout(syncCommentToViewport,100));
+    }
+    if(window.visualViewport)window.visualViewport.addEventListener("resize",syncCommentToViewport);
   }
 
   // ---- The Lab ----
