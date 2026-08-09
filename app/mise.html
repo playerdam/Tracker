@@ -756,6 +756,23 @@
       <span class="pro-pill">PRO</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
+    <button class="va-drawer-link" id="menuDrawerResume">
+      <span class="va-drawer-link-icon">📄</span>
+      <span class="va-drawer-link-label" id="menuDrawerResumeLbl">Lav dit CV</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="resume-ov" id="resumeOverlay">
+  <div class="resume-ov-hdr">
+    <button class="resume-ov-back" id="resumeClose" aria-label="Luk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <span class="resume-ov-title" id="resumeTitle">Dit CV</span>
+    <button class="resume-ov-share" id="resumeExport"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span id="resumeExportLbl">Del</span></button>
+  </div>
+  <div class="resume-ov-body">
+    <div id="resumeCard" class="resume-card"></div>
+    <div class="resume-editor" id="resumeEditor"></div>
   </div>
 </div>
 

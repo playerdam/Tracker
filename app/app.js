@@ -386,6 +386,9 @@
     const mSoc=$("#menuDrawerSocialLbl");if(mSoc)mSoc.textContent=t("tab_social");
     const mFeed=$("#menuDrawerFeedLbl");if(mFeed)mFeed.textContent=t("tab_feed");
     const mLab=$("#menuDrawerLabLbl");if(mLab)mLab.textContent=t("tab_lab");
+    const mRes=$("#menuDrawerResumeLbl");if(mRes)mRes.textContent=lang==="da"?"Lav dit CV":"Create your CV";
+    const rTit=$("#resumeTitle");if(rTit)rTit.textContent=lang==="da"?"Dit CV":"Your CV";
+    const rExp=$("#resumeExportLbl");if(rExp)rExp.textContent=lang==="da"?"Del":"Share";
     const bHist=$("#bnav-lbl-history");if(bHist)bHist.textContent=lang==="da"?"Historik":"History";
     const bStats=$("#bnav-lbl-stats");if(bStats)bStats.textContent="Stats";
     const bProf=$("#bnav-lbl-profile");if(bProf)bProf.textContent=lang==="da"?"Profil":"Profile";
@@ -984,7 +987,17 @@
     s.shiftHistory=Array.isArray(s.shiftHistory)?s.shiftHistory:[];
     s.labelI18n=(s.labelI18n&&typeof s.labelI18n==="object"&&!Array.isArray(s.labelI18n))?s.labelI18n:{};
     Object.keys(s.labelI18n).forEach(da=>{const en=s.labelI18n[da];if(en){_LBL_DA2EN[da.toLowerCase()]=en;_LBL_EN2DA[en.toLowerCase()]=da;}});
+    s.resume=_normResume(s.resume);
     return s;
+  }
+  function _normResume(r){
+    r=(r&&typeof r==="object")?r:{};
+    return {
+      name:r.name||"", title:r.title||"", location:r.location||"",
+      email:r.email||"", phone:r.phone||"", bio:r.bio||"",
+      specialties:Array.isArray(r.specialties)?r.specialties.filter(x=>x):[],
+      work:Array.isArray(r.work)?r.work.map(w=>({id:w.id||id(),place:w.place||"",role:w.role||"",start:w.start||"",end:w.end||""})):[]
+    };
   }
   function counterTotal(c){return c.subs.length?c.subs.reduce((a,b)=>a+b.count,0):c.count;}
   function fmtNum(n){return Math.round(n).toLocaleString(lang==="da"?"da-DK":"en-GB");}
@@ -3166,6 +3179,9 @@
   var _mSoc=$("#menuDrawerSocial");if(_mSoc)_mSoc.addEventListener("click",()=>_drawerGoTab("social"));
   var _mFeed=$("#menuDrawerFeed");if(_mFeed)_mFeed.addEventListener("click",()=>_drawerGoTab("feed"));
   var _mLab=$("#menuDrawerLab");if(_mLab)_mLab.addEventListener("click",()=>{closeLogDrawer();if(requirePro())switchTab("lab");});
+  var _mResume=$("#menuDrawerResume");if(_mResume)_mResume.addEventListener("click",()=>{closeLogDrawer();openResume();});
+  { const rc=$("#resumeClose"); if(rc)rc.addEventListener("click",closeResume);
+    const rx=$("#resumeExport"); if(rx)rx.addEventListener("click",exportResumeImage); }
   { const pc=$("#paywallClose"); if(pc)pc.addEventListener("click",closePaywall);
     const ps=$("#paywallScrim"); if(ps)ps.addEventListener("click",e=>{if(e.target===ps)closePaywall();});
     const pcta=$("#paywallCta"); if(pcta)pcta.addEventListener("click",()=>{ showToast(lang==="da"?"Køb åbner snart 🚀":"Purchases open soon 🚀"); }); }
@@ -4435,6 +4451,169 @@
     btn.className=followBtnClass(newStatus);
     btn.textContent=followBtnLabel(newStatus);
     btn.dataset.followStatus=newStatus;
+  }
+
+  // ══════════ CV / Resume ══════════
+  function getResume(){ if(!state.resume)state.resume=_normResume(null); return state.resume; }
+  function _resumeInitial(){ return (getResume().name||"?").trim().charAt(0).toUpperCase()||"?"; }
+  function _resumeStats(){
+    const stats=[];
+    state.counters.map(c=>({n:counterTotal(c),l:tLabel(c.label)})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,3).forEach(x=>stats.push(x));
+    const wines=(state.wines||[]).length;
+    if(wines>0)stats.push({n:wines,l:lang==="da"?"Vine i kælderen":"Wines"});
+    const badges=getBadgesEarned().length;
+    if(badges>0&&stats.length<4)stats.push({n:badges,l:lang==="da"?"Anerkendelser":"Awards"});
+    if(!stats.length)stats.push({n:career(),l:lang==="da"?"Håndværk i alt":"Craft total"});
+    return stats.slice(0,4);
+  }
+  function _resumeYears(){
+    const years=getResume().work.map(w=>parseInt(w.start,10)).filter(y=>y>1950&&y<2100);
+    return years.length?(new Date().getFullYear())-Math.min(...years):null;
+  }
+  function renderResumePreview(){
+    const el=$("#resumeCard");if(!el)return;
+    const r=getResume();
+    const name=r.name||(lang==="da"?"Dit navn":"Your name");
+    const stats=_resumeStats(),yrs=_resumeYears(),meta=[];
+    if(r.location)meta.push('📍 '+esc(r.location));
+    if(yrs!=null)meta.push('🔪 '+yrs+(lang==="da"?" år i faget":" yrs in the trade"));
+    let html='<div class="rc-head"><div class="rc-avatar">'+esc(_resumeInitial())+'</div>'
+      +'<div class="rc-who"><div class="rc-name">'+esc(name)+'</div>'
+      +(r.title?'<div class="rc-role">'+esc(r.title)+'</div>':'')
+      +(meta.length?'<div class="rc-meta">'+meta.map(m=>'<span>'+m+'</span>').join('')+'</div>':'')
+      +'</div></div>';
+    if(stats.length)html+='<div class="rc-stats">'+stats.map(s=>'<div class="rc-stat"><div class="n">'+esc(fmtNum(s.n))+'</div><div class="l">'+esc(s.l)+'</div></div>').join('')+'</div>';
+    html+='<div class="rc-body">';
+    if(r.bio)html+='<div class="rc-bio">'+esc(r.bio)+'</div>';
+    if(r.specialties.length)html+='<section><p class="rc-sec-lbl">'+(lang==="da"?"Speciale":"Specialties")+'</p><div class="rc-chips">'+r.specialties.map(s=>'<span class="rc-chip">'+esc(s)+'</span>').join('')+'</div></section>';
+    if(r.work.length)html+='<section><p class="rc-sec-lbl">'+(lang==="da"?"Erfaring":"Experience")+'</p>'+r.work.map(w=>{
+      const when=[w.start,w.end].filter(x=>x).join(' – ');
+      return '<div class="rc-exp-row"><span class="rc-exp-dot"></span><div class="rc-exp-main"><div class="rc-exp-place">'+esc(w.place||'—')+'</div>'+(w.role?'<div class="rc-exp-role">'+esc(w.role)+'</div>':'')+'</div>'+(when?'<div class="rc-exp-when">'+esc(when)+'</div>':'')+'</div>';
+    }).join('')+'</section>';
+    if(!r.bio&&!r.specialties.length&&!r.work.length)html+='<p class="rc-empty">'+(lang==="da"?"Udfyld felterne nedenfor, så tager dit CV form.":"Fill in the fields below and your CV takes shape.")+'</p>';
+    html+='</div>';
+    const contact=[r.email,r.phone].filter(x=>x).join('   ·   ');
+    if(contact)html+='<div class="rc-foot">'+esc(contact)+'</div>';
+    el.innerHTML=html;
+  }
+  function _reField(key,label,val,type,ph){
+    return '<div class="re-field"><label>'+esc(label)+'</label><input class="input" type="'+type+'" data-rf="'+key+'" value="'+esc(val||"")+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'></div>';
+  }
+  function _reJob(w,i){
+    const L=(da,en)=>lang==="da"?da:en;
+    return '<div class="re-job"><button class="re-job-del" data-rj-del="'+i+'" aria-label="Slet">×</button>'
+      +'<div class="re-field"><label>'+L("Sted","Place")+'</label><input class="input" data-rj="place" data-rj-idx="'+i+'" value="'+esc(w.place)+'"></div>'
+      +'<div class="re-field"><label>'+L("Rolle","Role")+'</label><input class="input" data-rj="role" data-rj-idx="'+i+'" value="'+esc(w.role)+'"></div>'
+      +'<div class="re-row2"><div class="re-field"><label>'+L("Fra (år)","From (yr)")+'</label><input class="input" data-rj="start" data-rj-idx="'+i+'" value="'+esc(w.start)+'" placeholder="2021"></div>'
+      +'<div class="re-field"><label>'+L("Til","To")+'</label><input class="input" data-rj="end" data-rj-idx="'+i+'" value="'+esc(w.end)+'" placeholder="'+L("nu","now")+'"></div></div></div>';
+  }
+  function renderResumeEditor(){
+    const el=$("#resumeEditor");if(!el)return;
+    const r=getResume();const L=(da,en)=>lang==="da"?da:en;
+    el.innerHTML=
+      '<div class="re-group"><h3>'+L("Om dig","About you")+'</h3>'
+      +_reField("name",L("Fulde navn","Full name"),r.name,"text")
+      +_reField("title",L("Titel / rolle","Title / role"),r.title,"text",L("fx Kok · Chef de partie","e.g. Chef de partie"))
+      +'<div class="re-row2">'+_reField("location",L("By","City"),r.location,"text")+_reField("phone",L("Telefon","Phone"),r.phone,"tel")+'</div>'
+      +_reField("email",L("Email","Email"),r.email,"email")
+      +'<div class="re-field"><label>'+L("Kort om dig","Short bio")+'</label><textarea class="input" data-rf="bio" placeholder="'+L("1-2 linjer om hvad du er god til…","1-2 lines about your craft…")+'">'+esc(r.bio||"")+'</textarea></div>'
+      +'</div>'
+      +'<div class="re-group"><h3>'+L("Speciale","Specialties")+'</h3>'
+      +_reField("specialties",L("Kommasepareret","Comma separated"),r.specialties.join(", "),"text",L("fx Skaldyr, Saucier, Naturvin","e.g. Seafood, Saucier"))
+      +'</div>'
+      +'<div class="re-group"><h3>'+L("Erfaring","Experience")+'</h3>'
+      +r.work.map((w,i)=>_reJob(w,i)).join("")
+      +'<button class="re-add" id="reAddJob">+ '+L("Tilføj job","Add job")+'</button></div>';
+    el.querySelectorAll("[data-rf]").forEach(inp=>inp.addEventListener("input",()=>_resumeSetField(inp.dataset.rf,inp.value)));
+    el.querySelectorAll("[data-rj]").forEach(inp=>inp.addEventListener("input",()=>{
+      const i=parseInt(inp.dataset.rjIdx,10),f=inp.dataset.rj,r2=getResume();
+      if(r2.work[i]){r2.work[i][f]=inp.value;save();renderResumePreview();}
+    }));
+    el.querySelectorAll("[data-rj-del]").forEach(b=>b.addEventListener("click",()=>{
+      getResume().work.splice(parseInt(b.dataset.rjDel,10),1);save();renderResumePreview();renderResumeEditor();
+    }));
+    const add=$("#reAddJob");if(add)add.addEventListener("click",()=>{getResume().work.push({id:id(),place:"",role:"",start:"",end:""});save();renderResumePreview();renderResumeEditor();});
+  }
+  function _resumeSetField(key,val){
+    const r=getResume();
+    if(key==="specialties")r.specialties=val.split(",").map(s=>s.trim()).filter(s=>s);
+    else r[key]=val;
+    save();renderResumePreview();
+  }
+  function openResume(){ renderResumePreview();renderResumeEditor();const ov=$("#resumeOverlay");if(ov)ov.classList.add("open"); }
+  function closeResume(){ const ov=$("#resumeOverlay");if(ov)ov.classList.remove("open"); }
+  function _wrapText(ctx,text,x,y,maxW,lh){
+    const words=String(text).split(/\s+/);let line="";
+    words.forEach(w=>{const test=line?line+" "+w:w;if(ctx.measureText(test).width>maxW&&line){ctx.fillText(line,x,y);line=w;y+=lh;}else line=test;});
+    if(line)ctx.fillText(line,x,y);
+    return y;
+  }
+  async function exportResumeImage(){
+    const r=getResume();
+    if(!r.name&&!r.work.length){showToast(lang==="da"?"Udfyld dit CV først":"Fill in your CV first");return;}
+    track("resume_export");haptic(20);
+    try{await document.fonts.load('600 76px Fraunces');await document.fonts.load('600 56px Fraunces');await document.fonts.load('600 34px Inter');}catch(e){}
+    const W=1080,H=1527,P=90;
+    const cv=document.createElement("canvas");cv.width=W;cv.height=H;
+    const ctx=cv.getContext("2d");
+    const paper="#FBFAF8",ink="#1C1517",accent="#8A2E3F",accentH="#6B1E2E",dim="#8C8085",line="#E7E1DD";
+    ctx.fillStyle=paper;ctx.fillRect(0,0,W,H);
+    function rr(x,y,w,h,rad){ctx.beginPath();ctx.moveTo(x+rad,y);ctx.arcTo(x+w,y,x+w,y+h,rad);ctx.arcTo(x+w,y+h,x,y+h,rad);ctx.arcTo(x,y+h,x,y,rad);ctx.arcTo(x,y,x+w,y,rad);ctx.closePath();}
+    const av=132,grd=ctx.createLinearGradient(P,P,P+av,P+av);grd.addColorStop(0,accent);grd.addColorStop(1,accentH);
+    ctx.fillStyle=grd;rr(P,P,av,av,26);ctx.fill();
+    ctx.fillStyle="#F9EEF0";ctx.font="600 76px Fraunces, serif";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(_resumeInitial(),P+av/2,P+av/2+4);
+    ctx.textBaseline="alphabetic";ctx.textAlign="left";
+    const tx=P+av+34;
+    ctx.fillStyle=ink;ctx.font="600 60px Fraunces, serif";ctx.fillText((r.name||"Dit navn").slice(0,24),tx,P+52);
+    let hy=P+52;
+    if(r.title){ctx.fillStyle=accent;ctx.font="600 34px Inter, sans-serif";hy+=46;ctx.fillText(r.title.slice(0,38),tx,hy);}
+    const yrs=_resumeYears(),mp=[];if(r.location)mp.push(r.location);if(yrs!=null)mp.push(yrs+(lang==="da"?" år i faget":" yrs"));
+    if(mp.length){ctx.fillStyle=dim;ctx.font="400 30px Inter, sans-serif";hy+=44;ctx.fillText(mp.join("   ·   "),tx,hy);}
+    let y=Math.max(P+av,hy)+70;
+    ctx.strokeStyle=line;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(P,y);ctx.lineTo(W-P,y);ctx.stroke();y+=66;
+    const stats=_resumeStats();
+    if(stats.length){
+      const cw=(W-2*P)/stats.length;
+      stats.forEach((s,i)=>{const cx=P+cw*i+cw/2;ctx.textAlign="center";
+        ctx.fillStyle=ink;ctx.font="600 54px Fraunces, serif";ctx.fillText(fmtNum(s.n),cx,y);
+        ctx.fillStyle=dim;ctx.font="600 21px Inter, sans-serif";ctx.fillText(s.l.toUpperCase().slice(0,16),cx,y+38);});
+      ctx.textAlign="left";y+=94;
+      ctx.strokeStyle=line;ctx.beginPath();ctx.moveTo(P,y);ctx.lineTo(W-P,y);ctx.stroke();y+=58;
+    }
+    function seclbl(txt){ctx.fillStyle=accent;ctx.font="700 24px Inter, sans-serif";ctx.fillText(txt.toUpperCase(),P,y);y+=46;}
+    if(r.bio){ctx.fillStyle=ink;ctx.font="400 32px Inter, sans-serif";y=_wrapText(ctx,r.bio,P,y,W-2*P,46)+40;}
+    if(r.specialties.length){
+      seclbl(lang==="da"?"Speciale":"Specialties");
+      let cx=P;ctx.font="500 28px Inter, sans-serif";
+      r.specialties.forEach(sp=>{const w=ctx.measureText(sp).width+44;if(cx+w>W-P){cx=P;y+=64;}
+        ctx.strokeStyle=line;ctx.lineWidth=2;rr(cx,y-40,w,52,26);ctx.stroke();
+        ctx.fillStyle=ink;ctx.fillText(sp,cx+22,y-4);cx+=w+14;});
+      y+=74;
+    }
+    if(r.work.length){
+      seclbl(lang==="da"?"Erfaring":"Experience");
+      r.work.slice(0,6).forEach(w=>{
+        ctx.fillStyle=accent;ctx.beginPath();ctx.arc(P+7,y-11,7,0,7);ctx.fill();
+        ctx.fillStyle=ink;ctx.font="600 34px Inter, sans-serif";ctx.fillText((w.place||"—").slice(0,32),P+34,y);
+        const when=[w.start,w.end].filter(x=>x).join(" – ");
+        if(when){ctx.fillStyle=dim;ctx.font="400 28px Inter, sans-serif";ctx.textAlign="right";ctx.fillText(when,W-P,y);ctx.textAlign="left";}
+        if(w.role){y+=40;ctx.fillStyle=dim;ctx.font="400 28px Inter, sans-serif";ctx.fillText(w.role.slice(0,42),P+34,y);}
+        y+=64;
+      });
+    }
+    const contact=[r.email,r.phone].filter(x=>x).join("    ·    ");
+    if(contact){ctx.strokeStyle=line;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(P,H-140);ctx.lineTo(W-P,H-140);ctx.stroke();
+      ctx.fillStyle=dim;ctx.font="500 28px Inter, sans-serif";ctx.fillText(contact,P,H-86);}
+    const blob=await new Promise(res=>cv.toBlob(res,"image/png"));
+    if(!blob)return;
+    const fname=((r.name||"cv").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"cv")+".png";
+    const file=new File([blob],fname,{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file]});return;}catch(e){if(e&&e.name==="AbortError")return;}
+    }
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
   }
 
   function setupFeed(){
