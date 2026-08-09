@@ -1027,10 +1027,20 @@
 
   // ---- photo ----
   let pendingPhotoDataUrl=null;
+  // Afspejler det ventende foto i BÅDE den gamle inline-thumb OG '+'-overlayens
+  // thumb/kamera-ikon, så knappen lyser når et billede er vedhæftet.
+  function reflectPendingPhoto(){
+    const has=!!pendingPhotoDataUrl;
+    const th=$("#photoThumb");if(th){th.src=has?pendingPhotoDataUrl:"";th.style.display=has?"block":"none";}
+    const cam=$("#photoBtn");if(cam)cam.style.color=has?"var(--accent)":"";
+    const ovth=$("#qlogOvThumb");if(ovth){ovth.src=has?pendingPhotoDataUrl:"";ovth.classList.toggle("show",has);}
+    const ovcam=$("#qlogOvCam");if(ovcam)ovcam.style.color=has?"var(--accent)":"";
+  }
+  function clearPendingPhoto(){pendingPhotoDataUrl=null;const pi=$("#photoInput");if(pi)pi.value="";reflectPendingPhoto();}
   function setupPhoto(){
-    const camBtn=$("#photoBtn"),photoInput=$("#photoInput"),thumb=$("#photoThumb");
-    if(!camBtn)return;
-    camBtn.addEventListener("click",()=>photoInput.click());
+    const photoInput=$("#photoInput");if(!photoInput)return;
+    const camBtn=$("#photoBtn");if(camBtn)camBtn.addEventListener("click",()=>photoInput.click());
+    const ovCam=$("#qlogOvCam");if(ovCam)ovCam.addEventListener("click",()=>photoInput.click());
     photoInput.addEventListener("change",async()=>{
       const file=photoInput.files[0];if(!file)return;
       const allowed=["image/jpeg","image/png","image/webp","image/heic","image/heif"];
@@ -1038,10 +1048,10 @@
       if(file.size>20*1024*1024){showToast(lang==="da"?"Billedet er for stort (maks 20 MB)":"Image too large (max 20 MB)");photoInput.value="";return;}
       const url=await resizeImage(file,1200);
       pendingPhotoDataUrl=url;
-      thumb.src=url;thumb.style.display="block";
-      camBtn.style.color="var(--accent)";
+      reflectPendingPhoto();
     });
-    thumb.addEventListener("click",()=>{pendingPhotoDataUrl=null;thumb.src="";thumb.style.display="none";camBtn.style.color="";photoInput.value="";});
+    const th=$("#photoThumb");if(th)th.addEventListener("click",clearPendingPhoto);
+    const ovth=$("#qlogOvThumb");if(ovth)ovth.addEventListener("click",clearPendingPhoto);
   }
   function resizeImage(file,maxPx){
     return new Promise(resolve=>{
@@ -1075,10 +1085,7 @@
       clearTimeout(ramp);barSet(100);
       const d=await res.json();
       setTimeout(()=>barSet(0),350);
-      pendingPhotoDataUrl=null;
-      const thumb=$("#photoThumb");if(thumb){thumb.src="";thumb.style.display="none";}
-      const camBtn=$("#photoBtn");if(camBtn)camBtn.style.color="";
-      const photoInput=$("#photoInput");if(photoInput)photoInput.value="";
+      clearPendingPhoto();
       return d.url||null;
     }catch(e){clearTimeout(ramp);barSet(0);return null;}
   }
@@ -3002,12 +3009,16 @@
     const hint=$("#qlogOvHint");if(hint)hint.textContent=t("qlog_hint_full");
     if(inp){inp.placeholder=t("qlog_ph")||"";inp.value=$("#qlogInput").value||"";inp.style.height="auto";}
     ov.classList.add("open");
+    reflectPendingPhoto();
     setTimeout(()=>{if(inp){inp.focus();inp.style.height="auto";inp.style.height=inp.scrollHeight+"px";}},60);
   }
   function closeQlogOverlay(){
     const ov=$("#qlogOverlay");if(ov)ov.classList.remove("open");
     const inp=$("#qlogOverlayInput");if(inp)inp.value="";
   }
+  // Annullér = luk OG kassér et evt. vedhæftet foto (så det ikke hænger ved til
+  // næste log). Submit bruger closeQlogOverlay, så fotoet overlever til upload.
+  function cancelQlogOverlay(){closeQlogOverlay();clearPendingPhoto();}
   function submitQlogOverlay(){
     const inp=$("#qlogOverlayInput");if(!inp)return;
     const val=inp.value.trim();if(!val)return;
@@ -3020,14 +3031,14 @@
     openQlogOverlay();
   });
   const qlogOvClose=$("#qlogOverlayClose");
-  if(qlogOvClose)qlogOvClose.addEventListener("click",closeQlogOverlay);
+  if(qlogOvClose)qlogOvClose.addEventListener("click",cancelQlogOverlay);
   const qlogOvBg=$("#qlogOverlay");
-  if(qlogOvBg)qlogOvBg.addEventListener("click",e=>{if(e.target===qlogOvBg)closeQlogOverlay();});
+  if(qlogOvBg)qlogOvBg.addEventListener("click",e=>{if(e.target===qlogOvBg)cancelQlogOverlay();});
   const qlogOvInp=$("#qlogOverlayInput");
   if(qlogOvInp){
     qlogOvInp.addEventListener("keydown",e=>{
       if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submitQlogOverlay();}
-      if(e.key==="Escape"){closeQlogOverlay();}
+      if(e.key==="Escape"){cancelQlogOverlay();}
     });
     qlogOvInp.addEventListener("input",()=>{
       qlogOvInp.style.height="auto";

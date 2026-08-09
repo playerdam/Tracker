@@ -412,6 +412,10 @@
   #qlogOverlayInput::placeholder{color:var(--faint)}
   .qlog-ov-close{appearance:none;background:none;border:none;color:var(--faint);font-size:17px;line-height:1;cursor:pointer;padding:4px;-webkit-tap-highlight-color:transparent;flex:none}
   .qlog-ov-close:active{opacity:.5}
+  .qlog-ov-cam{appearance:none;background:none;border:none;color:var(--faint);cursor:pointer;padding:4px;flex:none;display:flex;align-items:center;-webkit-tap-highlight-color:transparent;transition:color .12s}
+  .qlog-ov-cam:active{opacity:.5}
+  .qlog-ov-thumb{width:34px;height:34px;border-radius:7px;object-fit:cover;flex:none;display:none;cursor:pointer;border:1px solid rgba(0,0,0,.1)}
+  .qlog-ov-thumb.show{display:block}
   .qlog-ov-hint{font-size:12px;color:var(--faint);margin-top:10px;text-align:center}
   .photo-thumb{width:34px;height:34px;border-radius:6px;object-fit:cover;flex:none;display:none;cursor:pointer}
   .photo-thumb.show{display:block}
