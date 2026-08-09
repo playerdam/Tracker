@@ -25,7 +25,8 @@
   [data-theme="dark"] .vd2-act-shift{box-shadow:0 6px 18px rgba(0,0,0,.4)}
   [data-theme="dark"] .otp-box.filled{background:rgba(224,122,142,.1)}
   [data-theme="dark"] #appHeader{background:rgba(23,17,20,.97) !important;border-bottom-color:rgba(255,255,255,.07) !important}
-  [data-theme="dark"] .bottom-nav{background:rgba(28,21,25,.88);border-top-color:rgba(255,255,255,.07)}
+  [data-theme="dark"] .bottom-nav{background:transparent;border-top-color:rgba(255,255,255,.07)}
+  [data-theme="dark"] .bottom-nav::before{background:rgba(28,21,25,.88)}
   [data-theme="dark"] .de-hdr{background:rgba(23,17,20,.94)}
   [data-theme="dark"] .qlog-ov-bar{background:rgba(40,31,36,.9);box-shadow:0 8px 32px rgba(0,0,0,.5)}
 
@@ -820,9 +821,12 @@
   /* Inline forms */
   /* Item cards */
   /* ---- Bottom nav (mobile) ---- */
-  .bottom-nav{display:block;position:fixed;bottom:0;left:0;right:0;z-index:96;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.08)}
+  /* Blur ligger på ::before (ikke selve nav'en) — ellers sluger iOS tap på den
+     del af den hævede "+" der rager op OVER en backdrop-filtreret bar. */
+  .bottom-nav{display:block;position:fixed;bottom:0;left:0;right:0;z-index:96;background:transparent;border-top:1px solid rgba(0,0,0,.08)}
+  .bottom-nav::before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);pointer-events:none}
   @media (min-width:601px){.bnav-inner{max-width:760px;margin:0 auto}}
-  .bnav-inner{display:flex;justify-content:space-around;align-items:center;padding:8px 5% max(env(safe-area-inset-bottom,4px),8px)}
+  .bnav-inner{position:relative;z-index:1;display:flex;justify-content:space-around;align-items:center;padding:8px 5% max(env(safe-area-inset-bottom,4px),8px)}
   .bnav-btn{appearance:none;background:none;border:none;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;color:var(--faint);transition:.15s}
   .bnav-btn.active{color:var(--accent)}
   .bnav-btn .bnav-icon{width:22px;height:22px;stroke:currentColor;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.75;transition:.15s}
