@@ -188,7 +188,10 @@ app.post("/api/user/profile", async (req, res) => {
       body: JSON.stringify({ id: userId }),
       headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
     });
-    const rows = await sb(`users?id=eq.${userId}&select=nickname,profession,username,workplace,pro_until`);
+    // Hent kun pro_until når håndhævelse er slået til — ellers ingen afhængighed
+    // af en kolonne der måske ikke findes endnu (migration_pro.sql ikke kørt).
+    const proCol = PRO_ENFORCE ? ",pro_until" : "";
+    const rows = await sb(`users?id=eq.${userId}&select=nickname,profession,username,workplace${proCol}`);
     const u = (rows || [])[0] || {};
     const pro = PRO_ENFORCE ? !!(u.pro_until && new Date(u.pro_until) > new Date()) : true;
     res.json({ ok: true, nickname: u.nickname || null, profession: u.profession || null, username: u.username || null, workplace: u.workplace || null, pro, proUntil: u.pro_until || null });
