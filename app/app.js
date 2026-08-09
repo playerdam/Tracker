@@ -660,6 +660,9 @@
   let activeWineType=localStorage.getItem("mise_wine_type")||"alle";
   // Pro-rettighed (Vin, The Lab og alle AI-features). Sættes fra /api/user/profile.
   let _isPro=false;
+  // Håndhæves gating overhovedet? Spejler serverens PRO_ENFORCE (fra /api/config).
+  // Slukket = appen er HELT åben (test/beta) — gating er inert uanset _isPro.
+  let _proEnforced=false;
 
   const WINE_FLAGS={"Frankrig":"🇫🇷","France":"🇫🇷","Italien":"🇮🇹","Italy":"🇮🇹","Spanien":"🇪🇸","Spain":"🇪🇸","Portugal":"🇵🇹","Tyskland":"🇩🇪","Germany":"🇩🇪","Østrig":"🇦🇹","Austria":"🇦🇹","USA":"🇺🇸","Australien":"🇦🇺","Australia":"🇦🇺","New Zealand":"🇳🇿","Sydafrika":"🇿🇦","South Africa":"🇿🇦","Chile":"🇨🇱","Argentina":"🇦🇷","Grækenland":"🇬🇷","Greece":"🇬🇷","Ungarn":"🇭🇺","Hungary":"🇭🇺","Georgien":"🇬🇪","Georgia":"🇬🇪","Libanon":"🇱🇧","Lebanon":"🇱🇧","Danmark":"🇩🇰","Denmark":"🇩🇰","Slovenien":"🇸🇮","Kroatien":"🇭🇷"};
   const REGION_TO_LAND={"toscana":"Italien","tuscany":"Italien","piemonte":"Italien","piedmont":"Italien","veneto":"Italien","sicilia":"Italien","sicily":"Italien","lombardia":"Italien","lombardy":"Italien","emilia-romagna":"Italien","emilia romagna":"Italien","friuli":"Italien","puglia":"Italien","campania":"Italien","abruzzo":"Italien","umbria":"Italien","lazio":"Italien","marche":"Italien","brunello":"Italien","chianti":"Italien","barolo":"Italien","amarone":"Italien","bordeaux":"Frankrig","bourgogne":"Frankrig","burgundy":"Frankrig","champagne":"Frankrig","alsace":"Frankrig","loire":"Frankrig","rhône":"Frankrig","rhone":"Frankrig","provence":"Frankrig","languedoc":"Frankrig","roussillon":"Frankrig","côtes du rhône":"Frankrig","cotes du rhone":"Frankrig","médoc":"Frankrig","medoc":"Frankrig","saint-émilion":"Frankrig","pomerol":"Frankrig","rioja":"Spanien","ribera del duero":"Spanien","priorat":"Spanien","penedès":"Spanien","penedes":"Spanien","rias baixas":"Spanien","catalonia":"Spanien","catalunya":"Spanien","rueda":"Spanien","jumilla":"Spanien","douro":"Portugal","alentejo":"Portugal","vinho verde":"Portugal","dão":"Portugal","dao":"Portugal","setúbal":"Portugal","setubal":"Portugal","mosel":"Tyskland","rheingau":"Tyskland","pfalz":"Tyskland","nahe":"Tyskland","rheinhessen":"Tyskland","franken":"Tyskland","wachau":"Østrig","kamptal":"Østrig","burgenland":"Østrig","steiermark":"Østrig","napa valley":"USA","napa":"USA","sonoma":"USA","willamette valley":"USA","columbia valley":"USA","barossa valley":"Australien","barossa":"Australien","yarra valley":"Australien","mclaren vale":"Australien","coonawarra":"Australien","margaret river":"Australien","marlborough":"New Zealand","central otago":"New Zealand","hawke's bay":"New Zealand","stellenbosch":"Sydafrika","swartland":"Sydafrika","constantia":"Sydafrika","mendoza":"Argentina","patagonia":"Argentina","salta":"Argentina","maipo":"Chile","colchagua":"Chile","casablanca":"Chile","aconcagua":"Chile","nemea":"Grækenland","naoussa":"Grækenland","tokaj":"Ungarn","eger":"Ungarn","kakheti":"Georgien","bekaa valley":"Libanon"};
@@ -773,7 +776,7 @@
   // server-koldstart (Railway) ikke efterlader cfg tom og smider os ud af login.
   async function loadConfig(tries){
     for(let i=0;i<(tries||3);i++){
-      try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},8000);const j=await res.json();if(j&&j.supabaseUrl){cfg=j;return true;}}
+      try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},8000);const j=await res.json();if(j&&j.supabaseUrl){cfg=j;_proEnforced=!!j.proEnforced;return true;}}
       catch(e){console.warn("CT:config try"+i,e.message);}
       await new Promise(r=>setTimeout(r,600));
     }
@@ -2782,7 +2785,7 @@
 
   // ---- quick log ----
   async function parseLog(text){
-    if(!_isPro)return [];  // Gratis: spring AI over → kalderne falder tilbage til lokal parser
+    if(_proEnforced&&!_isPro)return [];  // Gratis (og gating tændt): spring AI over → lokal parser
     const base=apiBase();if(!base)throw new Error("no-backend");
     const token=await getToken();if(!token)throw new Error("no-auth");
     const counters=state.counters.map(c=>({label:c.label,subs:c.subs.map(s=>s.name),muligeTyper:c.suggest||[]}));
@@ -3152,12 +3155,12 @@
   });
   function _drawerGoTab(v){closeLogDrawer();switchTab(v);}
   // ── Pro-rettighed ──
-  function requirePro(){ if(_isPro)return true; openPaywall(); return false; }
+  function requirePro(){ if(!_proEnforced||_isPro)return true; openPaywall(); return false; }
   function openPaywall(){ const s=$("#paywallScrim"); if(s)s.classList.add("open"); }
   function closePaywall(){ const s=$("#paywallScrim"); if(s)s.classList.remove("open"); }
   // Viser/skjuler PRO-mærker rundt i UI'et efter rettighed
   function applyProState(){
-    document.querySelectorAll(".pro-pill").forEach(el=>{el.style.display=_isPro?"none":"";});
+    const gate=_proEnforced&&!_isPro;document.querySelectorAll(".pro-pill").forEach(el=>{el.style.display=gate?"":"none";});
   }
   var _mVin=$("#menuDrawerVin");if(_mVin)_mVin.addEventListener("click",()=>{closeLogDrawer();if(requirePro())switchTab("vin");});
   var _mSoc=$("#menuDrawerSocial");if(_mSoc)_mSoc.addEventListener("click",()=>_drawerGoTab("social"));
