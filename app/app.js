@@ -389,6 +389,8 @@
     const mRes=$("#menuDrawerResumeLbl");if(mRes)mRes.textContent=lang==="da"?"Lav dit CV":"Create your CV";
     const rTit=$("#resumeTitle");if(rTit)rTit.textContent=lang==="da"?"Dit CV":"Your CV";
     const rExp=$("#resumeExportLbl");if(rExp)rExp.textContent=lang==="da"?"Del":"Share";
+    const rST=$("#resumeShareTitle");if(rST)rST.textContent=lang==="da"?"Sådan ser dit CV ud":"This is your CV";
+    const rSD=$("#resumeShareDoLbl");if(rSD)rSD.textContent=lang==="da"?"Del CV":"Share CV";
     const bHist=$("#bnav-lbl-history");if(bHist)bHist.textContent=lang==="da"?"Historik":"History";
     const bStats=$("#bnav-lbl-stats");if(bStats)bStats.textContent="Stats";
     const bProf=$("#bnav-lbl-profile");if(bProf)bProf.textContent=lang==="da"?"Profil":"Profile";
@@ -994,7 +996,7 @@
     r=(r&&typeof r==="object")?r:{};
     return {
       name:r.name||"", title:r.title||"", location:r.location||"",
-      email:r.email||"", phone:r.phone||"", bio:r.bio||"",
+      email:r.email||"", phone:r.phone||"", bio:r.bio||"", photo:r.photo||"",
       specialties:Array.isArray(r.specialties)?r.specialties.filter(x=>x):[],
       work:Array.isArray(r.work)?r.work.map(w=>({id:w.id||id(),place:w.place||"",role:w.role||"",start:w.start||"",end:w.end||""})):[]
     };
@@ -3181,7 +3183,16 @@
   var _mLab=$("#menuDrawerLab");if(_mLab)_mLab.addEventListener("click",()=>{closeLogDrawer();if(requirePro())switchTab("lab");});
   var _mResume=$("#menuDrawerResume");if(_mResume)_mResume.addEventListener("click",()=>{closeLogDrawer();openResume();});
   { const rc=$("#resumeClose"); if(rc)rc.addEventListener("click",closeResume);
-    const rx=$("#resumeExport"); if(rx)rx.addEventListener("click",exportResumeImage); }
+    const rx=$("#resumeExport"); if(rx)rx.addEventListener("click",openResumeShare);
+    const rsd=$("#resumeShareDo"); if(rsd)rsd.addEventListener("click",shareResumeBlob);
+    const rpi=$("#resumePhotoInput"); if(rpi)rpi.addEventListener("change",async()=>{
+      const file=rpi.files&&rpi.files[0];if(!file)return;
+      if(!file.type.startsWith("image/")){showToast(t("img_only"));rpi.value="";return;}
+      if(file.size>20*1024*1024){showToast(lang==="da"?"Billedet er for stort (maks 20 MB)":"Image too large (max 20 MB)");rpi.value="";return;}
+      const url=await resizeImage(file,600);rpi.value="";
+      if(!url)return;
+      getResume().photo=url;save();renderResumePreview();renderResumeEditor();
+    }); }
   { const pc=$("#paywallClose"); if(pc)pc.addEventListener("click",closePaywall);
     const ps=$("#paywallScrim"); if(ps)ps.addEventListener("click",e=>{if(e.target===ps)closePaywall();});
     const pcta=$("#paywallCta"); if(pcta)pcta.addEventListener("click",()=>{ showToast(lang==="da"?"Køb åbner snart 🚀":"Purchases open soon 🚀"); }); }
@@ -4477,12 +4488,13 @@
     const stats=_resumeStats(),yrs=_resumeYears(),meta=[];
     if(r.location)meta.push('📍 '+esc(r.location));
     if(yrs!=null)meta.push('🔪 '+yrs+(lang==="da"?" år i faget":" yrs in the trade"));
-    let html='<div class="rc-head"><div class="rc-avatar">'+esc(_resumeInitial())+'</div>'
+    const avInner=r.photo?'<img src="'+esc(r.photo)+'" alt="">':esc(_resumeInitial());
+    let html='<div class="rc-head"><div class="rc-avatar'+(r.photo?' has-photo':'')+'">'+avInner+'</div>'
       +'<div class="rc-who"><div class="rc-name">'+esc(name)+'</div>'
       +(r.title?'<div class="rc-role">'+esc(r.title)+'</div>':'')
       +(meta.length?'<div class="rc-meta">'+meta.map(m=>'<span>'+m+'</span>').join('')+'</div>':'')
       +'</div></div>';
-    if(stats.length)html+='<div class="rc-stats">'+stats.map(s=>'<div class="rc-stat"><div class="n">'+esc(fmtNum(s.n))+'</div><div class="l">'+esc(s.l)+'</div></div>').join('')+'</div>';
+    if(stats.length)html+='<div class="rc-stats" style="grid-template-columns:repeat('+stats.length+',1fr)">'+stats.map(s=>'<div class="rc-stat"><div class="n">'+esc(fmtNum(s.n))+'</div><div class="l">'+esc(s.l)+'</div></div>').join('')+'</div>';
     html+='<div class="rc-body">';
     if(r.bio)html+='<div class="rc-bio">'+esc(r.bio)+'</div>';
     if(r.specialties.length)html+='<section><p class="rc-sec-lbl">'+(lang==="da"?"Speciale":"Specialties")+'</p><div class="rc-chips">'+r.specialties.map(s=>'<span class="rc-chip">'+esc(s)+'</span>').join('')+'</div></section>';
@@ -4512,6 +4524,9 @@
     const r=getResume();const L=(da,en)=>lang==="da"?da:en;
     el.innerHTML=
       '<div class="re-group"><h3>'+L("Om dig","About you")+'</h3>'
+      +'<div class="re-photo"><div class="re-photo-av'+(r.photo?' has':'')+'">'+(r.photo?'<img src="'+esc(r.photo)+'" alt="">':esc(_resumeInitial()))+'</div>'
+      +'<div class="re-photo-btns"><button type="button" class="re-photo-btn" id="rewPhotoPick">'+(r.photo?L("Skift foto","Change photo"):L("Upload foto","Upload photo"))+'</button>'
+      +(r.photo?'<button type="button" class="re-photo-rm" id="rewPhotoRm">'+L("Fjern","Remove")+'</button>':'')+'</div></div>'
       +_reField("name",L("Fulde navn","Full name"),r.name,"text")
       +_reField("title",L("Titel / rolle","Title / role"),r.title,"text",L("fx Kok · Chef de partie","e.g. Chef de partie"))
       +'<div class="re-row2">'+_reField("location",L("By","City"),r.location,"text")+_reField("phone",L("Telefon","Phone"),r.phone,"tel")+'</div>'
@@ -4533,6 +4548,8 @@
       getResume().work.splice(parseInt(b.dataset.rjDel,10),1);save();renderResumePreview();renderResumeEditor();
     }));
     const add=$("#reAddJob");if(add)add.addEventListener("click",()=>{getResume().work.push({id:id(),place:"",role:"",start:"",end:""});save();renderResumePreview();renderResumeEditor();});
+    const pick=$("#rewPhotoPick");if(pick)pick.addEventListener("click",()=>{const pi=$("#resumePhotoInput");if(pi)pi.click();});
+    const rm=$("#rewPhotoRm");if(rm)rm.addEventListener("click",()=>{getResume().photo="";save();renderResumePreview();renderResumeEditor();});
   }
   function _resumeSetField(key,val){
     const r=getResume();
@@ -4542,16 +4559,39 @@
   }
   function openResume(){ renderResumePreview();renderResumeEditor();const ov=$("#resumeOverlay");if(ov)ov.classList.add("open"); }
   function closeResume(){ const ov=$("#resumeOverlay");if(ov)ov.classList.remove("open"); }
+  function _loadImg(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=src;});}
   function _wrapText(ctx,text,x,y,maxW,lh){
     const words=String(text).split(/\s+/);let line="";
     words.forEach(w=>{const test=line?line+" "+w:w;if(ctx.measureText(test).width>maxW&&line){ctx.fillText(line,x,y);line=w;y+=lh;}else line=test;});
     if(line)ctx.fillText(line,x,y);
     return y;
   }
-  async function exportResumeImage(){
+  let _resumeBlob=null;
+  // "Del" i headeren → render billedet og vis det i en preview FØR deling.
+  async function openResumeShare(){
     const r=getResume();
     if(!r.name&&!r.work.length){showToast(lang==="da"?"Udfyld dit CV først":"Fill in your CV first");return;}
-    track("resume_export");haptic(20);
+    track("resume_preview");haptic(20);
+    const btn=$("#resumeExport");if(btn)btn.style.opacity=".5";
+    const out=await _buildResumeBlob();
+    if(btn)btn.style.opacity="";
+    if(!out){showToast(lang==="da"?"Kunne ikke lave billedet — prøv igen":"Couldn't render — try again");return;}
+    _resumeBlob=out;
+    const img=$("#resumeShareImg");if(img)img.src=URL.createObjectURL(out.blob);
+    const s=$("#resumeShareScrim");if(s)s.classList.add("open");
+  }
+  async function shareResumeBlob(){
+    if(!_resumeBlob)return;
+    track("resume_share");
+    const file=new File([_resumeBlob.blob],_resumeBlob.fname,{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file]});return;}catch(e){if(e&&e.name==="AbortError")return;}
+    }
+    const a=document.createElement("a");a.href=URL.createObjectURL(_resumeBlob.blob);a.download=_resumeBlob.fname;a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  }
+  async function _buildResumeBlob(){
+    const r=getResume();
     try{await document.fonts.load('600 76px Fraunces');await document.fonts.load('600 56px Fraunces');await document.fonts.load('600 34px Inter');}catch(e){}
     const W=1080,H=1527,P=90;
     const cv=document.createElement("canvas");cv.width=W;cv.height=H;
@@ -4559,11 +4599,21 @@
     const paper="#FBFAF8",ink="#1C1517",accent="#8A2E3F",accentH="#6B1E2E",dim="#8C8085",line="#E7E1DD";
     ctx.fillStyle=paper;ctx.fillRect(0,0,W,H);
     function rr(x,y,w,h,rad){ctx.beginPath();ctx.moveTo(x+rad,y);ctx.arcTo(x+w,y,x+w,y+h,rad);ctx.arcTo(x+w,y+h,x,y+h,rad);ctx.arcTo(x,y+h,x,y,rad);ctx.arcTo(x,y,x+w,y,rad);ctx.closePath();}
-    const av=132,grd=ctx.createLinearGradient(P,P,P+av,P+av);grd.addColorStop(0,accent);grd.addColorStop(1,accentH);
-    ctx.fillStyle=grd;rr(P,P,av,av,26);ctx.fill();
-    ctx.fillStyle="#F9EEF0";ctx.font="600 76px Fraunces, serif";ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillText(_resumeInitial(),P+av/2,P+av/2+4);
-    ctx.textBaseline="alphabetic";ctx.textAlign="left";
+    const av=132;
+    let photoImg=null;
+    if(r.photo){try{photoImg=await _loadImg(r.photo);}catch(e){}}
+    if(photoImg){
+      ctx.save();rr(P,P,av,av,26);ctx.clip();
+      const s=Math.max(av/photoImg.width,av/photoImg.height),dw=photoImg.width*s,dh=photoImg.height*s;
+      ctx.drawImage(photoImg,P+(av-dw)/2,P+(av-dh)/2,dw,dh);
+      ctx.restore();
+    }else{
+      const grd=ctx.createLinearGradient(P,P,P+av,P+av);grd.addColorStop(0,accent);grd.addColorStop(1,accentH);
+      ctx.fillStyle=grd;rr(P,P,av,av,26);ctx.fill();
+      ctx.fillStyle="#F9EEF0";ctx.font="600 76px Fraunces, serif";ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.fillText(_resumeInitial(),P+av/2,P+av/2+4);
+      ctx.textBaseline="alphabetic";ctx.textAlign="left";
+    }
     const tx=P+av+34;
     ctx.fillStyle=ink;ctx.font="600 60px Fraunces, serif";ctx.fillText((r.name||"Dit navn").slice(0,24),tx,P+52);
     let hy=P+52;
@@ -4606,14 +4656,9 @@
     if(contact){ctx.strokeStyle=line;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(P,H-140);ctx.lineTo(W-P,H-140);ctx.stroke();
       ctx.fillStyle=dim;ctx.font="500 28px Inter, sans-serif";ctx.fillText(contact,P,H-86);}
     const blob=await new Promise(res=>cv.toBlob(res,"image/png"));
-    if(!blob)return;
+    if(!blob)return null;
     const fname=((r.name||"cv").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"cv")+".png";
-    const file=new File([blob],fname,{type:"image/png"});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){
-      try{await navigator.share({files:[file]});return;}catch(e){if(e&&e.name==="AbortError")return;}
-    }
-    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    return {blob,fname};
   }
 
   function setupFeed(){

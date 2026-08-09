@@ -773,8 +773,15 @@
   <div class="resume-ov-body">
     <div id="resumeCard" class="resume-card"></div>
     <div class="resume-editor" id="resumeEditor"></div>
+    <input id="resumePhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
   </div>
 </div>
+
+<div class="scrim" id="resumeShareScrim"><div class="modal resume-share-modal">
+  <h2 class="resume-share-title" id="resumeShareTitle">Sådan ser dit CV ud</h2>
+  <div class="resume-share-imgwrap"><img id="resumeShareImg" alt=""></div>
+  <button class="btn primary resume-share-do" id="resumeShareDo"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span id="resumeShareDoLbl">Del CV</span></button>
+</div></div>
 
 <div class="scrim" id="paywallScrim"><div class="modal paywall">
   <button class="paywall-close" id="paywallClose" aria-label="Luk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
