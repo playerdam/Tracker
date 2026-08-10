@@ -38,7 +38,7 @@ const PARSE_MODEL   = process.env.PARSE_MODEL || "claude-haiku-4-5-20251001";
 // dvs. præcis nuværende adfærd. Sæt PRO_ENFORCE=1 på Railway når betaling (Fase 2)
 // er klar — så træder paywall + 402-gating i kraft.
 const PRO_ENFORCE   = process.env.PRO_ENFORCE === "1";
-const METRICS_KEY   = process.env.METRICS_KEY || "";   // admin-nøgle til /admin-dashboardet (fail-closed hvis tom)
+const METRICS_KEY   = (process.env.METRICS_KEY || "").trim();   // admin-nøgle til /admin-dashboardet (fail-closed hvis tom)
 const WINE_MODEL    = process.env.WINE_MODEL  || "claude-sonnet-4-6";
 
 // ---- Anthropic ----
@@ -176,7 +176,7 @@ app.get("/admin", (_req, res) => res.sendFile(path.join(__dirname, "admin", "das
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "craft-track" }));
 
 // ---- Admin: engagement-metrics (nøgle-beskyttet, read-only) ----
-function adminOk(req) { return !!METRICS_KEY && req.get("x-admin-key") === METRICS_KEY; }
+function adminOk(req) { return !!METRICS_KEY && (req.get("x-admin-key") || "").trim() === METRICS_KEY; }
 app.get("/api/admin/metrics", async (req, res) => {
   if (!adminOk(req)) return res.status(401).json({ error: "unauthorized" });
   try {
