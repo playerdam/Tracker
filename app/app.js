@@ -3246,9 +3246,33 @@
 
   // ---- notification permission ----
   async function requestNotifPermission(){
+    registerNativePush(true);          // native iOS (no-op på web) — må godt spørge her
     if(!("Notification" in window))return;
     if(Notification.permission==="default")await Notification.requestPermission();
     if(Notification.permission==="granted")ensurePushSubscription();
+  }
+  // ---- Native iOS push (APNs via Capacitor) ----
+  let _nativePushListeners=false;
+  async function registerNativePush(mayPrompt){
+    const P=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.PushNotifications;
+    if(!P)return;                       // ikke i native app / plugin ikke til stede
+    try{
+      if(!_nativePushListeners){
+        _nativePushListeners=true;
+        P.addListener("registration",async(t)=>{
+          const token=t&&t.value;if(!token)return;
+          const base=apiBase();const tok=await getToken();if(!base||!tok)return;
+          try{await fetch(base+"/api/push/register-native",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({token,platform:"ios"})});}catch(e){}
+        });
+        P.addListener("registrationError",(e)=>console.warn("CT:push reg err",e&&e.error));
+      }
+      let perm=await P.checkPermissions();
+      if(perm.receive!=="granted"){
+        if(!mayPrompt)return;            // ved boot: spørg ikke — vent til et godt øjeblik
+        perm=await P.requestPermissions();
+      }
+      if(perm.receive==="granted")await P.register();
+    }catch(e){console.warn("CT:native push",e&&e.message);}
   }
 
   // ---- social / leaderboard / challenge / team ----
@@ -5597,6 +5621,7 @@
     $("#mainWrap").style.display="";
     try{fixScrollPadding();}catch(e){}
     try{applyProState();}catch(e){}
+    try{registerNativePush(false);}catch(e){}   // native push: registrér token hvis allerede tilladt (spørger ikke)
     document.getElementById("view-vagt").classList.add("active");
     const _sb2=document.getElementById("shiftBar"),_ss2=document.getElementById("shiftStartBtn");
     if(_sb2)_sb2.style.display="none";if(_ss2)_ss2.style.display="none";

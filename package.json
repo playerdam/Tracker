@@ -13,6 +13,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@parse/node-apn": "^7.1.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "web-push": "^3.6.7"

@@ -22,6 +22,23 @@ if (webpush && VAPID_PUBLIC && VAPID_PRIVATE) {
   webpush.setVapidDetails("mailto:fdnnielsen@gmail.com", VAPID_PUBLIC, VAPID_PRIVATE);
 }
 const pushEnabled = () => !!(webpush && VAPID_PUBLIC && VAPID_PRIVATE);
+
+// ---- Native iOS push (APNs, token-auth via .p8) ----
+const APNS_KEY       = (process.env.APNS_KEY || "").replace(/\\n/g, "\n"); // .p8-indhold
+const APNS_KEY_ID    = (process.env.APNS_KEY_ID || "").trim();
+const APNS_TEAM_ID   = (process.env.APNS_TEAM_ID || "").trim();
+const APNS_BUNDLE_ID = (process.env.APNS_BUNDLE_ID || "dk.crafttracker.app").trim();
+const APNS_PRODUCTION = process.env.APNS_PRODUCTION !== "0"; // default prod — TestFlight bruger prod-APNs!
+let apnProvider = null, apnLib = null;
+try {
+  if (APNS_KEY && APNS_KEY_ID && APNS_TEAM_ID) {
+    apnLib = require("@parse/node-apn");
+    apnProvider = new apnLib.Provider({ token: { key: APNS_KEY, keyId: APNS_KEY_ID, teamId: APNS_TEAM_ID }, production: APNS_PRODUCTION });
+    console.log("APNs enabled (production=" + APNS_PRODUCTION + ")");
+  }
+} catch (e) { console.error("APNs init:", e.message); }
+const apnsEnabled = () => !!apnProvider;
+
 const cors    = require("cors");
 const path    = require("path");
 
@@ -794,20 +811,42 @@ app.post("/api/client-error", (req, res) => {
 
 // ---- Push-notifikationer ----
 async function sendPushTo(userIds, payload) {
-  if (!pushEnabled() || !userIds.length) return;
-  try {
-    const subs = await sb(`push_subs?user_id=in.(${userIds.join(",")})&select=endpoint,keys,user_id`) || [];
-    const body = JSON.stringify(payload);
-    await Promise.all(subs.map(async (sub) => {
-      try {
-        await webpush.sendNotification({ endpoint: sub.endpoint, keys: sub.keys }, body);
-      } catch (err) {
-        if (err.statusCode === 404 || err.statusCode === 410) {
-          try { await sb(`push_subs?endpoint=eq.${encodeURIComponent(sub.endpoint)}`, { method: "DELETE" }); } catch (e) {}
+  if (!userIds.length) return;
+  // Web-push (browser / PWA)
+  if (pushEnabled()) {
+    try {
+      const subs = await sb(`push_subs?user_id=in.(${userIds.join(",")})&select=endpoint,keys,user_id`) || [];
+      const body = JSON.stringify(payload);
+      await Promise.all(subs.map(async (sub) => {
+        try {
+          await webpush.sendNotification({ endpoint: sub.endpoint, keys: sub.keys }, body);
+        } catch (err) {
+          if (err.statusCode === 404 || err.statusCode === 410) {
+            try { await sb(`push_subs?endpoint=eq.${encodeURIComponent(sub.endpoint)}`, { method: "DELETE" }); } catch (e) {}
+          }
         }
+      }));
+    } catch (e) { console.error("web-push:", e.message); }
+  }
+  // Native iOS (APNs)
+  if (apnsEnabled()) {
+    try {
+      const toks = await sb(`device_tokens?user_id=in.(${userIds.join(",")})&select=token`) || [];
+      if (toks.length) {
+        const note = new apnLib.Notification();
+        note.alert = { title: payload.title || "Craft Tracker", body: payload.body || "" };
+        note.topic = APNS_BUNDLE_ID;
+        note.sound = "default";
+        const result = await apnProvider.send(note, toks.map(t => t.token));
+        await Promise.all((result.failed || []).map(async (f) => {
+          const reason = f.response && f.response.reason;
+          if (reason === "BadDeviceToken" || reason === "Unregistered") {
+            try { await sb(`device_tokens?token=eq.${encodeURIComponent(f.device)}`, { method: "DELETE" }); } catch (e) {}
+          }
+        }));
       }
-    }));
-  } catch (e) { console.error("push:", e.message); }
+    } catch (e) { console.error("apns:", e.message); }
+  }
 }
 
 app.post("/api/push/subscribe", async (req, res) => {
@@ -819,6 +858,24 @@ app.post("/api/push/subscribe", async (req, res) => {
       method: "POST",
       headers: { "Prefer": "resolution=merge-duplicates,return=representation" },
       body: JSON.stringify({ endpoint, user_id: userId, keys }),
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Native iOS push: registrér APNs-device-token ----
+app.post("/api/push/register-native", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    if (!apnsEnabled()) return res.json({ ok: true, enabled: false }); // inert før APNs er sat op
+    const { token, platform } = req.body || {};
+    if (!token) return res.status(400).json({ error: "token mangler" });
+    await sb("device_tokens?on_conflict=token", {
+      method: "POST",
+      headers: { "Prefer": "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify({ token: String(token).slice(0, 200), user_id: userId, platform: (platform || "ios").slice(0, 12), updated_at: new Date().toISOString() }),
     });
     res.json({ ok: true });
   } catch (err) {
