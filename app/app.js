@@ -5621,7 +5621,8 @@
     $("#mainWrap").style.display="";
     try{fixScrollPadding();}catch(e){}
     try{applyProState();}catch(e){}
-    try{registerNativePush(false);}catch(e){}   // native push: registrér token hvis allerede tilladt (spørger ikke)
+    // native push: spørg om tilladelse ved opstart (lille forsinkelse så boot ikke forstyrres)
+    setTimeout(()=>{try{registerNativePush(true);}catch(e){}},1400);
     document.getElementById("view-vagt").classList.add("active");
     const _sb2=document.getElementById("shiftBar"),_ss2=document.getElementById("shiftStartBtn");
     if(_sb2)_sb2.style.display="none";if(_ss2)_ss2.style.display="none";
