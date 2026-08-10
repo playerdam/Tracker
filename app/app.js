@@ -3255,7 +3255,7 @@
     if(!rows.length)return '<div class="lb-empty">'+esc(t("lb_empty"))+'</div>';
     return rows.map((r,i)=>{
       const isMe=(r.user_id||r.userId)===myId;
-      const nick=esc(r.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
+      const nick=esc(r.nickname||r.username||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
       const prof=r.profession?'<span class="lb-prof">'+esc(r.profession)+'</span>':'';
       return '<div class="lb-row'+(isMe?" lb-me":"")+'">'
         +'<span class="lb-medal">'+_lbMedalHtml(i)+'</span>'
@@ -3493,7 +3493,7 @@
         +(rows.length?'<div class="lb-section">'
           +rows.slice(0,10).map((r,i)=>{
             const isMe=r.user_id===myId;
-            const nick=esc(r.nickname||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
+            const nick=esc(r.nickname||r.username||t("lb_anon"))+(isMe?' <span class="lb-you">('+t("lb_you")+')</span>':'');
             return '<div class="lb-row'+(isMe?" lb-me":"")+'">'+'<span class="lb-rank">'+(i+1)+'</span>'+'<span class="lb-name">'+nick+'</span>'+'<span class="lb-score">'+r.total+'</span></div>';
           }).join("")
         +'</div>':'');
@@ -4215,7 +4215,7 @@
   }
 
   function feedEntryHtml(e){
-    const initial=(e.nickname||"?").charAt(0).toUpperCase();
+    const initial=(e.nickname||e.username||"?").charAt(0).toUpperCase();
     const catLabel=lang==="en"?(e.categoryEn||e.category||""):e.category||"";
     const numStr=(e.delta>0?"+":"")+e.delta;
     const likeIcon=e.liked?"❤️":"🤍";
@@ -4229,7 +4229,7 @@
         +'<div class="feed-photo-overlay"></div>'
         +'<div class="feed-photo-top">'
         +'<div class="feed-photo-avatar" data-profile="'+esc(e.userId)+'">'+esc(initial)+'</div>'
-        +'<span class="feed-photo-nick">'+esc(e.nickname||t("lb_anon"))+(e.isOwn?' ('+t("lb_you")+')':'')+'</span>'
+        +'<span class="feed-photo-nick">'+esc(e.nickname||e.username||t("lb_anon"))+(e.isOwn?' ('+t("lb_you")+')':'')+'</span>'
         +followBtn
         +'</div>'
         +'<div class="feed-photo-time">'+esc(timeAgo(e.loggedAt))+'</div>'
@@ -4250,7 +4250,7 @@
       +'<div class="feed-entry-head">'
       +'<div class="feed-avatar" data-profile="'+esc(e.userId)+'">'+esc(initial)+'</div>'
       +'<div class="feed-meta">'
-      +'<div class="feed-nick">'+esc(e.nickname||t("lb_anon"))+(e.isOwn?' <span class="lb-you">('+t("lb_you")+')</span>':'')+'</div>'
+      +'<div class="feed-nick">'+esc(e.nickname||e.username||t("lb_anon"))+(e.isOwn?' <span class="lb-you">('+t("lb_you")+')</span>':'')+'</div>'
       +(e.profession?'<div class="feed-time">'+esc(e.profession)+'</div>':'')
       +'<div class="feed-time">'+esc(timeAgo(e.loggedAt))+'</div>'
       +'</div>'
@@ -4403,7 +4403,7 @@
 
   function renderComments(el,comments){
     if(!comments.length){el.innerHTML='<p class="muted" style="padding:8px 0">'+esc(t("feed_comment_empty"))+'</p>';return;}
-    el.innerHTML=comments.map(c=>'<div class="comment-row"><div class="comment-nick">'+esc(c.nickname||t("lb_anon"))+'</div><div class="comment-text">'+esc(c.text)+'</div><div class="comment-time">'+esc(timeAgo(c.createdAt))+'</div></div>').join("");
+    el.innerHTML=comments.map(c=>'<div class="comment-row"><div class="comment-nick">'+esc(c.nickname||c.username||t("lb_anon"))+'</div><div class="comment-text">'+esc(c.text)+'</div><div class="comment-time">'+esc(timeAgo(c.createdAt))+'</div></div>').join("");
     el.scrollTop=el.scrollHeight;
   }
   // Løft kommentar-arket over tastaturet (som numtray'en), så skrivefeltet

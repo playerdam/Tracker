@@ -421,10 +421,10 @@ app.get("/api/leaderboard", async (req, res) => {
       fromDate.setHours(0, 0, 0, 0);
     }
     const filter = fromDate ? `&logged_at=gte.${fromDate.toISOString()}` : "";
-    const rows = await sb(`log_entries?select=user_id,delta,users!user_id(nickname,profession)${filter}`) || [];
+    const rows = await sb(`log_entries?select=user_id,delta,users!user_id(nickname,profession,username)${filter}`) || [];
     const agg = {};
     for (const r of rows) {
-      if (!agg[r.user_id]) agg[r.user_id] = { userId: r.user_id, total: 0, nickname: r.users?.nickname || null, profession: r.users?.profession || null };
+      if (!agg[r.user_id]) agg[r.user_id] = { userId: r.user_id, total: 0, nickname: r.users?.nickname || null, username: r.users?.username || null, profession: r.users?.profession || null };
       if (r.delta > 0) agg[r.user_id].total += r.delta;
     }
     const leaderboard = Object.values(agg).sort((a, b) => b.total - a.total).slice(0, 50);
@@ -454,10 +454,10 @@ app.get("/api/challenge/current", async (req, res) => {
     const cats = await sb(`categories?label_da=eq.${encodeURIComponent(categoryDa)}&select=id`);
     if (!cats?.length) return res.json({ categoryDa, categoryEn, leaderboard: [], weekStart: monday.toISOString(), weekEnd: sunday.toISOString() });
 
-    const rows = await sb(`log_entries?category_id=eq.${cats[0].id}&logged_at=gte.${monday.toISOString()}&select=user_id,delta,users!user_id(nickname,profession)`) || [];
+    const rows = await sb(`log_entries?category_id=eq.${cats[0].id}&logged_at=gte.${monday.toISOString()}&select=user_id,delta,users!user_id(nickname,profession,username)`) || [];
     const agg = {};
     for (const r of rows) {
-      if (!agg[r.user_id]) agg[r.user_id] = { userId: r.user_id, total: 0, nickname: r.users?.nickname || null, profession: r.users?.profession || null };
+      if (!agg[r.user_id]) agg[r.user_id] = { userId: r.user_id, total: 0, nickname: r.users?.nickname || null, username: r.users?.username || null, profession: r.users?.profession || null };
       if (r.delta > 0) agg[r.user_id].total += r.delta;
     }
     const leaderboard = Object.values(agg).sort((a, b) => b.total - a.total).slice(0, 25);
@@ -564,7 +564,7 @@ app.get("/api/teams/mine", async (req, res) => {
     const lastMonday = new Date(monday.getTime() - 7 * 24 * 3600 * 1000);
     const results = await Promise.all(memberships.map(async (ms) => {
       const team = ms.teams;
-      const members = await sb(`team_members?team_id=eq.${team.id}&select=user_id,users!user_id(nickname,profession)`) || [];
+      const members = await sb(`team_members?team_id=eq.${team.id}&select=user_id,users!user_id(nickname,profession,username)`) || [];
       const memberIds = members.map(m => m.user_id);
       let entries = [];
       if (memberIds.length) {
@@ -1055,7 +1055,7 @@ app.get("/api/feed", async (req, res) => {
     if (!ids.length) return res.json({ entries: [] });
 
     const inClause = ids.map(i => `"${i}"`).join(",");
-    let path = `log_entries?user_id=in.(${ids.join(",")})&is_public=eq.true&order=logged_at.desc&limit=40&select=id,user_id,delta,summary,image_url,logged_at,categories(label_da,label_en),users!user_id(nickname,profession)`;
+    let path = `log_entries?user_id=in.(${ids.join(",")})&is_public=eq.true&order=logged_at.desc&limit=40&select=id,user_id,delta,summary,image_url,logged_at,categories(label_da,label_en),users!user_id(nickname,profession,username)`;
     if (cursor) path += `&logged_at=lt.${encodeURIComponent(cursor)}`;
 
     const entries = await sb(path) || [];
@@ -1078,6 +1078,7 @@ app.get("/api/feed", async (req, res) => {
       id: e.id,
       userId: e.user_id,
       nickname: e.users?.nickname || null,
+      username: e.users?.username || null,
       profession: e.users?.profession || null,
       delta: e.delta,
       summary: e.summary || null,
@@ -1140,8 +1141,8 @@ app.get("/api/comments/:entryId", async (req, res) => {
   try {
     await verifyAuth(req);
     const { entryId } = req.params;
-    const rows = await sb(`comments?entry_id=eq.${entryId}&order=created_at.asc&select=id,text,created_at,users!user_id(nickname)`) || [];
-    res.json({ comments: rows.map(c => ({ id: c.id, text: c.text, createdAt: c.created_at, nickname: c.users?.nickname || null })) });
+    const rows = await sb(`comments?entry_id=eq.${entryId}&order=created_at.asc&select=id,text,created_at,users!user_id(nickname,username)`) || [];
+    res.json({ comments: rows.map(c => ({ id: c.id, text: c.text, createdAt: c.created_at, nickname: c.users?.nickname || null, username: c.users?.username || null })) });
   } catch (err) {
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
@@ -1163,8 +1164,8 @@ app.post("/api/comments/:entryId", async (req, res) => {
         sendPushTo([ownerId], { title: "Craft Tracker", body: who + ': "' + text.slice(0, 80) + '"' });
       }
     } catch (e) {}
-    const rows = await sb(`comments?entry_id=eq.${entryId}&order=created_at.asc&select=id,text,created_at,users!user_id(nickname)`) || [];
-    res.json({ comments: rows.map(c => ({ id: c.id, text: c.text, createdAt: c.created_at, nickname: c.users?.nickname || null })) });
+    const rows = await sb(`comments?entry_id=eq.${entryId}&order=created_at.asc&select=id,text,created_at,users!user_id(nickname,username)`) || [];
+    res.json({ comments: rows.map(c => ({ id: c.id, text: c.text, createdAt: c.created_at, nickname: c.users?.nickname || null, username: c.users?.username || null })) });
   } catch (err) {
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
