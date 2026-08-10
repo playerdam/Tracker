@@ -52,6 +52,13 @@
   .bar-val small{color:var(--faint);font-weight:400}
   @media (max-width:560px){.bar-row{grid-template-columns:110px 1fr 56px;gap:8px}.bar-row .lbl{font-size:12px}}
 
+  .chart{width:100%;height:auto;display:block}
+  .chart text{fill:var(--faint);font-size:10px;font-family:var(--sans)}
+  .chart .grid{stroke:var(--line);stroke-width:1}
+  .chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font-size:12.5px;color:var(--dim)}
+  .chart-legend .lg{display:inline-flex;align-items:center;gap:6px}
+  .chart-legend .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+
   .tbl-wrap{overflow-x:auto}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{text-align:right;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -86,6 +93,18 @@
     <div class="cards" id="cards"></div>
 
     <section>
+      <h2>Aktivitet over tid</h2>
+      <p class="hint">Logs og aktive brugere pr. dag (sidste 60 dage). X = dato · Y = antal.</p>
+      <div id="chartActivity"></div>
+    </section>
+
+    <section>
+      <h2>Vækst</h2>
+      <p class="hint">Brugere i alt over tid.</p>
+      <div id="chartGrowth"></div>
+    </section>
+
+    <section>
       <h2>Kerne-løkke-tragt</h2>
       <p class="hint">Af alle der opretter sig — hvor mange når hvert trin? Hvor falder de fra?</p>
       <div id="funnel"></div>
@@ -101,6 +120,12 @@
       <h2>Feature-brug</h2>
       <p class="hint">Hvor mange forskellige brugere har rørt hver feature (% af alle signups).</p>
       <div id="features"></div>
+    </section>
+
+    <section>
+      <h2>Alle events</h2>
+      <p class="hint">Alt hvad appen registrerer — samlet antal pr. type.</p>
+      <div id="allEvents"></div>
     </section>
 
     <section>
@@ -124,6 +149,27 @@
       +'<div class="bar-val">'+val+(pct!=null?' <small>'+pct+'%</small>':'')+'</div></div>';
   }
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function niceMax(v){ if(v<=1)return 1; var pow=Math.pow(10,Math.floor(Math.log10(v))); var f=v/pow; var nice=f<=1?1:f<=2?2:f<=5?5:10; return nice*pow; }
+  function fmtDay(d){ var p=String(d).split('-'); return p[2]+'/'+p[1]; }
+  function lineChart(el,days,series){
+    if(!days||!days.length){ el.innerHTML='<div style="color:var(--faint);font-size:13px">Ingen data endnu</div>'; return; }
+    var W=760,H=220,PL=38,PR=12,PT=12,PB=26,n=days.length;
+    var maxY=1; series.forEach(function(s){ s.vals.forEach(function(v){ if(v>maxY)maxY=v; }); }); maxY=niceMax(maxY);
+    function X(i){ return PL + (n<=1?(W-PL-PR)/2:i*(W-PL-PR)/(n-1)); }
+    function Y(v){ return H-PB-(v/maxY)*(H-PT-PB); }
+    var g='';
+    [0,0.5,1].forEach(function(f){ var y=Y(maxY*f); g+='<line class="grid" x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'"/><text x="'+(PL-6)+'" y="'+(y+3)+'" text-anchor="end">'+Math.round(maxY*f)+'</text>'; });
+    var ticks=[0,Math.floor((n-1)/2),n-1].filter(function(v,i,a){return a.indexOf(v)===i;});
+    ticks.forEach(function(i){ g+='<text x="'+X(i).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle">'+fmtDay(days[i])+'</text>'; });
+    series.forEach(function(s){
+      var pts=s.vals.map(function(v,i){return X(i).toFixed(1)+','+Y(v).toFixed(1);});
+      if(s.area) g+='<path d="M'+X(0).toFixed(1)+','+Y(0).toFixed(1)+' L'+pts.join(' L')+' L'+X(n-1).toFixed(1)+','+Y(0).toFixed(1)+' Z" fill="'+s.color+'" fill-opacity="0.13"/>';
+      g+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+s.color+'" stroke-width="2.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>';
+      if(n<=25) s.vals.forEach(function(v,i){ g+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="2.6" fill="'+s.color+'"/>'; });
+    });
+    var legend=series.map(function(s){return '<span class="lg"><span class="sw" style="background:'+s.color+'"></span>'+esc(s.label)+'</span>';}).join('');
+    el.innerHTML='<div class="chart-legend">'+legend+'</div><svg viewBox="0 0 '+W+' '+H+'" class="chart" preserveAspectRatio="xMidYMid meet">'+g+'</svg>';
+  }
 
   function showGate(msg){ $("#dash").style.display="none"; $("#gate").style.display=""; $("#gateErr").textContent=msg||""; }
   function showDash(){ $("#gate").style.display="none"; $("#dash").style.display=""; }
@@ -145,8 +191,20 @@
     var t=d.totals;
     $("#cards").innerHTML=[
       ["Signups",t.signups],["Aktive",t.activeCount],["Har logget",t.loggedCount],
-      ["Kom tilbage",t.repeatCount],["Logs i alt",t.totalLogs]
+      ["Kom tilbage",t.repeatCount],["Logs i alt",t.totalLogs],["Events i alt",t.totalEvents]
     ].map(function(c){return '<div class="card"><div class="n">'+c[1]+'</div><div class="l">'+c[0]+'</div></div>';}).join("");
+
+    var days=(d.daily||[]).map(function(x){return x.date;});
+    lineChart($("#chartActivity"),days,[
+      {label:'Logs/dag',color:'var(--accent)',area:true,vals:(d.daily||[]).map(function(x){return x.logs;})},
+      {label:'Aktive brugere/dag',color:'#5B7FB0',vals:(d.daily||[]).map(function(x){return x.active;})}
+    ]);
+    lineChart($("#chartGrowth"),days,[
+      {label:'Brugere i alt',color:'var(--accent)',area:true,vals:(d.daily||[]).map(function(x){return x.cum;})}
+    ]);
+    var et=d.eventTotals||[];
+    var emax=Math.max.apply(null,et.map(function(e){return e.n;}).concat([1]));
+    $("#allEvents").innerHTML= et.length ? et.map(function(e){return bar(e.event,e.n,emax,null);}).join('') : '<div style="color:var(--faint);font-size:13px">Ingen events endnu</div>';
 
     var sign=t.signups||1;
     $("#funnel").innerHTML=d.funnel.map(function(f){return bar(f.label,f.n,d.funnel[0].n||1,Math.round(100*f.n/sign));}).join("");

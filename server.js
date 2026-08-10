@@ -217,9 +217,41 @@ app.get("/api/admin/metrics", async (req, res) => {
     const usersOut = all.map(u => ({ name: u.name, created: day(u.created), logs: u.logs, logDays: u.logDays.size, activeDays: u.evDays.size, last: day(u.last), shifts: u.shifts, cvOpen: u.cvOpen, cvShare: u.cvShare }))
       .sort((a, b) => (b.activeDays - a.activeDays) || (b.logs - a.logs));
 
+    // ── Tidsserie (dag-for-dag, sidste 60 dage) ──
+    const allDays = []
+      .concat((users || []).map(u => day(u.created_at)))
+      .concat((events || []).map(e => day(e.created_at)))
+      .concat((logs || []).map(l => day(l.logged_at)))
+      .filter(Boolean).sort();
+    const daily = [];
+    let cumUsers = 0;
+    if (allDays.length) {
+      const startMs = Math.max(new Date(allDays[0]).getTime(), Date.now() - 60 * 864e5);
+      const endMs = new Date(day(new Date())).getTime();
+      const idx = {};
+      for (let ms = new Date(day(new Date(startMs))).getTime(); ms <= endMs; ms += 864e5) {
+        idx[day(new Date(ms))] = daily.length;
+        daily.push({ date: day(new Date(ms)), signups: 0, active: 0, logs: 0, shifts: 0, cum: 0 });
+      }
+      const activeSets = daily.map(() => new Set());
+      // brugere født FØR vinduet tæller stadig med i kumuleret total
+      cumUsers = (users || []).filter(u => day(u.created_at) < daily[0].date).length;
+      (users || []).forEach(u => { const i = idx[day(u.created_at)]; if (i != null) daily[i].signups++; });
+      (logs || []).forEach(l => { const i = idx[day(l.logged_at)]; if (i != null) daily[i].logs++; });
+      (events || []).forEach(e => { const i = idx[day(e.created_at)]; if (i != null) { activeSets[i].add(e.user_id); if (e.event === "shift_start") daily[i].shifts++; } });
+      let run = cumUsers;
+      daily.forEach((d, i) => { d.active = activeSets[i].size; run += d.signups; d.cum = run; });
+    }
+    // ── Alle events efter type (hele historikken) ──
+    const evCount = {};
+    (events || []).forEach(e => { evCount[e.event] = (evCount[e.event] || 0) + 1; });
+    const eventTotals = Object.keys(evCount).map(k => ({ event: k, n: evCount[k] })).sort((a, b) => b.n - a.n);
+
     res.json({
       generatedAt: new Date().toISOString(),
-      totals: { signups, activeCount, loggedCount, repeatCount, shiftedCount, totalLogs: (logs || []).length },
+      totals: { signups, activeCount, loggedCount, repeatCount, shiftedCount, totalLogs: (logs || []).length, totalEvents: (events || []).length },
+      daily,
+      eventTotals,
       funnel: [
         { label: "Oprettet konto", n: signups },
         { label: "Åbnet appen", n: activeCount },
