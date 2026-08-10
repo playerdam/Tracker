@@ -69,6 +69,15 @@
   .yes{color:var(--good);font-weight:700}
   .no{color:var(--faint)}
   tr.dead td{color:var(--faint)}
+  .resto-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .resto-row:last-child{border-bottom:none}
+  .resto-main{flex:1;min-width:0}
+  .resto-name{font-weight:600;font-size:14px}
+  .resto-meta{font-size:12px;color:var(--faint);margin-top:2px}
+  .resto-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;white-space:nowrap}
+  .resto-badge.pending{background:var(--accent-soft);color:var(--accent)}
+  .resto-badge.verified{background:rgba(47,125,79,.14);color:var(--good)}
+  .resto-approve{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
 
   .foot{color:var(--faint);font-size:12px;text-align:center;margin-top:24px}
 </style>
@@ -91,6 +100,12 @@
       <div style="display:flex;gap:8px"><button class="btn ghost" id="logoutBtn">Skift nøgle</button><button class="btn" id="refreshBtn">Opdatér</button></div>
     </div>
     <div class="cards" id="cards"></div>
+
+    <section id="restoSection" style="display:none">
+      <h2>Restauranter</h2>
+      <p class="hint">Godkend afventende restauranter, så de vises som verificerede.</p>
+      <div id="restoContent"></div>
+    </section>
 
     <section>
       <h2>Aktivitet over tid</h2>
@@ -183,7 +198,34 @@
       if(!r.ok) throw new Error("HTTP "+r.status);
       render(await r.json());
       showDash();
+      loadRestaurants();
     }catch(e){ showGate("Kunne ikke hente data: "+e.message); }
+  }
+
+  async function loadRestaurants(){
+    var key=localStorage.getItem(KEYLS); if(!key)return;
+    var sec=$("#restoSection"), el=$("#restoContent");
+    try{
+      var r=await fetch("/api/admin/restaurants",{headers:{"x-admin-key":key}});
+      if(!r.ok){ if(sec)sec.style.display="none"; return; }
+      var d=await r.json();
+      if(!d.enabled){ if(sec)sec.style.display="none"; return; }
+      if(sec)sec.style.display="";
+      var list=d.restaurants||[];
+      if(!list.length){ el.innerHTML='<div style="color:var(--faint);font-size:13px">Ingen restauranter endnu</div>'; return; }
+      el.innerHTML=list.map(function(x){
+        var st=x.status||"pending";
+        var badge='<span class="resto-badge '+(st==="verified"?"verified":"pending")+'">'+(st==="verified"?"✓ Verificeret":"Afventer")+'</span>';
+        var meta=[x.city,(x.members||0)+" medlemmer",x.by?("af @"+x.by):null].filter(Boolean).join(" · ");
+        var act=st==="verified"?'':'<button class="resto-approve" data-approve="'+esc(x.id)+'">Godkend</button>';
+        return '<div class="resto-row"><div class="resto-main"><div class="resto-name">'+esc(x.name)+'</div><div class="resto-meta">'+esc(meta)+'</div>'+(x.note?'<div class="resto-meta">📝 '+esc(x.note)+'</div>':'')+'</div>'+badge+act+'</div>';
+      }).join("");
+      el.querySelectorAll("[data-approve]").forEach(function(b){ b.addEventListener("click",async function(){
+        b.disabled=true;b.textContent="…";
+        try{ await fetch("/api/admin/restaurants/"+encodeURIComponent(b.dataset.approve)+"/verify",{method:"POST",headers:{"x-admin-key":key,"Content-Type":"application/json"},body:"{}"}); loadRestaurants(); }
+        catch(e){ b.disabled=false;b.textContent="Godkend"; }
+      }); });
+    }catch(e){ if(sec)sec.style.display="none"; }
   }
 
   function render(d){

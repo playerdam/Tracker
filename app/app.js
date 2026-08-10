@@ -671,6 +671,8 @@
   // Håndhæves gating overhovedet? Spejler serverens PRO_ENFORCE (fra /api/config).
   // Slukket = appen er HELT åben (test/beta) — gating er inert uanset _isPro.
   let _proEnforced=false;
+  // Restauranter (verificerede hold) — spejler serverens RESTAURANTS_ENABLED.
+  let _restaurantsEnabled=false;
 
   const WINE_FLAGS={"Frankrig":"🇫🇷","France":"🇫🇷","Italien":"🇮🇹","Italy":"🇮🇹","Spanien":"🇪🇸","Spain":"🇪🇸","Portugal":"🇵🇹","Tyskland":"🇩🇪","Germany":"🇩🇪","Østrig":"🇦🇹","Austria":"🇦🇹","USA":"🇺🇸","Australien":"🇦🇺","Australia":"🇦🇺","New Zealand":"🇳🇿","Sydafrika":"🇿🇦","South Africa":"🇿🇦","Chile":"🇨🇱","Argentina":"🇦🇷","Grækenland":"🇬🇷","Greece":"🇬🇷","Ungarn":"🇭🇺","Hungary":"🇭🇺","Georgien":"🇬🇪","Georgia":"🇬🇪","Libanon":"🇱🇧","Lebanon":"🇱🇧","Danmark":"🇩🇰","Denmark":"🇩🇰","Slovenien":"🇸🇮","Kroatien":"🇭🇷"};
   const REGION_TO_LAND={"toscana":"Italien","tuscany":"Italien","piemonte":"Italien","piedmont":"Italien","veneto":"Italien","sicilia":"Italien","sicily":"Italien","lombardia":"Italien","lombardy":"Italien","emilia-romagna":"Italien","emilia romagna":"Italien","friuli":"Italien","puglia":"Italien","campania":"Italien","abruzzo":"Italien","umbria":"Italien","lazio":"Italien","marche":"Italien","brunello":"Italien","chianti":"Italien","barolo":"Italien","amarone":"Italien","bordeaux":"Frankrig","bourgogne":"Frankrig","burgundy":"Frankrig","champagne":"Frankrig","alsace":"Frankrig","loire":"Frankrig","rhône":"Frankrig","rhone":"Frankrig","provence":"Frankrig","languedoc":"Frankrig","roussillon":"Frankrig","côtes du rhône":"Frankrig","cotes du rhone":"Frankrig","médoc":"Frankrig","medoc":"Frankrig","saint-émilion":"Frankrig","pomerol":"Frankrig","rioja":"Spanien","ribera del duero":"Spanien","priorat":"Spanien","penedès":"Spanien","penedes":"Spanien","rias baixas":"Spanien","catalonia":"Spanien","catalunya":"Spanien","rueda":"Spanien","jumilla":"Spanien","douro":"Portugal","alentejo":"Portugal","vinho verde":"Portugal","dão":"Portugal","dao":"Portugal","setúbal":"Portugal","setubal":"Portugal","mosel":"Tyskland","rheingau":"Tyskland","pfalz":"Tyskland","nahe":"Tyskland","rheinhessen":"Tyskland","franken":"Tyskland","wachau":"Østrig","kamptal":"Østrig","burgenland":"Østrig","steiermark":"Østrig","napa valley":"USA","napa":"USA","sonoma":"USA","willamette valley":"USA","columbia valley":"USA","barossa valley":"Australien","barossa":"Australien","yarra valley":"Australien","mclaren vale":"Australien","coonawarra":"Australien","margaret river":"Australien","marlborough":"New Zealand","central otago":"New Zealand","hawke's bay":"New Zealand","stellenbosch":"Sydafrika","swartland":"Sydafrika","constantia":"Sydafrika","mendoza":"Argentina","patagonia":"Argentina","salta":"Argentina","maipo":"Chile","colchagua":"Chile","casablanca":"Chile","aconcagua":"Chile","nemea":"Grækenland","naoussa":"Grækenland","tokaj":"Ungarn","eger":"Ungarn","kakheti":"Georgien","bekaa valley":"Libanon"};
@@ -784,7 +786,7 @@
   // server-koldstart (Railway) ikke efterlader cfg tom og smider os ud af login.
   async function loadConfig(tries){
     for(let i=0;i<(tries||3);i++){
-      try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},8000);const j=await res.json();if(j&&j.supabaseUrl){cfg=j;_proEnforced=!!j.proEnforced;return true;}}
+      try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},8000);const j=await res.json();if(j&&j.supabaseUrl){cfg=j;_proEnforced=!!j.proEnforced;_restaurantsEnabled=!!j.restaurantsEnabled;return true;}}
       catch(e){console.warn("CT:config try"+i,e.message);}
       await new Promise(r=>setTimeout(r,600));
     }
@@ -3314,7 +3316,10 @@
       }).join("")+'</div>':'';
     const codeSp=(team.invite_code||"").split("").join(" ");
     return '<div class="tcard" data-team-id="'+esc(team.id)+'" style="background:'+teamGrad(team.name)+'">'
-      +'<div class="tcard-top"><div class="tcard-name">'+esc(team.name)+'</div>'
+      +'<div class="tcard-top"><div class="tcard-name">'+esc(team.name)
+        +(team.kind==="restaurant"?' <span class="tcard-resto-badge'+(team.status==="verified"?" ok":"")+'">'+(team.status==="verified"?"✓ "+(lang==="da"?"Verificeret":"Verified"):(lang==="da"?"Afventer":"Pending"))+'</span>':'')
+        +(team.kind==="restaurant"&&team.city?'<div class="tcard-resto-city">'+esc(team.city)+'</div>':'')
+        +'</div>'
       +(myIdx>=0?'<div class="tcard-rank">#'+(myIdx+1)+' '+(lang==="da"?"af":"of")+' '+members.length+'</div>':'')+'</div>'
       +'<div class="tcard-mid">'
         +'<div class="tcard-avatars" data-toggle-list="'+esc(team.id)+'" role="button" aria-label="'+(lang==="da"?"Vis rangliste":"Show ranking")+'">'+avatars+'</div>'
@@ -3391,7 +3396,9 @@
       +'<div class="otp-hint" id="otpHint"></div>'
       +'<div class="tjoin-div"><span>'+(lang==="da"?"eller":"or")+'</span></div>'
       +'<div class="tjoin-title">'+(lang==="da"?"Start dit eget":"Start your own")+'</div>'
-      +'<div class="team-form" style="margin-top:10px;margin-bottom:0"><input class="input stac-name-inp" placeholder="'+esc(lang==="da"?"fx Restaurant Nord":"e.g. Noma Kitchen")+'" maxlength="40"><button class="btn primary btn-sm stac-create-btn">'+esc(lang==="da"?"Opret":"Create")+'</button></div>';
+      +(_restaurantsEnabled?'<div class="stac-type"><label class="stac-type-opt"><input type="radio" name="stacKind" value="crew" checked> '+(lang==="da"?"Hold":"Crew")+'</label><label class="stac-type-opt"><input type="radio" name="stacKind" value="restaurant"> '+(lang==="da"?"Restaurant":"Restaurant")+'</label></div>':'')
+      +'<div class="team-form" style="margin-top:10px;margin-bottom:0"><input class="input stac-name-inp" placeholder="'+esc(lang==="da"?"fx Restaurant Nord":"e.g. Noma Kitchen")+'" maxlength="40"><button class="btn primary btn-sm stac-create-btn">'+esc(lang==="da"?"Opret":"Create")+'</button></div>'
+      +(_restaurantsEnabled?'<input class="input stac-city-inp" placeholder="'+esc(lang==="da"?"By":"City")+'" maxlength="60" style="display:none;margin-top:8px"><div class="stac-resto-hint" style="display:none">'+esc(lang==="da"?"Restauranter godkendes manuelt før de vises som verificerede.":"Restaurants are approved manually before showing as verified.")+'</div>':'');
     container.appendChild(div);
     const boxes=[...div.querySelectorAll(".otp-box")];
     const row=div.querySelector("#otpRow");const hint=div.querySelector("#otpHint");
@@ -3434,14 +3441,27 @@
         if(txt.length===6)tryJoin();else boxes[Math.min(txt.length,5)].focus();
       });
     });
+    // Restaurant-valg → vis by-felt
+    if(_restaurantsEnabled){
+      const cityInp=div.querySelector(".stac-city-inp"),rHint=div.querySelector(".stac-resto-hint");
+      div.querySelectorAll('input[name="stacKind"]').forEach(rb=>rb.addEventListener("change",()=>{
+        const isResto=div.querySelector('input[name="stacKind"]:checked').value==="restaurant";
+        if(cityInp)cityInp.style.display=isResto?"":"none";
+        if(rHint)rHint.style.display=isResto?"":"none";
+      }));
+    }
     div.querySelector(".stac-create-btn").addEventListener("click",async()=>{
       const inp=div.querySelector(".stac-name-inp");const name=inp.value.trim();if(!name)return;
+      const kindSel=div.querySelector('input[name="stacKind"]:checked');
+      const isResto=_restaurantsEnabled&&kindSel&&kindSel.value==="restaurant";
+      const city=isResto?(div.querySelector(".stac-city-inp").value||"").trim():"";
+      const body={name};if(isResto){body.kind="restaurant";if(city)body.city=city;}
       const base=apiBase();const token=await getToken();if(!token)return;
       try{
-        const r=await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({name})});
-        if(!r.ok){showToast(lang==="da"?"Kunne ikke oprette hold — prøv igen":"Couldn't create team — try again");return;}
+        const r=await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});
+        if(!r.ok){showToast(lang==="da"?"Kunne ikke oprette — prøv igen":"Couldn't create — try again");return;}
         invalidateLabTeams();haptic(50);renderSocialTeam();
-        showToast(lang==="da"?"Holdet er oprettet — del koden med kollegerne 🎉":"Team created — share the code with your colleagues 🎉");
+        showToast(isResto?(lang==="da"?"Restaurant oprettet — afventer godkendelse 🕘":"Restaurant created — pending approval 🕘"):(lang==="da"?"Holdet er oprettet — del koden med kollegerne 🎉":"Team created — share the code 🎉"));
       }catch(e){
         showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
       }

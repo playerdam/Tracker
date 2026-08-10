@@ -39,6 +39,10 @@ const PARSE_MODEL   = process.env.PARSE_MODEL || "claude-haiku-4-5-20251001";
 // er klar — så træder paywall + 402-gating i kraft.
 const PRO_ENFORCE   = process.env.PRO_ENFORCE === "1";
 const METRICS_KEY   = (process.env.METRICS_KEY || "").trim();   // admin-nøgle til /admin-dashboardet (fail-closed hvis tom)
+// Restauranter (verificerede hold). OFF som standard — tænd FØRST når
+// migration_restaurants.sql er kørt, ellers refererer koden kolonner der mangler.
+const RESTAURANTS_ENABLED = process.env.RESTAURANTS_ENABLED === "1";
+const TEAM_SELECT = RESTAURANTS_ENABLED ? "id,name,invite_code,kind,status,city,verified_at" : "id,name,invite_code";
 const WINE_MODEL    = process.env.WINE_MODEL  || "claude-sonnet-4-6";
 
 // ---- Anthropic ----
@@ -269,8 +273,34 @@ app.get("/api/admin/metrics", async (req, res) => {
   }
 });
 
+// ---- Admin: restaurant-verifikation (nøgle-beskyttet) ----
+app.get("/api/admin/restaurants", async (req, res) => {
+  if (!adminOk(req)) return res.status(401).json({ error: "unauthorized" });
+  if (!RESTAURANTS_ENABLED) return res.json({ restaurants: [], enabled: false });
+  try {
+    const rows = await sb(`teams?kind=eq.restaurant&order=created_at.desc&select=id,name,city,status,note,created_at,verified_at`) || [];
+    const withCounts = await Promise.all(rows.map(async r => {
+      const m = await sb(`team_members?team_id=eq.${r.id}&select=user_id`) || [];
+      const creator = await sb(`teams?id=eq.${r.id}&select=created_by,users:created_by(username,nickname)`).catch(() => null);
+      const c = creator && creator[0] && creator[0].users;
+      return { ...r, members: m.length, by: c ? (c.username || c.nickname || null) : null };
+    }));
+    res.json({ restaurants: withCounts, enabled: true });
+  } catch (err) { console.error("admin/restaurants:", err.message); res.status(500).json({ error: err.message }); }
+});
+app.post("/api/admin/restaurants/:id/verify", async (req, res) => {
+  if (!adminOk(req)) return res.status(401).json({ error: "unauthorized" });
+  if (!RESTAURANTS_ENABLED) return res.status(400).json({ error: "disabled" });
+  try {
+    const approve = !req.body || req.body.approve !== false; // default godkend; {approve:false} = tilbage til pending
+    const patch = approve ? { status: "verified", verified_at: new Date().toISOString() } : { status: "pending", verified_at: null };
+    await sb(`teams?id=eq.${encodeURIComponent(req.params.id)}`, { method: "PATCH", body: JSON.stringify(patch) });
+    res.json({ ok: true });
+  } catch (err) { console.error("admin/restaurants/verify:", err.message); res.status(500).json({ error: err.message }); }
+});
+
 app.get("/api/config", (_req, res) => {
-  res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON, vapidKey: pushEnabled() ? VAPID_PUBLIC : null, proEnforced: PRO_ENFORCE });
+  res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON, vapidKey: pushEnabled() ? VAPID_PUBLIC : null, proEnforced: PRO_ENFORCE, restaurantsEnabled: RESTAURANTS_ENABLED });
 });
 
 // ---- Brugerprofil: opret (upsert) + hent ----
@@ -493,12 +523,19 @@ app.get("/api/challenge/current", async (req, res) => {
 app.post("/api/teams", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
-    const { name } = req.body || {};
+    const { name, kind, city, note } = req.body || {};
     if (!name?.trim()) return res.status(400).json({ error: "Holdnavn mangler" });
-    const teams = await sb("teams", {
-      method: "POST",
-      body: JSON.stringify({ name: name.trim(), invite_code: genCode(6), created_by: userId }),
-    });
+    // Restaurant = verificeret hold. Nye kolonner røres KUN når flaget er tændt
+    // (migrationen kørt), ellers oprettes et almindeligt crew som før.
+    const isRestaurant = RESTAURANTS_ENABLED && kind === "restaurant";
+    const teamBody = { name: name.trim(), invite_code: genCode(6), created_by: userId };
+    if (isRestaurant) {
+      teamBody.kind = "restaurant";
+      teamBody.status = "pending";
+      if (city) teamBody.city = String(city).trim().slice(0, 80);
+      if (note) teamBody.note = String(note).trim().slice(0, 300);
+    }
+    const teams = await sb("teams", { method: "POST", body: JSON.stringify(teamBody) });
     const team = teams[0];
     await sb("team_members", {
       method: "POST",
@@ -524,7 +561,7 @@ app.post("/api/teams", async (req, res) => {
         sendPushTo(mates, { title: team.name, body: who + " er kommet på holdet 👋" });
       }
     } catch (e) { console.error("team auto-follow:", e.message); }
-    res.json({ id: team.id, name: team.name, invite_code: team.invite_code });
+    res.json({ id: team.id, name: team.name, invite_code: team.invite_code, kind: team.kind || "crew", status: team.status || "active" });
   } catch (err) {
     console.error("teams/create:", err.message);
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
@@ -568,7 +605,7 @@ async function userTeamIds(userId) {
 app.get("/api/teams/list", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
-    const memberships = await sb(`team_members?user_id=eq.${userId}&select=teams(id,name,invite_code)`) || [];
+    const memberships = await sb(`team_members?user_id=eq.${userId}&select=teams(${TEAM_SELECT})`) || [];
     res.json({ teams: memberships.map(m => m.teams).filter(Boolean) });
   } catch (err) {
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
@@ -578,7 +615,7 @@ app.get("/api/teams/list", async (req, res) => {
 app.get("/api/teams/mine", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
-    const memberships = await sb(`team_members?user_id=eq.${userId}&select=team_id,teams(id,name,invite_code)`);
+    const memberships = await sb(`team_members?user_id=eq.${userId}&select=team_id,teams(${TEAM_SELECT})`);
     if (!memberships?.length) return res.json({ teams: [] });
 
     const monday = mondayOfWeek();

@@ -841,6 +841,12 @@
   .feed-post-photo.has img{display:block}
   .feed-post-photo.has .feed-post-pick{display:none}
   .feed-post-pick{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--dim);font-size:13px;font-weight:500}
+  .tcard-resto-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:5px;background:rgba(255,255,255,.22);color:#fff;vertical-align:middle;margin-left:6px}
+  .tcard-resto-badge.ok{background:rgba(255,255,255,.95);color:var(--accent-h)}
+  .tcard-resto-city{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px;font-weight:500}
+  .stac-type{display:flex;gap:16px;margin-top:8px}
+  .stac-type-opt{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--dim);cursor:pointer}
+  .stac-resto-hint{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.4}
 
   /* ---- Shared input class ---- */
   .input{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:16px;padding:11px 12px;width:100%}
