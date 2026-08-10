@@ -412,8 +412,6 @@
     document.querySelectorAll(".shift-nudge-chip").forEach(btn=>{const v=snChips[btn.dataset.min];if(v)btn.textContent=v;});
     const dTitle=$("#logDrawerTitle");if(dTitle)dTitle.textContent=lang==="da"?"Menu":"Menu";
     const fSearch=$("#feedSearch");if(fSearch)fSearch.placeholder=t("feed_search_ph");
-    const ftMine=$("#feedTabMine");if(ftMine)ftMine.textContent=t("feed_tab_mine");
-    const ftDiscover=$("#feedTabDiscover");if(ftDiscover)ftDiscover.textContent=t("feed_tab_discover");
     const cSend=$("#commentSend");if(cSend)cSend.textContent=t("feed_comment_send");
     const cInput=$("#commentInput");if(cInput)cInput.placeholder=t("feed_comment_ph");
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.textContent=t("shift_start");
@@ -2354,7 +2352,7 @@
       if(!r.ok){showToast(lang==="da"?"Kunne ikke dele — prøv igen":"Couldn't share — try again");btn.disabled=false;return;}
       haptic(40);showToast(lang==="da"?"Delt til dit feed 🍷":"Shared to your feed 🍷");
       closeWineShareSheet();
-      if(window._activeFeedTab&&window._activeFeedTab()==="mine")loadFeed(false,true);
+      {const fv=document.getElementById("view-feed");if(fv&&fv.classList.contains("active"))loadFeed(false);}
     }catch(e){
       showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
     }
@@ -3121,7 +3119,7 @@
       const aiBar=document.getElementById("stAiBar");if(aiBar)aiBar.classList.toggle("on",v==="station");
       if(v==="vagt")renderVagt();
       if(v==="social")loadSocial();
-      if(v==="feed"){loadFeed(false,window._activeFeedTab?window._activeFeedTab()==="mine":true);loadFollowRequests();}
+      if(v==="feed"){loadFeed(false);loadFollowRequests();}
       if(v==="lab")renderLabSeg();
       if(v==="history"){_buildVagtActivity(document.getElementById("historyShifts"));renderLogView();}
       if(v==="stats"){
@@ -4150,7 +4148,7 @@
     recordShiftEnd(getShift());saveShift(null);renderShiftBar();renderVagt();
     showToast(lang==="da"?"Vagt postet til feed!":"Shift posted to feed!");setTimeout(()=>requestNotifPermission(),1500);
     feedCursor=null;
-    const feedView=$("#view-feed");if(feedView&&feedView.classList.contains("active"))loadFeed(false,true);
+    const feedView=$("#view-feed");if(feedView&&feedView.classList.contains("active"))loadFeed(false);
   }
 
   function setupShift(){
@@ -4308,16 +4306,15 @@
     }catch(e){banner.style.display="none";}
   }
 
-  async function loadFeed(append,mine){
+  async function loadFeed(append){
     if(feedLoading)return;
     feedLoading=true;
-    const isMine=mine!=null?mine:(window._activeFeedTab?window._activeFeedTab()==="mine":false);
     const el=$("#feedContent");if(!el)return;
     if(!append){feedCursor=null;el.innerHTML=skeletonRows(4);}
     const base=apiBase();if(!base){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">🧭</div><div class="empty-state-title">'+esc(t("feed_empty"))+'</div></div>';feedLoading=false;return;}
     const token=await getToken();if(!token){feedLoading=false;return;}
     try{
-      let url=base+"/api/feed"+(isMine?"?mine=true":"");if(feedCursor)url+=(isMine?"&":"?")+"before="+encodeURIComponent(feedCursor);
+      let url=base+"/api/feed";if(feedCursor)url+="?before="+encodeURIComponent(feedCursor);
       const res=await fetch(url,{headers:{"Authorization":"Bearer "+token}});
       if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error||"HTTP "+res.status);}
       const d=await res.json();
@@ -4327,10 +4324,8 @@
       entries.forEach(e=>{e._followStatus=_followingCache[e.userId]||"none";});
 
       if(!entries.length&&!append){
-        const emptyIcon=isMine?"📝":"🧭";
-        const emptyTitle=isMine?t("feed_empty_own"):t("feed_empty");
-        const emptySub=isMine?(lang==="da"?"Afslut en vagt for at poste til dit feed":"End a shift to post to your feed"):(lang==="da"?"Søg på en kollegas kaldenavn og tryk følg":"Search for a colleague by nickname and follow them");
-        el.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+emptyIcon+'</div><div class="empty-state-title">'+esc(emptyTitle)+'</div><div class="empty-state-sub">'+esc(emptySub)+'</div></div>';
+        const emptySub=lang==="da"?"Følg kolleger eller afslut en vagt — så fyldes dit feed":"Follow colleagues or end a shift — your feed will fill up";
+        el.innerHTML='<div class="empty-state"><div class="empty-state-icon">🧭</div><div class="empty-state-title">'+esc(t("feed_empty"))+'</div><div class="empty-state-sub">'+esc(emptySub)+'</div></div>';
         feedLoading=false;return;
       }
       const html=entries.map(feedEntryHtml).join("");
@@ -4726,22 +4721,8 @@
     const feedSearchBtn=$("#feedSearchBtn");
     if(feedSearchBtn)feedSearchBtn.addEventListener("click",()=>{const q=($("#feedSearch").value||"").trim();if(q)searchUsers(q);});
 
-    // feed tabs
-    let activeFeedTab="mine";
-    function switchFeedTab(tab){
-      activeFeedTab=tab;
-      $("#feedTabMine").classList.toggle("active",tab==="mine");
-      $("#feedTabDiscover").classList.toggle("active",tab==="discover");
-      const discoverTop=$("#feedDiscoverSearch");
-      if(discoverTop)discoverTop.style.display=tab==="discover"?"block":"none";
-      loadFeed(false,tab==="mine");
-    }
-    const tabMine=$("#feedTabMine");if(tabMine)tabMine.addEventListener("click",()=>switchFeedTab("mine"));
-    const tabDiscover=$("#feedTabDiscover");if(tabDiscover)tabDiscover.addEventListener("click",()=>switchFeedTab("discover"));
-    // expose for external reload
-    window._switchFeedTab=switchFeedTab;
-    window._activeFeedTab=()=>activeFeedTab;
-    window._reloadFeed=()=>loadFeed(false,activeFeedTab==="mine");
+    // Ét samlet feed (dine egne + dem du følger) — ingen faner.
+    window._reloadFeed=()=>loadFeed(false);
 
     // comment send
     const sendBtn=$("#commentSend");if(sendBtn)sendBtn.addEventListener("click",sendComment);
