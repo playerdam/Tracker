@@ -588,6 +588,16 @@ app.post("/api/teams/join", async (req, res) => {
       body: JSON.stringify({ user_id: userId, team_id: team.id }),
       headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
     });
+    // Giv de eksisterende medlemmer besked om at en ny kollega er kommet på
+    try {
+      const mates = (await sb(`team_members?team_id=eq.${team.id}&select=user_id`) || [])
+        .map(m => m.user_id).filter(id2 => id2 !== userId);
+      if (mates.length) {
+        const me = await sb(`users?id=eq.${userId}&select=nickname,username`);
+        const who = (me && me[0] && (me[0].nickname || me[0].username)) || "En ny kollega";
+        sendPushTo(mates, { title: team.name, body: who + " er kommet på holdet 👋" });
+      }
+    } catch (e) {}
     res.json({ id: team.id, name: team.name, invite_code: team.invite_code });
   } catch (err) {
     console.error("teams/join:", err.message);
@@ -1032,6 +1042,11 @@ app.post("/api/follow", async (req, res) => {
     const { targetId } = req.body || {};
     if (!targetId || targetId === userId) return res.status(400).json({ error: "Ugyldigt" });
     await sb("follows", { method: "POST", body: JSON.stringify({ follower_id: userId, following_id: targetId, status: "pending" }) });
+    try {
+      const me = await sb(`users?id=eq.${userId}&select=nickname,username`);
+      const who = (me && me[0] && (me[0].nickname || me[0].username)) || "Nogen";
+      sendPushTo([targetId], { title: "Craft Tracker", body: who + " vil gerne følge dig 👋" });
+    } catch (e) {}
     res.json({ ok: true, status: "pending" });
   } catch (err) {
     if (err.message && err.message.includes("duplicate")) return res.json({ ok: true, status: "pending" });
