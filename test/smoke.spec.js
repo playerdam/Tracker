@@ -40,8 +40,10 @@ test("app booter, logger og navigerer uden JS-fejl", async ({ page }) => {
   await page.locator('.bnav-btn[data-tab="vagt"]').click();
   await expect(page.locator("#vd-ring-num")).toHaveText("11");
 
-  // Historik-fanen skal kunne åbnes
-  await page.locator('.bnav-btn[data-tab="history"]').click();
+  // Historik ligger nu i burger-menuen
+  await page.locator("#burgerBtn").click();
+  await page.waitForTimeout(150);
+  await page.locator("#menuDrawerHistory").click();
   await page.waitForTimeout(250);
   await expect(page.locator("#view-history")).toHaveClass(/active/);
 
@@ -51,22 +53,30 @@ test("app booter, logger og navigerer uden JS-fejl", async ({ page }) => {
   await page.locator("#qlogOverlayClose").click();
   await expect(page.locator("#qlogOverlay")).not.toHaveClass(/open/);
 
-  // Profil-fanen viser konto, hold og indstillinger
-  await page.locator('.bnav-btn[data-tab="profile"]').click();
+  // Profil ligger nu i burger-menuen
+  await page.locator("#burgerBtn").click();
+  await page.waitForTimeout(150);
+  await page.locator("#menuDrawerProfile").click();
   await expect(page.locator("#view-profile")).toHaveClass(/active/);
   await expect(page.locator("#profileCareerStrip")).toBeVisible();
   await expect(page.locator("#socialTeamContent")).toBeVisible();
 
-  // Burgermenuen skal kunne åbnes og navigere til de flyttede faner (Vin, Rangliste, Feed, Lab)
+  // Vin og Feed ligger nu i bund-nav
+  await page.locator('.bnav-btn[data-tab="vin"]').click();
+  await page.waitForTimeout(250);
+  await expect(page.locator("#view-vin")).toHaveClass(/active/);
+  await page.locator('.bnav-btn[data-tab="feed"]').click();
+  await page.waitForTimeout(250);
+  await expect(page.locator("#view-feed")).toHaveClass(/active/);
+
+  // Burgermenuen: Rangliste + Lab
   await page.locator("#burgerBtn").click();
   await expect(page.locator("#logDrawer")).toHaveClass(/open/);
   await page.locator("#logDrawerClose").click();
   await expect(page.locator("#logDrawer")).not.toHaveClass(/open/);
 
   for (const [btnId, viewId] of [
-    ["#menuDrawerVin", "#view-vin"],
     ["#menuDrawerSocial", "#view-social"],
-    ["#menuDrawerFeed", "#view-feed"],
     ["#menuDrawerLab", "#view-lab"],
   ]) {
     await page.locator("#burgerBtn").click();

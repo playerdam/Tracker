@@ -382,18 +382,18 @@
     $("#authPwLbl").textContent=t("auth_pw");
     const _so=$("#signOutBtn");if(_so)_so.textContent=t("auth_signout");
     renderStreak();
-    const mVin=$("#menuDrawerVinLbl");if(mVin)mVin.textContent=t("tab_wine");
+    const mProf=$("#menuDrawerProfileLbl");if(mProf)mProf.textContent=lang==="da"?"Profil":"Profile";
     const mSoc=$("#menuDrawerSocialLbl");if(mSoc)mSoc.textContent=t("tab_social");
-    const mFeed=$("#menuDrawerFeedLbl");if(mFeed)mFeed.textContent=t("tab_feed");
+    const mHist=$("#menuDrawerHistoryLbl");if(mHist)mHist.textContent=lang==="da"?"Historik":"History";
     const mLab=$("#menuDrawerLabLbl");if(mLab)mLab.textContent=t("tab_lab");
     const mRes=$("#menuDrawerResumeLbl");if(mRes)mRes.textContent=lang==="da"?"Lav dit CV":"Create your CV";
     const rTit=$("#resumeTitle");if(rTit)rTit.textContent=lang==="da"?"Dit CV":"Your CV";
     const rExp=$("#resumeExportLbl");if(rExp)rExp.textContent=lang==="da"?"Del":"Share";
     const rST=$("#resumeShareTitle");if(rST)rST.textContent=lang==="da"?"Sådan ser dit CV ud":"This is your CV";
     const rSD=$("#resumeShareDoLbl");if(rSD)rSD.textContent=lang==="da"?"Del CV":"Share CV";
-    const bHist=$("#bnav-lbl-history");if(bHist)bHist.textContent=lang==="da"?"Historik":"History";
+    const bVin=$("#bnav-lbl-vin");if(bVin)bVin.textContent=t("tab_wine");
     const bStats=$("#bnav-lbl-stats");if(bStats)bStats.textContent="Stats";
-    const bProf=$("#bnav-lbl-profile");if(bProf)bProf.textContent=lang==="da"?"Profil":"Profile";
+    const bFeed=$("#bnav-lbl-feed");if(bFeed)bFeed.textContent=t("tab_feed");
     const hLogT=$("#historyOutsideTitle");if(hLogT)hLogT.textContent=lang==="da"?"Uden for vagt":"Outside a shift";
     const sCatT=$("#statsCatTitle");if(sCatT)sCatT.textContent=lang==="da"?"Kategorier":"Categories";
     const sAskT=$("#statsAskTitle");if(sAskT)sAskT.textContent=lang==="da"?"Spørg om dine stats":"Ask about your stats";
@@ -3147,6 +3147,7 @@
       if(sc)sc.scrollTo({top:0,behavior:"smooth"});
       return;
     }
+    if(btn.dataset.tab==="vin"&&!requirePro())return;  // Vin er Pro
     switchTab(btn.dataset.tab);
   }));
 
@@ -3177,9 +3178,9 @@
   function applyProState(){
     const gate=_proEnforced&&!_isPro;document.querySelectorAll(".pro-pill").forEach(el=>{el.style.display=gate?"":"none";});
   }
-  var _mVin=$("#menuDrawerVin");if(_mVin)_mVin.addEventListener("click",()=>{closeLogDrawer();if(requirePro())switchTab("vin");});
+  var _mProfile=$("#menuDrawerProfile");if(_mProfile)_mProfile.addEventListener("click",()=>_drawerGoTab("profile"));
+  var _mHistory=$("#menuDrawerHistory");if(_mHistory)_mHistory.addEventListener("click",()=>_drawerGoTab("history"));
   var _mSoc=$("#menuDrawerSocial");if(_mSoc)_mSoc.addEventListener("click",()=>_drawerGoTab("social"));
-  var _mFeed=$("#menuDrawerFeed");if(_mFeed)_mFeed.addEventListener("click",()=>_drawerGoTab("feed"));
   var _mLab=$("#menuDrawerLab");if(_mLab)_mLab.addEventListener("click",()=>{closeLogDrawer();if(requirePro())switchTab("lab");});
   var _mResume=$("#menuDrawerResume");if(_mResume)_mResume.addEventListener("click",()=>{closeLogDrawer();openResume();});
   { const rc=$("#resumeClose"); if(rc)rc.addEventListener("click",closeResume);
@@ -4274,11 +4275,9 @@
       const r=await fetch(base+"/api/follow/requests",{headers:{"Authorization":"Bearer "+token}});
       const d=await r.json();
       const reqs=d.requests||[];
-      const badge=$("#feedBadge");
+      const badge=$("#feedBadge");            // på burger-knappen
       if(badge)badge.classList.toggle("show",reqs.length>0);
-      const badge2=$("#feedBadge2");
-      if(badge2)badge2.classList.toggle("show",reqs.length>0);
-      const badge3=$("#profileBadge");
+      const badge3=$("#profileBadge");        // på Profil i burger-menuen
       if(badge3)badge3.classList.toggle("show",reqs.length>0);
       if(!reqs.length){banner.style.display="none";return;}
       banner.style.display="";

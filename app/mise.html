@@ -734,20 +734,19 @@
     <button class="log-drawer-close" id="logDrawerClose" aria-label="Luk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <div class="log-drawer-body">
-    <button class="va-drawer-link" id="menuDrawerVin">
-      <span class="va-drawer-link-icon">🍷</span>
-      <span class="va-drawer-link-label" id="menuDrawerVinLbl">Vin</span>
-      <span class="pro-pill">PRO</span>
+    <button class="va-drawer-link" id="menuDrawerProfile">
+      <span class="bnav-icon-wrap"><span class="va-drawer-link-icon">👤</span><span class="bnav-badge" id="profileBadge"></span></span>
+      <span class="va-drawer-link-label" id="menuDrawerProfileLbl">Profil</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="va-drawer-link" id="menuDrawerHistory">
+      <span class="va-drawer-link-icon">🕘</span>
+      <span class="va-drawer-link-label" id="menuDrawerHistoryLbl">Historik</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="va-drawer-link" id="menuDrawerSocial">
       <span class="va-drawer-link-icon">🏆</span>
       <span class="va-drawer-link-label" id="menuDrawerSocialLbl">Rangliste</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-    <button class="va-drawer-link" id="menuDrawerFeed">
-      <span class="bnav-icon-wrap"><span class="va-drawer-link-icon">📸</span><span class="bnav-badge" id="feedBadge2"></span></span>
-      <span class="va-drawer-link-label" id="menuDrawerFeedLbl">Feed</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="va-drawer-link" id="menuDrawerLab">
@@ -804,9 +803,9 @@
       <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
       <span class="bnav-label" id="bnav-lbl-vagt">Overblik</span>
     </button>
-    <button class="bnav-btn" data-tab="history" id="bnav-history">
-      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 15.5"/></svg>
-      <span class="bnav-label" id="bnav-lbl-history">Historik</span>
+    <button class="bnav-btn" data-tab="vin" id="bnav-vin">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3l1 8a4 4 0 0 0 8 0l1-8z"/><line x1="12" y1="15" x2="12" y2="21"/><line x1="8.5" y1="21" x2="15.5" y2="21"/></svg>
+      <span class="bnav-label" id="bnav-lbl-vin">Vin</span>
     </button>
     <button class="bnav-btn bnav-fab" data-action="qlog" id="bnav-fab" aria-label="Log">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -815,9 +814,9 @@
       <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="14"/></svg>
       <span class="bnav-label" id="bnav-lbl-stats">Stats</span>
     </button>
-    <button class="bnav-btn" data-tab="profile" id="bnav-profile">
-      <span class="bnav-icon-wrap"><svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg><span class="bnav-badge" id="profileBadge"></span></span>
-      <span class="bnav-label" id="bnav-lbl-profile">Profil</span>
+    <button class="bnav-btn" data-tab="feed" id="bnav-feed">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="9" r="1.6"/><path d="M21 15l-5-4-9 8"/></svg>
+      <span class="bnav-label" id="bnav-lbl-feed">Feed</span>
     </button>
   </div>
 </nav>
