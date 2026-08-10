@@ -4557,7 +4557,7 @@
     else r[key]=val;
     save();renderResumePreview();
   }
-  function openResume(){ renderResumePreview();renderResumeEditor();const ov=$("#resumeOverlay");if(ov)ov.classList.add("open"); }
+  function openResume(){ track("resume_open");renderResumePreview();renderResumeEditor();const ov=$("#resumeOverlay");if(ov)ov.classList.add("open"); }
   function closeResume(){ const ov=$("#resumeOverlay");if(ov)ov.classList.remove("open"); }
   function _loadImg(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=src;});}
   function _wrapText(ctx,text,x,y,maxW,lh){
