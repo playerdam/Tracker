@@ -316,6 +316,28 @@ app.post("/api/admin/restaurants/:id/verify", async (req, res) => {
   } catch (err) { console.error("admin/restaurants/verify:", err.message); res.status(500).json({ error: err.message }); }
 });
 
+// ---- Admin: push-diagnostik (nøgle-beskyttet) ----
+app.get("/api/admin/push-debug", async (req, res) => {
+  if (!adminOk(req)) return res.status(401).json({ error: "unauthorized" });
+  let deviceTokens = null, webSubs = null;
+  try { deviceTokens = (await sb(`device_tokens?select=token`) || []).length; } catch (e) { deviceTokens = "fejl: " + e.message; }
+  try { webSubs = (await sb(`push_subs?select=endpoint`) || []).length; } catch (e) {}
+  res.json({ apns: apnsEnabled(), webpush: pushEnabled(), production: APNS_PRODUCTION, bundle: APNS_BUNDLE_ID, deviceTokens, webSubs });
+});
+app.post("/api/admin/push-test", async (req, res) => {
+  if (!adminOk(req)) return res.status(401).json({ error: "unauthorized" });
+  if (!apnsEnabled()) return res.json({ error: "apns ikke aktiveret" });
+  try {
+    const toks = await sb(`device_tokens?select=token`) || [];
+    if (!toks.length) return res.json({ tokens: 0, msg: "ingen device-tokens registreret endnu" });
+    const note = new apnLib.Notification();
+    note.alert = { title: "Craft Tracker", body: "Test-push 🔔" };
+    note.topic = APNS_BUNDLE_ID; note.sound = "default";
+    const result = await apnProvider.send(note, toks.map(t => t.token));
+    res.json({ tokens: toks.length, sent: (result.sent || []).length, failed: (result.failed || []).map(f => ({ status: f.status, reason: f.response && f.response.reason })) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.get("/api/config", (_req, res) => {
   res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON, vapidKey: pushEnabled() ? VAPID_PUBLIC : null, proEnforced: PRO_ENFORCE, restaurantsEnabled: RESTAURANTS_ENABLED });
 });
