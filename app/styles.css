@@ -832,6 +832,16 @@
   .resume-share-imgwrap img{width:100%;display:block}
   .resume-share-do{width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
 
+  .feed-compose{width:100%;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:inherit;font-size:14px;color:var(--dim);cursor:pointer;margin-bottom:12px;-webkit-tap-highlight-color:transparent}
+  .feed-compose:active{background:var(--surface-2)}
+  .feed-compose-ic{font-size:18px}
+  .feed-post-title{font-family:"Fraunces",serif;font-weight:600;font-size:18px;margin:0 0 14px;text-align:center}
+  .feed-post-photo{width:100%;aspect-ratio:4/3;border:1.5px dashed var(--border-2);border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;padding:0;position:relative;-webkit-tap-highlight-color:transparent}
+  .feed-post-photo img{width:100%;height:100%;object-fit:cover;display:none}
+  .feed-post-photo.has img{display:block}
+  .feed-post-photo.has .feed-post-pick{display:none}
+  .feed-post-pick{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--dim);font-size:13px;font-weight:500}
+
   /* ---- Shared input class ---- */
   .input{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:16px;padding:11px 12px;width:100%}
   .input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}

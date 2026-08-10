@@ -412,6 +412,11 @@
     document.querySelectorAll(".shift-nudge-chip").forEach(btn=>{const v=snChips[btn.dataset.min];if(v)btn.textContent=v;});
     const dTitle=$("#logDrawerTitle");if(dTitle)dTitle.textContent=lang==="da"?"Menu":"Menu";
     const fSearch=$("#feedSearch");if(fSearch)fSearch.placeholder=t("feed_search_ph");
+    const fcl=$("#feedComposeLbl");if(fcl)fcl.textContent=lang==="da"?"Del et foto…":"Share a photo…";
+    const fpt=$("#feedPostTitle");if(fpt)fpt.textContent=lang==="da"?"Del et foto":"Share a photo";
+    const fppl=$("#feedPostPickLbl");if(fppl)fppl.textContent=lang==="da"?"Vælg et foto":"Pick a photo";
+    const fpc=$("#feedPostCaption");if(fpc)fpc.placeholder=lang==="da"?"Skriv en note (valgfrit)…":"Add a note (optional)…";
+    const fpd=$("#feedPostDo");if(fpd)fpd.textContent=lang==="da"?"Del":"Share";
     const cSend=$("#commentSend");if(cSend)cSend.textContent=t("feed_comment_send");
     const cInput=$("#commentInput");if(cInput)cInput.placeholder=t("feed_comment_ph");
     const shiftStartBtn=$("#shiftStartBtn");if(shiftStartBtn)shiftStartBtn.textContent=t("shift_start");
@@ -881,7 +886,9 @@
     const base=apiBase();if(!base)return false;
     if(!navigator.onLine&&!fromQueue){const q=getSyncQ();q.push({categoryLabel,delta,imageUrl:imageUrl||null,summary:summary||null});saveSyncQ(q);updateOfflineDot();return false;}
     const token=await getToken();if(!token)return false;
-    const body={categoryLabel,delta};if(imageUrl)body.imageUrl=imageUrl;if(summary)body.summary=summary;
+    // Rå-logs er private — de tæller i stats/rangliste men oversvømmer ikke feedet.
+    // Kun vagt-recap (postShift) + eksplicit delte opslag er offentlige.
+    const body={categoryLabel,delta,isPublic:false};if(imageUrl)body.imageUrl=imageUrl;if(summary)body.summary=summary;
     try{await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});return true;}
     catch(e){if(!fromQueue){const q=getSyncQ();q.push({categoryLabel,delta,imageUrl:imageUrl||null,summary:summary||null});saveSyncQ(q);updateOfflineDot();}return false;}
   }
@@ -4233,7 +4240,7 @@
         +'</div>'
         +'<div class="feed-photo-time">'+esc(timeAgo(e.loggedAt))+'</div>'
         +'<div class="feed-photo-bottom">'
-        +'<div class="feed-photo-num">'+esc(numStr)+'</div>'
+        +((e.delta>0)?'<div class="feed-photo-num">'+esc(numStr)+'</div>':'')
         +(catLabel?'<div class="feed-photo-cat">'+esc(catLabel)+'</div>':'')
         +(e.summary?'<div class="feed-photo-caption">'+esc(e.summary)+'</div>':'')
         +'<div class="feed-photo-actions">'
@@ -4256,7 +4263,7 @@
       +followBtn
       +'</div>'
       +(e.summary?'<div class="feed-headline">'+esc(e.summary)+'</div>':'')
-      +'<div class="feed-stat"><span class="feed-num">'+esc(numStr)+'</span>'+(catLabel?'<span>'+esc(catLabel)+'</span>':'')+'</div>'
+      +((e.delta>0)?'<div class="feed-stat"><span class="feed-num">'+esc(numStr)+'</span>'+(catLabel?'<span>'+esc(catLabel)+'</span>':'')+'</div>':'')
       +'<div class="feed-actions">'
       +'<button class="feed-action-btn'+(e.liked?" liked":"")+'" data-like="'+esc(e.id)+'">'+likeIcon+' <span class="like-count">'+e.likes+'</span></button>'
       +'<button class="feed-action-btn" data-comments="'+esc(e.id)+'">💬 <span class="comment-count">'+e.comments+'</span></button>'
@@ -4723,6 +4730,51 @@
 
     // Ét samlet feed (dine egne + dem du følger) — ingen faner.
     window._reloadFeed=()=>loadFeed(false);
+
+    // ── Foto-opslag composer ("Del et foto") ──
+    let _feedPostPhoto=null;
+    function _feedPostReflect(){
+      const wrap=$("#feedPostPhotoWrap"),thumb=$("#feedPostThumb");
+      if(thumb)thumb.src=_feedPostPhoto||"";
+      if(wrap)wrap.classList.toggle("has",!!_feedPostPhoto);
+    }
+    function openFeedPost(){
+      _feedPostPhoto=null;_feedPostReflect();
+      const cap=$("#feedPostCaption");if(cap)cap.value="";
+      const s=$("#feedPostScrim");if(s)s.classList.add("open");
+    }
+    function closeFeedPost(){const s=$("#feedPostScrim");if(s)s.classList.remove("open");}
+    const composeBtn=$("#feedComposeBtn");if(composeBtn)composeBtn.addEventListener("click",openFeedPost);
+    const fpWrap=$("#feedPostPhotoWrap");if(fpWrap)fpWrap.addEventListener("click",()=>{const pi=$("#feedPostPhotoInput");if(pi)pi.click();});
+    const fpInput=$("#feedPostPhotoInput");
+    if(fpInput)fpInput.addEventListener("change",async()=>{
+      const file=fpInput.files&&fpInput.files[0];if(!file)return;
+      if(!file.type.startsWith("image/")){showToast(t("img_only"));fpInput.value="";return;}
+      if(file.size>20*1024*1024){showToast(lang==="da"?"Billedet er for stort (maks 20 MB)":"Image too large (max 20 MB)");fpInput.value="";return;}
+      const url=await resizeImage(file,1200);fpInput.value="";
+      if(url){_feedPostPhoto=url;_feedPostReflect();}
+    });
+    const fpDo=$("#feedPostDo");
+    if(fpDo)fpDo.addEventListener("click",async()=>{
+      const caption=($("#feedPostCaption").value||"").trim();
+      if(!_feedPostPhoto&&!caption){showToast(lang==="da"?"Vælg et foto først":"Pick a photo first");return;}
+      const base=apiBase();const token=await getToken();
+      if(!base||!token){showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");return;}
+      fpDo.disabled=true;fpDo.textContent="…";
+      let imageUrl=null;
+      try{
+        if(_feedPostPhoto){
+          const ur=await fetch(base+"/api/upload-photo",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({dataUrl:_feedPostPhoto})});
+          const ud=await ur.json();imageUrl=ud.url||null;
+        }
+        const r=await fetch(base+"/api/feed-post",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({imageUrl,caption})});
+        if(!r.ok)throw new Error("post");
+        track("feed_post");haptic(40);closeFeedPost();
+        showToast(lang==="da"?"Delt til feed 📷":"Shared to feed 📷");
+        feedCursor=null;loadFeed(false);
+      }catch(e){showToast(lang==="da"?"Noget gik galt — prøv igen":"Something went wrong, try again");}
+      fpDo.disabled=false;fpDo.textContent=lang==="da"?"Del":"Share";
+    });
 
     // comment send
     const sendBtn=$("#commentSend");if(sendBtn)sendBtn.addEventListener("click",sendComment);

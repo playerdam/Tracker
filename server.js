@@ -362,13 +362,34 @@ app.post("/api/log-entry", async (req, res) => {
       categoryId = created[0].id;
     }
 
-    const row = { user_id: userId, category_id: categoryId, delta, is_public: true };
+    // Rå-logs kan sendes private (isPublic:false) så de ikke oversvømmer feedet;
+    // default er offentlig (bagudkompatibelt med ældre klienter).
+    const row = { user_id: userId, category_id: categoryId, delta, is_public: req.body.isPublic !== false };
     if (imageUrl) row.image_url = imageUrl;
     if (summary) row.summary = summary.slice(0, 200);
     await sb("log_entries", { method: "POST", body: JSON.stringify(row) });
     res.json({ ok: true });
   } catch (err) {
     console.error("log-entry:", err.message);
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
+// ---- Selvstændigt foto-opslag i feedet (uden vagt/tæller) ----
+app.post("/api/feed-post", async (req, res) => {
+  try {
+    const userId = await verifyAuth(req);
+    if (rateLimited("feedpost", userId, 20, 3600000)) return res.status(429).json({ error: "for mange opslag — vent lidt" });
+    const { imageUrl, caption } = req.body || {};
+    const cap = (caption || "").trim().slice(0, 200);
+    if (!imageUrl && !cap) return res.status(400).json({ error: "Intet at poste" });
+    const row = { user_id: userId, category_id: null, delta: 0, is_public: true };
+    if (imageUrl) row.image_url = imageUrl;
+    if (cap) row.summary = cap;
+    await sb("log_entries", { method: "POST", body: JSON.stringify(row) });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("feed-post:", err.message);
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
   }
 });

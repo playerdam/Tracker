@@ -153,6 +153,7 @@
   </section>
 
   <section class="view" id="view-feed">
+    <button class="feed-compose" id="feedComposeBtn"><span class="feed-compose-ic">📷</span><span id="feedComposeLbl">Del et foto…</span></button>
     <div id="feedDiscoverSearch">
       <div class="feed-search">
         <input id="feedSearch" class="input" autocomplete="off">
@@ -771,6 +772,17 @@
     <input id="resumePhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
   </div>
 </div>
+
+<div class="scrim" id="feedPostScrim"><div class="modal">
+  <h2 class="feed-post-title" id="feedPostTitle">Del et foto</h2>
+  <button type="button" class="feed-post-photo" id="feedPostPhotoWrap">
+    <img id="feedPostThumb" alt="">
+    <span class="feed-post-pick" id="feedPostPickHint"><span style="font-size:26px">📷</span><span id="feedPostPickLbl">Vælg et foto</span></span>
+  </button>
+  <textarea id="feedPostCaption" class="input" rows="2" maxlength="200" placeholder="Skriv en note (valgfrit)…" style="margin-top:12px;resize:vertical"></textarea>
+  <input id="feedPostPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
+  <button class="btn primary" id="feedPostDo" style="width:100%;margin-top:14px">Del</button>
+</div></div>
 
 <div class="scrim" id="resumeShareScrim"><div class="modal resume-share-modal">
   <h2 class="resume-share-title" id="resumeShareTitle">Sådan ser dit CV ud</h2>
