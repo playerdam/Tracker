@@ -38,6 +38,7 @@ const PARSE_MODEL   = process.env.PARSE_MODEL || "claude-haiku-4-5-20251001";
 // dvs. præcis nuværende adfærd. Sæt PRO_ENFORCE=1 på Railway når betaling (Fase 2)
 // er klar — så træder paywall + 402-gating i kraft.
 const PRO_ENFORCE   = process.env.PRO_ENFORCE === "1";
+const METRICS_KEY   = process.env.METRICS_KEY || "";   // admin-nøgle til /admin-dashboardet (fail-closed hvis tom)
 const WINE_MODEL    = process.env.WINE_MODEL  || "claude-sonnet-4-6";
 
 // ---- Anthropic ----
@@ -171,7 +172,70 @@ app.use(express.static(path.join(__dirname, "app")));
 app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "app", "mise.html")));
 app.get("/privacy", (_req, res) => res.sendFile(path.join(__dirname, "app", "privacy.html")));
 app.get("/terms", (_req, res) => res.sendFile(path.join(__dirname, "app", "terms.html")));
+app.get("/admin", (_req, res) => res.sendFile(path.join(__dirname, "admin", "dashboard.html")));
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "craft-track" }));
+
+// ---- Admin: engagement-metrics (nøgle-beskyttet, read-only) ----
+function adminOk(req) { return !!METRICS_KEY && req.get("x-admin-key") === METRICS_KEY; }
+app.get("/api/admin/metrics", async (req, res) => {
+  if (!adminOk(req)) return res.status(401).json({ error: "unauthorized" });
+  try {
+    const [users, events, logs] = await Promise.all([
+      sb("users?select=id,username,nickname,created_at&limit=100000"),
+      sb("app_events?select=user_id,event,meta,created_at&limit=200000"),
+      sb("log_entries?select=user_id,logged_at&limit=200000"),
+    ]);
+    const day = d => (d ? new Date(d).toISOString().slice(0, 10) : null);
+    const byUser = {};
+    const ensure = id => (byUser[id] || (byUser[id] = { name: "—", created: null, logs: 0, logDays: new Set(), evDays: new Set(), last: null, shifts: 0, cvOpen: false, cvShare: false }));
+    (users || []).forEach(u => { const x = ensure(u.id); x.name = u.username || u.nickname || "—"; x.created = u.created_at; });
+    (logs || []).forEach(l => { const x = ensure(l.user_id); x.logs++; x.logDays.add(day(l.logged_at)); if (!x.last || l.logged_at > x.last) x.last = l.logged_at; });
+    (events || []).forEach(e => { const x = ensure(e.user_id); x.evDays.add(day(e.created_at)); if (!x.last || e.created_at > x.last) x.last = e.created_at; if (e.event === "shift_start") x.shifts++; if (e.event === "resume_open") x.cvOpen = true; if (e.event === "resume_share") x.cvShare = true; });
+
+    const all = Object.values(byUser);
+    const signups = (users || []).length;
+    const activeCount = all.filter(u => u.evDays.size > 0).length;
+    const loggedCount = all.filter(u => u.logs > 0).length;
+    const repeatCount = all.filter(u => u.logDays.size >= 2).length;
+    const shiftedCount = all.filter(u => u.shifts > 0).length;
+
+    const ret = { "0": Math.max(0, signups - activeCount), "1": 0, "2": 0, "3-4": 0, "5+": 0 };
+    all.forEach(u => { const d = u.evDays.size; if (d >= 5) ret["5+"]++; else if (d >= 3) ret["3-4"]++; else if (d === 2) ret["2"]++; else if (d === 1) ret["1"]++; });
+
+    const distinct = pred => { const s = new Set(); (events || []).forEach(e => { if (pred(e)) s.add(e.user_id); }); return s.size; };
+    const features = [
+      { label: "Startet vagt", n: distinct(e => e.event === "shift_start") },
+      { label: "Delt vagt-kort", n: distinct(e => e.event === "share_card") },
+      { label: "Åbnet Vin", n: distinct(e => e.event === "tab" && e.meta && e.meta.t === "vin") },
+      { label: "Åbnet Feed", n: distinct(e => e.event === "tab" && e.meta && e.meta.t === "feed") },
+      { label: "Åbnet Lab", n: distinct(e => e.event === "tab" && e.meta && e.meta.t === "lab") },
+      { label: "Scannet vin", n: distinct(e => e.event === "wine_scan") },
+      { label: "Åbnet CV", n: distinct(e => e.event === "resume_open") },
+      { label: "Delt CV", n: distinct(e => e.event === "resume_share") },
+    ].sort((a, b) => b.n - a.n);
+
+    const usersOut = all.map(u => ({ name: u.name, created: day(u.created), logs: u.logs, logDays: u.logDays.size, activeDays: u.evDays.size, last: day(u.last), shifts: u.shifts, cvOpen: u.cvOpen, cvShare: u.cvShare }))
+      .sort((a, b) => (b.activeDays - a.activeDays) || (b.logs - a.logs));
+
+    res.json({
+      generatedAt: new Date().toISOString(),
+      totals: { signups, activeCount, loggedCount, repeatCount, shiftedCount, totalLogs: (logs || []).length },
+      funnel: [
+        { label: "Oprettet konto", n: signups },
+        { label: "Åbnet appen", n: activeCount },
+        { label: "Logget ≥1 gang", n: loggedCount },
+        { label: "Logget på ≥2 dage", n: repeatCount },
+        { label: "Startet en vagt", n: shiftedCount },
+      ],
+      retention: ret,
+      features,
+      users: usersOut,
+    });
+  } catch (err) {
+    console.error("admin/metrics:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.get("/api/config", (_req, res) => {
   res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON, vapidKey: pushEnabled() ? VAPID_PUBLIC : null, proEnforced: PRO_ENFORCE });
