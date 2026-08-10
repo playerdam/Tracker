@@ -194,7 +194,7 @@ app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "app", "mise.html"
 app.get("/privacy", (_req, res) => res.sendFile(path.join(__dirname, "app", "privacy.html")));
 app.get("/terms", (_req, res) => res.sendFile(path.join(__dirname, "app", "terms.html")));
 app.get("/admin", (_req, res) => res.sendFile(path.join(__dirname, "admin", "dashboard.html")));
-app.get("/api/health", (_req, res) => res.json({ ok: true, service: "craft-track" }));
+app.get("/api/health", (_req, res) => res.json({ ok: true, service: "craft-track", apns: apnsEnabled(), webpush: pushEnabled() }));
 
 // ---- Admin: engagement-metrics (nøgle-beskyttet, read-only) ----
 function adminOk(req) { return !!METRICS_KEY && (req.get("x-admin-key") || "").trim() === METRICS_KEY; }
