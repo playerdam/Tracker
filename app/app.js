@@ -4709,11 +4709,23 @@
   // ── Profil (følg-gated) ──
   let _profileData=null,_profileTab="photos",_achExpanded=false;
   function _pfNum(n){try{return (n||0).toLocaleString(lang==="da"?"da-DK":"en-US");}catch(e){return String(n||0);}}
+  // Løft profil-viewet så det stopper lige over bund-nav'en (nav + '+'-FAB forbliver synlige)
+  function _liftProfileForNav(){
+    const scrim=$("#profileScrim");if(!scrim)return;
+    const nav=document.getElementById("bottomNav")||document.querySelector(".bottom-nav");
+    if(!nav){scrim.style.bottom="0px";return;}
+    let top=nav.getBoundingClientRect().top;
+    const fab=nav.querySelector(".bnav-fab");
+    if(fab){const ft=fab.getBoundingClientRect().top;if(ft<top)top=ft;}
+    const gap=Math.max(0,Math.round(window.innerHeight-top));
+    scrim.style.bottom=gap+"px";
+  }
   async function openProfile(userId){
     if(!userId)return;
     const scrim=$("#profileScrim"),body=$("#profileBody");if(!scrim||!body)return;
     _profileTab="photos";_achExpanded=false;
     body.innerHTML='<div class="pf-empty">'+esc(lang==="da"?"Henter…":"Loading…")+'</div>';
+    _liftProfileForNav();
     scrim.classList.add("open");
     const base=apiBase(),token=await getToken();
     if(!base||!token){body.innerHTML='<div class="pf-empty">—</div>';return;}
@@ -4797,6 +4809,7 @@
   function setupProfile(){
     const close=$("#profileClose");if(close)close.addEventListener("click",()=>{const s=$("#profileScrim");if(s)s.classList.remove("open");});
     const lb=$("#profilePhotoScrim");if(lb)lb.addEventListener("click",()=>lb.classList.remove("open"));
+    window.addEventListener("resize",()=>{const s=$("#profileScrim");if(s&&s.classList.contains("open"))_liftProfileForNav();});
     const body=$("#profileBody");
     if(body)body.addEventListener("click",async e=>{
       const tabBtn=e.target.closest("[data-pftab]");
