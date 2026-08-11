@@ -4706,9 +4706,127 @@
     return {blob,fname};
   }
 
+  // ── Profil (følg-gated) ──
+  let _profileData=null,_profileTab="photos",_achExpanded=false;
+  function _pfNum(n){try{return (n||0).toLocaleString(lang==="da"?"da-DK":"en-US");}catch(e){return String(n||0);}}
+  async function openProfile(userId){
+    if(!userId)return;
+    const scrim=$("#profileScrim"),body=$("#profileBody");if(!scrim||!body)return;
+    _profileTab="photos";_achExpanded=false;
+    body.innerHTML='<div class="pf-empty">'+esc(lang==="da"?"Henter…":"Loading…")+'</div>';
+    scrim.classList.add("open");
+    const base=apiBase(),token=await getToken();
+    if(!base||!token){body.innerHTML='<div class="pf-empty">—</div>';return;}
+    try{
+      const r=await fetch(base+"/api/profile/"+encodeURIComponent(userId),{headers:{"Authorization":"Bearer "+token}});
+      const p=await r.json();
+      if(!r.ok||p.error){body.innerHTML='<div class="pf-empty">'+esc(p.error||(lang==="da"?"Kunne ikke hente profil":"Could not load profile"))+'</div>';return;}
+      _profileData=p;renderProfile();
+    }catch(e){body.innerHTML='<div class="pf-empty">'+esc(e.message||"Fejl")+'</div>';}
+  }
+  function _pfBadges(){
+    return (_profileData.badges||[]).slice().reverse().map(id=>BADGE_DEFS.find(b=>b.id===id)).filter(Boolean);
+  }
+  function _pfAchHtml(){
+    const all=_pfBadges();if(!all.length)return "";
+    const show=_achExpanded?all:all.slice(0,4);
+    const moreLbl=_achExpanded?(lang==="da"?"Vis mindre":"Show less"):(lang==="da"?"Vis mere":"Show more");
+    const moreBtn=all.length>4?'<button class="pf-ach-more" id="pfAchMore">'+esc(moreLbl)+'</button>':'';
+    const badges=show.map(b=>'<div class="pf-badge"><div class="pf-badge-ic">'+b.icon+'</div><div class="pf-badge-lbl">'+esc(lang==="da"?b.da:b.en)+'</div></div>').join("");
+    return '<div class="pf-ach"><div class="pf-ach-head"><span class="pf-ach-title">Achievements · '+all.length+'</span>'+moreBtn+'</div><div class="pf-ach-row">'+badges+'</div></div>';
+  }
+  function _pfTabBody(){
+    const p=_profileData;
+    if(_profileTab==="photos"){
+      if(!p.photos||!p.photos.length)return '<div class="pf-empty">'+esc(lang==="da"?"Ingen billeder endnu":"No photos yet")+'</div>';
+      return '<div class="pf-grid">'+p.photos.map(ph=>'<div class="pf-grid-cell" data-pfphoto="'+esc(ph.imageUrl)+'" data-pfcap="'+esc(ph.summary||"")+'"><img src="'+esc(ph.imageUrl)+'" loading="lazy" alt=""></div>').join("")+'</div>';
+    }
+    if(_profileTab==="shifts"){
+      const s=p.shifts||{count:0,hours:0};const avg=s.count?Math.round(s.hours/s.count*10)/10:0;
+      return '<div class="pf-statcards">'
+        +'<div class="pf-card"><div class="n">'+s.count+'</div><div class="l">'+esc(lang==="da"?"Vagter":"Shifts")+'</div></div>'
+        +'<div class="pf-card"><div class="n">'+s.hours+'</div><div class="l">'+esc(lang==="da"?"Timer i alt":"Total hours")+'</div></div>'
+        +'<div class="pf-card"><div class="n">'+avg+'</div><div class="l">'+esc(lang==="da"?"Gns/vagt":"Avg/shift")+'</div></div>'
+        +'</div>';
+    }
+    const w=p.wine||{count:0,glasses:0,bottles:0};
+    return '<div class="pf-statcards">'
+      +'<div class="pf-card"><div class="n">'+w.count+'</div><div class="l">'+esc(lang==="da"?"Vine":"Wines")+'</div></div>'
+      +'<div class="pf-card"><div class="n">'+w.glasses+'</div><div class="l">'+esc(lang==="da"?"Glas":"Glasses")+'</div></div>'
+      +'<div class="pf-card"><div class="n">'+w.bottles+'</div><div class="l">'+esc(lang==="da"?"Flasker":"Bottles")+'</div></div>'
+      +'</div>';
+  }
+  function renderProfile(){
+    const p=_profileData,body=$("#profileBody");if(!p||!body)return;
+    const name=p.nickname||p.username||t("lb_anon");
+    const initial=name.charAt(0).toUpperCase();
+    const role=[p.profession,p.workplace].filter(Boolean).join(" · ");
+    const userLine=(p.username&&p.username!==name)?("@"+p.username):"";
+    let head='<div class="pf-head">'
+      +'<div class="pf-avatar">'+esc(initial)+'</div>'
+      +'<div class="pf-name">'+esc(name)+'</div>'
+      +(userLine?'<div class="pf-user">'+esc(userLine)+'</div>':'')
+      +(role?'<div class="pf-role">'+esc(role)+'</div>':'')
+      +((p.sharesTeam&&!p.isSelf)?'<div class="pf-team-badge">🧑‍🍳 '+esc(lang==="da"?"Holdkammerat":"Teammate")+'</div>':'');
+    if(!p.locked){
+      head+='<div class="pf-stats">'
+        +'<div class="pf-stat"><span class="n">'+_pfNum(p.career||0)+'</span><span class="l">'+esc(lang==="da"?"Håndværk":"Craft")+'</span></div>'
+        +'<div class="pf-stat"><span class="n">'+(p.followers||0)+'</span><span class="l">'+esc(lang==="da"?"Følgere":"Followers")+'</span></div>'
+        +'<div class="pf-stat"><span class="n">'+(p.following||0)+'</span><span class="l">'+esc(lang==="da"?"Følger":"Following")+'</span></div>'
+        +'</div>';
+    }else{
+      head+='<div class="pf-stats"><div class="pf-stat"><span class="n">'+(p.followers||0)+'</span><span class="l">'+esc(lang==="da"?"Følgere":"Followers")+'</span></div></div>';
+    }
+    if(!p.isSelf){
+      const fs=p.followStatus||"none";
+      const lbl=(p.locked&&fs==="none")?(lang==="da"?"Anmod om at følge":"Request to follow"):followBtnLabel(fs);
+      head+='<div class="pf-follow"><button class="'+followBtnClass(fs)+'" id="pfFollowBtn" data-follow-status="'+esc(fs)+'">'+esc(lbl)+'</button></div>';
+    }
+    head+='</div>';
+    if(p.locked){
+      body.innerHTML=head+'<div class="pf-locked"><div class="pf-lock-ic">🔒</div><div>'+esc(lang==="da"?"Privat profil — følg for at se billeder og stats":"Private profile — follow to see photos and stats")+'</div></div>';
+      return;
+    }
+    const tabs='<div class="pf-tabs">'
+      +'<button class="pf-tab'+(_profileTab==="photos"?" active":"")+'" data-pftab="photos">📸 '+esc(lang==="da"?"Billeder":"Photos")+'</button>'
+      +'<button class="pf-tab'+(_profileTab==="shifts"?" active":"")+'" data-pftab="shifts">🗓 '+esc(lang==="da"?"Vagter":"Shifts")+'</button>'
+      +'<button class="pf-tab'+(_profileTab==="wine"?" active":"")+'" data-pftab="wine">🍷 '+esc(lang==="da"?"Vin":"Wine")+'</button>'
+      +'</div>';
+    body.innerHTML=head+_pfAchHtml()+tabs+'<div class="pf-tabbody" id="pfTabBody">'+_pfTabBody()+'</div>';
+  }
+  function setupProfile(){
+    const close=$("#profileClose");if(close)close.addEventListener("click",()=>{const s=$("#profileScrim");if(s)s.classList.remove("open");});
+    const scrim=$("#profileScrim");if(scrim)scrim.addEventListener("click",e=>{if(e.target===scrim)scrim.classList.remove("open");});
+    const lb=$("#profilePhotoScrim");if(lb)lb.addEventListener("click",()=>lb.classList.remove("open"));
+    const body=$("#profileBody");
+    if(body)body.addEventListener("click",async e=>{
+      const tabBtn=e.target.closest("[data-pftab]");
+      if(tabBtn){_profileTab=tabBtn.dataset.pftab;document.querySelectorAll("#profileBody .pf-tab").forEach(x=>x.classList.toggle("active",x.dataset.pftab===_profileTab));const tb=$("#pfTabBody");if(tb)tb.innerHTML=_pfTabBody();return;}
+      const more=e.target.closest("#pfAchMore");
+      if(more){_achExpanded=!_achExpanded;const ach=document.querySelector("#profileBody .pf-ach");if(ach)ach.outerHTML=_pfAchHtml();return;}
+      const cell=e.target.closest("[data-pfphoto]");
+      if(cell){const img=$("#profilePhotoImg"),cap=$("#profilePhotoCap"),ls=$("#profilePhotoScrim");if(img)img.src=cell.dataset.pfphoto;if(cap)cap.textContent=cell.dataset.pfcap||"";if(ls)ls.classList.add("open");return;}
+      const fb=e.target.closest("#pfFollowBtn");
+      if(fb&&_profileData){
+        const uid=_profileData.userId,cur=fb.dataset.followStatus||"none";
+        const newStatus=(cur==="none")?"pending":"none";
+        fb.dataset.followStatus=newStatus;fb.className=followBtnClass(newStatus);
+        fb.textContent=(_profileData.locked&&newStatus==="none")?(lang==="da"?"Anmod om at følge":"Request to follow"):followBtnLabel(newStatus);
+        _followingCache[uid]=newStatus==="none"?undefined:newStatus;
+        const ok=await toggleFollow(uid,cur);
+        if(ok){_profileData.followStatus=newStatus;}
+        else{fb.dataset.followStatus=cur;fb.className=followBtnClass(cur);fb.textContent=(_profileData.locked&&cur==="none")?(lang==="da"?"Anmod om at følge":"Request to follow"):followBtnLabel(cur);_followingCache[uid]=cur==="none"?undefined:cur;showToast(lang==="da"?"Kunne ikke opdatere — prøv igen":"Couldn't update — try again");}
+        return;
+      }
+    });
+  }
+
   function setupFeed(){
     const feedEl=$("#feedContent");
     feedEl.addEventListener("click",async e=>{
+      // åbn profil (avatar/navn)
+      const profEl=e.target.closest("[data-profile]");
+      if(profEl){openProfile(profEl.dataset.profile);return;}
       // follow/unfollow
       const followBtn=e.target.closest("[data-follow]");
       if(followBtn){
@@ -4735,6 +4853,8 @@
       // load more
       if(e.target.id==="feedLoadMore"){loadFeed(true);}
     });
+
+    setupProfile();
 
     // search results follow buttons
     const searchRes=$("#feedSearchResults");
