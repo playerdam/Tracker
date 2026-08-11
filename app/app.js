@@ -908,7 +908,7 @@
     if(h===_lastPushHash)return;
     const base=apiBase();const token=await getToken();if(!base||!token)return;
     try{
-      const r=await fetch(base+"/api/state",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({data:state})});
+      const r=await fetch(base+"/api/state",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({data:{...state,_badges:getBadgesEarned()}})});
       if(r.ok)_lastPushHash=h;
     }catch(e){}
   }

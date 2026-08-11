@@ -1180,6 +1180,84 @@ app.delete("/api/follow/:followerId/reject", async (req, res) => {
 });
 
 // ---- Social: feed ----
+// ---- Social: se en anden brugers profil (privat / følg-gated) ----
+app.get("/api/profile/:userId", async (req, res) => {
+  try {
+    const viewerId = await verifyAuth(req);
+    const targetId = req.params.userId;
+    if (!targetId) return res.status(400).json({ error: "mangler bruger" });
+
+    const urows = await sb(`users?id=eq.${targetId}&select=nickname,profession,username,workplace`);
+    if (!urows || !urows[0]) return res.status(404).json({ error: "bruger findes ikke" });
+    const u = urows[0];
+
+    // følgere / følger
+    const followerRows = await sb(`follows?following_id=eq.${targetId}&status=eq.accepted&select=follower_id`) || [];
+    const followingRows = await sb(`follows?follower_id=eq.${targetId}&status=eq.accepted&select=following_id`) || [];
+
+    // relation viewer→target + live hold-deling
+    const isSelf = viewerId === targetId;
+    let followStatus = "none";
+    if (!isSelf) {
+      const rel = await sb(`follows?follower_id=eq.${viewerId}&following_id=eq.${targetId}&select=status`);
+      if (rel && rel[0]) followStatus = rel[0].status; // pending | accepted
+    }
+    let sharesTeam = false;
+    if (!isSelf) {
+      const myTeams = (await sb(`team_members?user_id=eq.${viewerId}&select=team_id`) || []).map(t => t.team_id);
+      if (myTeams.length) {
+        const shared = await sb(`team_members?user_id=eq.${targetId}&team_id=in.(${myTeams.join(",")})&select=team_id&limit=1`) || [];
+        sharesTeam = shared.length > 0;
+      }
+    }
+    const canView = isSelf || followStatus === "accepted" || sharesTeam;
+
+    const base = {
+      userId: targetId,
+      nickname: u.nickname || null,
+      username: u.username || null,
+      profession: u.profession || null,
+      workplace: u.workplace || null,
+      followers: followerRows.length,
+      following: followingRows.length,
+      followStatus, sharesTeam, isSelf, canView,
+    };
+    // Låst profil: kun basisinfo + følgere, intet indhold
+    if (!canView) return res.json({ ...base, locked: true });
+
+    // stats + badges fra target's synkede state
+    let career = 0, topCats = [], badges = [];
+    try {
+      const st = await sb(`user_state?user_id=eq.${targetId}&select=data`);
+      const data = st && st[0] && st[0].data;
+      if (data) {
+        (Array.isArray(data.counters) ? data.counters : []).forEach(c => {
+          const tot = (c.count || 0) + ((c.subs || []).reduce((a, s) => a + (s.count || 0), 0));
+          career += tot;
+          if (tot > 0) topCats.push({ label: c.label || "", count: tot });
+        });
+        (Array.isArray(data.wines) ? data.wines : []).forEach(w => { career += (w.glasses || 0) + (w.bottles || 0); });
+        topCats.sort((a, b) => b.count - a.count);
+        topCats = topCats.slice(0, 6);
+        badges = Array.isArray(data._badges) ? data._badges : [];
+      }
+    } catch (e) {}
+
+    // offentlige billed-posts (grid)
+    const photos = await sb(`log_entries?user_id=eq.${targetId}&is_public=eq.true&image_url=not.is.null&order=logged_at.desc&limit=30&select=id,image_url,summary,delta,logged_at`) || [];
+
+    res.json({
+      ...base,
+      career,
+      topCats,
+      badges,
+      photos: photos.map(p => ({ id: p.id, imageUrl: p.image_url, summary: p.summary || null, delta: p.delta, loggedAt: p.logged_at })),
+    });
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
 app.get("/api/feed", async (req, res) => {
   try {
     const userId = await verifyAuth(req);
