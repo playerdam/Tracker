@@ -581,25 +581,16 @@ app.post("/api/teams", async (req, res) => {
       body: JSON.stringify({ user_id: userId, team_id: team.id }),
       headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
     });
-    // Hold = gensidig tillid: auto-follow begge veje + giv holdet besked
+    // Hold ≠ follow: feedet bruger LIVE holdmedlemskab. Giv blot evt. medlemmer besked.
     try {
       const mates = (await sb(`team_members?team_id=eq.${team.id}&select=user_id`) || [])
         .map(m => m.user_id).filter(id2 => id2 !== userId);
       if (mates.length) {
-        const rows = mates.flatMap(mid => [
-          { follower_id: userId, following_id: mid, status: "accepted" },
-          { follower_id: mid, following_id: userId, status: "accepted" },
-        ]);
-        await sb("follows?on_conflict=follower_id,following_id", {
-          method: "POST",
-          headers: { "Prefer": "resolution=merge-duplicates,return=representation" },
-          body: JSON.stringify(rows),
-        });
         const me = await sb(`users?id=eq.${userId}&select=nickname,username`);
         const who = (me && me[0] && (me[0].nickname || me[0].username)) || "En ny kollega";
         sendPushTo(mates, { title: team.name, body: who + " er kommet på holdet 👋" });
       }
-    } catch (e) { console.error("team auto-follow:", e.message); }
+    } catch (e) { console.error("team notify:", e.message); }
     res.json({ id: team.id, name: team.name, invite_code: team.invite_code, kind: team.kind || "crew", status: team.status || "active" });
   } catch (err) {
     console.error("teams/create:", err.message);
@@ -1199,9 +1190,17 @@ app.get("/api/feed", async (req, res) => {
     if (mine) {
       ids = [userId];
     } else {
-      // Ét samlet feed: dine egne + dem du følger (accepterede)
+      // Ét samlet feed: dine egne + dem du følger (accepterede) + LIVE holdkammerater
       const followRows = await sb(`follows?follower_id=eq.${userId}&status=eq.accepted&select=following_id`) || [];
-      ids = [userId, ...followRows.map(r => r.following_id)];
+      // Live holdmedlemskab: folk du DELER et hold med lige nu (forlader du holdet, forsvinder de)
+      let teammateIds = [];
+      const myTeams = await sb(`team_members?user_id=eq.${userId}&select=team_id`) || [];
+      if (myTeams.length) {
+        const teamIds = myTeams.map(t => t.team_id);
+        const mates = await sb(`team_members?team_id=in.(${teamIds.join(",")})&select=user_id`) || [];
+        teammateIds = mates.map(m => m.user_id);
+      }
+      ids = [...new Set([userId, ...followRows.map(r => r.following_id), ...teammateIds])];
     }
 
     if (!ids.length) return res.json({ entries: [] });
