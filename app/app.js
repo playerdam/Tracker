@@ -4709,24 +4709,28 @@
   // ── Profil (følg-gated) ──
   let _profileData=null,_profileTab="photos",_achExpanded=false;
   function _pfNum(n){try{return (n||0).toLocaleString(lang==="da"?"da-DK":"en-US");}catch(e){return String(n||0);}}
-  // Løft profil-viewet så det stopper lige over bund-nav'en (nav + '+'-FAB forbliver synlige)
-  function _liftProfileForNav(){
+  // Profilen dækker HELE skærmen (ingen interaktion bagved). Bund-nav'en løftes OVENPÅ
+  // profilen så den forbliver synlig+brugbar, og indholdet får bund-plads så det ikke skæres.
+  function _fitProfileToNav(open){
     const scrim=$("#profileScrim");if(!scrim)return;
     const nav=document.getElementById("bottomNav")||document.querySelector(".bottom-nav");
-    if(!nav){scrim.style.bottom="0px";return;}
+    if(!open){if(nav)nav.style.zIndex="";scrim.style.paddingBottom="";return;}
+    if(!nav){scrim.style.paddingBottom="0px";return;}
     let top=nav.getBoundingClientRect().top;
     const fab=nav.querySelector(".bnav-fab");
     if(fab){const ft=fab.getBoundingClientRect().top;if(ft<top)top=ft;}
     const gap=Math.max(0,Math.round(window.innerHeight-top));
-    scrim.style.bottom=gap+"px";
+    scrim.style.paddingBottom=gap+"px";  // indhold slutter over nav'en
+    nav.style.zIndex="360";              // nav ovenpå profil-viewet (350)
   }
+  function closeProfile(){const s=$("#profileScrim");if(s)s.classList.remove("open");_fitProfileToNav(false);}
   async function openProfile(userId){
     if(!userId)return;
     const scrim=$("#profileScrim"),body=$("#profileBody");if(!scrim||!body)return;
     _profileTab="photos";_achExpanded=false;
     body.innerHTML='<div class="pf-empty">'+esc(lang==="da"?"Henter…":"Loading…")+'</div>';
-    _liftProfileForNav();
     scrim.classList.add("open");
+    _fitProfileToNav(true);
     const base=apiBase(),token=await getToken();
     if(!base||!token){body.innerHTML='<div class="pf-empty">—</div>';return;}
     try{
@@ -4807,9 +4811,12 @@
     body.innerHTML=head+_pfAchHtml()+tabs+'<div class="pf-tabbody" id="pfTabBody">'+_pfTabBody()+'</div>';
   }
   function setupProfile(){
-    const close=$("#profileClose");if(close)close.addEventListener("click",()=>{const s=$("#profileScrim");if(s)s.classList.remove("open");});
+    const close=$("#profileClose");if(close)close.addEventListener("click",closeProfile);
     const lb=$("#profilePhotoScrim");if(lb)lb.addEventListener("click",()=>lb.classList.remove("open"));
-    window.addEventListener("resize",()=>{const s=$("#profileScrim");if(s&&s.classList.contains("open"))_liftProfileForNav();});
+    window.addEventListener("resize",()=>{const s=$("#profileScrim");if(s&&s.classList.contains("open"))_fitProfileToNav(true);});
+    // tryk på en bund-nav-fane mens profilen er åben → luk profilen (nav'en navigerer selv)
+    const pnav=document.getElementById("bottomNav")||document.querySelector(".bottom-nav");
+    if(pnav)pnav.addEventListener("click",()=>{const s=$("#profileScrim");if(s&&s.classList.contains("open"))closeProfile();});
     const body=$("#profileBody");
     if(body)body.addEventListener("click",async e=>{
       const tabBtn=e.target.closest("[data-pftab]");
