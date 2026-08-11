@@ -4796,7 +4796,6 @@
   }
   function setupProfile(){
     const close=$("#profileClose");if(close)close.addEventListener("click",()=>{const s=$("#profileScrim");if(s)s.classList.remove("open");});
-    const scrim=$("#profileScrim");if(scrim)scrim.addEventListener("click",e=>{if(e.target===scrim)scrim.classList.remove("open");});
     const lb=$("#profilePhotoScrim");if(lb)lb.addEventListener("click",()=>lb.classList.remove("open"));
     const body=$("#profileBody");
     if(body)body.addEventListener("click",async e=>{
