@@ -4745,11 +4745,15 @@
   }
   function _pfAchHtml(){
     const all=_pfBadges();if(!all.length)return "";
-    const show=_achExpanded?all:all.slice(0,4);
     const moreLbl=_achExpanded?(lang==="da"?"Vis mindre":"Show less"):(lang==="da"?"Vis mere":"Show more");
-    const moreBtn=all.length>4?'<button class="pf-ach-more" id="pfAchMore">'+esc(moreLbl)+'</button>':'';
-    const badges=show.map(b=>'<div class="pf-badge"><div class="pf-badge-ic">'+b.icon+'</div><div class="pf-badge-lbl">'+esc(lang==="da"?b.da:b.en)+'</div></div>').join("");
-    return '<div class="pf-ach"><div class="pf-ach-head"><span class="pf-ach-title">Achievements · '+all.length+'</span>'+moreBtn+'</div><div class="pf-ach-row">'+badges+'</div></div>';
+    const moreBtn=all.length>8?'<button class="pf-ach-more" id="pfAchMore">'+esc(moreLbl)+'</button>':'';
+    let inner;
+    if(_achExpanded){
+      inner='<div class="pf-ach-grid">'+all.map(b=>'<div class="pf-badge"><div class="pf-badge-ic">'+b.icon+'</div><div class="pf-badge-lbl">'+esc(lang==="da"?b.da:b.en)+'</div></div>').join("")+'</div>';
+    }else{
+      inner='<div class="pf-ach-strip">'+all.map(b=>'<div class="pf-ach-ic" title="'+esc(lang==="da"?b.da:b.en)+'">'+b.icon+'</div>').join("")+'</div>';
+    }
+    return '<div class="pf-ach"><div class="pf-ach-head"><span class="pf-ach-title">Achievements · '+all.length+'</span>'+moreBtn+'</div>'+inner+'</div>';
   }
   function _pfTabBody(){
     const p=_profileData;
@@ -4778,21 +4782,17 @@
     const initial=name.charAt(0).toUpperCase();
     const role=[p.profession,p.workplace].filter(Boolean).join(" · ");
     const userLine=(p.username&&p.username!==name)?("@"+p.username):"";
+    const statsInner=p.locked
+      ?'<div class="pf-stat"><span class="n">'+(p.followers||0)+'</span><span class="l">'+esc(lang==="da"?"Følgere":"Followers")+'</span></div>'
+      :('<div class="pf-stat"><span class="n">'+_pfNum(p.career||0)+'</span><span class="l">'+esc(lang==="da"?"Håndværk":"Craft")+'</span></div>'
+        +'<div class="pf-stat"><span class="n">'+(p.followers||0)+'</span><span class="l">'+esc(lang==="da"?"Følgere":"Followers")+'</span></div>'
+        +'<div class="pf-stat"><span class="n">'+(p.following||0)+'</span><span class="l">'+esc(lang==="da"?"Følger":"Following")+'</span></div>');
     let head='<div class="pf-head">'
-      +'<div class="pf-avatar">'+esc(initial)+'</div>'
+      +'<div class="pf-hrow"><div class="pf-avatar">'+esc(initial)+'</div><div class="pf-stats">'+statsInner+'</div></div>'
       +'<div class="pf-name">'+esc(name)+'</div>'
       +(userLine?'<div class="pf-user">'+esc(userLine)+'</div>':'')
       +(role?'<div class="pf-role">'+esc(role)+'</div>':'')
       +((p.sharesTeam&&!p.isSelf)?'<div class="pf-team-badge">🧑‍🍳 '+esc(lang==="da"?"Holdkammerat":"Teammate")+'</div>':'');
-    if(!p.locked){
-      head+='<div class="pf-stats">'
-        +'<div class="pf-stat"><span class="n">'+_pfNum(p.career||0)+'</span><span class="l">'+esc(lang==="da"?"Håndværk":"Craft")+'</span></div>'
-        +'<div class="pf-stat"><span class="n">'+(p.followers||0)+'</span><span class="l">'+esc(lang==="da"?"Følgere":"Followers")+'</span></div>'
-        +'<div class="pf-stat"><span class="n">'+(p.following||0)+'</span><span class="l">'+esc(lang==="da"?"Følger":"Following")+'</span></div>'
-        +'</div>';
-    }else{
-      head+='<div class="pf-stats"><div class="pf-stat"><span class="n">'+(p.followers||0)+'</span><span class="l">'+esc(lang==="da"?"Følgere":"Followers")+'</span></div></div>';
-    }
     if(!p.isSelf){
       const fs=p.followStatus||"none";
       const lbl=(p.locked&&fs==="none")?(lang==="da"?"Anmod om at følge":"Request to follow"):followBtnLabel(fs);

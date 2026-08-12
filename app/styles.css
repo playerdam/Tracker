@@ -1276,24 +1276,28 @@
   .profile-topbar{position:sticky;top:0;z-index:10;height:52px;display:flex;align-items:center;padding:0 6px;background:var(--surface)}
   .profile-back{width:42px;height:42px;border-radius:50%;border:none;background:none;color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .12s}
   .profile-back:active{background:rgba(0,0,0,.07)}
-  .pf-head{padding:6px 22px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
-  .pf-avatar{width:84px;height:84px;border-radius:50%;background:var(--accent);color:#fff;font-family:"Fraunces",serif;font-weight:600;font-size:38px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(138,46,63,.28)}
-  .pf-name{font-family:"Fraunces",serif;font-weight:600;font-size:22px;letter-spacing:-.01em;margin-top:8px}
-  .pf-user{color:var(--faint);font-size:13px;margin-top:-3px}
-  .pf-role{color:var(--text);font-size:13px;opacity:.85}
-  .pf-team-badge{display:inline-flex;align-items:center;gap:4px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;margin-top:2px}
-  .pf-stats{display:flex;gap:28px;margin:14px 0 6px;justify-content:center}
+  .pf-head{padding:12px 18px 10px;display:flex;flex-direction:column;gap:2px}
+  .pf-hrow{display:flex;align-items:center;gap:16px}
+  .pf-avatar{width:60px;height:60px;border-radius:50%;background:var(--accent);color:#fff;font-family:"Fraunces",serif;font-weight:600;font-size:26px;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 3px 12px rgba(138,46,63,.26)}
+  .pf-stats{display:flex;flex:1;justify-content:space-around;text-align:center;gap:8px}
   .pf-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
-  .pf-stat .n{font-family:"Fraunces",serif;font-weight:600;font-size:21px;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
-  .pf-stat .l{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em}
-  .pf-follow{margin-top:6px}
+  .pf-stat .n{font-family:"Fraunces",serif;font-weight:600;font-size:18px;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
+  .pf-stat .l{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.03em}
+  .pf-name{font-family:"Fraunces",serif;font-weight:600;font-size:18px;letter-spacing:-.01em;margin-top:10px;line-height:1.15}
+  .pf-user{color:var(--faint);font-size:12.5px}
+  .pf-role{color:var(--text);font-size:12.5px;opacity:.85}
+  .pf-team-badge{align-self:flex-start;display:inline-flex;align-items:center;gap:4px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;margin-top:4px}
+  .pf-follow{margin-top:10px}
+  .pf-follow .feed-follow-btn{display:block;width:100%;text-align:center;padding:8px}
   .pf-locked{padding:22px 22px 44px;text-align:center;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:8px}
   .pf-lock-ic{font-size:28px}
-  .pf-ach{padding:10px 22px 2px}
+  .pf-ach{padding:12px 18px 4px}
   .pf-ach-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
   .pf-ach-title{font-size:13px;font-weight:600;color:var(--text)}
   .pf-ach-more{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent}
-  .pf-ach-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-start}
+  .pf-ach-strip{display:flex;gap:13px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .pf-ach-ic{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+  .pf-ach-grid{display:flex;flex-wrap:wrap;gap:12px 10px}
   .pf-badge{display:flex;flex-direction:column;align-items:center;gap:4px;width:62px}
   .pf-badge-ic{width:46px;height:46px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:22px}
   .pf-badge-lbl{font-size:10px;color:var(--faint);text-align:center;line-height:1.15}
