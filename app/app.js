@@ -3036,10 +3036,16 @@
   // Qlog focus overlay
   // ── Smart quick-log: tap-genveje + autocomplete ──
   function _catIconSvg(catId){const c=allCats().find(x=>x.id===catId);return (c&&c.icon)||DOTS_ICON;}
-  function _qlogTop(n){return (state.counters||[]).slice().sort((a,b)=>counterTotal(b)-counterTotal(a)).slice(0,n);}
+  // Rækkefølgen fryses når loggen åbnes, så chips IKKE hopper rundt mens man tapper.
+  // Re-sorteres først næste gang overlayet åbnes.
+  let _qlogChipOrder=null;
+  function _computeQlogOrder(){_qlogChipOrder=(state.counters||[]).slice().sort((a,b)=>counterTotal(b)-counterTotal(a)).slice(0,12).map(c=>c.id);}
   function renderQlogChips(){
     const box=$("#qlogChips");if(!box)return;
-    let html=_qlogTop(12).map(c=>{
+    if(!_qlogChipOrder)_computeQlogOrder();
+    const byId={};(state.counters||[]).forEach(c=>byId[c.id]=c);
+    const ordered=_qlogChipOrder.map(id=>byId[id]).filter(Boolean);
+    let html=ordered.map(c=>{
       const tot=counterTotal(c);
       const right=tot>0?'<span class="qchip-cnt">'+fmtNum(tot)+'</span>':'<span class="qchip-plus">＋</span>';
       return '<button class="qchip" data-qchip="'+esc(c.id)+'"><span class="qchip-ic">'+_catIconSvg(c.cat)+'</span>'+esc(c.label)+right+'</button>';
@@ -3127,7 +3133,7 @@
     const hint=$("#qlogOvHint");if(hint)hint.textContent=t("qlog_hint_full");
     if(inp){inp.placeholder=t("qlog_ph")||"";inp.value=$("#qlogInput").value||"";inp.style.height="auto";}
     ov.classList.add("open");
-    renderQlogChips();renderQlogAc(inp?inp.value:"");
+    _computeQlogOrder();renderQlogChips();renderQlogAc(inp?inp.value:"");
     reflectPendingPhoto();
     setTimeout(()=>{if(inp){inp.focus();inp.style.height="auto";inp.style.height=inp.scrollHeight+"px";}},60);
   }
