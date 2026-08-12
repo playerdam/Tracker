@@ -128,7 +128,7 @@
       feed_empty:"Følg nogen for at se deres aktivitet her",
       feed_empty_own:"Du har ikke postet noget endnu",
       feed_load_more:"Indlæs mere",
-      feed_search_ph:"Søg på kaldenavn…",
+      feed_search_ph:"Søg navn, titel el. sted (fx kok, Noma)…",
       lab_sub:"Eksperimenter med dine retter",
       lab_new:"Nyt eksperiment",
       lab_photo_lbl:"Tag et billede",
@@ -309,7 +309,7 @@
       feed_empty:"Follow someone to see their activity here",
       feed_empty_own:"You have not posted anything yet",
       feed_load_more:"Load more",
-      feed_search_ph:"Search by nickname…",
+      feed_search_ph:"Search name, role or place (e.g. chef, Noma)…",
       feed_follow:"Follow",feed_unfollow:"Following",
       feed_like:"Like",feed_comment:"Comment",
       feed_comments:"Comments",feed_comment_ph:"Write a comment…",
@@ -4617,8 +4617,9 @@
         const fs=_followingCache[u.id]||u.followStatus||"none";
         const name=u.nickname||(u.username?"@"+u.username:t("lb_anon"));
         const handle=u.username?"@"+u.username:"";
-        return '<div class="feed-user-row">'
-          +'<div class="feed-user-info"><div class="feed-user-nick">'+esc(name)+'</div>'+(handle&&handle!==name?'<div class="feed-user-prof">'+esc(handle)+'</div>':u.profession?'<div class="feed-user-prof">'+esc(u.profession)+'</div>':'')+'</div>'
+        const sub=[u.profession,u.workplace].filter(Boolean).join(" · ")||(handle&&handle!==name?handle:"");
+        return '<div class="feed-user-row" data-profile="'+esc(u.id)+'">'
+          +'<div class="feed-user-info"><div class="feed-user-nick">'+esc(name)+'</div>'+(sub?'<div class="feed-user-prof">'+esc(sub)+'</div>':'')+'</div>'
           +'<button class="'+followBtnClass(fs)+'" data-follow="'+esc(u.id)+'" data-follow-status="'+esc(fs)+'">'+esc(followBtnLabel(fs))+'</button>'
           +'</div>';
       }).join("")+'</div>';
@@ -5002,7 +5003,11 @@
     if(searchRes){
       searchRes.addEventListener("click",async e=>{
         const followBtn=e.target.closest("[data-follow]");
-        if(!followBtn)return;
+        if(!followBtn){
+          const prof=e.target.closest("[data-profile]");
+          if(prof)openProfile(prof.dataset.profile);
+          return;
+        }
         const uid=followBtn.dataset.follow;
         const curStatus=followBtn.dataset.followStatus||"none";
         const newStatus=(curStatus==="none")?"pending":"none";

@@ -1092,13 +1092,13 @@ app.get("/api/users/search", async (req, res) => {
     const q = (req.query.q || "").trim();
     if (!q || q.length < 2) return res.json({ users: [] });
     const qEnc = encodeURIComponent(q);
-    const rows = await sb(`users?or=(username.ilike.*${qEnc}*,nickname.ilike.*${qEnc}*)&select=id,nickname,profession,username&limit=20`) || [];
+    const rows = await sb(`users?or=(username.ilike.*${qEnc}*,nickname.ilike.*${qEnc}*,profession.ilike.*${qEnc}*,workplace.ilike.*${qEnc}*)&select=id,nickname,profession,username,workplace&limit=20`) || [];
     const followRows = await sb(`follows?follower_id=eq.${userId}&select=following_id,status`) || [];
     const followMap = {};
     followRows.forEach(r => { followMap[r.following_id] = r.status; });
     const users = rows
       .filter(r => r.id !== userId)
-      .map(r => ({ id: r.id, nickname: r.nickname, profession: r.profession, username: r.username, followStatus: followMap[r.id] || "none" }));
+      .map(r => ({ id: r.id, nickname: r.nickname, profession: r.profession, username: r.username, workplace: r.workplace, followStatus: followMap[r.id] || "none" }));
     res.json({ users });
   } catch (err) {
     res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
