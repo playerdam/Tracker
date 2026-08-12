@@ -1227,6 +1227,8 @@ app.get("/api/profile/:userId", async (req, res) => {
 
     // stats + badges fra target's synkede state
     let career = 0, topCats = [], badges = [];
+    let shifts = { count: 0, hours: 0 };
+    let wine = { count: 0, glasses: 0, bottles: 0 };
     try {
       const st = await sb(`user_state?user_id=eq.${targetId}&select=data`);
       const data = st && st[0] && st[0].data;
@@ -1236,7 +1238,18 @@ app.get("/api/profile/:userId", async (req, res) => {
           career += tot;
           if (tot > 0) topCats.push({ label: c.label || "", count: tot });
         });
-        (Array.isArray(data.wines) ? data.wines : []).forEach(w => { career += (w.glasses || 0) + (w.bottles || 0); });
+        const wines = Array.isArray(data.wines) ? data.wines : [];
+        wines.forEach(w => { const g = w.glasses || 0, b = w.bottles || 0; career += g + b; wine.glasses += g; wine.bottles += b; });
+        wine.count = wines.length;
+        const hist = Array.isArray(data.shiftHistory) ? data.shiftHistory : [];
+        shifts.count = hist.length;
+        let ms = 0;
+        hist.forEach(s => {
+          const a = s.startedAt ? new Date(s.startedAt).getTime() : 0;
+          const b = s.endedAt ? new Date(s.endedAt).getTime() : 0;
+          if (a && b && b > a) ms += b - a;
+        });
+        shifts.hours = Math.round(ms / 3600000 * 10) / 10;
         topCats.sort((a, b) => b.count - a.count);
         topCats = topCats.slice(0, 6);
         badges = Array.isArray(data._badges) ? data._badges : [];
@@ -1251,6 +1264,8 @@ app.get("/api/profile/:userId", async (req, res) => {
       career,
       topCats,
       badges,
+      shifts,
+      wine,
       photos: photos.map(p => ({ id: p.id, imageUrl: p.image_url, summary: p.summary || null, delta: p.delta, loggedAt: p.logged_at })),
     });
   } catch (err) {
