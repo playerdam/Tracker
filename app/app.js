@@ -156,7 +156,7 @@
       lab_add_step:"+ Tilføj trin",lab_ph_step:"Beskriv trinnet…",
       lab_ai_wine:"AI: Foreslå vine baseret på ingredienser",
       lab_ai_desc:"Generer beskrivelse med AI",lab_ai_desc_loading:"Genererer…",lab_ai_desc_err:"Kunne ikke generere — prøv igen",
-      lab_add_test:"+ Ny testrunde",lab_delete_dish:"Slet denne ret",lab_export_card:"Eksportér som kort",
+      lab_add_test:"+ Ny testrunde",lab_delete_dish:"Slet denne ret",lab_export_card:"Eksportér som kort",lab_tab_recipe:"Opskrift",lab_tab_kitchen:"Køkken",lab_tab_finish:"Finish",lab_tab_notes:"Noter",
       lab_ai_fab:"Spørg AI",lab_ai_title:"Spørg AI om denne ret",lab_ai_thinking:"Tænker…",lab_ai_ph:"Stil et spørgsmål…",
       lab_ing_col_amt:"Mængde",lab_ing_col_unit:"Enhed",lab_ing_col_name:"Ingrediens",
       lab_ph_ing_amt:"mæng.",lab_ph_ing_unit:"enhed",lab_ph_ing_name:"Ingrediens…",lab_ph_ing_prep:"Forbehandling (fx brunois, blancheret, fermenteret…)",
@@ -301,7 +301,7 @@
       lab_add_step:"+ Add step",lab_ph_step:"Describe the step…",
       lab_ai_wine:"AI: Suggest wine based on ingredients",
       lab_ai_desc:"Generate description with AI",lab_ai_desc_loading:"Generating…",lab_ai_desc_err:"Could not generate — try again",
-      lab_add_test:"+ New test round",lab_delete_dish:"Delete this dish",lab_export_card:"Export as card",
+      lab_add_test:"+ New test round",lab_delete_dish:"Delete this dish",lab_export_card:"Export as card",lab_tab_recipe:"Recipe",lab_tab_kitchen:"Kitchen",lab_tab_finish:"Finish",lab_tab_notes:"Notes",
       lab_ai_fab:"Ask AI",lab_ai_title:"Ask AI about this dish",lab_ai_thinking:"Thinking…",lab_ai_ph:"Ask a question…",
       lab_ing_col_amt:"Amount",lab_ing_col_unit:"Unit",lab_ing_col_name:"Ingredient",
       lab_ph_ing_amt:"amt.",lab_ph_ing_unit:"unit",lab_ph_ing_name:"Ingredient…",lab_ph_ing_prep:"Prep (e.g. brunoise, blanched, fermented…)",
@@ -476,6 +476,10 @@
     const dsTSteps=$("#dsTitleSteps");if(dsTSteps)dsTSteps.textContent=t("lab_sec_steps");
     const dsTPrice=$("#dsTitlePrice");if(dsTPrice)dsTPrice.textContent=t("lab_sec_price");
     const dsTPrep=$("#dsTitlePrep");if(dsTPrep)dsTPrep.textContent=t("lab_sec_prep");
+    var deTO=$("#deTabOpskrift");if(deTO)deTO.textContent=t("lab_tab_recipe");
+    var deTK=$("#deTabKoekken");if(deTK)deTK.textContent=t("lab_tab_kitchen");
+    var deTF=$("#deTabFinish");if(deTF)deTF.textContent=t("lab_tab_finish");
+    var deTN=$("#deTabNoter");if(deTN)deTN.textContent=t("lab_tab_notes");
     const dsTTech=$("#dsTitleTech");if(dsTTech)dsTTech.textContent=t("lab_sec_tech");
     const dsTPlating=$("#dsTitlePlating");if(dsTPlating)dsTPlating.textContent=t("lab_sec_plating");
     const dsTWine=$("#dsTitleWine");if(dsTWine)dsTWine.textContent=t("lab_sec_wine");
@@ -5323,7 +5327,7 @@
         +'<div class="pp-crow big"><span>'+(lang==="da"?"Foreslået pris":"Suggested price")+'</span><b id="ppPrice">'+_fmtKr(price)+'</b></div>'
         +'<div class="pp-crow margin"><span>Margin</span><b id="ppMargin">'+_fmtKr(margin)+' · '+mPct+'%</b></div>'
       +'</div>';
-    _wirePricePanel();
+    _wirePricePanel();renderDishSummary();
   }
   function _updatePriceTotals(){
     if(!_currentDish)return;var d=_currentDish.data;
@@ -5336,6 +5340,7 @@
     var cover=basePortions?totalBase/basePortions:0;var price=pct>0?cover/(pct/100):0;var margin=price-cover;var mPct=price>0?Math.round(margin/price*100):0;
     var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
     set("ppTotalCost",_fmtKr(totalBase*factor));set("ppCover",_fmtKr(cover));set("ppFc",pct+"%");set("ppPrice",_fmtKr(price));set("ppMargin",_fmtKr(margin)+" · "+mPct+"%");
+    renderDishSummary();
   }
   function _wirePricePanel(){
     var panel=$("#pricePanel");if(!panel||panel._wired)return;panel._wired=true;
@@ -5441,6 +5446,40 @@
     if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]});return;}catch(e){if(e&&e.name==="AbortError")return;}}
     var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},5000);
   }
+  // ── The Lab: faner (gruppér sektioner) + top-oversigt ──
+  var _deTabs={opskrift:["dsGrundinfo","dsIng","dsSteps"],koekken:["dsPrice","dsPrep","dsTech"],finish:["dsPlating","dsWine","dsService"],noter:["dsTest","dsPhotos"]};
+  var _deTabPrimary={opskrift:"dsIng",koekken:"dsPrice",finish:"dsPlating",noter:"dsTest"};
+  var _deAllSections=["dsGrundinfo","dsIng","dsSteps","dsPrice","dsPrep","dsTech","dsPlating","dsWine","dsService","dsTest","dsPhotos"];
+  function _showDeTab(tab){
+    if(!_deTabs[tab])tab="opskrift";
+    _deAllSections.forEach(function(secId){
+      var sec=document.getElementById(secId);if(!sec)return;
+      var inTab=_deTabs[tab].indexOf(secId)>=0;
+      sec.style.display=inTab?"":"none";
+      sec.classList.toggle("open",inTab&&secId===_deTabPrimary[tab]);
+      var bd=sec.querySelector(".ds-bd");if(bd)bd.style.height="";
+    });
+    document.querySelectorAll("#deTabs .de-tab").forEach(function(b){b.classList.toggle("active",b.dataset.detab===tab);});
+  }
+  function _wireDeTabs(){
+    var tabs=$("#deTabs");if(!tabs||tabs._wired)return;tabs._wired=true;
+    tabs.addEventListener("click",function(e){var b=e.target.closest("[data-detab]");if(b){_showDeTab(b.dataset.detab);haptic(10);}});
+  }
+  function renderDishSummary(){
+    var el=$("#deSummary");if(!el||!_currentDish)return;var d=_currentDish.data;var parts=[];
+    var portions=parseInt(d.portions,10);
+    if(portions)parts.push(portions+" "+(d.portionUnit||"prs")+".");
+    var nIng=(d.ingredients||[]).filter(function(i){return (i.name||"").trim();}).length;
+    if(nIng)parts.push(nIng+" "+(lang==="da"?"ingredienser":"ingredients"));
+    var totalCost=(d.ingredients||[]).reduce(function(a,i){return a+_pnum(i.cost);},0);
+    if(totalCost>0){
+      var pct=Math.round(_pnum(d.foodCostPct))||30;var cover=totalCost/(portions||1);
+      var price=pct>0?cover/(pct/100):0;var margin=price-cover;var mPct=price>0?Math.round(margin/price*100):0;
+      parts.push("margin "+mPct+"%");parts.push("food cost "+pct+"%");
+    }
+    el.innerHTML=parts.map(function(p){return "<span>"+esc(p)+"</span>";}).join("<i></i>");
+    el.style.display=parts.length?"":"none";
+  }
   function markDirty(){
     _dishDirty=true;
     var saveLbl=$("#deSaveLbl");var saveBtn=$("#deSaveBtn");
@@ -5517,6 +5556,8 @@
       var el=document.getElementById(id);
       if(el&&!el._labWired){el._labWired=true;el.addEventListener("input",markDirty);}
     });
+    var dpEl=$("#dePortions");if(dpEl&&!dpEl._ppWired){dpEl._ppWired=true;dpEl.addEventListener("input",function(){_priceScaleTo=null;renderPricePanel();renderDishSummary();});}
+    _wireDeTabs();_showDeTab("opskrift");renderDishSummary();
     editor.classList.add("open");editor.scrollTop=0;
     if(isNew){setTimeout(function(){var n=$("#deName");if(n){n.focus();n.select();}},350);}
   }
