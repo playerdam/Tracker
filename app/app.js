@@ -144,7 +144,7 @@
       lab_new_dish:"Ny ret",lab_filter_all:"Alle",lab_filter_idea:"Idé",lab_filter_testing:"Test",lab_filter_ready:"Klar",lab_filter_menu:"På menu",
       lab_name_ph:"Navn på retten…",lab_hero_add:"Tilføj forsidebillede",
       lab_status_idea:"Idé",lab_status_testing:"Test",lab_status_ready:"Klar",lab_status_menu:"På menu",
-      lab_sec_grundinfo:"Grundinfo",lab_sec_ing:"Ingredienser",lab_sec_steps:"Fremgangsmåde",lab_sec_price:"Skalér & pris",lab_sec_tech:"Teknik & Tid",lab_sec_plating:"Anretning",lab_sec_wine:"Vine & parring",lab_sec_tests:"Testnoter",lab_sec_photos:"Billeder",
+      lab_sec_grundinfo:"Grundinfo",lab_sec_ing:"Ingredienser",lab_sec_steps:"Fremgangsmåde",lab_sec_price:"Skalér & pris",lab_sec_prep:"Prep / mise",lab_sec_tech:"Teknik & Tid",lab_sec_plating:"Anretning",lab_sec_wine:"Vine & parring",lab_sec_tests:"Testnoter",lab_sec_photos:"Billeder",
       lab_lbl_season:"Sæson",lab_lbl_portions:"Portioner",lab_lbl_concept:"Koncept & inspiration",
       lab_ph_concept:"Hvad er idéen bag retten? Hvad er sæsonen, fortællingen, teksturen…",
       lab_lbl_cooktime:"Tilberedning",lab_lbl_resttime:"Hvile / sous vide",lab_lbl_temp:"Temperatur",lab_lbl_platingtime:"Anretn. tid",
@@ -156,7 +156,7 @@
       lab_add_step:"+ Tilføj trin",lab_ph_step:"Beskriv trinnet…",
       lab_ai_wine:"AI: Foreslå vine baseret på ingredienser",
       lab_ai_desc:"Generer beskrivelse med AI",lab_ai_desc_loading:"Genererer…",lab_ai_desc_err:"Kunne ikke generere — prøv igen",
-      lab_add_test:"+ Ny testrunde",lab_delete_dish:"Slet denne ret",
+      lab_add_test:"+ Ny testrunde",lab_delete_dish:"Slet denne ret",lab_export_card:"Eksportér som kort",
       lab_ai_fab:"Spørg AI",lab_ai_title:"Spørg AI om denne ret",lab_ai_thinking:"Tænker…",lab_ai_ph:"Stil et spørgsmål…",
       lab_ing_col_amt:"Mængde",lab_ing_col_unit:"Enhed",lab_ing_col_name:"Ingrediens",
       lab_ph_ing_amt:"mæng.",lab_ph_ing_unit:"enhed",lab_ph_ing_name:"Ingrediens…",lab_ph_ing_prep:"Forbehandling (fx brunois, blancheret, fermenteret…)",
@@ -289,7 +289,7 @@
       lab_new_dish:"New dish",lab_filter_all:"All",lab_filter_idea:"Idea",lab_filter_testing:"Test",lab_filter_ready:"Ready",lab_filter_menu:"On menu",
       lab_name_ph:"Dish name…",lab_hero_add:"Add hero photo",
       lab_status_idea:"Idea",lab_status_testing:"Test",lab_status_ready:"Ready",lab_status_menu:"On menu",
-      lab_sec_grundinfo:"Overview",lab_sec_ing:"Ingredients",lab_sec_steps:"Method",lab_sec_price:"Scale & cost",lab_sec_tech:"Technique & Timing",lab_sec_plating:"Plating",lab_sec_wine:"Wine & Pairing",lab_sec_tests:"Test notes",lab_sec_photos:"Photos",
+      lab_sec_grundinfo:"Overview",lab_sec_ing:"Ingredients",lab_sec_steps:"Method",lab_sec_price:"Scale & cost",lab_sec_prep:"Prep / mise",lab_sec_tech:"Technique & Timing",lab_sec_plating:"Plating",lab_sec_wine:"Wine & Pairing",lab_sec_tests:"Test notes",lab_sec_photos:"Photos",
       lab_lbl_season:"Season",lab_lbl_portions:"Portions",lab_lbl_concept:"Concept & inspiration",
       lab_ph_concept:"What's the idea behind this dish? The season, story, texture…",
       lab_lbl_cooktime:"Cook time",lab_lbl_resttime:"Rest / sous vide",lab_lbl_temp:"Temperature",lab_lbl_platingtime:"Plating time",
@@ -301,7 +301,7 @@
       lab_add_step:"+ Add step",lab_ph_step:"Describe the step…",
       lab_ai_wine:"AI: Suggest wine based on ingredients",
       lab_ai_desc:"Generate description with AI",lab_ai_desc_loading:"Generating…",lab_ai_desc_err:"Could not generate — try again",
-      lab_add_test:"+ New test round",lab_delete_dish:"Delete this dish",
+      lab_add_test:"+ New test round",lab_delete_dish:"Delete this dish",lab_export_card:"Export as card",
       lab_ai_fab:"Ask AI",lab_ai_title:"Ask AI about this dish",lab_ai_thinking:"Thinking…",lab_ai_ph:"Ask a question…",
       lab_ing_col_amt:"Amount",lab_ing_col_unit:"Unit",lab_ing_col_name:"Ingredient",
       lab_ph_ing_amt:"amt.",lab_ph_ing_unit:"unit",lab_ph_ing_name:"Ingredient…",lab_ph_ing_prep:"Prep (e.g. brunoise, blanched, fermented…)",
@@ -475,6 +475,7 @@
     const dsTIng=$("#dsTitleIng");if(dsTIng)dsTIng.textContent=t("lab_sec_ing");
     const dsTSteps=$("#dsTitleSteps");if(dsTSteps)dsTSteps.textContent=t("lab_sec_steps");
     const dsTPrice=$("#dsTitlePrice");if(dsTPrice)dsTPrice.textContent=t("lab_sec_price");
+    const dsTPrep=$("#dsTitlePrep");if(dsTPrep)dsTPrep.textContent=t("lab_sec_prep");
     const dsTTech=$("#dsTitleTech");if(dsTTech)dsTTech.textContent=t("lab_sec_tech");
     const dsTPlating=$("#dsTitlePlating");if(dsTPlating)dsTPlating.textContent=t("lab_sec_plating");
     const dsTWine=$("#dsTitleWine");if(dsTWine)dsTWine.textContent=t("lab_sec_wine");
@@ -5241,6 +5242,12 @@
         catch(e){showToast(lang==="da"?"Noget gik galt":"Something went wrong");}
       });
     }
+    // Export as recipe card
+    var deExportBtn=$("#deExportBtn");
+    if(deExportBtn){
+      deExportBtn.textContent="📸 "+t("lab_export_card");
+      deExportBtn.addEventListener("click",shareDishCard);
+    }
     // Hero photo
     var deHeroAdd=$("#deHeroAdd");var deHeroInput=$("#deHeroInput");var deHeroImg=$("#deHeroImg");
     if(deHeroAdd)deHeroAdd.addEventListener("click",function(){if(deHeroInput)deHeroInput.click();});
@@ -5346,6 +5353,94 @@
       if(fc&&_currentDish){var p=Math.round(_pnum(_currentDish.data.foodCostPct))||30;p=Math.min(90,Math.max(5,p+parseInt(fc.dataset.ppfc,10)));_currentDish.data.foodCostPct=p;markDirty();renderPricePanel();return;}
     });
   }
+  // ── The Lab: Prep / mise-liste (genereret afkryds-liste) ──
+  var _prepDone={};
+  function renderPrepPanel(){
+    var panel=$("#prepPanel");if(!panel||!_currentDish)return;
+    var d=_currentDish.data;
+    var ings=(d.ingredients||[]).filter(function(i){return (i.name||"").trim();});
+    var steps=(d.steps||[]).filter(function(s){return (s.text||"").trim();});
+    if(!ings.length&&!steps.length){panel.innerHTML='<div class="pp-empty">'+(lang==="da"?"Tilføj ingredienser og trin — så bygger vi en prep-liste":"Add ingredients and steps — we build a prep list")+'</div>';return;}
+    function item(key,title,note){
+      var done=!!_prepDone[key];
+      return '<div class="prep-item'+(done?" done":"")+'" data-prep="'+esc(key)+'"><span class="prep-box"></span><span class="prep-txt"><b>'+esc(title)+'</b>'+(note?' <small>— '+esc(note)+'</small>':'')+'</span></div>';
+    }
+    var html='<div class="prep-h">'+(lang==="da"?"Mise / forbered":"Mise / prep")+'</div>';
+    html+=ings.map(function(i){return item("ing:"+i.id,i.name,i.prep||"");}).join("");
+    if(steps.length){
+      html+='<div class="prep-h">'+(lang==="da"?"Trin":"Steps")+'</div>';
+      html+=steps.map(function(s,idx){
+        var txt=s.text||"";var title=(idx+1)+" · "+(txt.length>64?txt.slice(0,64)+"…":txt);
+        var meta=[];if(s.temp)meta.push(s.temp+"°C");if(s.time)meta.push(s.time+" min");
+        return item("step:"+s.id,title,meta.join(" · "));
+      }).join("");
+    }
+    panel.innerHTML=html;_wirePrepPanel();
+  }
+  function _wirePrepPanel(){
+    var panel=$("#prepPanel");if(!panel||panel._wired)return;panel._wired=true;
+    panel.addEventListener("click",function(e){
+      var it=e.target.closest("[data-prep]");if(!it)return;
+      var k=it.dataset.prep;_prepDone[k]=!_prepDone[k];it.classList.toggle("done",!!_prepDone[k]);haptic(10);
+    });
+  }
+  // ── The Lab: eksportér ret som opskrifts-kort (PNG) ──
+  function _wrapCanvas(ctx,text,maxW){
+    var words=String(text||"").split(/\s+/),lines=[],cur="";
+    words.forEach(function(w){var test=cur?cur+" "+w:w;if(ctx.measureText(test).width>maxW&&cur){lines.push(cur);cur=w;}else cur=test;});
+    if(cur)lines.push(cur);return lines.length?lines:[""];
+  }
+  async function _buildDishCardBlob(){
+    if(!_currentDish)return null;
+    var d=_currentDish.data||{};var name=(_currentDish.name||"Ret").trim();
+    try{await document.fonts.load('600 80px Fraunces');}catch(e){}
+    var W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;var ctx=cv.getContext("2d");
+    ctx.fillStyle="#FBF7F3";ctx.fillRect(0,0,W,H);
+    var hg=ctx.createLinearGradient(0,0,W,300);hg.addColorStop(0,"#8A2E3F");hg.addColorStop(1,"#C07A5A");
+    ctx.fillStyle=hg;ctx.fillRect(0,0,W,300);
+    ctx.fillStyle="#fff";ctx.textAlign="left";ctx.font="600 76px Fraunces, serif";
+    var nameLines=_wrapCanvas(ctx,name,W-160),ny=nameLines.length>1?165:230;
+    nameLines.slice(0,2).forEach(function(l){ctx.fillText(l,80,ny);ny+=84;});
+    var ings=(d.ingredients||[]).filter(function(i){return (i.name||"").trim();});
+    var sub=ings.slice(0,3).map(function(i){return i.name;}).join(" · ");
+    if(d.portions)sub+=(sub?" — ":"")+d.portions+" "+(d.portionUnit||"prs")+".";
+    ctx.fillStyle="#6B5F58";ctx.font="400 34px Inter, sans-serif";ctx.fillText(sub.slice(0,58),80,382);
+    var colY=470,leftX=80,rightX=580,colW=430,lineH=42;
+    ctx.font="700 26px Inter, sans-serif";ctx.fillStyle="#8A2E3F";
+    ctx.fillText(lang==="da"?"INGREDIENSER":"INGREDIENTS",leftX,colY);
+    ctx.fillText(lang==="da"?"FREMGANG":"METHOD",rightX,colY);
+    var ly=colY+50;ctx.fillStyle="#1A1410";ctx.font="400 30px Inter, sans-serif";
+    ings.slice(0,15).forEach(function(i){
+      var amt=(i.amount||"")+(i.unit?" "+i.unit:"");var line=(amt?amt+" ":"")+i.name;
+      _wrapCanvas(ctx,line,colW).slice(0,2).forEach(function(l){ctx.fillText(l,leftX,ly);ly+=lineH;});
+    });
+    var ry=colY+50,steps=(d.steps||[]).filter(function(s){return (s.text||"").trim();});
+    steps.slice(0,10).forEach(function(s,idx){
+      ctx.fillStyle="#8A2E3F";ctx.font="600 30px Inter, sans-serif";ctx.fillText((idx+1)+".",rightX,ry);
+      ctx.fillStyle="#1A1410";ctx.font="400 28px Inter, sans-serif";
+      _wrapCanvas(ctx,s.text,colW-42).slice(0,3).forEach(function(l){ctx.fillText(l,rightX+44,ry);ry+=38;});
+      ry+=14;
+    });
+    if(d.winePairing){
+      ry+=12;ctx.fillStyle="#8A2E3F";ctx.font="700 26px Inter, sans-serif";ctx.fillText(lang==="da"?"VIN":"WINE",rightX,ry);ry+=42;
+      ctx.fillStyle="#1A1410";ctx.font="400 28px Inter, sans-serif";
+      _wrapCanvas(ctx,d.winePairing,colW).slice(0,2).forEach(function(l){ctx.fillText(l,rightX,ry);ry+=38;});
+    }
+    ctx.strokeStyle="#E5DDD5";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(80,H-110);ctx.lineTo(W-80,H-110);ctx.stroke();
+    ctx.fillStyle="#A89C94";ctx.font="600 28px Inter, sans-serif";ctx.textAlign="left";
+    ctx.fillText((d.technique||d.season||"").slice(0,40),80,H-58);
+    ctx.textAlign="right";ctx.fillText("The Lab",W-80,H-58);ctx.textAlign="left";
+    return await new Promise(function(r){cv.toBlob(r,"image/png");});
+  }
+  async function shareDishCard(){
+    if(!_currentDish)return;
+    if(_dishDirty){try{await saveDish(false);}catch(e){}}
+    var blob=await _buildDishCardBlob();if(!blob){showToast(lang==="da"?"Kunne ikke lave kort":"Couldn't build card");return;}
+    var fname=(((_currentDish&&_currentDish.name)||"ret").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"ret")+".png";
+    var file=new File([blob],fname,{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]});return;}catch(e){if(e&&e.name==="AbortError")return;}}
+    var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},5000);
+  }
   function markDirty(){
     _dishDirty=true;
     var saveLbl=$("#deSaveLbl");var saveBtn=$("#deSaveBtn");
@@ -5416,7 +5511,7 @@
     setPlatingPhoto(d.platingUrl||"");
     var dePlating=$("#dePlating");if(dePlating)dePlating.value=d.plating||"";
     var deWine=$("#deWine");if(deWine)deWine.value=d.winePairing||"";
-    _priceScaleTo=null;renderIngredients();renderSteps();renderTestRounds();renderPhotoGallery();renderPricePanel();
+    _priceScaleTo=null;_prepDone={};renderIngredients();renderSteps();renderTestRounds();renderPhotoGallery();renderPricePanel();renderPrepPanel();
     updateVisChips(_currentDish.visibility||"private");renderServiceNotes();
     ["deSeason","dePortions","dePortionUnit","deConcept","deCookTime","deRestTime","deMainTemp","dePlatingTime","deTechnique","dePlating","deWine"].forEach(function(id){
       var el=document.getElementById(id);
@@ -5495,7 +5590,7 @@
         var ing=(_currentDish.data.ingredients||[]).find(function(x){return x.id===id;});
         if(ing&&field)ing[field]=inp.value;
         if(field==="name"){var c=$("#dsIngCount");if(c)c.textContent=(_currentDish.data.ingredients||[]).length||"";}
-        markDirty();renderPricePanel();
+        markDirty();renderPricePanel();renderPrepPanel();
       });
     });
     list.querySelectorAll("[data-rm-ing]").forEach(function(btn){
@@ -5505,7 +5600,7 @@
         renderIngredients();markDirty();
       });
     });
-    renderPricePanel();
+    renderPricePanel();renderPrepPanel();
   }
 
   function renderSteps(){
@@ -5537,6 +5632,7 @@
         renderSteps();markDirty();
       });
     });
+    renderPrepPanel();
   }
 
   function renderTestRounds(){
