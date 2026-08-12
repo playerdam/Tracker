@@ -1343,3 +1343,30 @@
   #profilePhotoScrim.open{display:flex}
   #profilePhotoImg{max-width:100%;max-height:80vh;border-radius:8px;object-fit:contain}
   #profilePhotoCap{color:#fff;margin-top:12px;font-size:14px;text-align:center;max-width:92%}
+
+  /* ── The Lab: Skalér & pris ── */
+  .pp-scale{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .pp-scale-lbl{font-size:12px;color:var(--dim)}
+  .pp-scale-n{width:56px;text-align:center;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:"Fraunces",serif;font-weight:600;font-size:15px;padding:6px 4px;-webkit-appearance:none}
+  .pp-scale-unit{font-size:12px;color:var(--faint)}
+  .pp-scale-note{margin-left:auto;font-size:12px;color:#4E8B6A;font-weight:600}
+  .pp-step{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--accent);font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+  .pp-step.sm{width:26px;height:26px;font-size:15px}
+  .pp-list{margin-bottom:14px}
+  .pp-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+  .pp-row:last-child{border-bottom:none}
+  .pp-amt{font-family:"Fraunces",serif;font-weight:600;color:var(--accent);min-width:62px;font-variant-numeric:tabular-nums;font-size:13.5px}
+  .pp-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pp-costwrap{display:flex;align-items:center;gap:6px;flex:none}
+  .pp-cost{width:56px;text-align:right;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text);font-size:13px;padding:5px 7px;-webkit-appearance:none}
+  .pp-linecost{font-size:12px;color:var(--faint);min-width:42px;text-align:right;font-variant-numeric:tabular-nums}
+  .pp-empty{color:var(--faint);font-size:13px;padding:10px 0}
+  .pp-card{background:var(--surface-2,var(--bg));border-radius:14px;padding:14px 16px}
+  .pp-crow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px}
+  .pp-crow>span:first-child{color:var(--dim)}
+  .pp-crow b{font-family:"Fraunces",serif;font-weight:600;font-variant-numeric:tabular-nums}
+  .pp-crow.big b{font-size:20px;color:var(--accent)}
+  .pp-crow.margin b{color:#4E8B6A}
+  .pp-fc{display:inline-flex;align-items:center;gap:8px}
+  .pp-fc b{min-width:40px;text-align:center;color:var(--accent)}
+  .pp-hr{height:1px;background:var(--border);margin:5px 0}

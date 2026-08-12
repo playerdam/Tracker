@@ -144,7 +144,7 @@
       lab_new_dish:"Ny ret",lab_filter_all:"Alle",lab_filter_idea:"Idé",lab_filter_testing:"Test",lab_filter_ready:"Klar",lab_filter_menu:"På menu",
       lab_name_ph:"Navn på retten…",lab_hero_add:"Tilføj forsidebillede",
       lab_status_idea:"Idé",lab_status_testing:"Test",lab_status_ready:"Klar",lab_status_menu:"På menu",
-      lab_sec_grundinfo:"Grundinfo",lab_sec_ing:"Ingredienser",lab_sec_steps:"Fremgangsmåde",lab_sec_tech:"Teknik & Tid",lab_sec_plating:"Anretning",lab_sec_wine:"Vine & parring",lab_sec_tests:"Testnoter",lab_sec_photos:"Billeder",
+      lab_sec_grundinfo:"Grundinfo",lab_sec_ing:"Ingredienser",lab_sec_steps:"Fremgangsmåde",lab_sec_price:"Skalér & pris",lab_sec_tech:"Teknik & Tid",lab_sec_plating:"Anretning",lab_sec_wine:"Vine & parring",lab_sec_tests:"Testnoter",lab_sec_photos:"Billeder",
       lab_lbl_season:"Sæson",lab_lbl_portions:"Portioner",lab_lbl_concept:"Koncept & inspiration",
       lab_ph_concept:"Hvad er idéen bag retten? Hvad er sæsonen, fortællingen, teksturen…",
       lab_lbl_cooktime:"Tilberedning",lab_lbl_resttime:"Hvile / sous vide",lab_lbl_temp:"Temperatur",lab_lbl_platingtime:"Anretn. tid",
@@ -289,7 +289,7 @@
       lab_new_dish:"New dish",lab_filter_all:"All",lab_filter_idea:"Idea",lab_filter_testing:"Test",lab_filter_ready:"Ready",lab_filter_menu:"On menu",
       lab_name_ph:"Dish name…",lab_hero_add:"Add hero photo",
       lab_status_idea:"Idea",lab_status_testing:"Test",lab_status_ready:"Ready",lab_status_menu:"On menu",
-      lab_sec_grundinfo:"Overview",lab_sec_ing:"Ingredients",lab_sec_steps:"Method",lab_sec_tech:"Technique & Timing",lab_sec_plating:"Plating",lab_sec_wine:"Wine & Pairing",lab_sec_tests:"Test notes",lab_sec_photos:"Photos",
+      lab_sec_grundinfo:"Overview",lab_sec_ing:"Ingredients",lab_sec_steps:"Method",lab_sec_price:"Scale & cost",lab_sec_tech:"Technique & Timing",lab_sec_plating:"Plating",lab_sec_wine:"Wine & Pairing",lab_sec_tests:"Test notes",lab_sec_photos:"Photos",
       lab_lbl_season:"Season",lab_lbl_portions:"Portions",lab_lbl_concept:"Concept & inspiration",
       lab_ph_concept:"What's the idea behind this dish? The season, story, texture…",
       lab_lbl_cooktime:"Cook time",lab_lbl_resttime:"Rest / sous vide",lab_lbl_temp:"Temperature",lab_lbl_platingtime:"Plating time",
@@ -474,6 +474,7 @@
     const dsTGrund=$("#dsTitleGrundinfo");if(dsTGrund)dsTGrund.textContent=t("lab_sec_grundinfo");
     const dsTIng=$("#dsTitleIng");if(dsTIng)dsTIng.textContent=t("lab_sec_ing");
     const dsTSteps=$("#dsTitleSteps");if(dsTSteps)dsTSteps.textContent=t("lab_sec_steps");
+    const dsTPrice=$("#dsTitlePrice");if(dsTPrice)dsTPrice.textContent=t("lab_sec_price");
     const dsTTech=$("#dsTitleTech");if(dsTTech)dsTTech.textContent=t("lab_sec_tech");
     const dsTPlating=$("#dsTitlePlating");if(dsTPlating)dsTPlating.textContent=t("lab_sec_plating");
     const dsTWine=$("#dsTitleWine");if(dsTWine)dsTWine.textContent=t("lab_sec_wine");
@@ -5274,6 +5275,77 @@
     var deName=$("#deName");if(deName)deName.addEventListener("input",function(){if(!_currentDish)return;_currentDish.name=deName.value||"Ny ret";markDirty();});
   }
 
+  // ── The Lab: Skalér & pris/margin ──
+  function _pnum(v){if(v==null)return 0;var s=String(v).replace(/[^0-9.,-]/g,"").replace(",",".");var n=parseFloat(s);return isNaN(n)?0:n;}
+  function _fmtAmt(n){if(!isFinite(n))return "0";var r=Math.round(n*100)/100;return r.toLocaleString(lang==="da"?"da-DK":"en-GB",{maximumFractionDigits:2});}
+  function _fmtKr(n){return Math.round(n||0).toLocaleString(lang==="da"?"da-DK":"en-GB")+" kr";}
+  var _priceScaleTo=null;
+  function renderPricePanel(){
+    var panel=$("#pricePanel");if(!panel||!_currentDish)return;
+    var d=_currentDish.data;var ings=d.ingredients||[];
+    var basePortions=parseInt(d.portions,10)||1;if(basePortions<1)basePortions=1;
+    if(_priceScaleTo==null||_priceScaleTo<1)_priceScaleTo=basePortions;
+    var factor=basePortions?(_priceScaleTo/basePortions):1;
+    var pct=Math.round(_pnum(d.foodCostPct))||30;
+    var unit=d.portionUnit||"prs";
+    var named=ings.filter(function(i){return (i.name||"").trim();});
+    var rows=named.map(function(i){
+      var scaled=_pnum(i.amount)*factor;
+      var amtStr=_pnum(i.amount)?(_fmtAmt(scaled)+(i.unit?" "+i.unit:"")):"";
+      var lc=_pnum(i.cost)*factor;
+      return '<div class="pp-row"><div class="pp-amt">'+esc(amtStr)+'</div><div class="pp-name">'+esc(i.name)+'</div>'
+        +'<div class="pp-costwrap"><input class="pp-cost" inputmode="decimal" data-ppcost="'+esc(i.id)+'" value="'+esc(i.cost||"")+'" placeholder="kr"><span class="pp-linecost" data-ppline="'+esc(i.id)+'">'+(lc>0?_fmtKr(lc):"")+'</span></div></div>';
+    }).join("");
+    var totalBase=named.reduce(function(a,i){return a+_pnum(i.cost);},0);
+    var cover=basePortions?totalBase/basePortions:0;
+    var price=pct>0?cover/(pct/100):0;var margin=price-cover;var mPct=price>0?Math.round(margin/price*100):0;
+    panel.innerHTML=
+      '<div class="pp-scale"><span class="pp-scale-lbl">'+(lang==="da"?"Skalér til":"Scale to")+'</span>'
+        +'<button class="pp-step" data-ppscale="-1" type="button">−</button>'
+        +'<input class="pp-scale-n" id="ppScaleN" inputmode="numeric" value="'+_priceScaleTo+'">'
+        +'<button class="pp-step" data-ppscale="1" type="button">＋</button>'
+        +'<span class="pp-scale-unit">'+esc(unit)+'.</span>'
+        +(Math.abs(factor-1)>0.001?'<span class="pp-scale-note">×'+_fmtAmt(factor)+'</span>':'')
+      +'</div>'
+      +'<div class="pp-list">'+(rows||'<div class="pp-empty">'+(lang==="da"?"Tilføj ingredienser (og priser) først":"Add ingredients (and costs) first")+'</div>')+'</div>'
+      +'<div class="pp-card">'
+        +'<div class="pp-crow"><span>'+(lang==="da"?"Råvarepris i alt":"Total cost")+'</span><b id="ppTotalCost">'+_fmtKr(totalBase*factor)+'</b></div>'
+        +'<div class="pp-crow"><span>'+(lang==="da"?"Pris / kuvert":"Cost / cover")+'</span><b id="ppCover">'+_fmtKr(cover)+'</b></div>'
+        +'<div class="pp-crow"><span>Food cost</span><span class="pp-fc"><button class="pp-step sm" data-ppfc="-1" type="button">−</button><b id="ppFc">'+pct+'%</b><button class="pp-step sm" data-ppfc="1" type="button">＋</button></span></div>'
+        +'<div class="pp-hr"></div>'
+        +'<div class="pp-crow big"><span>'+(lang==="da"?"Foreslået pris":"Suggested price")+'</span><b id="ppPrice">'+_fmtKr(price)+'</b></div>'
+        +'<div class="pp-crow margin"><span>Margin</span><b id="ppMargin">'+_fmtKr(margin)+' · '+mPct+'%</b></div>'
+      +'</div>';
+    _wirePricePanel();
+  }
+  function _updatePriceTotals(){
+    if(!_currentDish)return;var d=_currentDish.data;
+    var ings=(d.ingredients||[]).filter(function(i){return (i.name||"").trim();});
+    var basePortions=parseInt(d.portions,10)||1;if(basePortions<1)basePortions=1;
+    var factor=basePortions?((_priceScaleTo||basePortions)/basePortions):1;
+    var pct=Math.round(_pnum(d.foodCostPct))||30;
+    ings.forEach(function(i){var el=document.querySelector('.pp-linecost[data-ppline="'+i.id+'"]');if(el){var lc=_pnum(i.cost)*factor;el.textContent=lc>0?_fmtKr(lc):"";}});
+    var totalBase=ings.reduce(function(a,i){return a+_pnum(i.cost);},0);
+    var cover=basePortions?totalBase/basePortions:0;var price=pct>0?cover/(pct/100):0;var margin=price-cover;var mPct=price>0?Math.round(margin/price*100):0;
+    var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+    set("ppTotalCost",_fmtKr(totalBase*factor));set("ppCover",_fmtKr(cover));set("ppFc",pct+"%");set("ppPrice",_fmtKr(price));set("ppMargin",_fmtKr(margin)+" · "+mPct+"%");
+  }
+  function _wirePricePanel(){
+    var panel=$("#pricePanel");if(!panel||panel._wired)return;panel._wired=true;
+    panel.addEventListener("input",function(e){
+      var c=e.target.closest("[data-ppcost]");
+      if(c){var ing=((_currentDish&&_currentDish.data.ingredients)||[]).find(function(x){return x.id===c.dataset.ppcost;});if(ing){ing.cost=c.value;markDirty();_updatePriceTotals();}}
+    });
+    panel.addEventListener("change",function(e){
+      if(e.target.id==="ppScaleN"){_priceScaleTo=Math.max(1,parseInt(e.target.value,10)||1);renderPricePanel();}
+    });
+    panel.addEventListener("click",function(e){
+      var sc=e.target.closest("[data-ppscale]");
+      if(sc){_priceScaleTo=Math.max(1,(_priceScaleTo||1)+parseInt(sc.dataset.ppscale,10));renderPricePanel();return;}
+      var fc=e.target.closest("[data-ppfc]");
+      if(fc&&_currentDish){var p=Math.round(_pnum(_currentDish.data.foodCostPct))||30;p=Math.min(90,Math.max(5,p+parseInt(fc.dataset.ppfc,10)));_currentDish.data.foodCostPct=p;markDirty();renderPricePanel();return;}
+    });
+  }
   function markDirty(){
     _dishDirty=true;
     var saveLbl=$("#deSaveLbl");var saveBtn=$("#deSaveBtn");
@@ -5344,7 +5416,7 @@
     setPlatingPhoto(d.platingUrl||"");
     var dePlating=$("#dePlating");if(dePlating)dePlating.value=d.plating||"";
     var deWine=$("#deWine");if(deWine)deWine.value=d.winePairing||"";
-    renderIngredients();renderSteps();renderTestRounds();renderPhotoGallery();
+    _priceScaleTo=null;renderIngredients();renderSteps();renderTestRounds();renderPhotoGallery();renderPricePanel();
     updateVisChips(_currentDish.visibility||"private");renderServiceNotes();
     ["deSeason","dePortions","dePortionUnit","deConcept","deCookTime","deRestTime","deMainTemp","dePlatingTime","deTechnique","dePlating","deWine"].forEach(function(id){
       var el=document.getElementById(id);
@@ -5423,7 +5495,7 @@
         var ing=(_currentDish.data.ingredients||[]).find(function(x){return x.id===id;});
         if(ing&&field)ing[field]=inp.value;
         if(field==="name"){var c=$("#dsIngCount");if(c)c.textContent=(_currentDish.data.ingredients||[]).length||"";}
-        markDirty();
+        markDirty();renderPricePanel();
       });
     });
     list.querySelectorAll("[data-rm-ing]").forEach(function(btn){
@@ -5433,6 +5505,7 @@
         renderIngredients();markDirty();
       });
     });
+    renderPricePanel();
   }
 
   function renderSteps(){
