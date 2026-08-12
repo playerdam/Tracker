@@ -1224,22 +1224,28 @@
   }
 
   // ---- log ----
+  const ACCUM_WINDOW=30*60000; // samme ting logget igen inden for 30 min → læg sammen
   function addLogEntry(msg,imageUrl,cat){
     const now=new Date();
-    const time=now.getHours().toString().padStart(2,"0")+":"+now.getMinutes().toString().padStart(2,"0");
-    logHistory.unshift({time,msg});if(logHistory.length>8)logHistory.pop();renderLogFeed();
     if(!Array.isArray(state.log))state.log=[];
+    // Akkumulér: tryk "østers" 5 gange → én linje "+5 østers" (ikke 5×"+1")
+    const one=/^([+-]?\d+)\s+(.+)$/.exec(msg);
+    const last=state.log[0];
+    if(one&&!imageUrl&&last&&!last.img&&(now.getTime()-last.ts)<ACCUM_WINDOW){
+      const lo=/^([+-]?\d+)\s+(.+)$/.exec(last.text);
+      if(lo&&lo[2]===one[2]){
+        const sum=(parseInt(lo[1],10)||0)+(parseInt(one[1],10)||0);
+        last.text=(sum>0?"+":"")+sum+" "+one[2];last.ts=now.getTime();
+        if(cat&&!last.cat)last.cat=cat;
+        save();renderLogView();return;
+      }
+    }
     const entry={ts:now.getTime(),text:msg};
     if(imageUrl)entry.img=imageUrl;
     if(cat)entry.cat=cat;
     state.log.unshift(entry);
     if(state.log.length>2000)state.log.length=2000;
     save();renderLogView();
-  }
-  function renderLogFeed(){
-    const feed=$("#logFeed");if(!logHistory.length){feed.hidden=true;return;}
-    feed.hidden=false;
-    feed.innerHTML=logHistory.map(e=>'<div class="logentry"><span class="log-time">'+esc(e.time)+'</span><span class="log-text">'+esc(e.msg)+'</span></div>').join("");
   }
   function _logCatMeta(cat){
     const map={
