@@ -30,6 +30,10 @@
 	<string>Bruges til at gemme billeder</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Bruges til at vælge billeder af vietiketter og til retter</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Bruges til at logge dine ting med stemmen</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Bruges til at omsætte tale til log-tekst</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

@@ -11,6 +11,7 @@
     "ios:release": "node scripts/bump-build.js && npm run build && npx cap sync ios && npx cap open ios && echo '\\n✅ Klar til Xcode: vælg \"Any iOS Device\" → Product → Archive → Distribute App → TestFlight & App Store'"
   },
   "dependencies": {
+    "@capacitor-community/speech-recognition": "^7.0.1",
     "@capacitor/core": "^7.6.6",
     "@capacitor/haptics": "^7.0.5",
     "@capacitor/ios": "^7.6.6",

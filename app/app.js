@@ -3028,18 +3028,109 @@
   }
 
   // Qlog focus overlay
+  // ── Smart quick-log: tap-genveje + autocomplete ──
+  function _catIconSvg(catId){const c=allCats().find(x=>x.id===catId);return (c&&c.icon)||DOTS_ICON;}
+  function _qlogTop(n){return (state.counters||[]).slice().sort((a,b)=>counterTotal(b)-counterTotal(a)).slice(0,n);}
+  function renderQlogChips(){
+    const box=$("#qlogChips");if(!box)return;
+    let html=_qlogTop(12).map(c=>{
+      const tot=counterTotal(c);
+      const right=tot>0?'<span class="qchip-cnt">'+fmtNum(tot)+'</span>':'<span class="qchip-plus">＋</span>';
+      return '<button class="qchip" data-qchip="'+esc(c.id)+'"><span class="qchip-ic">'+_catIconSvg(c.cat)+'</span>'+esc(c.label)+right+'</button>';
+    }).join("");
+    html+='<button class="qchip new" data-qnew="1">＋ '+esc(lang==="da"?"Ny ting":"New item")+'</button>';
+    box.innerHTML=html;
+  }
+  function quickLogItem(label,delta,sub){
+    if(!label||!delta)return;
+    undoSnapshot=clone(state);
+    const summary=[],syncItems=[],cats=[];
+    const a={kind:"counter",counter:label,delta:delta};if(sub)a.sub=sub;
+    applyOne(a,summary,syncItems,cats);
+    save();renderCounters();renderWines();renderCareer();
+    if(summary.length){
+      showToast(t("toast_logged")+summary.join(", "));
+      addLogEntry(summary.join(" · "),null,cats&&cats[0]);haptic(40);
+      deferSync(syncItems,null,summary.join(" · "));
+      checkBadges();checkRecords();maybeNudgeShiftStart();
+    }
+    renderQlogChips();
+  }
+  function renderQlogAc(q){
+    const box=$("#qlogAc"),chips=$("#qlogChips");if(!box)return;
+    q=(q||"").trim();
+    let qty=1,term=q;const m=q.match(/^(\d+)\s+(.+)$/);if(m){qty=parseInt(m[1],10)||1;term=m[2];}
+    const tl=term.toLowerCase();
+    if(!tl){box.hidden=true;box.innerHTML="";if(chips)chips.hidden=false;return;}
+    const matches=[];
+    (state.counters||[]).forEach(c=>{
+      if((c.label||"").toLowerCase().includes(tl))matches.push({c,delta:qty});
+      (c.subs||[]).forEach(s=>{if(s.name&&s.name!=="Uden type"&&s.name.toLowerCase().includes(tl))matches.push({c,sub:s.name,delta:qty});});
+    });
+    matches.sort((a,b)=>counterTotal(b.c)-counterTotal(a.c));
+    let html=matches.slice(0,6).map(x=>{
+      const nm=x.sub?(esc(x.c.label)+' <small>'+esc(x.sub)+'</small>'):esc(x.c.label);
+      const go=x.delta>1?("+"+x.delta):"Log +1";
+      return '<div class="qac-item" data-qac="'+esc(x.c.label)+'" data-qacsub="'+esc(x.sub||"")+'" data-qacd="'+x.delta+'"><span class="qac-ic">'+_catIconSvg(x.c.cat)+'</span><span class="qac-name">'+nm+'</span><span class="qac-go">'+go+' →</span></div>';
+    }).join("");
+    html+='<div class="qac-item qac-new" data-qacnew="'+esc(term)+'" data-qacd="'+qty+'"><span class="qac-ic">＋</span><span class="qac-name">'+esc(lang==="da"?'Opret "'+term+'"':'Create "'+term+'"')+' <small>'+esc(lang==="da"?"ny ting":"new item")+'</small></span><span class="qac-go">→</span></div>';
+    box.innerHTML=html;box.hidden=false;if(chips)chips.hidden=true;
+  }
+  // ── Tale: native Capacitor-plugin + web-fallback ──
+  let _voiceOn=false,_webRec=null,_voicePartial=null;
+  function _speechPlugin(){return (window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition)||null;}
+  function _voiceSetLive(on){
+    _voiceOn=on;const mic=$("#qlogOvMic");if(mic)mic.classList.toggle("live",on);
+    const hint=$("#qlogOvHint");if(hint)hint.textContent=on?(lang==="da"?"🎙️ Lytter… sig fx \"3 cortado\"":"🎙️ Listening… e.g. \"3 cortado\""):t("qlog_hint_full");
+  }
+  function _voiceText(v){const inp=$("#qlogOverlayInput");if(!inp||v==null)return;inp.value=v;inp.style.height="auto";inp.style.height=inp.scrollHeight+"px";renderQlogAc(v);}
+  async function startVoice(){
+    if(_voiceOn){stopVoice();return;}
+    const P=_speechPlugin();
+    if(P){
+      try{
+        let av=true;try{const r=await P.available();av=!r||r.available!==false;}catch(e){}
+        if(!av){showToast(lang==="da"?"Tale ikke tilgængelig her":"Voice not available here");return;}
+        try{await P.requestPermissions();}catch(e){}
+        if(!_voicePartial){_voicePartial=await P.addListener("partialResults",d=>{const v=d&&d.matches&&d.matches[0];if(v)_voiceText(v);});}
+        await P.start({language:lang==="da"?"da-DK":"en-US",maxResults:1,partialResults:true,popup:false});
+        _voiceSetLive(true);
+      }catch(e){console.warn("voice native:",e&&e.message);_voiceSetLive(false);showToast(lang==="da"?"Kunne ikke starte tale":"Couldn't start voice");}
+      return;
+    }
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(SR){
+      try{
+        const rec=new SR();rec.lang=lang==="da"?"da-DK":"en-US";rec.interimResults=true;rec.continuous=false;
+        rec.onresult=ev=>{let s="";for(let i=0;i<ev.results.length;i++)s+=ev.results[i][0].transcript;_voiceText(s);};
+        rec.onerror=()=>stopVoice();rec.onend=()=>{_webRec=null;_voiceSetLive(false);};
+        _webRec=rec;rec.start();_voiceSetLive(true);
+      }catch(e){showToast(lang==="da"?"Tale ikke tilgængelig":"Voice not available");}
+      return;
+    }
+    showToast(lang==="da"?"Tale kræver et nyt build":"Voice needs a new build");
+  }
+  async function stopVoice(){
+    _voiceSetLive(false);
+    const P=_speechPlugin();if(P){try{await P.stop();}catch(e){}}
+    if(_webRec){try{_webRec.stop();}catch(e){}_webRec=null;}
+  }
   function openQlogOverlay(){
     const ov=$("#qlogOverlay");if(!ov)return;
     const inp=$("#qlogOverlayInput");
     const hint=$("#qlogOvHint");if(hint)hint.textContent=t("qlog_hint_full");
     if(inp){inp.placeholder=t("qlog_ph")||"";inp.value=$("#qlogInput").value||"";inp.style.height="auto";}
     ov.classList.add("open");
+    renderQlogChips();renderQlogAc(inp?inp.value:"");
     reflectPendingPhoto();
     setTimeout(()=>{if(inp){inp.focus();inp.style.height="auto";inp.style.height=inp.scrollHeight+"px";}},60);
   }
   function closeQlogOverlay(){
+    if(_voiceOn)stopVoice();
     const ov=$("#qlogOverlay");if(ov)ov.classList.remove("open");
     const inp=$("#qlogOverlayInput");if(inp)inp.value="";
+    const ac=$("#qlogAc");if(ac){ac.hidden=true;ac.innerHTML="";}
+    const ch=$("#qlogChips");if(ch)ch.hidden=false;
   }
   // Annullér = luk OG kassér et evt. vedhæftet foto (så det ikke hænger ved til
   // næste log). Submit bruger closeQlogOverlay, så fotoet overlever til upload.
@@ -3057,6 +3148,8 @@
   });
   const qlogOvClose=$("#qlogOverlayClose");
   if(qlogOvClose)qlogOvClose.addEventListener("click",cancelQlogOverlay);
+  const qlogOvMic=$("#qlogOvMic");
+  if(qlogOvMic)qlogOvMic.addEventListener("click",startVoice);
   const qlogOvBg=$("#qlogOverlay");
   if(qlogOvBg)qlogOvBg.addEventListener("click",e=>{if(e.target===qlogOvBg)cancelQlogOverlay();});
   const qlogOvInp=$("#qlogOverlayInput");
@@ -3068,8 +3161,25 @@
     qlogOvInp.addEventListener("input",()=>{
       qlogOvInp.style.height="auto";
       qlogOvInp.style.height=qlogOvInp.scrollHeight+"px";
+      renderQlogAc(qlogOvInp.value);
     });
   }
+
+  const qlogChipsBox=$("#qlogChips");
+  if(qlogChipsBox)qlogChipsBox.addEventListener("click",e=>{
+    const chip=e.target.closest("[data-qchip]");
+    if(chip){const c=(state.counters||[]).find(x=>x.id===chip.dataset.qchip);if(c)quickLogItem(c.label,1);return;}
+    if(e.target.closest("[data-qnew]")){const inp=$("#qlogOverlayInput");if(inp)inp.focus();return;}
+  });
+  const qlogAcBox=$("#qlogAc");
+  if(qlogAcBox)qlogAcBox.addEventListener("click",e=>{
+    const it=e.target.closest("[data-qac]");
+    if(it){quickLogItem(it.dataset.qac,parseInt(it.dataset.qacd,10)||1,it.dataset.qacsub||"");
+      const inp=$("#qlogOverlayInput");if(inp){inp.value="";inp.style.height="auto";}renderQlogAc("");return;}
+    const nw=e.target.closest("[data-qacnew]");
+    if(nw){quickLogItem(nw.dataset.qacnew,parseInt(nw.dataset.qacd,10)||1);
+      const inp=$("#qlogOverlayInput");if(inp){inp.value="";inp.style.height="auto";}renderQlogAc("");return;}
+  });
 
   document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s){if(s._askSkip)s._askSkip();else s.classList.remove("open");}}));
 
