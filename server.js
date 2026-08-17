@@ -340,9 +340,28 @@ app.post("/api/admin/push-test", async (req, res) => {
 });
 
 // ---- Craft-rating: fælles vin-katalog + ratings (flag: WINE_RATINGS_ENABLED) ----
+// Vin-signatur = vinens identitet ("dens egen side"). Strammest MULIGE match uden nogensinde
+// at smelte to reelt forskellige vine sammen (false merge er den farlige fejl — ratings kan
+// ikke skilles ad igen). Bruges BÅDE ved skriv og opslag — de SKAL være identiske, så ret kun ét sted.
 function _wineSig(producer, name, vint) {
   const norm = s => (s || "").toString().toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9æøå]+/g, " ").trim();
-  return [norm(producer), norm(name), norm(vint)].filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
+  // Producent = anker. Normaliseres KUN — vi fjerner aldrig ord (Domaine Leroy vs Maison Leroy skal forblive to huse).
+  const prod = norm(producer);
+  // Navn: fjern KUN rene appellations-klassifikationer (ren støj der aldrig adskiller to vine fra samme hus).
+  // Rør ALDRIG ord som reserva/riserva/cru/classico — de adskiller cuvéer.
+  const CLASS = new Set(["docg", "doca", "doc", "aoc", "aop", "ava", "igt", "igp"]);
+  let nameToks = norm(name).split(" ").filter(t => t && !CLASS.has(t));
+  // Fjern en ledende gentagelse af producenten i navnet ("Damilano Barolo Cannubi" + producent "Damilano").
+  const prodToks = prod.split(" ").filter(Boolean);
+  if (prodToks.length && nameToks.length > prodToks.length && prodToks.every((t, i) => nameToks[i] === t)) {
+    nameToks = nameToks.slice(prodToks.length);
+  }
+  const nm = nameToks.join(" ");
+  // Årgang: træk et rigtigt årstal ud (1900–2099), så "Vintage 2015" == "2015". Ellers non-vintage/tom.
+  const vnorm = norm(vint);
+  const ym = vnorm.match(/\b(19|20)\d{2}\b/);
+  const vy = ym ? ym[0] : (/\bnv\b|\bn v\b|non vintage/.test(vnorm) ? "nv" : "");
+  return [prod, nm, vy].filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
 }
 async function _wineRatingsPayload(sig, viewerId) {
   const cat = await sb(`wine_catalog?signature=eq.${encodeURIComponent(sig)}&select=id`);
