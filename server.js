@@ -59,6 +59,7 @@ const METRICS_KEY   = (process.env.METRICS_KEY || "").trim();   // admin-nøgle 
 // Restauranter (verificerede hold). OFF som standard — tænd FØRST når
 // migration_restaurants.sql er kørt, ellers refererer koden kolonner der mangler.
 const RESTAURANTS_ENABLED = process.env.RESTAURANTS_ENABLED === "1";
+const WINE_RATINGS_ENABLED = process.env.WINE_RATINGS_ENABLED === "1"; // Craft-rating (fælles vin-katalog + ratings)
 const TEAM_SELECT = RESTAURANTS_ENABLED ? "id,name,invite_code,kind,status,city,verified_at" : "id,name,invite_code";
 const WINE_MODEL    = process.env.WINE_MODEL  || "claude-sonnet-4-6";
 
@@ -338,8 +339,69 @@ app.post("/api/admin/push-test", async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ---- Craft-rating: fælles vin-katalog + ratings (flag: WINE_RATINGS_ENABLED) ----
+function _wineSig(producer, name, vint) {
+  const norm = s => (s || "").toString().toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9æøå]+/g, " ").trim();
+  return [norm(producer), norm(name), norm(vint)].filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
+}
+async function _wineRatingsPayload(sig, viewerId) {
+  const cat = await sb(`wine_catalog?signature=eq.${encodeURIComponent(sig)}&select=id`);
+  if (!cat || !cat[0]) return { sig, wineId: null, count: 0, craftScore: null, yourRating: null, ratings: [] };
+  const wineId = cat[0].id;
+  const rows = await sb(`wine_ratings?wine_id=eq.${wineId}&select=user_id,score,comment,updated_at,users(nickname,username)&order=updated_at.desc&limit=200`) || [];
+  const scores = rows.map(r => r.score).filter(n => n > 0);
+  const craftScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10 : null;
+  const mine = rows.find(r => r.user_id === viewerId);
+  return {
+    sig, wineId, count: scores.length, craftScore,
+    yourRating: mine ? { score: mine.score, comment: mine.comment || "" } : null,
+    ratings: rows.map(r => ({ isMine: r.user_id === viewerId, name: (r.users && (r.users.nickname || r.users.username)) || "Anon", score: r.score, comment: r.comment || "", when: r.updated_at })),
+  };
+}
+app.post("/api/wine/ratings", async (req, res) => {
+  try {
+    const viewerId = await verifyAuth(req);
+    if (!WINE_RATINGS_ENABLED) return res.json({ enabled: false });
+    const { producer, name, vint } = req.body || {};
+    const sig = _wineSig(producer, name, vint);
+    if (!sig) return res.json({ sig: "", count: 0, craftScore: null, yourRating: null, ratings: [] });
+    res.json(await _wineRatingsPayload(sig, viewerId));
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+app.post("/api/wine/rate", async (req, res) => {
+  try {
+    const viewerId = await verifyAuth(req);
+    if (!WINE_RATINGS_ENABLED) return res.json({ enabled: false });
+    const b = req.body || {};
+    const sig = _wineSig(b.producer, b.name, b.vint);
+    if (!sig) return res.status(400).json({ error: "for lidt info om vinen" });
+    const score = Math.min(5, Math.max(1, parseInt(b.score, 10) || 0));
+    if (!score) return res.status(400).json({ error: "ugyldig score" });
+    const catBody = { signature: sig };
+    ["producer", "name", "vint", "type", "land", "region", "grape"].forEach(k => { if (b[k]) catBody[k] = b[k]; });
+    if (b.imageUrl) catBody.image_url = b.imageUrl;
+    const catRows = await sb("wine_catalog?on_conflict=signature", {
+      method: "POST",
+      headers: { "Prefer": "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify(catBody),
+    });
+    const wineId = catRows && catRows[0] && catRows[0].id;
+    if (!wineId) throw new Error("katalog-fejl");
+    await sb("wine_ratings?on_conflict=wine_id,user_id", {
+      method: "POST",
+      headers: { "Prefer": "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify({ wine_id: wineId, user_id: viewerId, score, comment: (b.comment || "").slice(0, 500), updated_at: new Date().toISOString() }),
+    });
+    res.json(await _wineRatingsPayload(sig, viewerId));
+  } catch (err) {
+    res.status(authErr(err.message) ? 401 : 500).json({ error: err.message });
+  }
+});
+
 app.get("/api/config", (_req, res) => {
-  res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON, vapidKey: pushEnabled() ? VAPID_PUBLIC : null, proEnforced: PRO_ENFORCE, restaurantsEnabled: RESTAURANTS_ENABLED });
+  res.json({ supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON, vapidKey: pushEnabled() ? VAPID_PUBLIC : null, proEnforced: PRO_ENFORCE, restaurantsEnabled: RESTAURANTS_ENABLED, wineRatingsEnabled: WINE_RATINGS_ENABLED });
 });
 
 // ---- Brugerprofil: opret (upsert) + hent ----
