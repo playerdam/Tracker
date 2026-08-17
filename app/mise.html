@@ -208,8 +208,8 @@
         <div class="vd2-act-sub" id="wineLineupSub">Flere flasker på ét billede</div></div>
       </button>
     </div>
-    <input type="file" id="winePageScanInput" accept="image/*" style="display:none">
-    <input type="file" id="wineLineupInput" accept="image/*" style="display:none">
+    <input type="file" id="winePageScanInput" accept="image/*" capture="environment" style="display:none">
+    <input type="file" id="wineLineupInput" accept="image/*" capture="environment" style="display:none">
     <div class="searchwrap">
       <div class="searchbox">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -928,7 +928,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           <span id="waScanLbl">Scan etiket</span>
         </button>
-        <input type="file" id="waScanInput" accept="image/*" style="display:none">
+        <input type="file" id="waScanInput" accept="image/*" capture="environment" style="display:none">
         <div class="mactions" style="margin-top:4px">
           <button class="btn primary" id="waSave">Gem</button>
           <button class="btn ghost" id="waCancel">Annuller</button>
