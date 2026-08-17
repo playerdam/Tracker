@@ -218,6 +218,40 @@
   .wabout-card-close{appearance:none;border:none;background:var(--surface-2);color:var(--dim);width:30px;height:30px;border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;flex:none}
   .wabout-card-title{font-family:"Fraunces",serif;font-size:22px;font-weight:700;color:var(--text);padding:20px 16px 2px;line-height:1.2}
   .wabout-card-producer{font-size:13px;color:var(--dim);padding:0 16px 16px;font-weight:500}
+  /* Craft-rating (Vivino-erstatning) */
+  .wr{padding:0 16px 4px}
+  .wr-load,.wr-empty{font-size:13px;color:var(--faint);padding:6px 2px 12px}
+  .wr-score{display:flex;align-items:center;gap:15px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:12px}
+  .wr-score-num{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:38px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+  .wr-score-meta{flex:1;min-width:0}
+  .wr-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:20px;margin-bottom:4px}
+  .wr-stars{font-size:16px;letter-spacing:2px;color:#D9A441}
+  .wr-stars .off{color:var(--border)}
+  .wr-count{font-size:12px;color:var(--faint);margin-top:3px}
+  .wr-yours{border:1px solid var(--border);border-radius:16px;padding:13px 15px;margin-bottom:14px}
+  .wr-yours-head{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px}
+  .wr-input{display:flex;gap:4px;margin-bottom:9px}
+  .wr-star{background:none;border:none;padding:0 2px;font-size:27px;line-height:1;color:var(--border);cursor:pointer;transition:color .12s}
+  .wr-star.on{color:#D9A441}
+  .wr-comment{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:11px;padding:8px 10px;font:inherit;font-size:13px;background:var(--bg);color:var(--text);resize:vertical;min-height:38px}
+  .wr-comment:focus{outline:none;border-color:var(--accent)}
+  .wr-actions{display:flex;align-items:center;gap:10px;margin-top:9px}
+  .wr-submit{padding:8px 16px;font-size:13px}
+  .wr-submit:disabled{opacity:.45;cursor:default}
+  .wr-saved{font-size:12px;color:var(--accent);font-weight:600}
+  .wr-list-h{display:flex;justify-content:space-between;align-items:center;margin:4px 0 2px}
+  .wr-list-t{font-size:13px;font-weight:700;color:var(--text)}
+  .wr-more{background:none;border:none;font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;padding:4px 2px}
+  .wr-rev{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--border)}
+  .wr-rev:last-child{border-bottom:none}
+  .wr-av{width:33px;height:33px;border-radius:50%;background:var(--accent);color:#fff;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none}
+  .wr-rev-body{flex:1;min-width:0}
+  .wr-rev-top{display:flex;align-items:center;gap:8px}
+  .wr-rev-name{font-size:13px;font-weight:600;color:var(--text)}
+  .wr-rev-stars{font-size:11px;letter-spacing:1px;color:#D9A441}
+  .wr-rev-stars .off{color:var(--border)}
+  .wr-rev-when{font-size:11px;color:var(--faint);margin-left:auto;white-space:nowrap}
+  .wr-rev-txt{font-size:13px;color:var(--dim);margin-top:2px;line-height:1.4;word-wrap:break-word}
   .wabout-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 4px}
   .wabout-cell{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
   .wabout-cell-photo{padding:0;overflow:hidden;cursor:zoom-in}

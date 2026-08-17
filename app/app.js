@@ -679,6 +679,8 @@
   let _proEnforced=false;
   // Restauranter (verificerede hold) — spejler serverens RESTAURANTS_ENABLED.
   let _restaurantsEnabled=false;
+  // Craft-rating (fælles vin-katalog + ratings) — spejler serverens WINE_RATINGS_ENABLED.
+  let _wineRatingsEnabled=false;
 
   const WINE_FLAGS={"Frankrig":"🇫🇷","France":"🇫🇷","Italien":"🇮🇹","Italy":"🇮🇹","Spanien":"🇪🇸","Spain":"🇪🇸","Portugal":"🇵🇹","Tyskland":"🇩🇪","Germany":"🇩🇪","Østrig":"🇦🇹","Austria":"🇦🇹","USA":"🇺🇸","Australien":"🇦🇺","Australia":"🇦🇺","New Zealand":"🇳🇿","Sydafrika":"🇿🇦","South Africa":"🇿🇦","Chile":"🇨🇱","Argentina":"🇦🇷","Grækenland":"🇬🇷","Greece":"🇬🇷","Ungarn":"🇭🇺","Hungary":"🇭🇺","Georgien":"🇬🇪","Georgia":"🇬🇪","Libanon":"🇱🇧","Lebanon":"🇱🇧","Danmark":"🇩🇰","Denmark":"🇩🇰","Slovenien":"🇸🇮","Kroatien":"🇭🇷"};
   const REGION_TO_LAND={"toscana":"Italien","tuscany":"Italien","piemonte":"Italien","piedmont":"Italien","veneto":"Italien","sicilia":"Italien","sicily":"Italien","lombardia":"Italien","lombardy":"Italien","emilia-romagna":"Italien","emilia romagna":"Italien","friuli":"Italien","puglia":"Italien","campania":"Italien","abruzzo":"Italien","umbria":"Italien","lazio":"Italien","marche":"Italien","brunello":"Italien","chianti":"Italien","barolo":"Italien","amarone":"Italien","bordeaux":"Frankrig","bourgogne":"Frankrig","burgundy":"Frankrig","champagne":"Frankrig","alsace":"Frankrig","loire":"Frankrig","rhône":"Frankrig","rhone":"Frankrig","provence":"Frankrig","languedoc":"Frankrig","roussillon":"Frankrig","côtes du rhône":"Frankrig","cotes du rhone":"Frankrig","médoc":"Frankrig","medoc":"Frankrig","saint-émilion":"Frankrig","pomerol":"Frankrig","rioja":"Spanien","ribera del duero":"Spanien","priorat":"Spanien","penedès":"Spanien","penedes":"Spanien","rias baixas":"Spanien","catalonia":"Spanien","catalunya":"Spanien","rueda":"Spanien","jumilla":"Spanien","douro":"Portugal","alentejo":"Portugal","vinho verde":"Portugal","dão":"Portugal","dao":"Portugal","setúbal":"Portugal","setubal":"Portugal","mosel":"Tyskland","rheingau":"Tyskland","pfalz":"Tyskland","nahe":"Tyskland","rheinhessen":"Tyskland","franken":"Tyskland","wachau":"Østrig","kamptal":"Østrig","burgenland":"Østrig","steiermark":"Østrig","napa valley":"USA","napa":"USA","sonoma":"USA","willamette valley":"USA","columbia valley":"USA","barossa valley":"Australien","barossa":"Australien","yarra valley":"Australien","mclaren vale":"Australien","coonawarra":"Australien","margaret river":"Australien","marlborough":"New Zealand","central otago":"New Zealand","hawke's bay":"New Zealand","stellenbosch":"Sydafrika","swartland":"Sydafrika","constantia":"Sydafrika","mendoza":"Argentina","patagonia":"Argentina","salta":"Argentina","maipo":"Chile","colchagua":"Chile","casablanca":"Chile","aconcagua":"Chile","nemea":"Grækenland","naoussa":"Grækenland","tokaj":"Ungarn","eger":"Ungarn","kakheti":"Georgien","bekaa valley":"Libanon"};
@@ -792,7 +794,7 @@
   // server-koldstart (Railway) ikke efterlader cfg tom og smider os ud af login.
   async function loadConfig(tries){
     for(let i=0;i<(tries||3);i++){
-      try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},8000);const j=await res.json();if(j&&j.supabaseUrl){cfg=j;_proEnforced=!!j.proEnforced;_restaurantsEnabled=!!j.restaurantsEnabled;return true;}}
+      try{const res=await fetchWithTimeout(apiBase()+"/api/config",{},8000);const j=await res.json();if(j&&j.supabaseUrl){cfg=j;_proEnforced=!!j.proEnforced;_restaurantsEnabled=!!j.restaurantsEnabled;_wineRatingsEnabled=!!j.wineRatingsEnabled;return true;}}
       catch(e){console.warn("CT:config try"+i,e.message);}
       await new Promise(r=>setTimeout(r,600));
     }
@@ -2450,6 +2452,109 @@
     const divEl=document.getElementById("wAboutDivider");if(divEl)divEl.style.display="";
     const bodyEl=document.getElementById("wAboutBody");
     if(bodyEl){bodyEl.style.display="";if(w.about){bodyEl.textContent=w.about;bodyEl.style.color="var(--dim)";}else{bodyEl.textContent=lang==="da"?"Ingen beskrivelse endnu.":"No description yet.";bodyEl.style.color="var(--faint)";}}
+    renderWineRating(w);
+  }
+
+  // ---- Craft-rating (fælles vin-katalog, Vivino-erstatning) ----
+  // _wrState holder den aktuelle vins ratings; genbruges af paint/handlers.
+  let _wrState=null, _wrPending=0, _wrWine=null;
+  function _wrStars(n,max){max=max||5;n=Math.round(n||0);let h="";for(let i=1;i<=max;i++)h+=i<=n?'★':'<span class="off">★</span>';return h;}
+  function renderWineRating(w){
+    const box=document.getElementById("wAboutRating");if(!box)return;
+    _wrState=null;_wrPending=0;_wrWine=w||null;
+    // Gated: kun når serveren har WINE_RATINGS_ENABLED=1, og vinen har nok info til en signatur.
+    if(!_wineRatingsEnabled||!w||!(w.name||w.producer)){box.style.display="none";box.innerHTML="";return;}
+    box.style.display="";
+    box.innerHTML='<div class="wr-load">'+(lang==="da"?"Henter Craft-rating…":"Loading Craft rating…")+'</div>';
+    _wireWineRating();
+    (async()=>{
+      try{
+        const token=await getToken();if(!token){box.style.display="none";return;}
+        const r=await fetch(apiBase()+"/api/wine/ratings",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({producer:w.producer||"",name:w.name||"",vint:w.vint||""})});
+        const j=await r.json();
+        if(j&&j.enabled===false){box.style.display="none";return;}
+        _wrState=Object.assign({expanded:false},j||{});
+        _wrPending=(_wrState.yourRating&&_wrState.yourRating.score)||0;
+        _paintWineRating();
+      }catch(e){box.style.display="none";}
+    })();
+  }
+  function _paintWineRating(){
+    const box=document.getElementById("wAboutRating");if(!box||!_wrState)return;
+    const s=_wrState, da=lang==="da";
+    const cnt=s.count||0;
+    // Craft-score kort (eller tom-tilstand).
+    let head;
+    if(cnt>0){
+      head='<div class="wr-score"><div class="wr-score-num">'+(s.craftScore!=null?s.craftScore.toLocaleString(da?"da-DK":"en-GB"):"–")+'</div>'
+        +'<div class="wr-score-meta"><span class="wr-badge">Craft-score</span>'
+        +'<div class="wr-stars">'+_wrStars(s.craftScore)+'</div>'
+        +'<div class="wr-count">'+cnt+' '+(da?(cnt===1?"vurdering":"vurderinger"):(cnt===1?"rating":"ratings"))+'</div></div></div>';
+    }else{
+      head='<div class="wr-empty">'+(da?"Ingen vurderinger endnu — vær den første.":"No ratings yet — be the first.")+'</div>';
+    }
+    // Din vurdering (stjerne-input + kommentar).
+    const yr=s.yourRating;
+    let input='<div class="wr-yours"><div class="wr-yours-head">'+(da?"Din vurdering":"Your rating")+'</div>'
+      +'<div class="wr-input">';
+    for(let i=1;i<=5;i++)input+='<button type="button" class="wr-star'+(i<=_wrPending?" on":"")+'" data-s="'+i+'" aria-label="'+i+'">★</button>';
+    input+='</div>'
+      +'<textarea class="wr-comment" maxlength="500" rows="2" placeholder="'+esc(da?"Skriv en kommentar (valgfrit)":"Add a comment (optional)")+'">'+esc(yr&&yr.comment||"")+'</textarea>'
+      +'<div class="wr-actions"><button type="button" class="btn wr-submit" disabled>'+(yr?(da?"Opdatér vurdering":"Update rating"):(da?"Gem vurdering":"Save rating"))+'</button><span class="wr-saved" style="display:none">'+(da?"Gemt ✓":"Saved ✓")+'</span></div></div>';
+    // Vurderinger-liste med fold-ud.
+    let list="";
+    if(cnt>0){
+      const rows=s.ratings||[];
+      const shown=s.expanded?rows:rows.slice(0,3);
+      list='<div class="wr-list-h"><span class="wr-list-t">'+(da?"Vurderinger":"Ratings")+'</span>'
+        +(rows.length>3?'<button type="button" class="wr-more">'+(s.expanded?(da?"Vis færre":"Show fewer"):(da?"Vis alle "+rows.length:"Show all "+rows.length))+'</button>':'')
+        +'</div><div class="wr-list">';
+      list+=shown.map(rv=>{
+        const nm=rv.isMine?(da?"Dig":"You"):(rv.name||"Anon");
+        const init=(nm||"?").charAt(0).toUpperCase();
+        return '<div class="wr-rev"><div class="wr-av">'+esc(init)+'</div><div class="wr-rev-body">'
+          +'<div class="wr-rev-top"><span class="wr-rev-name">'+esc(nm)+'</span><span class="wr-rev-stars">'+_wrStars(rv.score)+'</span><span class="wr-rev-when">'+(rv.when?timeAgo(rv.when):"")+'</span></div>'
+          +(rv.comment?'<div class="wr-rev-txt">'+esc(rv.comment)+'</div>':'')
+          +'</div></div>';
+      }).join("");
+      list+='</div>';
+    }
+    box.innerHTML=head+input+list;
+    _wrSyncSubmit();
+  }
+  function _wrSyncSubmit(){
+    const box=document.getElementById("wAboutRating");if(!box)return;
+    const btn=box.querySelector(".wr-submit");if(!btn)return;
+    const had=_wrState&&_wrState.yourRating&&_wrState.yourRating.score;
+    // Aktivér når der er valgt en score OG (ny score ELLER ændret kommentar).
+    btn.disabled=!(_wrPending>0);
+  }
+  let _wrWired=false;
+  function _wireWineRating(){
+    if(_wrWired)return;_wrWired=true;
+    const box=document.getElementById("wAboutRating");if(!box)return;
+    box.addEventListener("click",async e=>{
+      const star=e.target.closest(".wr-star");
+      if(star){_wrPending=parseInt(star.dataset.s,10)||0;box.querySelectorAll(".wr-star").forEach(b=>b.classList.toggle("on",(parseInt(b.dataset.s,10)||0)<=_wrPending));_wrSyncSubmit();return;}
+      const more=e.target.closest(".wr-more");
+      if(more&&_wrState){_wrState.expanded=!_wrState.expanded;_paintWineRating();return;}
+      const sub=e.target.closest(".wr-submit");
+      if(sub){
+        if(_wrPending<1||!_wrState)return;
+        const ta=box.querySelector(".wr-comment");const comment=ta?ta.value:"";
+        sub.disabled=true;sub.textContent=lang==="da"?"Gemmer…":"Saving…";
+        try{
+          const token=await getToken();if(!token)return;
+          const w0=_wrWine||(_waWineId?state.wines.find(x=>x.id===_waWineId):null)||{};
+          const body={producer:w0.producer||"",name:w0.name||"",vint:w0.vint||"",score:_wrPending,comment:comment,
+            type:w0.type,land:w0.land,region:w0.region,grape:w0.grape,imageUrl:w0.imageUrl};
+          const r=await fetch(apiBase()+"/api/wine/rate",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});
+          const j=await r.json();
+          if(j&&!j.error){_wrState=Object.assign({expanded:_wrState.expanded},j);_wrPending=(_wrState.yourRating&&_wrState.yourRating.score)||_wrPending;_paintWineRating();const sv=box.querySelector(".wr-saved");if(sv){sv.style.display="";setTimeout(()=>{if(sv)sv.style.display="none";},2000);}}
+          else{sub.disabled=false;sub.textContent=lang==="da"?"Prøv igen":"Try again";}
+        }catch(err){sub.disabled=false;sub.textContent=lang==="da"?"Prøv igen":"Try again";}
+      }
+    });
   }
 
   function _waGrapeUpdateRm(){

@@ -339,6 +339,81 @@ app.post("/api/admin/push-test", async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ---- Admin: vin-dubletter (find + flet vine der er samme, men fik hver sin side) ----
+// Signaturen fejler bevidst mod duplikat frem for false-merge; her rydder man de duplikater op MANUELT.
+function _sigTokens(sig) { return new Set((sig || "").split(" ").filter(Boolean)); }
+function _sigYear(sig) { const m = (sig || "").match(/\b(19|20)\d{2}\b/); return m ? m[0] : null; }
+function _sigDupCandidate(a, b) {
+  const ya = _sigYear(a), yb = _sigYear(b);
+  if (ya && yb && ya !== yb) return false; // forskellig årgang = forskellig vin
+  const ta = _sigTokens(a), tb = _sigTokens(b);
+  if (!ta.size || !tb.size) return false;
+  if (a === b) return false;
+  let inter = 0; ta.forEach(t => { if (tb.has(t)) inter++; });
+  const small = Math.min(ta.size, tb.size), uni = ta.size + tb.size - inter;
+  const subset = inter === small;                 // den ene er indeholdt i den anden (fx manglende producent)
+  const jaccard = uni ? inter / uni : 0;
+  return subset || jaccard >= 0.6;
+}
+app.get("/api/admin/wine/duplicates", async (req, res) => {
+  if (!adminOk(req)) return res.status(401).json({ error: "unauthorized" });
+  if (!WINE_RATINGS_ENABLED) return res.json({ clusters: [], enabled: false });
+  try {
+    const rows = await sb(`wine_catalog?select=id,signature,producer,name,vint,image_url&order=signature.asc`) || [];
+    const rat = await sb(`wine_ratings?select=wine_id`) || [];
+    const cnt = {}; rat.forEach(r => { cnt[r.wine_id] = (cnt[r.wine_id] || 0) + 1; });
+    // Union-find over duplikat-kandidater.
+    const parent = rows.map((_, i) => i);
+    const find = i => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+    for (let i = 0; i < rows.length; i++) for (let j = i + 1; j < rows.length; j++)
+      if (_sigDupCandidate(rows[i].signature, rows[j].signature)) parent[find(j)] = find(i);
+    const groups = {};
+    rows.forEach((r, i) => { const k = find(i); (groups[k] = groups[k] || []).push({ ...r, ratings: cnt[r.id] || 0 }); });
+    const clusters = Object.values(groups).filter(g => g.length > 1)
+      .map(g => g.sort((a, b) => b.ratings - a.ratings || b.signature.length - a.signature.length));
+    res.json({ clusters, enabled: true });
+  } catch (err) { console.error("admin/wine/duplicates:", err.message); res.status(500).json({ error: err.message }); }
+});
+app.post("/api/admin/wine/merge", async (req, res) => {
+  if (!adminOk(req)) return res.status(401).json({ error: "unauthorized" });
+  if (!WINE_RATINGS_ENABLED) return res.status(400).json({ error: "disabled" });
+  try {
+    const keepId = (req.body && req.body.keepId || "").trim();
+    const mergeIds = ((req.body && req.body.mergeIds) || []).filter(id => id && id !== keepId);
+    if (!keepId || !mergeIds.length) return res.status(400).json({ error: "keepId + mergeIds kræves" });
+    const keepRow = (await sb(`wine_catalog?id=eq.${encodeURIComponent(keepId)}&select=*`) || [])[0];
+    if (!keepRow) return res.status(404).json({ error: "keep-vin findes ikke" });
+    let moved = 0, dropped = 0;
+    for (const mid of mergeIds) {
+      const mRatings = await sb(`wine_ratings?wine_id=eq.${encodeURIComponent(mid)}&select=user_id,score,comment,updated_at`) || [];
+      // Frisk keep-brugerliste hver runde (kan vokse undervejs ved fler-flet).
+      const keepR = await sb(`wine_ratings?wine_id=eq.${encodeURIComponent(keepId)}&select=user_id,updated_at`) || [];
+      const keepBy = {}; keepR.forEach(r => { keepBy[r.user_id] = r.updated_at; });
+      for (const r of mRatings) {
+        if (keepBy[r.user_id] == null) {
+          // Ingen konflikt — flyt ratingen over på keep-vinen.
+          await sb(`wine_ratings?wine_id=eq.${encodeURIComponent(mid)}&user_id=eq.${encodeURIComponent(r.user_id)}`, { method: "PATCH", body: JSON.stringify({ wine_id: keepId }) });
+          keepBy[r.user_id] = r.updated_at; moved++;
+        } else if (new Date(r.updated_at) > new Date(keepBy[r.user_id])) {
+          // Brugeren har vurderet begge — behold den nyeste (opdatér keep, drop merge-siden ved cascade).
+          await sb(`wine_ratings?wine_id=eq.${encodeURIComponent(keepId)}&user_id=eq.${encodeURIComponent(r.user_id)}`, { method: "PATCH", body: JSON.stringify({ score: r.score, comment: r.comment, updated_at: r.updated_at }) });
+          keepBy[r.user_id] = r.updated_at; dropped++;
+        } else { dropped++; }
+      }
+      // Bagudfyld tomme felter på keep-vinen fra merge-vinen (mist ikke land/region/drue/foto).
+      const mRow = (await sb(`wine_catalog?id=eq.${encodeURIComponent(mid)}&select=*`) || [])[0];
+      if (mRow) {
+        const patch = {};
+        ["producer", "name", "vint", "type", "land", "region", "grape", "image_url"].forEach(k => { if (!keepRow[k] && mRow[k]) { patch[k] = mRow[k]; keepRow[k] = mRow[k]; } });
+        if (Object.keys(patch).length) await sb(`wine_catalog?id=eq.${encodeURIComponent(keepId)}`, { method: "PATCH", body: JSON.stringify(patch) });
+      }
+      // Slet merge-katalogrækken (cascade fjerner evt. resterende ratings på den).
+      await sb(`wine_catalog?id=eq.${encodeURIComponent(mid)}`, { method: "DELETE" });
+    }
+    res.json({ ok: true, kept: keepId, merged: mergeIds.length, moved, dropped });
+  } catch (err) { console.error("admin/wine/merge:", err.message); res.status(500).json({ error: err.message }); }
+});
+
 // ---- Craft-rating: fælles vin-katalog + ratings (flag: WINE_RATINGS_ENABLED) ----
 // Vin-signatur = vinens identitet ("dens egen side"). Strammest MULIGE match uden nogensinde
 // at smelte to reelt forskellige vine sammen (false merge er den farlige fejl — ratings kan
