@@ -1385,6 +1385,7 @@ app.get("/api/profile/:userId", async (req, res) => {
     let career = 0, topCats = [], badges = [];
     let shifts = { count: 0, hours: 0 };
     let wine = { count: 0, glasses: 0, bottles: 0 };
+    let wineList = [];
     try {
       const st = await sb(`user_state?user_id=eq.${targetId}&select=data`);
       const data = st && st[0] && st[0].data;
@@ -1397,6 +1398,12 @@ app.get("/api/profile/:userId", async (req, res) => {
         const wines = Array.isArray(data.wines) ? data.wines : [];
         wines.forEach(w => { const g = w.glasses || 0, b = w.bottles || 0; career += g + b; wine.glasses += g; wine.bottles += b; });
         wine.count = wines.length;
+        // Læse-only oversigt over personens vine (til profilens vin-fane).
+        wineList = wines.slice(0, 60).map(w => ({
+          name: w.name || "", producer: w.producer || "", vint: w.vint || "", type: w.type || "",
+          land: w.land || "", region: w.region || "", imageUrl: w.imageUrl || null,
+          glasses: w.glasses || 0, bottles: w.bottles || 0,
+        }));
         const hist = Array.isArray(data.shiftHistory) ? data.shiftHistory : [];
         shifts.count = hist.length;
         let ms = 0;
@@ -1422,6 +1429,7 @@ app.get("/api/profile/:userId", async (req, res) => {
       badges,
       shifts,
       wine,
+      wineList,
       photos: photos.map(p => ({ id: p.id, imageUrl: p.image_url, summary: p.summary || null, delta: p.delta, loggedAt: p.logged_at })),
     });
   } catch (err) {

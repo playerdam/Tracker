@@ -5059,12 +5059,30 @@
         +'<div class="pf-card"><div class="n">'+avg+'</div><div class="l">'+esc(lang==="da"?"Gns/vagt":"Avg/shift")+'</div></div>'
         +'</div>';
     }
-    const w=p.wine||{count:0,glasses:0,bottles:0};
-    return '<div class="pf-statcards">'
-      +'<div class="pf-card"><div class="n">'+w.count+'</div><div class="l">'+esc(lang==="da"?"Vine":"Wines")+'</div></div>'
-      +'<div class="pf-card"><div class="n">'+w.glasses+'</div><div class="l">'+esc(lang==="da"?"Glas":"Glasses")+'</div></div>'
-      +'<div class="pf-card"><div class="n">'+w.bottles+'</div><div class="l">'+esc(lang==="da"?"Flasker":"Bottles")+'</div></div>'
+    const w=p.wine||{count:0,glasses:0,bottles:0};const da=lang==="da";
+    let html='<div class="pf-statcards">'
+      +'<div class="pf-card"><div class="n">'+w.count+'</div><div class="l">'+esc(da?"Vine":"Wines")+'</div></div>'
+      +'<div class="pf-card"><div class="n">'+w.glasses+'</div><div class="l">'+esc(da?"Glas":"Glasses")+'</div></div>'
+      +'<div class="pf-card"><div class="n">'+w.bottles+'</div><div class="l">'+esc(da?"Flasker":"Bottles")+'</div></div>'
       +'</div>';
+    // Læse-only oversigt over personens kælder (ingen scan/redigering).
+    const list=p.wineList||[];
+    if(list.length){
+      html+='<div class="pf-winelist">'+list.map(wn=>{
+        const nm=esc(wn.name||(da?"Vin":"Wine"))+(wn.vint?' <span class="pf-wr-vint">'+esc(wn.vint)+'</span>':'');
+        const meta=[wn.producer,wn.region||wn.land].filter(Boolean).join(" · ");
+        const cnt=[];if(wn.glasses)cnt.push(wn.glasses+" "+(da?"glas":"gl."));if(wn.bottles)cnt.push(wn.bottles+" "+(da?"fl.":"btl"));
+        const thumb=wn.imageUrl?'<img class="pf-wr-img" src="'+esc(wn.imageUrl)+'" loading="lazy" alt="">':'<div class="pf-wr-ph">🍷</div>';
+        return '<div class="pf-wr">'+thumb+'<div class="pf-wr-body"><div class="pf-wr-name">'+nm+'</div>'
+          +(meta?'<div class="pf-wr-meta">'+esc(meta)+'</div>':'')+'</div>'
+          +(cnt.length?'<div class="pf-wr-cnt">'+esc(cnt.join(" · "))+'</div>':'')+'</div>';
+      }).join("")+'</div>';
+    }else if(w.count){
+      html+='<div class="pf-empty">'+esc(da?"Kælderen indlæses…":"Loading cellar…")+'</div>';
+    }else{
+      html+='<div class="pf-empty">'+esc(da?"Ingen vine endnu":"No wines yet")+'</div>';
+    }
+    return html;
   }
   function renderProfile(){
     const p=_profileData,body=$("#profileBody");if(!p||!body)return;
