@@ -575,17 +575,17 @@
 
   const CATS=[
     {id:"aabnet-mad",da:"Åbnet mad",en:"Opened food",
-     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 32 C5 20 12 10 24 8 C34 8 38 18 36 28 C34 40 26 52 16 54 C9 52 4 42 5 32Z" stroke-width="2.5"/><path d="M5 32 Q16 10 24 8" stroke-width="1.2"/><path d="M5 32 Q22 18 36 28" stroke-width="1.2"/><path d="M5 32 Q10 44 16 54" stroke-width="1.2"/><ellipse cx="20" cy="32" rx="10" ry="8" fill="currentColor" stroke="none"/><circle cx="5" cy="32" r="3.5" fill="currentColor" stroke="none"/><path d="M51 8 L57 14 L57 36 L45 36 L45 14 Z" fill="currentColor" stroke="none"/><rect x="43" y="36" width="16" height="5" rx="2" fill="currentColor" stroke="none"/><rect x="46" y="41" width="10" height="18" rx="4" fill="currentColor" stroke="none"/><circle cx="51" cy="47" r="1.8" fill="var(--surface)" stroke="none"/><circle cx="51" cy="53" r="1.8" fill="var(--surface)" stroke="none"/></svg>'},
+     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M32 52 C20 52 11 43 11 30 Q11 27 14 29 Q16 22 21 27 Q24 20 28 26 Q31 19 32 26 Q33 19 36 26 Q40 20 43 27 Q48 22 50 29 Q53 27 53 30 C53 43 44 52 32 52 Z" fill="currentColor" opacity=".15" stroke="none"/><path d="M32 52 C20 52 11 43 11 30 Q11 27 14 29 Q16 22 21 27 Q24 20 28 26 Q31 19 32 26 Q33 19 36 26 Q40 20 43 27 Q48 22 50 29 Q53 27 53 30 C53 43 44 52 32 52 Z"/><path d="M32 51 L22 30 M32 51 L32 28 M32 51 L42 30" stroke-width="1.8" opacity=".45"/><circle cx="32" cy="42" r="3" fill="currentColor" stroke="none"/></svg>'},
     {id:"aabnet-drikke",da:"Åbnet drikke",en:"Opened drinks",
-     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="2" width="10" height="6" rx="2.5" fill="currentColor" stroke="none"/><path d="M19 8 L19 18 M27 8 L27 18"/><path d="M19 18 C17 21 14 24 14 28"/><path d="M27 18 C29 21 32 24 32 28"/><path d="M14 28 L14 56 Q14 62 18 62 L28 62 Q32 62 32 56 L32 28"/><path d="M14 38 L32 38 M14 50 L32 50" stroke-width="1.2"/><line x1="40" y1="10" x2="60" y2="10" stroke-width="3"/><circle cx="40" cy="10" r="2.5" fill="currentColor" stroke="none"/><circle cx="60" cy="10" r="2.5" fill="currentColor" stroke="none"/><line x1="50" y1="10" x2="50" y2="18" stroke-width="2.5"/><path d="M50 18 C46 19 46 23 50 24 C54 25 54 29 50 30 C46 31 46 35 50 36 C54 37 53 40 51 42" stroke-width="2"/><path d="M51 42 L49 46" stroke-width="1.5"/></svg>'},
+     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M26 24 V15 H38 V24 L43 33 V54 A5 5 0 0 1 38 59 H26 A5 5 0 0 1 21 54 V33 Z"/><line x1="21" y1="40" x2="43" y2="40" stroke-width="2.4" opacity=".55"/><rect x="28" y="6" width="8" height="8" rx="2.5" fill="currentColor" opacity=".18" stroke="none"/><path d="M46 13 L52 7" stroke-width="2.6"/></svg>'},
     {id:"snittet",da:"Snittet",en:"Cut",
-     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 56 L42 12 L54 20 L20 58Z" fill="currentColor" stroke="none"/><rect x="4" y="53" width="5" height="10" rx="2" fill="currentColor" stroke="none"/><path d="M2 54 C2 50 4 48 7 48 L7 62 C4 62 2 60 2 56Z" fill="currentColor" stroke="none"/><circle cx="4.5" cy="52" r="1.5" fill="var(--surface)" stroke="none"/><circle cx="4.5" cy="57" r="1.5" fill="var(--surface)" stroke="none"/><line x1="36" y1="26" x2="36" y2="62" stroke-width="2"/><path d="M36 26 C52 26 62 34 62 44 C62 54 52 62 36 62" stroke-width="2.5"/><path d="M36 31 C49 31 57 37 57 44 C57 51 49 57 36 57" stroke-width="1.8"/><path d="M36 37 C46 37 52 40 52 44 C52 48 46 51 36 51" stroke-width="1.5"/><path d="M36 42 C40 42 43 43 43 44 C43 45 40 46 36 46" stroke-width="1.2"/><path d="M34 26 C33 22 34 20 36 18" stroke-width="1.5"/><path d="M38 26 C39 22 38 20 36 18" stroke-width="1.5"/></svg>'},
+     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 44 L45 11 C49 14 50 19 47 23 L27 44 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M20 44 L45 11 C49 14 50 19 47 23 L27 44 Z"/><line x1="20" y1="44" x2="11" y2="53" stroke-width="6"/></svg>'},
     {id:"tilberedt",da:"Tilberedt",en:"Prepared",
-     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14 C20 10 22 8 20 4" stroke-width="1.8"/><path d="M32 12 C32 8 34 6 32 2" stroke-width="1.8"/><path d="M44 14 C44 10 46 8 44 4" stroke-width="1.8"/><rect x="28" y="16" width="8" height="6" rx="3" fill="currentColor" stroke="none"/><path d="M16 28 C16 24 20 22 22 22 L42 22 C44 22 48 24 48 28" stroke-width="2.5"/><line x1="14" y1="28" x2="50" y2="28" stroke-width="2.5"/><path d="M14 28 L14 54 Q14 62 20 62 L44 62 Q50 62 50 54 L50 28"/><path d="M14 36 C10 36 8 38 8 42 C8 46 10 48 14 48" stroke-width="2"/><path d="M50 36 C54 36 56 38 56 42 C56 46 54 48 50 48" stroke-width="2"/></svg>'},
+     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 34 H40 V39 A7 7 0 0 1 33 46 H15 A7 7 0 0 1 8 39 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M8 34 H40 V39 A7 7 0 0 1 33 46 H15 A7 7 0 0 1 8 39 Z"/><line x1="40" y1="37" x2="58" y2="33" stroke-width="4"/><path d="M17 26 C17 22 21 22 21 18 M27 26 C27 22 31 22 31 18" stroke-width="2.4" opacity=".6"/></svg>'},
     {id:"serveret",da:"Serveret",en:"Served",
-     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="32" cy="56" rx="26" ry="6" stroke-width="2.5"/><path d="M8 56 C8 36 16 20 32 18 C48 20 56 36 56 56" stroke-width="2.5"/><path d="M14 46 C16 34 22 26 32 24 C42 26 48 34 50 46" stroke-width="1.2"/><circle cx="32" cy="10" r="5" fill="currentColor" stroke="none"/><line x1="32" y1="15" x2="32" y2="20" stroke-width="2.5"/></svg>'},
+     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 44 C11 28 20 19 32 19 C44 19 53 28 53 44 Z" fill="currentColor" opacity=".14" stroke="none"/><path d="M11 44 C11 28 20 19 32 19 C44 19 53 28 53 44"/><line x1="7" y1="44" x2="57" y2="44"/><line x1="32" y1="19" x2="32" y2="14"/><circle cx="32" cy="12" r="2.6" fill="currentColor" stroke="none"/></svg>'},
     {id:"andet",da:"Andet",en:"Other",
-     icon:'<svg viewBox="0 0 64 64" fill="currentColor" stroke="none"><circle cx="32" cy="12" r="7"/><circle cx="32" cy="32" r="7"/><circle cx="32" cy="52" r="7"/></svg>'},
+     icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M32 8 C34 22 40 28 54 30 C40 32 34 38 32 52 C30 38 24 32 10 30 C24 28 30 22 32 8 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M32 8 C34 22 40 28 54 30 C40 32 34 38 32 52 C30 38 24 32 10 30 C24 28 30 22 32 8 Z"/></svg>'},
   ];
   function guessCategory(label){
     if(state.customCats&&state.customCats.length)return state.customCats[0].id;
@@ -1277,13 +1277,16 @@
     state.log.splice(idx,1);
     save();renderCounters();renderWines();renderCareer();renderVagt();renderLogView();haptic(20);
   }
+  // Custom vinglas — bruges til "wine"-logs i strømmen (matcher det bespoke ikonsæt).
+  const WINE_GLASS_ICON='<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10 H44 C44 25 38 31 32 31 C26 31 20 25 20 10 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M20 10 H44 C44 25 38 31 32 31 C26 31 20 25 20 10 Z"/><line x1="32" y1="31" x2="32" y2="50"/><line x1="22" y1="52" x2="42" y2="52"/></svg>';
+  // Log-strøm: bespoke SVG-ikon (fra kategori-sættet) + kategoriens farve. Ingen emojis.
   function _logCatMeta(cat){
-    const map={
-      "aabnet-mad":{emoji:"📦",i:0},"aabnet-drikke":{emoji:"🍷",i:3},"snittet":{emoji:"🔪",i:4},
-      "tilberedt":{emoji:"🍳",i:2},"serveret":{emoji:"🍽",i:5},"andet":{emoji:"✨",i:1},"wine":{emoji:"🍷",i:3},
-    };
-    const m=map[cat]||map.andet;
-    return {emoji:m.emoji,c:VD_COLORS[m.i]};
+    const colorIdx={"aabnet-mad":0,"aabnet-drikke":3,"snittet":4,"tilberedt":2,"serveret":5,"andet":1,"wine":3};
+    const i=colorIdx[cat]!=null?colorIdx[cat]:1;
+    let svg;
+    if(cat==="wine")svg=WINE_GLASS_ICON;
+    else{const cdef=allCats().find(x=>x.id===cat);svg=(cdef&&cdef.icon)||DOTS_ICON;}
+    return {svg,c:VD_COLORS[i]};
   }
   function _relTime(ts){
     const min=Math.floor((Date.now()-ts)/60000);
@@ -1295,7 +1298,7 @@
   function _logItemHtml(e,timeStr){
     const meta=_logCatMeta(e.cat);
     return '<div class="logtl-item">'
-      +'<div class="logtl-ico" style="background:'+meta.c[1]+';color:'+meta.c[0]+'">'+meta.emoji+'</div>'
+      +'<div class="logtl-ico" style="background:'+meta.c[1]+';color:'+meta.c[0]+'">'+meta.svg+'</div>'
       +'<div class="logtl-body">'
         +'<div class="logtl-time">'+esc(timeStr)+'</div>'
         +'<div class="logtl-text">'+esc(e.text)+'</div>'
@@ -1995,7 +1998,7 @@
         const meta=_logCatMeta(e.cat);
         const canUndo=e.ops&&e.ops.length;
         return '<div class="vd2-lg">'
-          +'<div class="vd2-lg-ic" style="background:'+meta.c[1]+';color:'+meta.c[0]+'">'+meta.emoji+'</div>'
+          +'<div class="vd2-lg-ic" style="background:'+meta.c[1]+';color:'+meta.c[0]+'">'+meta.svg+'</div>'
           +'<div class="vd2-lg-body"><div class="vd2-lg-text">'+esc(e.text)+'</div><div class="vd2-lg-time">'+esc(_relTime(e.ts))+'</div></div>'
           +(canUndo?'<button class="vd2-lg-undo" type="button" data-undo-ts="'+e.ts+'" aria-label="'+(da?"Fortryd":"Undo")+'">↺</button>':'')
           +'</div>';

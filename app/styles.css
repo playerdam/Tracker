@@ -84,6 +84,7 @@
   .logtl-item:last-child{padding-bottom:0}
   .logtl-item:not(:last-child)::before{content:'';position:absolute;left:15px;top:32px;bottom:-4px;width:2px;background:var(--border)}
   .logtl-ico{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;z-index:1}
+  .logtl-ico svg{width:19px;height:19px}
   .logtl-body{flex:1;min-width:0;padding-top:3px}
   .logtl-time{font-family:"Fraunces",serif;font-size:11px;color:var(--faint);margin-bottom:2px}
   .logtl-text{font-size:14px;color:var(--text);line-height:1.4}
@@ -1117,6 +1118,7 @@
   .vd2-stream{display:flex;flex-direction:column;gap:8px}
   .vd2-lg{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 12px}
   .vd2-lg-ic{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+  .vd2-lg-ic svg{width:20px;height:20px}
   .vd2-lg-body{flex:1;min-width:0}
   .vd2-lg-text{font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .vd2-lg-time{font-size:11.5px;color:var(--faint);margin-top:1px}
