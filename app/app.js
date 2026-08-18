@@ -1233,7 +1233,9 @@
 
   // ---- log ----
   const ACCUM_WINDOW=30*60000; // samme ting logget igen inden for 30 min → læg sammen
-  function addLogEntry(msg,imageUrl,cat){
+  // Struktureret log af hvilke tællere/vine et log-kald ændrede — så "denne vagt"-strømmen kan fortryde præcist.
+  let _logOps=null;
+  function addLogEntry(msg,imageUrl,cat,ops){
     const now=new Date();
     if(!Array.isArray(state.log))state.log=[];
     // Akkumulér: tryk "østers" 5 gange → én linje "+5 østers" (ikke 5×"+1")
@@ -1245,15 +1247,35 @@
         const sum=(parseInt(lo[1],10)||0)+(parseInt(one[1],10)||0);
         last.text=(sum>0?"+":"")+sum+" "+one[2];last.ts=now.getTime();
         if(cat&&!last.cat)last.cat=cat;
-        save();renderLogView();return;
+        if(ops&&ops.length)last.ops=(last.ops||[]).concat(ops);
+        save();renderLogView();renderVagt();return;
       }
     }
     const entry={ts:now.getTime(),text:msg};
     if(imageUrl)entry.img=imageUrl;
     if(cat)entry.cat=cat;
+    if(ops&&ops.length)entry.ops=ops.slice();
     state.log.unshift(entry);
     if(state.log.length>2000)state.log.length=2000;
-    save();renderLogView();
+    save();renderLogView();renderVagt();
+  }
+  // Fortryd én log-indgang: vend dens tæller/vin-ændringer og fjern linjen.
+  function undoLogEntry(ts){
+    if(!Array.isArray(state.log))return;
+    const idx=state.log.findIndex(e=>e.ts===ts);
+    if(idx<0)return;
+    const e=state.log[idx];
+    (e.ops||[]).forEach(op=>{
+      if(op.t==="c"){
+        const c=(state.counters||[]).find(x=>x.id===op.id);if(!c)return;
+        if(op.sub){const s=(c.subs||[]).find(x=>x.id===op.sub);if(s)s.count=Math.max(0,s.count-op.delta);}
+        else c.count=Math.max(0,(c.count||0)-op.delta);
+      }else if(op.t==="w"){
+        const w=(state.wines||[]).find(x=>x.id===op.id);if(w)w[op.measure]=Math.max(0,(w[op.measure]||0)-op.delta);
+      }
+    });
+    state.log.splice(idx,1);
+    save();renderCounters();renderWines();renderCareer();renderVagt();renderLogView();haptic(20);
   }
   function _logCatMeta(cat){
     const map={
@@ -1906,6 +1928,32 @@
     inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();ask();}});
   }
 
+  // Aktiv-vagt cockpit (variant A): inline hurtig-log + "denne vagt"-strøm med fortryd.
+  function _buildVagtCockpit(shift){
+    const da=lang==="da";
+    const micSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4"/></svg>';
+    let h='<button class="vd2-qlog" id="vagtQlogOpen" type="button">'
+      +'<span class="vd2-qlog-plus">+</span>'
+      +'<span class="vd2-qlog-ph">'+esc(da?"Log fx «åbnet 12 østers»…":"Log e.g. «opened 12 oysters»…")+'</span>'
+      +'<span class="vd2-qlog-mic" id="vagtQlogMic" aria-label="'+(da?"Tal":"Voice")+'">'+micSvg+'</span></button>';
+    const entries=_entriesForShift(shift).slice(0,12);
+    h+='<div class="vd2-cockpit-sec">'+(da?"Denne vagt":"This shift")+'</div>';
+    if(!entries.length){
+      h+='<div class="vd2-stream-empty">'+(da?"Ingen tællinger endnu — skriv i feltet ovenfor.":"Nothing logged yet — type in the field above.")+'</div>';
+    }else{
+      h+='<div class="vd2-stream">'+entries.map(e=>{
+        const meta=_logCatMeta(e.cat);
+        const canUndo=e.ops&&e.ops.length;
+        return '<div class="vd2-lg">'
+          +'<div class="vd2-lg-ic" style="background:'+meta.c[1]+';color:'+meta.c[0]+'">'+meta.emoji+'</div>'
+          +'<div class="vd2-lg-body"><div class="vd2-lg-text">'+esc(e.text)+'</div><div class="vd2-lg-time">'+esc(_relTime(e.ts))+'</div></div>'
+          +(canUndo?'<button class="vd2-lg-undo" type="button" data-undo-ts="'+e.ts+'" aria-label="'+(da?"Fortryd":"Undo")+'">↺</button>':'')
+          +'</div>';
+      }).join("")+'</div>';
+    }
+    return h;
+  }
+
   function renderVagt(){
     const el=document.getElementById("vagtContent");if(!el)return;
     const shift=getShift();
@@ -1931,12 +1979,19 @@
     }
     el.innerHTML='<div id="vagtDash"></div>'
       +'<div id="vagtQuick"></div>'
-      +'<div class="vd2-actions" style="grid-template-columns:1fr">'+shiftCard+'</div>';
+      +'<div class="vd2-actions" style="grid-template-columns:1fr">'+shiftCard+'</div>'
+      +'<div id="vagtCockpit">'+(shift?_buildVagtCockpit(shift):'')+'</div>';
 
     _buildVagtDashboard(document.getElementById("vagtDash"),shift);
     _buildVagtQuickStats(document.getElementById("vagtQuick"),shift);
 
     // ── Wiring ──
+    const cockpit=document.getElementById("vagtCockpit");
+    if(cockpit&&shift){
+      const qopen=document.getElementById("vagtQlogOpen");
+      if(qopen)qopen.addEventListener("click",()=>{openQlogOverlay();});
+      cockpit.addEventListener("click",e=>{const u=e.target.closest("[data-undo-ts]");if(u){undoLogEntry(parseInt(u.dataset.undoTs,10));}});
+    }
     const sc=document.getElementById("vagtShiftCard");
     if(sc)sc.addEventListener("click",()=>{
       if(getShift()){openShiftModal();return;}
@@ -2953,6 +3008,7 @@
     if(!s){if(c.subs.length===0&&c.count>0){c.subs.push({id:id(),name:"Uden type",count:c.count});c.count=0;}s={id:id(),name:canon,count:0};c.subs.push(s);if(!c.suggest.some(x=>x.toLowerCase()===canon.toLowerCase()))c.suggest.push(canon);}
     s.count=Math.max(0,s.count+delta);
     summary.push((delta>0?"+":"")+delta+" "+canon+" ("+c.label+")");
+    return s;
   }
   const VALID_CAT_IDS=new Set(["aabnet-mad","aabnet-drikke","snittet","tilberedt","serveret","andet"]);
   function _guessCat(a){
@@ -2970,9 +3026,11 @@
         if(!(a.counter_da&&a.counter_en))requestLabelTranslation(nm);
       }
       const subName=(a.sub||"").trim();
-      if(subName){addToSub(c,subName,delta,summary);}
-      else if(c.subs.length){let s=c.subs.find(x=>x.name==="Uden type");if(!s){s={id:id(),name:"Uden type",count:0};c.subs.push(s);}s.count=Math.max(0,s.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
+      let _opSub=null;
+      if(subName){const s=addToSub(c,subName,delta,summary);_opSub=s?s.id:null;}
+      else if(c.subs.length){let s=c.subs.find(x=>x.name==="Uden type");if(!s){s={id:id(),name:"Uden type",count:0};c.subs.push(s);}s.count=Math.max(0,s.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);_opSub=s.id;}
       else{c.count=Math.max(0,c.count+delta);summary.push((delta>0?"+":"")+delta+" "+c.label);}
+      if(_logOps)_logOps.push({t:"c",id:c.id,sub:_opSub,delta});
       if(syncItems)syncItems.push({categoryLabel:c.label,delta});
       if(cats)cats.push(c.cat||"andet");
     }else if(a.kind==="wine"){
@@ -2983,6 +3041,7 @@
       let w=state.wines.find(x=>x.name.toLowerCase()===nm)||state.wines.find(x=>x.name&&(x.name.toLowerCase().includes(nm)||nm.includes(x.name.toLowerCase())));
       if(!w){w={id:id(),name:a.wine||"Ukendt vin",producer:a.producer||"",land:a.country||"",region:a.region||"",grape:a.grape||"",vint:"",glasses:0,bottles:0,opened:0};state.wines.unshift(w);}
       w[measure]=Math.max(0,(w[measure]||0)+delta);
+      if(_logOps)_logOps.push({t:"w",id:w.id,measure,delta});
       const measureLbl=measure==="bottles"?t("bottles").toLowerCase():measure==="opened"?(lang==="da"?"åbnet":"opened"):t("glasses").toLowerCase();
       summary.push((delta>0?"+":"")+delta+" "+measureLbl+" "+w.name);
     }
@@ -3072,6 +3131,7 @@
     }
     if(!actions.length){showToast(t("toast_unknown"));input.focus();return;}
     undoSnapshot=clone(state);
+    _logOps=[];
     const summary=[],ask=[],syncItems=[],cats=[];
     actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems,cats);});
     input.value="";save();renderCounters();renderWines();renderCareer();
@@ -3081,7 +3141,7 @@
   function finishLog(summary,syncItems,imageUrl,cats){
     const msg=summary.length?(t("toast_logged")+summary.join(", ")):t("toast_nothing");
     showToast(msg);
-    if(summary.length){addLogEntry(summary.join(" · "),imageUrl,cats&&cats[0]);haptic(40);}
+    if(summary.length){addLogEntry(summary.join(" · "),imageUrl,cats&&cats[0],_logOps);haptic(40);}
     const logSummary=summary.join(" · ");
     deferSync(syncItems,imageUrl,logSummary);
     checkBadges();checkRecords();
@@ -3123,6 +3183,7 @@
     if(spin)spin.classList.remove("on");if(send)send.disabled=false;inp.disabled=false;
     if(!actions.length){showToast(t("toast_unknown"));inp.focus();return;}
     undoSnapshot=clone(state);
+    _logOps=[];
     const summary=[],ask=[],syncItems=[],cats=[];
     actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems,cats);});
     inp.value="";save();renderCounters();renderWines();renderCareer();
@@ -3160,13 +3221,14 @@
   function quickLogItem(label,delta,sub){
     if(!label||!delta)return;
     undoSnapshot=clone(state);
+    _logOps=[];
     const summary=[],syncItems=[],cats=[];
     const a={kind:"counter",counter:label,delta:delta};if(sub)a.sub=sub;
     applyOne(a,summary,syncItems,cats);
     save();renderCounters();renderWines();renderCareer();
     if(summary.length){
       showToast(t("toast_logged")+summary.join(", "));
-      addLogEntry(summary.join(" · "),null,cats&&cats[0]);haptic(40);
+      addLogEntry(summary.join(" · "),null,cats&&cats[0],_logOps);haptic(40);
       deferSync(syncItems,null,summary.join(" · "));
       checkBadges();checkRecords();maybeNudgeShiftStart();
     }
@@ -4283,11 +4345,12 @@
     }
     if(!actions.length){showToast(lang==="da"?"Forstod ikke — prøv igen":"Couldn\u2019t parse — try again");if(inp)inp.focus();return;}
     undoSnapshot=clone(state);
+    _logOps=[];
     const summary=[],syncItems=[],cats=[];
     actions.forEach(a=>applyOne(a,summary,syncItems,cats));
     if(inp)inp.value="";
     save();_updateVagtAfterLog();renderCounters();renderCareer();
-    if(summary.length){addLogEntry(summary.join(" · "),null,cats[0]);haptic(40);deferSync(syncItems,null,summary.join(" · "));}
+    if(summary.length){addLogEntry(summary.join(" · "),null,cats[0],_logOps);haptic(40);deferSync(syncItems,null,summary.join(" · "));}
     checkBadges();checkRecords();
     _renderShiftStep1Totals();
     if(inp)inp.focus();

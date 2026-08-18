@@ -1093,6 +1093,23 @@
   .catov-total{display:flex;justify-content:space-between;align-items:center;padding:12px 2px 2px;margin-top:4px;border-top:1.5px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
   .catov-total-val{font-family:"Fraunces",serif;font-size:18px;font-weight:700;color:var(--accent);letter-spacing:0;font-variant-numeric:tabular-nums}
   /* Action cards */
+  /* Aktiv-vagt cockpit (variant A) */
+  .vd2-qlog{display:flex;align-items:center;gap:10px;width:100%;appearance:none;font-family:inherit;text-align:left;background:var(--surface);border:1.5px solid var(--accent-soft);border-radius:15px;padding:12px 13px;margin-bottom:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,border-color .12s}
+  .vd2-qlog:active{transform:scale(.985)}
+  .vd2-qlog-plus{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;flex:none}
+  .vd2-qlog-ph{flex:1;min-width:0;font-size:14px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vd2-qlog-mic{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+  .vd2-qlog-mic svg{width:17px;height:17px}
+  .vd2-cockpit-sec{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin:2px 2px 9px}
+  .vd2-stream-empty{font-size:13px;color:var(--faint);padding:4px 2px 8px;line-height:1.5}
+  .vd2-stream{display:flex;flex-direction:column;gap:8px}
+  .vd2-lg{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 12px}
+  .vd2-lg-ic{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+  .vd2-lg-body{flex:1;min-width:0}
+  .vd2-lg-text{font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vd2-lg-time{font-size:11.5px;color:var(--faint);margin-top:1px}
+  .vd2-lg-undo{appearance:none;border:none;background:var(--surface-2);color:var(--dim);width:34px;height:34px;border-radius:50%;font-size:17px;line-height:1;cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+  .vd2-lg-undo:active{transform:scale(.9);color:var(--accent)}
   .vd2-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
   .vd2-act{appearance:none;border:none;font-family:inherit;text-align:left;border-radius:20px;padding:14px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:9px;min-height:100px;-webkit-tap-highlight-color:transparent;transition:transform .12s;position:relative;overflow:hidden;touch-action:manipulation}
   .vd2-act:active{transform:scale(.96)}
