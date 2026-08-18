@@ -2434,6 +2434,9 @@
     if(shareBtn)shareBtn.style.display="";
     const dispName=w.name+(w.vint?" "+w.vint:"");
     if(hTitle)hTitle.textContent=dispName;
+    // Vinbilledet er centrum: stort centreret hero-billede i toppen (ikke en grid-celle).
+    const heroEl=document.getElementById("wAboutHero"),heroImg=document.getElementById("wAboutHeroImg");
+    if(heroEl&&heroImg){if(w.imageUrl){heroImg.src=w.imageUrl;heroEl.style.display="";}else{heroImg.removeAttribute("src");heroEl.style.display="none";}}
     const titleEl=document.getElementById("wAboutTitle");if(titleEl)titleEl.textContent=dispName;
     const prodEl=document.getElementById("wAboutProducer");if(prodEl)prodEl.textContent=w.producer||"";
     const gridEl=document.getElementById("wAboutGrid");
@@ -2444,7 +2447,6 @@
     if(w.vint)cells.push({icon:_waboutSVGS.vint,label:lang==="da"?"Årgang":"Vintage",value:w.vint});
     if(w.type&&w.type!=="andet")cells.push({icon:_waboutSVGS.type,label:lang==="da"?"Type":"Type",value:_wtypeLabel[w.type]||w.type});
     if(w.grape)cells.push({icon:_waboutSVGS.grape,label:lang==="da"?"Drue":"Grape",value:w.grape});
-    if(w.imageUrl)cells.push({photo:w.imageUrl});
     if((w.opened||0)>0)cells.push({icon:_waboutSVGS.opened,label:lang==="da"?"Åbnet":"Opened",value:fmtNum(w.opened)+" "+(lang==="da"?"fl.":"btl.")});
     const totG=(w.glasses||0)+(w.bottles||0)*6;
     if(totG>0)cells.push({icon:_waboutSVGS.count,label:lang==="da"?"Drukket":"Drunk",value:totG+((w.bottles||0)>0?" ("+w.bottles+" fl.)":"")});
@@ -2654,9 +2656,9 @@
     function closeLb(){lb.style.display="none";lbImg.src="";}
     lbClose.addEventListener("click",closeLb);
     lb.addEventListener("click",e=>{if(!e.target.closest("#wPhotoLbImg"))closeLb();});
-    document.getElementById("wAboutGrid").addEventListener("click",e=>{
-      const img=e.target.closest(".wabout-photo-img");
-      if(img)openLb(img.src);
+    document.getElementById("wAboutView").addEventListener("click",e=>{
+      const img=e.target.closest(".wabout-photo-img,.wabout-hero-img");
+      if(img&&img.src)openLb(img.src);
     });
   })();
 
