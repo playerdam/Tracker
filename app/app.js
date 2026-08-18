@@ -2459,11 +2459,13 @@
 
   // ---- Craft-rating (fælles vin-katalog, Vivino-erstatning) ----
   // _wrState holder den aktuelle vins ratings; genbruges af paint/handlers.
-  let _wrState=null, _wrPending=0, _wrWine=null;
+  // Variant B: kompakt one-pager — Craft-score + din vurdering som to chips, kommentarer foldet væk.
+  let _wrState=null, _wrPending=0, _wrWine=null, _wrEditing=false, _wrDraft="";
   function _wrStars(n,max){max=max||5;n=Math.round(n||0);let h="";for(let i=1;i<=max;i++)h+=i<=n?'★':'<span class="off">★</span>';return h;}
+  function _wrSyncDraft(){const box=document.getElementById("wAboutRating");if(!box)return;const ta=box.querySelector(".wr-comment");if(ta)_wrDraft=ta.value;}
   function renderWineRating(w){
     const box=document.getElementById("wAboutRating");if(!box)return;
-    _wrState=null;_wrPending=0;_wrWine=w||null;
+    _wrState=null;_wrPending=0;_wrWine=w||null;_wrEditing=false;_wrDraft="";
     // Gated: kun når serveren har WINE_RATINGS_ENABLED=1, og vinen har nok info til en signatur.
     if(!_wineRatingsEnabled||!w||!(w.name||w.producer)){box.style.display="none";box.innerHTML="";return;}
     box.style.display="";
@@ -2476,7 +2478,8 @@
         const j=await r.json();
         if(j&&j.enabled===false){box.style.display="none";return;}
         _wrState=Object.assign({expanded:false},j||{});
-        _wrPending=(_wrState.yourRating&&_wrState.yourRating.score)||0;
+        const yr0=_wrState.yourRating;
+        _wrPending=(yr0&&yr0.score)||0;_wrDraft=(yr0&&yr0.comment)||"";_wrEditing=false;
         _paintWineRating();
       }catch(e){box.style.display="none";}
     })();
@@ -2484,52 +2487,38 @@
   function _paintWineRating(){
     const box=document.getElementById("wAboutRating");if(!box||!_wrState)return;
     const s=_wrState, da=lang==="da";
-    const cnt=s.count||0;
-    // Craft-score kort (eller tom-tilstand).
-    let head;
-    if(cnt>0){
-      head='<div class="wr-score"><div class="wr-score-num">'+(s.craftScore!=null?s.craftScore.toLocaleString(da?"da-DK":"en-GB"):"–")+'</div>'
-        +'<div class="wr-score-meta"><span class="wr-badge">Craft-score</span>'
-        +'<div class="wr-stars">'+_wrStars(s.craftScore)+'</div>'
-        +'<div class="wr-count">'+cnt+' '+(da?(cnt===1?"vurdering":"vurderinger"):(cnt===1?"rating":"ratings"))+'</div></div></div>';
-    }else{
-      head='<div class="wr-empty">'+(da?"Ingen vurderinger endnu — vær den første.":"No ratings yet — be the first.")+'</div>';
+    const cnt=s.count||0, yr=s.yourRating;
+    // To chips: Craft-score (fælles) + Din vurdering (tryk en stjerne for at vurdere/redigere).
+    let html='<div class="wr-chips">'
+      +'<div class="wr-chip"><div class="wr-chip-k">Craft-score</div>'
+      +'<div class="wr-chip-big"><span class="wr-chip-n">'+(s.craftScore!=null?s.craftScore.toLocaleString(da?"da-DK":"en-GB"):"–")+'</span>'
+      +'<span class="wr-stars">'+(s.craftScore!=null?_wrStars(s.craftScore):'<span class="off">★★★★★</span>')+'</span></div></div>'
+      +'<div class="wr-chip wr-chip-you"><div class="wr-chip-k">'+(da?"Din vurdering":"Your rating")+'</div><div class="wr-your-stars">';
+    for(let i=1;i<=5;i++)html+='<span class="wr-star'+(i<=_wrPending?" on":"")+'" data-s="'+i+'" role="button" aria-label="'+i+'">★</span>';
+    html+='</div></div></div>';
+    // Kommentar-editor: vises kun mens man vurderer (efter tryk på en stjerne).
+    if(_wrEditing){
+      html+='<div class="wr-editor"><textarea class="wr-comment" maxlength="500" rows="2" placeholder="'+esc(da?"Skriv en kommentar (valgfrit)":"Add a comment (optional)")+'">'+esc(_wrDraft||"")+'</textarea>'
+        +'<div class="wr-actions"><button type="button" class="btn wr-submit"'+(_wrPending>0?"":" disabled")+'>'+(yr?(da?"Opdatér":"Update"):(da?"Gem vurdering":"Save rating"))+'</button>'
+        +'<button type="button" class="wr-cancel">'+(da?"Annullér":"Cancel")+'</button><span class="wr-saved" style="display:none">'+(da?"Gemt ✓":"Saved ✓")+'</span></div></div>';
     }
-    // Din vurdering (stjerne-input + kommentar).
-    const yr=s.yourRating;
-    let input='<div class="wr-yours"><div class="wr-yours-head">'+(da?"Din vurdering":"Your rating")+'</div>'
-      +'<div class="wr-input">';
-    for(let i=1;i<=5;i++)input+='<button type="button" class="wr-star'+(i<=_wrPending?" on":"")+'" data-s="'+i+'" aria-label="'+i+'">★</button>';
-    input+='</div>'
-      +'<textarea class="wr-comment" maxlength="500" rows="2" placeholder="'+esc(da?"Skriv en kommentar (valgfrit)":"Add a comment (optional)")+'">'+esc(yr&&yr.comment||"")+'</textarea>'
-      +'<div class="wr-actions"><button type="button" class="btn wr-submit" disabled>'+(yr?(da?"Opdatér vurdering":"Update rating"):(da?"Gem vurdering":"Save rating"))+'</button><span class="wr-saved" style="display:none">'+(da?"Gemt ✓":"Saved ✓")+'</span></div></div>';
-    // Vurderinger-liste med fold-ud.
-    let list="";
+    // Kommentarer foldet væk bag én knap; folder hele listen ud på tryk.
     if(cnt>0){
-      const rows=s.ratings||[];
-      const shown=s.expanded?rows:rows.slice(0,3);
-      list='<div class="wr-list-h"><span class="wr-list-t">'+(da?"Vurderinger":"Ratings")+'</span>'
-        +(rows.length>3?'<button type="button" class="wr-more">'+(s.expanded?(da?"Vis færre":"Show fewer"):(da?"Vis alle "+rows.length:"Show all "+rows.length))+'</button>':'')
-        +'</div><div class="wr-list">';
-      list+=shown.map(rv=>{
-        const nm=rv.isMine?(da?"Dig":"You"):(rv.name||"Anon");
-        const init=(nm||"?").charAt(0).toUpperCase();
-        return '<div class="wr-rev"><div class="wr-av">'+esc(init)+'</div><div class="wr-rev-body">'
-          +'<div class="wr-rev-top"><span class="wr-rev-name">'+esc(nm)+'</span><span class="wr-rev-stars">'+_wrStars(rv.score)+'</span><span class="wr-rev-when">'+(rv.when?timeAgo(rv.when):"")+'</span></div>'
-          +(rv.comment?'<div class="wr-rev-txt">'+esc(rv.comment)+'</div>':'')
-          +'</div></div>';
-      }).join("");
-      list+='</div>';
+      html+='<button type="button" class="wr-fold">'+(s.expanded?(da?"Skjul vurderinger":"Hide ratings"):(da?"Vis alle "+cnt+" vurderinger":"Show all "+cnt+" ratings"))+' <span class="wr-chev">'+(s.expanded?"▴":"▾")+'</span></button>';
+      if(s.expanded){
+        html+='<div class="wr-list">'+(s.ratings||[]).map(rv=>{
+          const nm=rv.isMine?(da?"Dig":"You"):(rv.name||"Anon");
+          const init=(nm||"?").charAt(0).toUpperCase();
+          return '<div class="wr-rev"><div class="wr-av">'+esc(init)+'</div><div class="wr-rev-body">'
+            +'<div class="wr-rev-top"><span class="wr-rev-name">'+esc(nm)+'</span><span class="wr-rev-stars">'+_wrStars(rv.score)+'</span><span class="wr-rev-when">'+(rv.when?timeAgo(rv.when):"")+'</span></div>'
+            +(rv.comment?'<div class="wr-rev-txt">'+esc(rv.comment)+'</div>':'')
+            +'</div></div>';
+        }).join("")+'</div>';
+      }
+    }else if(!_wrEditing){
+      html+='<div class="wr-empty">'+(da?"Vær den første til at vurdere.":"Be the first to rate.")+'</div>';
     }
-    box.innerHTML=head+input+list;
-    _wrSyncSubmit();
-  }
-  function _wrSyncSubmit(){
-    const box=document.getElementById("wAboutRating");if(!box)return;
-    const btn=box.querySelector(".wr-submit");if(!btn)return;
-    const had=_wrState&&_wrState.yourRating&&_wrState.yourRating.score;
-    // Aktivér når der er valgt en score OG (ny score ELLER ændret kommentar).
-    btn.disabled=!(_wrPending>0);
+    box.innerHTML=html;
   }
   let _wrWired=false;
   function _wireWineRating(){
@@ -2537,22 +2526,24 @@
     const box=document.getElementById("wAboutRating");if(!box)return;
     box.addEventListener("click",async e=>{
       const star=e.target.closest(".wr-star");
-      if(star){_wrPending=parseInt(star.dataset.s,10)||0;box.querySelectorAll(".wr-star").forEach(b=>b.classList.toggle("on",(parseInt(b.dataset.s,10)||0)<=_wrPending));_wrSyncSubmit();return;}
-      const more=e.target.closest(".wr-more");
-      if(more&&_wrState){_wrState.expanded=!_wrState.expanded;_paintWineRating();return;}
+      if(star){_wrSyncDraft();_wrPending=parseInt(star.dataset.s,10)||0;_wrEditing=true;_paintWineRating();const ta=box.querySelector(".wr-comment");if(ta)ta.focus();return;}
+      const cancel=e.target.closest(".wr-cancel");
+      if(cancel){_wrEditing=false;const yr=_wrState&&_wrState.yourRating;_wrPending=(yr&&yr.score)||0;_wrDraft=(yr&&yr.comment)||"";_paintWineRating();return;}
+      const fold=e.target.closest(".wr-fold");
+      if(fold&&_wrState){_wrSyncDraft();_wrState.expanded=!_wrState.expanded;_paintWineRating();return;}
       const sub=e.target.closest(".wr-submit");
       if(sub){
         if(_wrPending<1||!_wrState)return;
-        const ta=box.querySelector(".wr-comment");const comment=ta?ta.value:"";
+        _wrSyncDraft();
         sub.disabled=true;sub.textContent=lang==="da"?"Gemmer…":"Saving…";
         try{
           const token=await getToken();if(!token)return;
           const w0=_wrWine||(_waWineId?state.wines.find(x=>x.id===_waWineId):null)||{};
-          const body={producer:w0.producer||"",name:w0.name||"",vint:w0.vint||"",score:_wrPending,comment:comment,
+          const body={producer:w0.producer||"",name:w0.name||"",vint:w0.vint||"",score:_wrPending,comment:_wrDraft,
             type:w0.type,land:w0.land,region:w0.region,grape:w0.grape,imageUrl:w0.imageUrl};
           const r=await fetch(apiBase()+"/api/wine/rate",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});
           const j=await r.json();
-          if(j&&!j.error){_wrState=Object.assign({expanded:_wrState.expanded},j);_wrPending=(_wrState.yourRating&&_wrState.yourRating.score)||_wrPending;_paintWineRating();const sv=box.querySelector(".wr-saved");if(sv){sv.style.display="";setTimeout(()=>{if(sv)sv.style.display="none";},2000);}}
+          if(j&&!j.error){_wrState=Object.assign({expanded:_wrState.expanded},j);const yr=_wrState.yourRating;_wrPending=(yr&&yr.score)||_wrPending;_wrDraft=(yr&&yr.comment)||"";_wrEditing=false;_paintWineRating();const sv=box.querySelector(".wr-saved");if(sv){sv.style.display="";setTimeout(()=>{if(sv)sv.style.display="none";},2000);}}
           else{sub.disabled=false;sub.textContent=lang==="da"?"Prøv igen":"Try again";}
         }catch(err){sub.disabled=false;sub.textContent=lang==="da"?"Prøv igen":"Try again";}
       }
