@@ -1093,6 +1093,15 @@
   .catov-total{display:flex;justify-content:space-between;align-items:center;padding:12px 2px 2px;margin-top:4px;border-top:1.5px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
   .catov-total-val{font-family:"Fraunces",serif;font-size:18px;font-weight:700;color:var(--accent);letter-spacing:0;font-variant-numeric:tabular-nums}
   /* Action cards */
+  /* First-run guide (empty state) */
+  .vd-guide{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px 16px 6px}
+  .vd-guide-h{font-family:"Fraunces",serif;font-weight:600;font-size:18px;color:var(--text);margin-bottom:3px}
+  .vd-guide-lead{font-size:12.5px;color:var(--dim);margin-bottom:13px;line-height:1.5}
+  .vd-guide-step{display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-top:1px solid var(--border)}
+  .vd-guide-num{width:23px;height:23px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-family:"Fraunces",serif;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+  .vd-guide-tx{font-size:13px;line-height:1.4}
+  .vd-guide-tx b{font-weight:600;color:var(--text)}
+  .vd-guide-tx span{color:var(--faint);display:block;font-size:11.5px;margin-top:1px}
   /* Aktiv-vagt cockpit (variant A) */
   .vd2-qlog{display:flex;align-items:center;gap:10px;width:100%;appearance:none;font-family:inherit;text-align:left;background:var(--surface);border:1.5px solid var(--accent-soft);border-radius:15px;padding:12px 13px;margin-bottom:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,border-color .12s}
   .vd2-qlog:active{transform:scale(.985)}

@@ -1625,8 +1625,13 @@
     const r=52,circ=+(2*Math.PI*r).toFixed(2);
     const arcLen=+(circ*_vagtRingPct(grandTotal,shift)).toFixed(2);
     const streak=calcStreak();
-    const captionParts=[fmtWorkTime(totalWorkMs())+" "+(lang==="da"?"i alt":"total")];
-    if(streak>=2)captionParts.push("🔥 "+(lang==="da"?streak+" dage i træk":streak+" day streak"));
+    let captionParts;
+    if(!shift&&_isNewUser()){
+      captionParts=[lang==="da"?"Din første tælling venter ✨":"Your first count awaits ✨"];
+    }else{
+      captionParts=[fmtWorkTime(totalWorkMs())+" "+(lang==="da"?"i alt":"total")];
+      if(streak>=2)captionParts.push("🔥 "+(lang==="da"?streak+" dage i træk":streak+" day streak"));
+    }
     container.innerHTML='<div class="vd2-hero">'
       +'<div class="vd2-hero-solo">'
         +'<div class="vd-ring-wrap" role="img" aria-label="'+fmtNum(grandTotal)+' '+(lang==="da"?"tællinger":"counts")+'">'
@@ -1928,6 +1933,30 @@
     inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();ask();}});
   }
 
+  // Helt ny bruger: intet logget, ingen vine, ingen vagt (aktiv eller historik).
+  function _isNewUser(){
+    return !getShift() && !(state.counters||[]).length && !(state.wines||[]).length
+      && !(state.shiftHistory||[]).length && !(state.log||[]).length;
+  }
+  // First-run guide (empty state variant A) — forklarer appen i 3 trin. Forsvinder ved første log.
+  function _buildFirstRunGuide(){
+    const da=lang==="da";
+    const steps=da?[
+      ["Start en vagt","Tryk på kortet ovenfor når servicen går i gang"],
+      ["Skriv hvad du laver","«åbnet 12 østers» — appen finder tælleren selv"],
+      ["Se håndværket vokse","Ringen, stats og achievements fyldes op"],
+    ]:[
+      ["Start a shift","Tap the card above when service begins"],
+      ["Write what you do","«opened 12 oysters» — the app finds the counter"],
+      ["Watch your craft grow","The ring, stats and achievements fill up"],
+    ];
+    return '<div class="vd-guide">'
+      +'<div class="vd-guide-h">'+(da?"Velkommen 👋":"Welcome 👋")+'</div>'
+      +'<div class="vd-guide-lead">'+(da?"Craft Tracker tæller dit håndværk gennem vagten. Sådan kommer du i gang:":"Craft Tracker counts your craft through the shift. Here's how to start:")+'</div>'
+      +steps.map((s,i)=>'<div class="vd-guide-step"><span class="vd-guide-num">'+(i+1)+'</span><div class="vd-guide-tx"><b>'+esc(s[0])+'</b><span>'+esc(s[1])+'</span></div></div>').join("")
+      +'</div>';
+  }
+
   // Aktiv-vagt cockpit (variant A): inline hurtig-log + "denne vagt"-strøm med fortryd.
   function _buildVagtCockpit(shift){
     const da=lang==="da";
@@ -1980,7 +2009,7 @@
     el.innerHTML='<div id="vagtDash"></div>'
       +'<div id="vagtQuick"></div>'
       +'<div class="vd2-actions" style="grid-template-columns:1fr">'+shiftCard+'</div>'
-      +'<div id="vagtCockpit">'+(shift?_buildVagtCockpit(shift):'')+'</div>';
+      +'<div id="vagtCockpit">'+(shift?_buildVagtCockpit(shift):(_isNewUser()?_buildFirstRunGuide():''))+'</div>';
 
     _buildVagtDashboard(document.getElementById("vagtDash"),shift);
     _buildVagtQuickStats(document.getElementById("vagtQuick"),shift);
