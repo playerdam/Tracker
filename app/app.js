@@ -1618,6 +1618,21 @@
   }
 
   // ── ét roligt hero: kun ringen er "vigtigst" ──
+  // Ring count-up: animér tallet fra forrige værdi til ny når man logger (ikke ved fane-skift/vagt-skift).
+  let _ringDisplayed=null,_ringShiftKey=null;
+  function _animateRing(el,wrap,from,to){
+    if(!el)return;
+    const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(reduce){el.textContent=fmtNum(to);return;}
+    if(wrap){wrap.classList.remove("ring-pulse");void wrap.offsetWidth;wrap.classList.add("ring-pulse");}
+    const dur=650,start=performance.now();
+    function step(now){
+      const p=Math.min(1,(now-start)/dur),e=1-Math.pow(1-p,3);
+      el.textContent=fmtNum(Math.round(from+(to-from)*e));
+      if(p<1)requestAnimationFrame(step);else el.textContent=fmtNum(to);
+    }
+    requestAnimationFrame(step);
+  }
   function _buildVagtDashboard(container,shift){
     if(!container)return;
     const sm=_vagtSnapMap(shift);
@@ -1648,6 +1663,12 @@
         +'<div class="vd2-caption">'+captionParts.join(" · ")+'</div>'
       +'</div>'
     +'</div>';
+    // Count-up kun ved reel stigning i samme kontekst (log) — ikke ved fane-/vagt-skift.
+    const shiftKey=!!shift;
+    if(_ringDisplayed!=null&&_ringShiftKey===shiftKey&&grandTotal>_ringDisplayed){
+      _animateRing(container.querySelector("#vd-ring-num"),container.querySelector(".vd-ring-wrap"),_ringDisplayed,grandTotal);
+    }
+    _ringDisplayed=grandTotal;_ringShiftKey=shiftKey;
   }
 
   // ── Rolig quick-stat grid: samme data som før, ingen ringe der konkurrerer om opmærksomhed ──
