@@ -25,7 +25,11 @@ with expected(migration, tbl, col) as (
     ('schema_lab_share.sql',    'lab_dishes',    'team_id'),
     ('schema_push_analytics.sql','push_subs',    null),
     ('schema_push_analytics.sql','pro_waitlist', null),
-    ('schema_push_analytics.sql','app_events',   null)
+    ('schema_push_analytics.sql','app_events',   null),
+    ('migration_wine_ratings.sql','wine_catalog', null),
+    ('migration_wine_ratings.sql','wine_catalog', 'signature'),
+    ('migration_wine_ratings.sql','wine_ratings', null),
+    ('migration_wine_ratings.sql','wine_ratings', 'score')
 )
 select
   e.migration,

@@ -29,3 +29,20 @@ create index if not exists wine_ratings_wine_idx on wine_ratings(wine_id);
 -- Kun service_role (serveren) rører tabellerne — RLS til som defense-in-depth.
 alter table wine_catalog enable row level security;
 alter table wine_ratings enable row level security;
+
+-- ── VERIFY (read-only) ─────────────────────────────────────────────
+-- Kør EFTER migrationen. Alle 4 rækker skal vise '✅ OK'.
+with expected(objekt, tbl, col) as (values
+  ('wine_catalog',            'wine_catalog', null),
+  ('wine_catalog.signature',  'wine_catalog', 'signature'),
+  ('wine_ratings',            'wine_ratings', null),
+  ('wine_ratings.score',      'wine_ratings', 'score'))
+select e.objekt,
+  case when e.col is null then
+    case when exists (select 1 from information_schema.tables
+      where table_schema='public' and table_name=e.tbl) then '✅ OK' else '❌ MANGLER' end
+  else
+    case when exists (select 1 from information_schema.columns
+      where table_schema='public' and table_name=e.tbl and column_name=e.col) then '✅ OK' else '❌ MANGLER' end
+  end as status
+from expected e order by e.objekt;
