@@ -86,7 +86,7 @@
       auth_signout:"Log ud",
       auth_splash_tag:"Track dit håndværk.\nFejr dit arbejde.\nVoks hver dag.",
       auth_get_started:"Kom i gang",auth_go_login:"Log ind",
-      auth_h1_login:"Velkommen tilbage 👋",auth_h1_signup:"Opret din konto",
+      auth_h1_login:"Velkommen tilbage",auth_h1_signup:"Opret din konto",
       auth_or:"eller",auth_google:"Fortsæt med Google",auth_apple:"Fortsæt med Apple",
       auth_oauth_err:"Kunne ikke logge ind — prøv igen",
       su_title1:"Opret din konto",su_sub1:"Lad os lære dig at kende",
@@ -235,7 +235,7 @@
       auth_signout:"Sign out",
       auth_splash_tag:"Track your craft.\nCelebrate your work.\nGrow every day.",
       auth_get_started:"Get started",auth_go_login:"Log in",
-      auth_h1_login:"Welcome back 👋",auth_h1_signup:"Create your account",
+      auth_h1_login:"Welcome back",auth_h1_signup:"Create your account",
       auth_or:"or",auth_google:"Continue with Google",auth_apple:"Continue with Apple",
       auth_oauth_err:"Could not sign in — try again",
       su_title1:"Create your account",su_sub1:"Let\u2019s get to know you",
@@ -360,7 +360,7 @@
     const winePageScanLbl=$("#winePageScanLbl");if(winePageScanLbl)winePageScanLbl.textContent=t("wine_scan");
     const addWineBtnEl=$("#addWineBtn");if(addWineBtnEl)addWineBtnEl.textContent=t("wine_add_manual");
     const waScanLbl=document.getElementById("waScanLbl");if(waScanLbl)waScanLbl.textContent=t("wine_scan");
-    const waEditBtn=document.getElementById("wAboutEditBtn");if(waEditBtn&&waEditBtn.style.display!=="none")waEditBtn.textContent=lang==="da"?"✏ Rediger":"✏ Edit";
+    const waEditBtn=document.getElementById("wAboutEditBtn");if(waEditBtn&&waEditBtn.style.display!=="none")waEditBtn.innerHTML=icon("pencil")+" "+(lang==="da"?"Rediger":"Edit");
     document.querySelectorAll(".wa-type-btn").forEach(b=>{b.textContent=t("wine_type_"+b.dataset.wtype);});
     const waName=document.getElementById("waName");if(waName)waName.placeholder=t("w_name_ph");
     const waProducer=document.getElementById("waProducer");if(waProducer)waProducer.placeholder=t("w_producer_ph");
@@ -404,7 +404,7 @@
     const pwS=$("#paywallSub");if(pwS)pwS.textContent=lang==="da"?"Få det fulde værktøj til dit håndværk.":"The full toolkit for your craft.";
     const pwC=$("#paywallCta");if(pwC)pwC.textContent=lang==="da"?"Opgrader til Pro":"Upgrade to Pro";
     const pwF=$("#paywallFine");if(pwF)pwF.textContent=lang==="da"?"Basics er altid gratis.":"Basics are always free.";
-    const pwFeats=$("#paywallFeats");if(pwFeats){const F=lang==="da"?[["🍷","Vin-styring — kælder, ratings, label-scanning"],["🍳","The Lab — opskriftsudvikling, hold-deling, kogebøger"],["✨","Smart AI-logning — skriv i naturligt sprog"],["📊","Spørg om dine stats i naturligt sprog"]]:[["🍷","Wine management — cellar, ratings, label scanning"],["🍳","The Lab — recipe development, team sharing, cookbooks"],["✨","Smart AI logging — write in natural language"],["📊","Ask about your stats in natural language"]];pwFeats.innerHTML=F.map(f=>'<li><span class="pf-ic">'+f[0]+'</span><span>'+esc(f[1])+'</span></li>').join("");}
+    const pwFeats=$("#paywallFeats");if(pwFeats){const F=lang==="da"?[[icon("wine"),"Vin-styring — kælder, ratings, label-scanning"],[icon("pan"),"The Lab — opskriftsudvikling, hold-deling, kogebøger"],[icon("sparkle"),"Smart AI-logning — skriv i naturligt sprog"],[icon("chart"),"Spørg om dine stats i naturligt sprog"]]:[[icon("wine"),"Wine management — cellar, ratings, label scanning"],[icon("pan"),"The Lab — recipe development, team sharing, cookbooks"],[icon("sparkle"),"Smart AI logging — write in natural language"],[icon("chart"),"Ask about your stats in natural language"]];pwFeats.innerHTML=F.map(f=>'<li><span class="pf-ic">'+f[0]+'</span><span>'+esc(f[1])+'</span></li>').join("");}
     const snTitle=$("#shiftNudgeTitle");if(snTitle)snTitle.textContent=lang==="da"?"Ser ud til du er i gang":"Looks like you're working";
     const snSub=$("#shiftNudgeSub");if(snSub)snSub.textContent=lang==="da"?"Ingen vagt kører — hvor længe har du arbejdet?":"No shift is running — how long have you been working?";
     const snDismiss=$("#shiftNudgeDismiss");if(snDismiss)snDismiss.textContent=lang==="da"?"Nej tak":"No thanks";
@@ -595,6 +595,34 @@
   function allCats(){
     return [...CATS,...(state.customCats||[]).map(c=>({id:c.id,da:c.name,en:c.name,icon:c.icon||DOTS_ICON,custom:true,iconPending:c.iconPending}))];
   }
+
+  // ── Custom UI-ikonbibliotek — bespoke SVG, ingen emojis. Skalerer med font-size (1em), arver farve. ──
+  function _svg(inner,vb){return '<svg class="uic" viewBox="0 0 '+(vb||24)+' '+(vb||24)+'" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>';}
+  const UI={
+    camera:_svg('<rect x="3" y="7" width="18" height="13" rx="2.6" fill="currentColor" opacity=".12" stroke="none"/><rect x="3" y="7" width="18" height="13" rx="2.6"/><path d="M8.5 7 L10 4.5 H14 L15.5 7"/><circle cx="12" cy="13.5" r="3.4"/><circle cx="12" cy="13.5" r="1.3" fill="currentColor" stroke="none"/>'),
+    calendar:_svg('<rect x="3.5" y="5" width="17" height="15.5" rx="2.6" fill="currentColor" opacity=".1" stroke="none"/><rect x="3.5" y="5" width="17" height="15.5" rx="2.6"/><path d="M3.5 9.5 H20.5"/><path d="M8 3 V6 M16 3 V6"/><circle cx="8.5" cy="14" r="1.3" fill="currentColor" stroke="none"/><circle cx="12.5" cy="14" r="1.3" fill="currentColor" stroke="none" opacity=".55"/>'),
+    wine:_svg('<path d="M8 4 H16 C16 9 13.6 11.4 12 11.4 C10.4 11.4 8 9 8 4 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M8 4 H16 C16 9 13.6 11.4 12 11.4 C10.4 11.4 8 9 8 4 Z"/><line x1="12" y1="11.4" x2="12" y2="18"/><line x1="8.5" y1="19" x2="15.5" y2="19"/>'),
+    bottle:_svg('<path d="M10 9 V5.5 H14 V9 L15.6 12 V19 A2 2 0 0 1 13.6 21 H10.4 A2 2 0 0 1 8.4 19 V12 Z" fill="currentColor" opacity=".14" stroke="none"/><path d="M10 9 V5.5 H14 V9 L15.6 12 V19 A2 2 0 0 1 13.6 21 H10.4 A2 2 0 0 1 8.4 19 V12 Z"/><line x1="8.4" y1="14.5" x2="15.6" y2="14.5" opacity=".5"/>'),
+    cheers:_svg('<path d="M6 4 L11 4 L10 10 A2 2 0 0 1 7 10 Z" fill="currentColor" opacity=".15" stroke="none"/><path d="M6 4 L11 4 L10 10 A2 2 0 0 1 7 10 Z"/><line x1="8.5" y1="11" x2="8.5" y2="19"/><path d="M13 4 L18 4 L17 10 A2 2 0 0 1 14 10 Z"/><line x1="15.5" y1="11" x2="15.5" y2="19"/><line x1="6" y1="20" x2="18" y2="20" opacity=".5"/>'),
+    lock:_svg('<rect x="4.5" y="10.5" width="15" height="10" rx="2.6" fill="currentColor" opacity=".13" stroke="none"/><rect x="4.5" y="10.5" width="15" height="10" rx="2.6"/><path d="M8 10.5 V8 A4 4 0 0 1 16 8 V10.5"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/><line x1="12" y1="15.6" x2="12" y2="17.6"/>'),
+    compass:_svg('<circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5 L12.6 12.4 L8.5 15.5 L11.4 11.6 Z" fill="currentColor" stroke="none"/>'),
+    search:_svg('<circle cx="10.5" cy="10.5" r="6.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.3" y1="15.3" x2="20" y2="20" stroke-width="2"/>'),
+    chef:_svg('<path d="M7.5 13 C5 13 4.3 9.4 7 9 C7 6.2 9.6 5 11 6.6 C12 5.1 14.6 5.6 15 7.6 C18 6.8 19.2 10.4 16.5 12 L16.5 13 Z" fill="currentColor" opacity=".14" stroke="none"/><path d="M7.5 13 C5 13 4.3 9.4 7 9 C7 6.2 9.6 5 11 6.6 C12 5.1 14.6 5.6 15 7.6 C18 6.8 19.2 10.4 16.5 12"/><path d="M7.5 13 H16.5 V16.5 A2 2 0 0 1 14.5 18.5 H9.5 A2 2 0 0 1 7.5 16.5 Z"/>'),
+    flame:_svg('<path d="M12 3 C13 7 16 8.5 16 12.5 A4 4 0 0 1 8 12.5 C8 10 9.6 9.4 10.2 7.6 C11 9.6 12.3 8.6 12.3 6.2 C12.3 5 12.1 4 12 3 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M12 3 C13 7 16 8.5 16 12.5 A4 4 0 0 1 8 12.5 C8 10 9.6 9.4 10.2 7.6 C11 9.6 12.3 8.6 12.3 6.2 C12.3 5 12.1 4 12 3 Z"/>'),
+    pencil:_svg('<path d="M4 20 L4.5 16 L15 5.5 L18.5 9 L8 19.5 Z" fill="currentColor" opacity=".13" stroke="none"/><path d="M4 20 L4.5 16 L15 5.5 L18.5 9 L8 19.5 Z"/><line x1="13" y1="7.5" x2="16.5" y2="11"/>'),
+    chart:_svg('<path d="M4 20 H20" opacity=".5"/><rect x="5.5" y="12" width="3.4" height="6.5" rx="1" fill="currentColor" opacity=".16" stroke="none"/><rect x="5.5" y="12" width="3.4" height="6.5" rx="1"/><rect x="10.3" y="7" width="3.4" height="11.5" rx="1" fill="currentColor" opacity=".16" stroke="none"/><rect x="10.3" y="7" width="3.4" height="11.5" rx="1"/><rect x="15.1" y="14.5" width="3.4" height="4" rx="1" fill="currentColor" opacity=".16" stroke="none"/><rect x="15.1" y="14.5" width="3.4" height="4" rx="1"/>'),
+    pan:_svg('<path d="M3 10 H14 V12 A5 5 0 0 1 9 17 H8 A5 5 0 0 1 3 12 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M3 10 H14 V12 A5 5 0 0 1 9 17 H8 A5 5 0 0 1 3 12 Z"/><line x1="14" y1="11" x2="21" y2="9.5" stroke-width="2.2"/><path d="M6 7 C6 5.5 7.5 5.5 7.5 4 M9.5 7 C9.5 5.5 11 5.5 11 4" opacity=".55"/>'),
+    book:_svg('<path d="M12 6.5 C10 5 6.5 5 4.5 6 V18.5 C6.5 17.5 10 17.5 12 19 C14 17.5 17.5 17.5 19.5 18.5 V6 C17.5 5 14 5 12 6.5 Z" fill="currentColor" opacity=".12" stroke="none"/><path d="M12 6.5 C10 5 6.5 5 4.5 6 V18.5 C6.5 17.5 10 17.5 12 19 C14 17.5 17.5 17.5 19.5 18.5 V6 C17.5 5 14 5 12 6.5 Z"/><line x1="12" y1="6.5" x2="12" y2="19"/>'),
+    people:_svg('<circle cx="9" cy="8.5" r="3.2" fill="currentColor" opacity=".14" stroke="none"/><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19 C3.5 15.4 5.8 13.5 9 13.5 C12.2 13.5 14.5 15.4 14.5 19"/><path d="M15.5 6 A3.2 3.2 0 0 1 15.5 12"/><path d="M15.8 13.6 C18.6 13.9 20.5 15.7 20.5 19"/>'),
+    clipboard:_svg('<rect x="5" y="4.5" width="14" height="16" rx="2.4" fill="currentColor" opacity=".1" stroke="none"/><rect x="5" y="4.5" width="14" height="16" rx="2.4"/><rect x="9" y="3" width="6" height="3.6" rx="1.4" fill="currentColor" opacity=".2" stroke="none"/><rect x="9" y="3" width="6" height="3.6" rx="1.4"/><line x1="8.5" y1="11" x2="15.5" y2="11" opacity=".6"/><line x1="8.5" y1="14.5" x2="13.5" y2="14.5" opacity=".6"/>'),
+    trophy:_svg('<path d="M8 4.5 H16 V9 A4 4 0 0 1 8 9 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M8 4.5 H16 V9 A4 4 0 0 1 8 9 Z"/><path d="M8 5.5 H5 V7 A3 3 0 0 0 8 10 M16 5.5 H19 V7 A3 3 0 0 1 16 10"/><line x1="12" y1="13" x2="12" y2="16.5"/><line x1="8.5" y1="20" x2="15.5" y2="20"/><line x1="9.5" y1="20" x2="14.5" y2="16.8"/>'),
+    sparkle:_svg('<path d="M12 3 C13 8 15 10 20 11 C15 12 13 14 12 19 C11 14 9 12 4 11 C9 10 11 8 12 3 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M12 3 C13 8 15 10 20 11 C15 12 13 14 12 19 C11 14 9 12 4 11 C9 10 11 8 12 3 Z"/>'),
+    hand:_svg('<path d="M8 11 V5.5 A1.4 1.4 0 0 1 10.8 5.5 V10 M10.8 10 V4.4 A1.4 1.4 0 0 1 13.6 4.4 V10 M13.6 10 V5.4 A1.4 1.4 0 0 1 16.4 5.4 V13 C16.4 17 14 19.5 10.8 19.5 C8.6 19.5 7.4 18.6 6 16 L4.6 13.4 A1.4 1.4 0 0 1 7 12 L8 13.6 Z" fill="currentColor" opacity=".13" stroke="none"/><path d="M8 11 V5.5 A1.4 1.4 0 0 1 10.8 5.5 V10 M10.8 10 V4.4 A1.4 1.4 0 0 1 13.6 4.4 V10 M13.6 10 V5.4 A1.4 1.4 0 0 1 16.4 5.4 V13 C16.4 17 14 19.5 10.8 19.5 C8.6 19.5 7.4 18.6 6 16 L4.6 13.4 A1.4 1.4 0 0 1 7 12 L8 13.6"/>'),
+    pin:_svg('<path d="M12 21 C12 21 5.5 14.5 5.5 10 A6.5 6.5 0 0 1 18.5 10 C18.5 14.5 12 21 12 21 Z" fill="currentColor" opacity=".14" stroke="none"/><path d="M12 21 C12 21 5.5 14.5 5.5 10 A6.5 6.5 0 0 1 18.5 10 C18.5 14.5 12 21 12 21 Z"/><circle cx="12" cy="10" r="2.4" fill="currentColor" stroke="none"/>'),
+    warn:_svg('<path d="M12 3.5 L21 19 H3 Z" fill="currentColor" opacity=".13" stroke="none"/><path d="M12 3.5 L21 19 H3 Z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="16.6" r="1.1" fill="currentColor" stroke="none"/>'),
+    signal:_svg('<path d="M5 12 A9 9 0 0 1 19 12" opacity=".5"/><path d="M8 13.5 A5.5 5.5 0 0 1 16 13.5"/><circle cx="12" cy="17" r="1.8" fill="currentColor" stroke="none"/>'),
+  };
+  function icon(name){return UI[name]||UI.sparkle;}
 
   const CATALOG=[
     {id:"preset_oyster",da:"Østers åbnet",en:"Oysters opened",cat:"aabnet-mad",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 38c0-14 9-22 22-22s22 8 22 22"/><path d="M10 38c4 7 12 12 22 12s18-5 22-12"/><ellipse cx="32" cy="40" rx="10" ry="6" fill="currentColor" opacity=".18"/><path d="M32 20c-2 4-3 10-3 18"/></svg>'},
@@ -1645,10 +1673,10 @@
     const streak=calcStreak();
     let captionParts;
     if(!shift&&_isNewUser()){
-      captionParts=[lang==="da"?"Din første tælling venter ✨":"Your first count awaits ✨"];
+      captionParts=[(lang==="da"?"Din første tælling venter ":"Your first count awaits ")+icon("sparkle")];
     }else{
       captionParts=[fmtWorkTime(totalWorkMs())+" "+(lang==="da"?"i alt":"total")];
-      if(streak>=2)captionParts.push("🔥 "+(lang==="da"?streak+" dage i træk":streak+" day streak"));
+      if(streak>=2)captionParts.push(icon("flame")+" "+(lang==="da"?streak+" dage i træk":streak+" day streak"));
     }
     container.innerHTML='<div class="vd2-hero">'
       +'<div class="vd2-hero-solo">'
@@ -1804,7 +1832,7 @@
       const itemsHtml=shiftEntries.length
         ?shiftEntries.map(e=>_logItemHtml(e,new Date(e.ts).toLocaleTimeString(loc,{hour:"2-digit",minute:"2-digit"}))).join("")
         :'<p class="muted" style="padding:2px 2px 8px">'+(lang==="da"?"Ingen logs i denne vagt":"No logs in this shift")+'</p>';
-      body.innerHTML=itemsHtml+'<button class="vd2-shift-editbtn" data-idx="'+i+'">'+(lang==="da"?"✏ Rediger vagt":"✏ Edit shift")+'</button>';
+      body.innerHTML=itemsHtml+'<button class="vd2-shift-editbtn" data-idx="'+i+'">'+(lang==="da"?icon("pencil")+" Rediger vagt":icon("pencil")+" Edit shift")+'</button>';
       card.appendChild(head);card.appendChild(body);
       container.appendChild(card);
     });
@@ -1826,7 +1854,7 @@
     const pct=hrs>0?(within===0?1:within/lap):0;
     const arcLen=+(circ*pct).toFixed(2);
     const captionParts=[shifts+" "+(lang==="da"?(shifts===1?"vagt":"vagter"):(shifts===1?"shift":"shifts"))];
-    if(streak>=2)captionParts.push("🔥 "+(lang==="da"?streak+" dage i træk":streak+" day streak"));
+    if(streak>=2)captionParts.push(icon("flame")+" "+(lang==="da"?streak+" dage i træk":streak+" day streak"));
     container.innerHTML='<div class="vd2-hero">'
       +'<div class="vd2-hero-solo">'
         +'<div class="vd-ring-wrap" role="img" aria-label="'+Math.floor(hrs)+' '+(lang==="da"?"timer i alt":"hours total")+'">'
@@ -1975,7 +2003,7 @@
       ["Watch your craft grow","The ring, stats and achievements fill up"],
     ];
     return '<div class="vd-guide">'
-      +'<div class="vd-guide-h">'+(da?"Velkommen 👋":"Welcome 👋")+'</div>'
+      +'<div class="vd-guide-h">'+(da?"Velkommen ":"Welcome ")+icon("hand")+'</div>'
       +'<div class="vd-guide-lead">'+(da?"Craft Tracker tæller dit håndværk gennem vagten. Sådan kommer du i gang:":"Craft Tracker counts your craft through the shift. Here's how to start:")+'</div>'
       +steps.map((s,i)=>'<div class="vd-guide-step"><span class="vd-guide-num">'+(i+1)+'</span><div class="vd-guide-tx"><b>'+esc(s[0])+'</b><span>'+esc(s[1])+'</span></div></div>').join("")
       +'</div>';
@@ -2381,9 +2409,9 @@
 
     if(!shown.length){
       if(!state.wines.length){
-        list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🍷</div><div class="empty-state-title">'+(lang==="da"?"Kælderen er tom":"The cellar is empty")+'</div><div class="empty-state-sub">'+(lang==="da"?"Søg efter en vin foroven, eller tilføj manuelt":"Search for a wine above, or add one manually")+'</div><button class="btn primary" style="margin-top:16px" data-act="add-wine">'+(lang==="da"?"+ Tilføj din første vin":"+ Add your first wine")+'</button></div>';
+        list.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+icon("wine")+'</div><div class="empty-state-title">'+(lang==="da"?"Kælderen er tom":"The cellar is empty")+'</div><div class="empty-state-sub">'+(lang==="da"?"Søg efter en vin foroven, eller tilføj manuelt":"Search for a wine above, or add one manually")+'</div><button class="btn primary" style="margin-top:16px" data-act="add-wine">'+(lang==="da"?"+ Tilføj din første vin":"+ Add your first wine")+'</button></div>';
       } else {
-        list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">'+(lang==="da"?"Ingen vine matcher":"No wines match")+'</div><div class="empty-state-sub">'+esc(t("wine_no_q"))+'</div></div>';
+        list.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+icon("search")+'</div><div class="empty-state-title">'+(lang==="da"?"Ingen vine matcher":"No wines match")+'</div><div class="empty-state-sub">'+esc(t("wine_no_q"))+'</div></div>';
       }
       return;
     }
@@ -2481,7 +2509,7 @@
       const wineName=w.name||w.producer||(lang==="da"?"Vin":"Wine");
       const r=await fetch(base+"/api/log-entry",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({categoryLabel:wineName,delta:1,imageUrl,summary})});
       if(!r.ok){showToast(lang==="da"?"Kunne ikke dele — prøv igen":"Couldn't share — try again");btn.disabled=false;return;}
-      haptic(40);showToast(lang==="da"?"Delt til dit feed 🍷":"Shared to your feed 🍷");
+      haptic(40);showToast(lang==="da"?"Delt til dit feed":"Shared to your feed");
       closeWineShareSheet();
       {const fv=document.getElementById("view-feed");if(fv&&fv.classList.contains("active"))loadFeed(false);}
     }catch(e){
@@ -2537,7 +2565,7 @@
     const backBtn=document.getElementById("wAboutBackBtn");
     if(backBtn)backBtn.style.display="none";
     if(viewEl)viewEl.style.display="";if(editEl)editEl.style.display="none";
-    if(editBtn){editBtn.style.display="";editBtn.textContent=lang==="da"?"✏ Rediger":"✏ Edit";}
+    if(editBtn){editBtn.style.display="";editBtn.innerHTML=icon("pencil")+" "+(lang==="da"?"Rediger":"Edit");}
     if(!w){if(hTitle)hTitle.textContent="";if(shareBtn)shareBtn.style.display="none";return;}
     if(shareBtn)shareBtn.style.display="";
     const dispName=w.name+(w.vint?" "+w.vint:"");
@@ -4570,7 +4598,7 @@
     });
     const feedPostBtn=$("#shiftFeedPost");if(feedPostBtn)feedPostBtn.addEventListener("click",postShift);
     const shareImgBtn=$("#shiftShareImg");
-    if(shareImgBtn){shareImgBtn.textContent="📸 "+(lang==="da"?"Del som billede":"Share as image");shareImgBtn.addEventListener("click",shareShiftCard);}
+    if(shareImgBtn){shareImgBtn.innerHTML=icon("camera")+" "+(lang==="da"?"Del som billede":"Share as image");shareImgBtn.addEventListener("click",shareShiftCard);}
     const slAdd=$("#shiftLogAdd"),slIn=$("#shiftLogIn");
     if(slAdd&&slIn)slAdd.addEventListener("click",()=>runShiftLogAdd(slIn.value));
     if(slIn)slIn.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runShiftLogAdd(slIn.value);}});
@@ -4704,7 +4732,7 @@
     feedLoading=true;
     const el=$("#feedContent");if(!el)return;
     if(!append){feedCursor=null;el.innerHTML=skeletonRows(4);}
-    const base=apiBase();if(!base){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">🧭</div><div class="empty-state-title">'+esc(t("feed_empty"))+'</div></div>';feedLoading=false;return;}
+    const base=apiBase();if(!base){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+icon("compass")+'</div><div class="empty-state-title">'+esc(t("feed_empty"))+'</div></div>';feedLoading=false;return;}
     const token=await getToken();if(!token){feedLoading=false;return;}
     try{
       let url=base+"/api/feed";if(feedCursor)url+="?before="+encodeURIComponent(feedCursor);
@@ -4718,7 +4746,7 @@
 
       if(!entries.length&&!append){
         const emptySub=lang==="da"?"Følg kolleger eller afslut en vagt — så fyldes dit feed":"Follow colleagues or end a shift — your feed will fill up";
-        el.innerHTML='<div class="empty-state"><div class="empty-state-icon">🧭</div><div class="empty-state-title">'+esc(t("feed_empty"))+'</div><div class="empty-state-sub">'+esc(emptySub)+'</div></div>';
+        el.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+icon("compass")+'</div><div class="empty-state-title">'+esc(t("feed_empty"))+'</div><div class="empty-state-sub">'+esc(emptySub)+'</div></div>';
         feedLoading=false;return;
       }
       const html=entries.map(feedEntryHtml).join("");
@@ -5125,7 +5153,7 @@
         const nm=esc(wn.name||(da?"Vin":"Wine"))+(wn.vint?' <span class="pf-wr-vint">'+esc(wn.vint)+'</span>':'');
         const meta=[wn.producer,wn.region||wn.land].filter(Boolean).join(" · ");
         const cnt=[];if(wn.glasses)cnt.push(wn.glasses+" "+(da?"glas":"gl."));if(wn.bottles)cnt.push(wn.bottles+" "+(da?"fl.":"btl"));
-        const thumb=wn.imageUrl?'<img class="pf-wr-img" src="'+esc(wn.imageUrl)+'" loading="lazy" alt="">':'<div class="pf-wr-ph">🍷</div>';
+        const thumb=wn.imageUrl?'<img class="pf-wr-img" src="'+esc(wn.imageUrl)+'" loading="lazy" alt="">':'<div class="pf-wr-ph">'+icon("wine")+'</div>';
         return '<div class="pf-wr">'+thumb+'<div class="pf-wr-body"><div class="pf-wr-name">'+nm+'</div>'
           +(meta?'<div class="pf-wr-meta">'+esc(meta)+'</div>':'')+'</div>'
           +(cnt.length?'<div class="pf-wr-cnt">'+esc(cnt.join(" · "))+'</div>':'')+'</div>';
@@ -5153,7 +5181,7 @@
       +'<div class="pf-name">'+esc(name)+'</div>'
       +(userLine?'<div class="pf-user">'+esc(userLine)+'</div>':'')
       +(role?'<div class="pf-role">'+esc(role)+'</div>':'')
-      +((p.sharesTeam&&!p.isSelf)?'<div class="pf-team-badge">🧑‍🍳 '+esc(lang==="da"?"Holdkammerat":"Teammate")+'</div>':'');
+      +((p.sharesTeam&&!p.isSelf)?'<div class="pf-team-badge">'+icon("chef")+' '+esc(lang==="da"?"Holdkammerat":"Teammate")+'</div>':'');
     if(!p.isSelf){
       const fs=p.followStatus||"none";
       const lbl=(p.locked&&fs==="none")?(lang==="da"?"Anmod om at følge":"Request to follow"):followBtnLabel(fs);
@@ -5161,13 +5189,13 @@
     }
     head+='</div>';
     if(p.locked){
-      body.innerHTML=head+'<div class="pf-locked"><div class="pf-lock-ic">🔒</div><div>'+esc(lang==="da"?"Privat profil — følg for at se billeder og stats":"Private profile — follow to see photos and stats")+'</div></div>';
+      body.innerHTML=head+'<div class="pf-locked"><div class="pf-lock-ic">'+icon("lock")+'</div><div>'+esc(lang==="da"?"Privat profil — følg for at se billeder og stats":"Private profile — follow to see photos and stats")+'</div></div>';
       return;
     }
     const tabs='<div class="pf-tabs">'
-      +'<button class="pf-tab'+(_profileTab==="photos"?" active":"")+'" data-pftab="photos">📸 '+esc(lang==="da"?"Billeder":"Photos")+'</button>'
-      +'<button class="pf-tab'+(_profileTab==="shifts"?" active":"")+'" data-pftab="shifts">🗓 '+esc(lang==="da"?"Vagter":"Shifts")+'</button>'
-      +'<button class="pf-tab'+(_profileTab==="wine"?" active":"")+'" data-pftab="wine">🍷 '+esc(lang==="da"?"Vin":"Wine")+'</button>'
+      +'<button class="pf-tab'+(_profileTab==="photos"?" active":"")+'" data-pftab="photos">'+icon("camera")+' '+esc(lang==="da"?"Billeder":"Photos")+'</button>'
+      +'<button class="pf-tab'+(_profileTab==="shifts"?" active":"")+'" data-pftab="shifts">'+icon("calendar")+' '+esc(lang==="da"?"Vagter":"Shifts")+'</button>'
+      +'<button class="pf-tab'+(_profileTab==="wine"?" active":"")+'" data-pftab="wine">'+icon("wine")+' '+esc(lang==="da"?"Vin":"Wine")+'</button>'
       +'</div>';
     body.innerHTML=head+_pfAchHtml()+tabs+'<div class="pf-tabbody" id="pfTabBody">'+_pfTabBody()+'</div>';
   }
@@ -5318,7 +5346,7 @@
         const r=await fetch(base+"/api/feed-post",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({imageUrl,caption})});
         if(!r.ok)throw new Error("post");
         track("feed_post");haptic(40);closeFeedPost();
-        showToast(lang==="da"?"Delt til feed 📷":"Shared to feed 📷");
+        showToast(lang==="da"?"Delt til feed":"Shared to feed");
         feedCursor=null;loadFeed(false);
       }catch(e){showToast(lang==="da"?"Noget gik galt — prøv igen":"Something went wrong, try again");}
       fpDo.disabled=false;fpDo.textContent=lang==="da"?"Del":"Share";
@@ -5481,7 +5509,7 @@
     // Export as recipe card
     var deExportBtn=$("#deExportBtn");
     if(deExportBtn){
-      deExportBtn.textContent="📸 "+t("lab_export_card");
+      deExportBtn.innerHTML=icon("camera")+" "+t("lab_export_card");
       deExportBtn.addEventListener("click",shareDishCard);
     }
     // Hero photo
@@ -6228,7 +6256,7 @@
       showToast(lang==="da"?"Publiceret i din kogebog 🌍":"Published to your cookbook 🌍");
       syncLogEntry(lang==="da"?"Ret publiceret":"Dish published",1,_currentDish.heroUrl||null,false,(lang==="da"?"📖 Publicerede \"":"📖 Published \"")+(_currentDish.name||"")+(lang==="da"?"\" i kogebogen":"\" to the cookbook"));
     }
-    if(vis==="private")showToast(lang==="da"?"Retten er privat igen 🔒":"Dish is private again 🔒");
+    if(vis==="private")showToast(lang==="da"?"Retten er privat igen":"Dish is private again");
   }
   function pickTeam(teams){
     return new Promise(function(resolve){
