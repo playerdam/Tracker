@@ -113,11 +113,11 @@
 
     <div class="vd2-sec" style="margin-top:22px"><span class="vd2-sec-title" id="profilePrefsTitle">Indstillinger</span></div>
     <button class="va-drawer-link" id="langDrawerLink">
-      <span class="va-drawer-link-icon">🌐</span>
+      <span class="va-drawer-link-icon"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12 H20.5" opacity=".7"/><path d="M12 3.5 C15 6 15 18 12 20.5 C9 18 9 6 12 3.5 Z"/></svg></span>
       <span class="va-drawer-link-label" id="langDrawerLbl">English</span>
     </button>
     <button class="va-drawer-link" id="themeDrawerLink">
-      <span class="va-drawer-link-icon" id="themeDrawerIcon">🌙</span>
+      <span class="va-drawer-link-icon" id="themeDrawerIcon"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13.5 A8 8 0 1 1 10.5 4 A6.3 6.3 0 0 0 20 13.5 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M20 13.5 A8 8 0 1 1 10.5 4 A6.3 6.3 0 0 0 20 13.5 Z"/></svg></span>
       <span class="va-drawer-link-label" id="themeDrawerLbl">Mørkt tema</span>
     </button>
 
@@ -140,8 +140,8 @@
 
   <section class="view" id="view-social">
     <div class="social-tabs">
-      <button class="social-tab active" data-stab="global" id="stab-global">🌍 Global</button>
-      <button class="social-tab" data-stab="challenge" id="stab-challenge">🏆 Ugens</button>
+      <button class="social-tab active" data-stab="global" id="stab-global"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12 H20.5" opacity=".7"/><path d="M12 3.5 C15 6 15 18 12 20.5 C9 18 9 6 12 3.5 Z"/></svg> Global</button>
+      <button class="social-tab" data-stab="challenge" id="stab-challenge"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4.5 H16 V9 A4 4 0 0 1 8 9 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M8 4.5 H16 V9 A4 4 0 0 1 8 9 Z"/><path d="M8 5.5 H5 V7 A3 3 0 0 0 8 10 M16 5.5 H19 V7 A3 3 0 0 1 16 10"/><line x1="12" y1="13" x2="12" y2="16.5"/><line x1="8.5" y1="20" x2="15.5" y2="20"/><line x1="9.5" y1="20" x2="14.5" y2="16.8"/></svg> Ugens</button>
     </div>
     <div id="social-global">
       <div class="lb-period-row">
@@ -157,11 +157,11 @@
   </section>
 
   <section class="view" id="view-feed">
-    <button class="feed-compose" id="feedComposeBtn"><span class="feed-compose-ic">📷</span><span id="feedComposeLbl">Del et foto…</span></button>
+    <button class="feed-compose" id="feedComposeBtn"><span class="feed-compose-ic"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.6" fill="currentColor" opacity=".12" stroke="none"/><rect x="3" y="7" width="18" height="13" rx="2.6"/><path d="M8.5 7 L10 4.5 H14 L15.5 7"/><circle cx="12" cy="13.5" r="3.4"/><circle cx="12" cy="13.5" r="1.3" fill="currentColor" stroke="none"/></svg></span><span id="feedComposeLbl">Del et foto…</span></button>
     <div id="feedDiscoverSearch">
       <div class="feed-search">
         <input id="feedSearch" class="input" autocomplete="off">
-        <button class="btn ghost btn-sm" id="feedSearchBtn">🔍</button>
+        <button class="btn ghost btn-sm" id="feedSearchBtn"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.3" y1="15.3" x2="20" y2="20" stroke-width="2"/></svg></button>
       </div>
       <div id="feedSearchResults" style="display:none"></div>
     </div>
@@ -278,9 +278,9 @@
   </div>
   <div class="de-vis-bar" id="deVisBar">
     <span class="de-vis-lbl" id="deVisLbl">Deling</span>
-    <button class="de-vis-chip active" data-vis="private" id="dvChipPrivate">🔒 <span>Privat</span></button>
-    <button class="de-vis-chip" data-vis="team" id="dvChipTeam">👥 <span>Holdet</span></button>
-    <button class="de-vis-chip" data-vis="public" id="dvChipPublic">🌍 <span>Offentlig</span></button>
+    <button class="de-vis-chip active" data-vis="private" id="dvChipPrivate"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.6" fill="currentColor" opacity=".13" stroke="none"/><rect x="4.5" y="10.5" width="15" height="10" rx="2.6"/><path d="M8 10.5 V8 A4 4 0 0 1 16 8 V10.5"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/><line x1="12" y1="15.6" x2="12" y2="17.6"/></svg> <span>Privat</span></button>
+    <button class="de-vis-chip" data-vis="team" id="dvChipTeam"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3.2" fill="currentColor" opacity=".14" stroke="none"/><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19 C3.5 15.4 5.8 13.5 9 13.5 C12.2 13.5 14.5 15.4 14.5 19"/><path d="M15.5 6 A3.2 3.2 0 0 1 15.5 12"/><path d="M15.8 13.6 C18.6 13.9 20.5 15.7 20.5 19"/></svg> <span>Holdet</span></button>
+    <button class="de-vis-chip" data-vis="public" id="dvChipPublic"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12 H20.5" opacity=".7"/><path d="M12 3.5 C15 6 15 18 12 20.5 C9 18 9 6 12 3.5 Z"/></svg> <span>Offentlig</span></button>
   </div>
   <!-- Hero photo -->
   <div id="deHeroWrap" style="position:relative;background:var(--bg);border-bottom:1px solid var(--border)">
@@ -431,7 +431,7 @@
   </div>
   <!-- Eksportér + slet -->
   <div style="padding:16px;margin-bottom:100px">
-    <button class="btn primary" id="deExportBtn" style="width:100%;margin-bottom:12px">📸 Eksportér som kort</button>
+    <button class="btn primary" id="deExportBtn" style="width:100%;margin-bottom:12px"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.6" fill="currentColor" opacity=".12" stroke="none"/><rect x="3" y="7" width="18" height="13" rx="2.6"/><path d="M8.5 7 L10 4.5 H14 L15.5 7"/><circle cx="12" cy="13.5" r="3.4"/><circle cx="12" cy="13.5" r="1.3" fill="currentColor" stroke="none"/></svg> Eksportér som kort</button>
     <button class="btn ghost btn-sm" id="deDeleteBtn" style="width:100%;color:var(--faint)"></button>
   </div>
 </div>
@@ -489,7 +489,7 @@
       <div class="mactions">
         <button class="btn primary btn-sm" id="shiftPost"></button>
         <button class="btn ghost btn-sm" id="shiftFeedPost" style="border-color:var(--accent);color:var(--accent)"></button>
-        <button class="btn ghost btn-sm" id="shiftShareImg">📸</button>
+        <button class="btn ghost btn-sm" id="shiftShareImg"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.6" fill="currentColor" opacity=".12" stroke="none"/><rect x="3" y="7" width="18" height="13" rx="2.6"/><path d="M8.5 7 L10 4.5 H14 L15.5 7"/><circle cx="12" cy="13.5" r="3.4"/><circle cx="12" cy="13.5" r="1.3" fill="currentColor" stroke="none"/></svg></button>
         <button class="btn ghost btn-sm" id="shiftDiscard" style="color:var(--faint)"></button>
       </div>
     </div>
@@ -559,7 +559,7 @@
 
 
 <div class="scrim" id="shiftNudgeScrim"><div class="modal">
-  <div class="shift-nudge-icon">⏱️</div>
+  <div class="shift-nudge-icon"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5 V13.5 L14.5 15"/><line x1="10" y1="3" x2="14" y2="3"/><line x1="12" y1="3.2" x2="12" y2="6"/></svg></div>
   <div class="shift-nudge-title" id="shiftNudgeTitle">Ser ud til du er i gang</div>
   <div class="shift-nudge-sub" id="shiftNudgeSub">Ingen vagt kører — hvor længe har du arbejdet?</div>
   <div class="shift-nudge-chips">
@@ -656,7 +656,7 @@
 <div class="scrim" id="shiftEditScrim"><div class="modal" style="max-height:80vh;overflow-y:auto">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
     <h2 id="shiftEditTitle" style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin:0"></h2>
-    <button id="shiftEditDelete" style="appearance:none;background:none;border:none;color:var(--faint);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1">🗑</button>
+    <button id="shiftEditDelete" style="appearance:none;background:none;border:none;color:var(--faint);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7 H19" /><path d="M7 7 L8 19.5 A1.6 1.6 0 0 0 9.6 21 H14.4 A1.6 1.6 0 0 0 16 19.5 L17 7 Z" fill="currentColor" opacity=".12" stroke="none"/><path d="M7 7 L8 19.5 A1.6 1.6 0 0 0 9.6 21 H14.4 A1.6 1.6 0 0 0 16 19.5 L17 7"/><path d="M9.5 7 V5.2 A1.4 1.4 0 0 1 10.9 3.8 H13.1 A1.4 1.4 0 0 1 14.5 5.2 V7"/><line x1="10" y1="10.5" x2="10.3" y2="17.5" opacity=".55"/><line x1="14" y1="10.5" x2="13.7" y2="17.5" opacity=".55"/></svg></button>
   </div>
   <p id="shiftEditMeta" style="font-size:12px;color:var(--faint);margin:0 0 16px"></p>
   <div id="shiftEditEntries"></div>
@@ -774,28 +774,28 @@
   </div>
   <div class="log-drawer-body">
     <button class="va-drawer-link" id="menuDrawerProfile">
-      <span class="bnav-icon-wrap"><span class="va-drawer-link-icon">👤</span><span class="bnav-badge" id="profileBadge"></span></span>
+      <span class="bnav-icon-wrap"><span class="va-drawer-link-icon"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6" fill="currentColor" opacity=".14" stroke="none"/><circle cx="12" cy="8" r="3.6"/><path d="M5 20 C5 15.6 8 13.5 12 13.5 C16 13.5 19 15.6 19 20"/></svg></span><span class="bnav-badge" id="profileBadge"></span></span>
       <span class="va-drawer-link-label" id="menuDrawerProfileLbl">Profil</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="va-drawer-link" id="menuDrawerHistory">
-      <span class="va-drawer-link-icon">🕘</span>
+      <span class="va-drawer-link-icon"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5 V12 L15 13.8"/></svg></span>
       <span class="va-drawer-link-label" id="menuDrawerHistoryLbl">Historik</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="va-drawer-link" id="menuDrawerSocial">
-      <span class="va-drawer-link-icon">🏆</span>
+      <span class="va-drawer-link-icon"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4.5 H16 V9 A4 4 0 0 1 8 9 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M8 4.5 H16 V9 A4 4 0 0 1 8 9 Z"/><path d="M8 5.5 H5 V7 A3 3 0 0 0 8 10 M16 5.5 H19 V7 A3 3 0 0 1 16 10"/><line x1="12" y1="13" x2="12" y2="16.5"/><line x1="8.5" y1="20" x2="15.5" y2="20"/><line x1="9.5" y1="20" x2="14.5" y2="16.8"/></svg></span>
       <span class="va-drawer-link-label" id="menuDrawerSocialLbl">Rangliste</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="va-drawer-link" id="menuDrawerLab">
-      <span class="va-drawer-link-icon">🍳</span>
+      <span class="va-drawer-link-icon"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 H14 V12 A5 5 0 0 1 9 17 H8 A5 5 0 0 1 3 12 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M3 10 H14 V12 A5 5 0 0 1 9 17 H8 A5 5 0 0 1 3 12 Z"/><line x1="14" y1="11" x2="21" y2="9.5" stroke-width="2.2"/><path d="M6 7 C6 5.5 7.5 5.5 7.5 4 M9.5 7 C9.5 5.5 11 5.5 11 4" opacity=".55"/></svg></span>
       <span class="va-drawer-link-label" id="menuDrawerLabLbl">The Lab</span>
       <span class="pro-pill">PRO</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="va-drawer-link" id="menuDrawerResume">
-      <span class="va-drawer-link-icon">📄</span>
+      <span class="va-drawer-link-icon"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3 H14 L18 7 V21 H6 Z" fill="currentColor" opacity=".1" stroke="none"/><path d="M6 3 H14 L18 7 V21 H6 Z"/><path d="M14 3 V7 H18"/><line x1="9" y1="12.5" x2="15" y2="12.5" opacity=".6"/><line x1="9" y1="16" x2="14" y2="16" opacity=".6"/></svg></span>
       <span class="va-drawer-link-label" id="menuDrawerResumeLbl">Lav dit CV</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
@@ -819,7 +819,7 @@
   <h2 class="feed-post-title" id="feedPostTitle">Del et foto</h2>
   <button type="button" class="feed-post-photo" id="feedPostPhotoWrap">
     <img id="feedPostThumb" alt="">
-    <span class="feed-post-pick" id="feedPostPickHint"><span style="font-size:26px">📷</span><span id="feedPostPickLbl">Vælg et foto</span></span>
+    <span class="feed-post-pick" id="feedPostPickHint"><span style="font-size:26px"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.6" fill="currentColor" opacity=".12" stroke="none"/><rect x="3" y="7" width="18" height="13" rx="2.6"/><path d="M8.5 7 L10 4.5 H14 L15.5 7"/><circle cx="12" cy="13.5" r="3.4"/><circle cx="12" cy="13.5" r="1.3" fill="currentColor" stroke="none"/></svg></span><span id="feedPostPickLbl">Vælg et foto</span></span>
   </button>
   <textarea id="feedPostCaption" class="input" rows="2" maxlength="200" placeholder="Skriv en note (valgfrit)…" style="margin-top:12px;resize:vertical"></textarea>
   <input id="feedPostPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="display:none">
@@ -838,10 +838,10 @@
   <h2 class="paywall-title" id="paywallTitle">Lås alt op med Pro</h2>
   <p class="paywall-sub" id="paywallSub">Få det fulde værktøj til dit håndværk.</p>
   <ul class="paywall-feats" id="paywallFeats">
-    <li><span class="pf-ic">🍷</span><span>Vin-styring — kælder, ratings, label-scanning</span></li>
-    <li><span class="pf-ic">🍳</span><span>The Lab — opskriftsudvikling, hold-deling, kogebøger</span></li>
-    <li><span class="pf-ic">✨</span><span>Smart AI-logning — skriv i naturligt sprog</span></li>
-    <li><span class="pf-ic">📊</span><span>Spørg om dine stats i naturligt sprog</span></li>
+    <li><span class="pf-ic"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 H16 C16 9 13.6 11.4 12 11.4 C10.4 11.4 8 9 8 4 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M8 4 H16 C16 9 13.6 11.4 12 11.4 C10.4 11.4 8 9 8 4 Z"/><line x1="12" y1="11.4" x2="12" y2="18"/><line x1="8.5" y1="19" x2="15.5" y2="19"/></svg></span><span>Vin-styring — kælder, ratings, label-scanning</span></li>
+    <li><span class="pf-ic"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 H14 V12 A5 5 0 0 1 9 17 H8 A5 5 0 0 1 3 12 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M3 10 H14 V12 A5 5 0 0 1 9 17 H8 A5 5 0 0 1 3 12 Z"/><line x1="14" y1="11" x2="21" y2="9.5" stroke-width="2.2"/><path d="M6 7 C6 5.5 7.5 5.5 7.5 4 M9.5 7 C9.5 5.5 11 5.5 11 4" opacity=".55"/></svg></span><span>The Lab — opskriftsudvikling, hold-deling, kogebøger</span></li>
+    <li><span class="pf-ic"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 C13 8 15 10 20 11 C15 12 13 14 12 19 C11 14 9 12 4 11 C9 10 11 8 12 3 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M12 3 C13 8 15 10 20 11 C15 12 13 14 12 19 C11 14 9 12 4 11 C9 10 11 8 12 3 Z"/></svg></span><span>Smart AI-logning — skriv i naturligt sprog</span></li>
+    <li><span class="pf-ic"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 H20" opacity=".5"/><rect x="5.5" y="12" width="3.4" height="6.5" rx="1" fill="currentColor" opacity=".16" stroke="none"/><rect x="5.5" y="12" width="3.4" height="6.5" rx="1"/><rect x="10.3" y="7" width="3.4" height="11.5" rx="1" fill="currentColor" opacity=".16" stroke="none"/><rect x="10.3" y="7" width="3.4" height="11.5" rx="1"/><rect x="15.1" y="14.5" width="3.4" height="4" rx="1" fill="currentColor" opacity=".16" stroke="none"/><rect x="15.1" y="14.5" width="3.4" height="4" rx="1"/></svg></span><span>Spørg om dine stats i naturligt sprog</span></li>
   </ul>
   <button class="btn primary paywall-cta" id="paywallCta">Opgrader til Pro</button>
   <p class="paywall-fine" id="paywallFine">Basics er altid gratis.</p>
@@ -886,7 +886,7 @@
       <button class="wabout-card-close" id="wAboutClose" aria-label="Luk">×</button>
       <span id="wAboutHeaderTitle" class="wabout-header-title"></span>
       <button class="wabout-edit-btn" id="wAboutShareBtn" type="button" style="display:none">Post to feed</button>
-      <button class="wabout-edit-btn" id="wAboutEditBtn" type="button">✏ Rediger</button>
+      <button class="wabout-edit-btn" id="wAboutEditBtn" type="button"><svg class="uic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 L4.5 16 L15 5.5 L18.5 9 L8 19.5 Z" fill="currentColor" opacity=".13" stroke="none"/><path d="M4 20 L4.5 16 L15 5.5 L18.5 9 L8 19.5 Z"/><line x1="13" y1="7.5" x2="16.5" y2="11"/></svg> Rediger</button>
     </div>
     <div id="wAboutView">
       <div class="wabout-hero" id="wAboutHero" style="display:none"><img id="wAboutHeroImg" class="wabout-hero-img" alt="" loading="lazy"></div>

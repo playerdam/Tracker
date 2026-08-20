@@ -103,7 +103,7 @@
       tab_social:"Rangliste",
       challenge_title:"Ugens udfordring",challenge_days:"dage tilbage",challenge_ends:"{0} dage tilbage",
       lb_title:"Ugentlig rangliste",lb_week:"uge fra",lb_anon:"Anonym",lb_you:"dig",lb_empty:"Ingen data endnu",
-      stab_global:"🌍 Global",stab_challenge:"🏆 Ugens",
+      stab_global:"Global",stab_challenge:"Ugens",
       lb_period_week:"Uge",lb_period_month:"Måned",lb_period_all:"Altid",
       lb_total_pts:"pt i alt",team_lb_title:"Dit hold",team_no_team:"Ikke på et hold endnu",
       team_title:"Hold",team_create_ph:"fx Noma Kitchen",team_create_btn:"Opret hold",
@@ -252,7 +252,7 @@
       tab_social:"Leaderboard",
       challenge_title:"Weekly challenge",challenge_days:"days left",challenge_ends:"{0} days left",
       lb_title:"Weekly leaderboard",lb_week:"week from",lb_anon:"Anonymous",lb_you:"you",lb_empty:"No data yet",
-      stab_global:"🌍 Global",stab_challenge:"🏆 Weekly",
+      stab_global:"Global",stab_challenge:"Weekly",
       lb_period_week:"Week",lb_period_month:"Month",lb_period_all:"All time",
       lb_total_pts:"pts total",team_lb_title:"Your team",team_no_team:"Not on a team yet",
       team_title:"Team",team_create_ph:"e.g. Noma Kitchen",team_create_btn:"Create team",
@@ -622,7 +622,69 @@
     warn:_svg('<path d="M12 3.5 L21 19 H3 Z" fill="currentColor" opacity=".13" stroke="none"/><path d="M12 3.5 L21 19 H3 Z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="16.6" r="1.1" fill="currentColor" stroke="none"/>'),
     signal:_svg('<path d="M5 12 A9 9 0 0 1 19 12" opacity=".5"/><path d="M8 13.5 A5.5 5.5 0 0 1 16 13.5"/><circle cx="12" cy="17" r="1.8" fill="currentColor" stroke="none"/>'),
   };
-  function icon(name){return UI[name]||UI.sparkle;}
+  function icon(name){return UI[name]||(typeof _BI!=="undefined"&&_BI[name])||UI.sparkle;}
+
+  // ── Custom badge-ikoner — bespoke SVG til achievements (erstatter ~40 emojis). ──
+  const _BI={
+    star:_svg('<path d="M12 3 L14 8.5 L20 9 L15.5 13 L17 19 L12 15.7 L7 19 L8.5 13 L4 9 L10 8.5 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M12 3 L14 8.5 L20 9 L15.5 13 L17 19 L12 15.7 L7 19 L8.5 13 L4 9 L10 8.5 Z"/>'),
+    medal:_svg('<path d="M8.5 8 L5.5 3 M15.5 8 L18.5 3 M9.5 3 H14.5" opacity=".7"/><circle cx="12" cy="14.5" r="5.5" fill="currentColor" opacity=".16" stroke="none"/><circle cx="12" cy="14.5" r="5.5"/><path d="M12 12 L12.9 13.9 L15 14.2 L13.5 15.6 L13.9 17.7 L12 16.7 L10.1 17.7 L10.5 15.6 L9 14.2 L11.1 13.9 Z" stroke-width="1.2"/>'),
+    crown:_svg('<path d="M4 17 L6 8 L10 12 L12 6 L14 12 L18 8 L20 17 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M4 17 L6 8 L10 12 L12 6 L14 12 L18 8 L20 17 Z"/><line x1="5" y1="20" x2="19" y2="20"/>'),
+    gem:_svg('<path d="M6 4 H18 L22 10 L12 21 L2 10 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M6 4 H18 L22 10 L12 21 L2 10 Z"/><path d="M2 10 H22 M8 4 L6 10 L12 21 M16 4 L18 10 L12 21" opacity=".55"/>'),
+    scroll:_svg('<rect x="6" y="4" width="12" height="16" rx="2.4" fill="currentColor" opacity=".1" stroke="none"/><rect x="6" y="4" width="12" height="16" rx="2.4"/><line x1="9" y1="8.5" x2="15" y2="8.5" opacity=".6"/><line x1="9" y1="12" x2="15" y2="12" opacity=".6"/><line x1="9" y1="15.5" x2="13" y2="15.5" opacity=".6"/>'),
+    layers:_svg('<path d="M12 3 L21 8 L12 13 L3 8 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M12 3 L21 8 L12 13 L3 8 Z"/><path d="M3 12 L12 17 L21 12" opacity=".65"/><path d="M3 16 L12 21 L21 16" opacity=".4"/>'),
+    briefcase:_svg('<rect x="3.5" y="7.5" width="17" height="12" rx="2.5" fill="currentColor" opacity=".13" stroke="none"/><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M8.5 7.5 V6 A2 2 0 0 1 10.5 4 H13.5 A2 2 0 0 1 15.5 6 V7.5"/><line x1="3.5" y1="13" x2="20.5" y2="13" opacity=".6"/>'),
+    building:_svg('<rect x="5" y="3.5" width="14" height="17" rx="1.6" fill="currentColor" opacity=".12" stroke="none"/><rect x="5" y="3.5" width="14" height="17" rx="1.6"/><path d="M8.5 7 H10.5 M13.5 7 H15.5 M8.5 10.5 H10.5 M13.5 10.5 H15.5" opacity=".6"/><path d="M10 20.5 V16.5 H14 V20.5"/>'),
+    target:_svg('<circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/>'),
+    rocket:_svg('<path d="M12 2.5 C15 5.5 16 9 16 12 L14 15 H10 L8 12 C8 9 9 5.5 12 2.5 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M12 2.5 C15 5.5 16 9 16 12 L14 15 H10 L8 12 C8 9 9 5.5 12 2.5 Z"/><circle cx="12" cy="9" r="1.6" fill="currentColor" stroke="none"/><path d="M10 15 L8 19 M14 15 L16 19 M12 15.5 V19.5" opacity=".7"/>'),
+    flag:_svg('<line x1="6" y1="3" x2="6" y2="21"/><path d="M6 4 H17.5 L14.5 7.5 L17.5 11 H6 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M6 4 H17.5 L14.5 7.5 L17.5 11 H6"/>'),
+    clock:_svg('<circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5 V12 L15 13.8"/>'),
+    hourglass:_svg('<path d="M6 3 H18 V6 L13 12 L18 18 V21 H6 V18 L11 12 L6 6 Z" fill="currentColor" opacity=".13" stroke="none"/><path d="M6 3 H18 V6 L13 12 L18 18 V21 H6 V18 L11 12 L6 6 Z"/><path d="M6 3 H18 M6 21 H18"/>'),
+    sunrise:_svg('<path d="M7 18 A5 5 0 0 1 17 18 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M7 18 A5 5 0 0 1 17 18"/><path d="M12 8.5 V5.5 M6 10.5 L4.5 9 M18 10.5 L19.5 9" opacity=".7"/><line x1="3" y1="18" x2="21" y2="18"/><line x1="6" y1="21" x2="18" y2="21" opacity=".4"/>'),
+    planet:_svg('<circle cx="12" cy="11" r="6" fill="currentColor" opacity=".16" stroke="none"/><circle cx="12" cy="11" r="6"/><ellipse cx="12" cy="11" rx="10" ry="3.6" transform="rotate(-22 12 11)"/>'),
+    map:_svg('<path d="M3 6 L9 4 L15 6 L21 4 V18 L15 20 L9 18 L3 20 Z" fill="currentColor" opacity=".1" stroke="none"/><path d="M3 6 L9 4 L15 6 L21 4 V18 L15 20 L9 18 L3 20 Z"/><path d="M9 4 V18 M15 6 V20" opacity=".6"/>'),
+    globe:_svg('<circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12 H20.5" opacity=".7"/><path d="M12 3.5 C15 6 15 18 12 20.5 C9 18 9 6 12 3.5 Z"/>'),
+    grape:_svg('<path d="M13 11 V6.5 M13 6.5 C13 4.5 16 4 16.5 6.5" stroke-width="1.6"/><g fill="currentColor" opacity=".16" stroke="none"><circle cx="9.5" cy="12.5" r="2.1"/><circle cx="13.5" cy="12.5" r="2.1"/><circle cx="11.5" cy="16" r="2.1"/><circle cx="15.5" cy="16" r="2.1"/><circle cx="13.5" cy="19.5" r="2.1"/></g><circle cx="9.5" cy="12.5" r="2.1"/><circle cx="13.5" cy="12.5" r="2.1"/><circle cx="11.5" cy="16" r="2.1"/><circle cx="15.5" cy="16" r="2.1"/><circle cx="13.5" cy="19.5" r="2.1"/>'),
+    puzzle:_svg('<path d="M4 8.5 H8 A1.6 1.6 0 1 1 11 8.5 H15 V12 A1.6 1.6 0 1 1 15 15.2 V19 H11 A1.6 1.6 0 1 0 8 19 H4 Z" fill="currentColor" opacity=".14" stroke="none"/><path d="M4 8.5 H8 A1.6 1.6 0 1 1 11 8.5 H15 V12 A1.6 1.6 0 1 1 15 15.2 V19 H11 A1.6 1.6 0 1 0 8 19 H4 Z"/>'),
+    palette:_svg('<path d="M12 3.5 A8.5 8.5 0 1 0 12 20.5 C13.2 20.5 13.6 19.3 13 18.4 C12.4 17.5 13 16.5 14 16.5 H16 A4.5 4.5 0 0 0 20.5 12 C20.5 7 16.7 3.5 12 3.5 Z" fill="currentColor" opacity=".12" stroke="none"/><path d="M12 3.5 A8.5 8.5 0 1 0 12 20.5 C13.2 20.5 13.6 19.3 13 18.4 C12.4 17.5 13 16.5 14 16.5 H16 A4.5 4.5 0 0 0 20.5 12 C20.5 7 16.7 3.5 12 3.5 Z"/><circle cx="8" cy="9.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="10" r="1.1" fill="currentColor" stroke="none"/>'),
+    moon:_svg('<path d="M20 13.5 A8 8 0 1 1 10.5 4 A6.3 6.3 0 0 0 20 13.5 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M20 13.5 A8 8 0 1 1 10.5 4 A6.3 6.3 0 0 0 20 13.5 Z"/>'),
+    box:_svg('<path d="M12 3 L21 7.5 V16.5 L12 21 L3 16.5 V7.5 Z" fill="currentColor" opacity=".13" stroke="none"/><path d="M12 3 L21 7.5 V16.5 L12 21 L3 16.5 V7.5 Z"/><path d="M3 7.5 L12 12 L21 7.5 M12 12 V21" opacity=".6"/>'),
+    house:_svg('<path d="M4 11 L12 4 L20 11 V20 H4 Z" fill="currentColor" opacity=".13" stroke="none"/><path d="M4 11 L12 4 L20 11"/><path d="M6 11 V20 H18 V11"/><rect x="10" y="14" width="4" height="6"/>'),
+    flask:_svg('<path d="M9.5 3.5 H14.5 V9 L18.5 17.5 A2 2 0 0 1 16.7 20.5 H7.3 A2 2 0 0 1 5.5 17.5 L9.5 9 Z" fill="currentColor" opacity=".13" stroke="none"/><path d="M9.5 3.5 H14.5 V9 L18.5 17.5 A2 2 0 0 1 16.7 20.5 H7.3 A2 2 0 0 1 5.5 17.5 L9.5 9 Z"/><line x1="8" y1="13.5" x2="16" y2="13.5" opacity=".55"/>'),
+    bolt:_svg('<path d="M13 2.5 L5 13 H11 L10 21.5 L19 10 H13 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M13 2.5 L5 13 H11 L10 21.5 L19 10 H13 Z"/>'),
+    flower:_svg('<circle cx="12" cy="9" r="4" fill="currentColor" opacity=".16" stroke="none"/><circle cx="12" cy="9" r="4"/><path d="M12 9 A2.2 2.2 0 0 1 12 5.4" opacity=".6"/><path d="M12 13 V20"/><path d="M12 16 C9 16 8 14 8.5 12 M12 17 C15 17 16 15 15.5 13" opacity=".7"/>'),
+    heart:_svg('<path d="M12 20 C4 14 3 8.5 6.5 6 C9 4.3 11 6 12 8 C13 6 15 4.3 17.5 6 C21 8.5 20 14 12 20 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M12 20 C4 14 3 8.5 6.5 6 C9 4.3 11 6 12 8 C13 6 15 4.3 17.5 6 C21 8.5 20 14 12 20 Z"/>'),
+  };
+  // Emoji → custom SVG (badges gemmer stadig emoji som intern nøgle; brugeren ser kun SVG).
+  const _BADGE_MAP={
+    "🔪":icon("clipboard"),"📋":icon("clipboard"),"📜":_BI.scroll,"📚":icon("book"),"🗒":icon("clipboard"),"📖":icon("book"),"📕":icon("book"),"🗃":_BI.box,
+    "💯":_BI.star,"⭐":_BI.star,"🌟":_BI.star,"✨":icon("sparkle"),"💫":icon("sparkle"),"🏆":icon("trophy"),"🏅":_BI.medal,"👑":_BI.crown,"💎":_BI.gem,
+    "🗂":_BI.layers,"📁":_BI.layers,"🗄":_BI.layers,"🧰":_BI.briefcase,"🎒":_BI.box,
+    "🎬":_BI.flag,"🗓":icon("calendar"),"📅":icon("calendar"),"📆":icon("calendar"),"🧾":icon("clipboard"),"💼":_BI.briefcase,"🏢":_BI.building,"🎯":_BI.target,"🚀":_BI.rocket,
+    "⏰":_BI.clock,"⏲":_BI.clock,"⏱":_BI.clock,"🕐":_BI.clock,"⏳":_BI.hourglass,"🌅":_BI.sunrise,"🌄":_BI.sunrise,"🌠":_BI.star,"🪐":_BI.planet,
+    "🔥":icon("flame"),
+    "📍":icon("pin"),"🗺":_BI.map,"🗺️":_BI.map,"🧭":icon("compass"),"🌍":_BI.globe,"🌎":_BI.globe,"🌐":_BI.globe,
+    "🍷":icon("wine"),"🍾":icon("bottle"),"🥂":icon("cheers"),"🍇":_BI.grape,"🍶":icon("bottle"),
+    "🏃":_BI.bolt,"🥇":_BI.medal,"🦾":icon("trophy"),"🧩":_BI.puzzle,"🎨":_BI.palette,"📸":icon("camera"),"🦉":_BI.moon,"🌈":icon("sparkle"),
+    "🏠":_BI.house,"📦":_BI.box,"🔬":_BI.flask,"🔍":icon("search"),"⚡":_BI.bolt,"🌹":_BI.flower,"❤️":_BI.heart,"🤍":_BI.heart,
+  };
+  function _badgeSvg(e){return _BADGE_MAP[e]||icon("sparkle");}
+
+  // Sidste custom-ikoner (likes, tema, kollektioner, pro, lab, m.m.)
+  Object.assign(UI,{
+    heart:_svg('<path d="M12 20 C4 14 3 8.5 6.5 6 C9 4.3 11 6 12 8 C13 6 15 4.3 17.5 6 C21 8.5 20 14 12 20 Z"/>'),
+    heartFull:_svg('<path d="M12 20 C4 14 3 8.5 6.5 6 C9 4.3 11 6 12 8 C13 6 15 4.3 17.5 6 C21 8.5 20 14 12 20 Z" fill="currentColor" stroke="none"/>'),
+    sun:_svg('<circle cx="12" cy="12" r="4.2" fill="currentColor" opacity=".16" stroke="none"/><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5 V5 M12 19 V21.5 M2.5 12 H5 M19 12 H21.5 M5.2 5.2 L7 7 M17 17 L18.8 18.8 M18.8 5.2 L17 7 M7 17 L5.2 18.8"/>'),
+    mic:_svg('<rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" opacity=".16" stroke="none"/><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11 A6 6 0 0 0 18 11"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="8.5" y1="21" x2="15.5" y2="21"/>'),
+    chat:_svg('<path d="M4 5.5 H20 A1.5 1.5 0 0 1 21.5 7 V14.5 A1.5 1.5 0 0 1 20 16 H9 L5 19.5 V16 A1.5 1.5 0 0 1 4 14.5 Z" fill="currentColor" opacity=".12" stroke="none"/><path d="M4 5.5 H20 A1.5 1.5 0 0 1 21.5 7 V14.5 A1.5 1.5 0 0 1 20 16 H9 L5 19.5 V16 A1.5 1.5 0 0 1 4 14.5 Z"/><path d="M8 9 H16 M8 12 H13" opacity=".55"/>'),
+    coffee:_svg('<path d="M5 8 H17 V13 A5 5 0 0 1 12 18 H10 A5 5 0 0 1 5 13 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M5 8 H17 V13 A5 5 0 0 1 12 18 H10 A5 5 0 0 1 5 13 Z"/><path d="M17 9.5 H19.5 A2.3 2.3 0 0 1 19.5 14 H17"/><path d="M8 5.5 C8 4.3 9 4 9 3 M12 5.5 C12 4.3 13 4 13 3" opacity=".55"/>'),
+    cocktail:_svg('<path d="M4.5 5.5 H19.5 L12 14 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M4.5 5.5 H19.5 L12 14 Z"/><line x1="12" y1="14" x2="12" y2="20"/><line x1="8" y1="20" x2="16" y2="20"/><circle cx="16.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/>'),
+    bowtie:_svg('<path d="M3.5 8 L10.5 12 L3.5 16 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M3.5 8 L10.5 12 L3.5 16 Z"/><path d="M20.5 8 L13.5 12 L20.5 16 Z" fill="currentColor" opacity=".16" stroke="none"/><path d="M20.5 8 L13.5 12 L20.5 16 Z"/><rect x="10" y="9.5" width="4" height="5" rx="1.2" fill="currentColor" stroke="none"/>'),
+    infinity:_svg('<path d="M9.5 12 C9.5 9.4 6 9.4 6 12 C6 14.6 9.5 14.6 12 12 C14.5 9.4 18 9.4 18 12 C18 14.6 14.5 14.6 12 12 Z" fill="currentColor" opacity=".14" stroke="none"/><path d="M9.5 12 C9.5 9.4 6 9.4 6 12 C6 14.6 9.5 14.6 12 12 C14.5 9.4 18 9.4 18 12 C18 14.6 14.5 14.6 12 12"/>'),
+    robot:_svg('<rect x="5" y="8" width="14" height="11" rx="3" fill="currentColor" opacity=".13" stroke="none"/><rect x="5" y="8" width="14" height="11" rx="3"/><circle cx="9.5" cy="13" r="1.4" fill="currentColor" stroke="none"/><circle cx="14.5" cy="13" r="1.4" fill="currentColor" stroke="none"/><line x1="12" y1="5" x2="12" y2="8"/><circle cx="12" cy="4" r="1.3" fill="currentColor" stroke="none"/><path d="M10 16.5 H14" opacity=".5"/>'),
+    trash:_svg('<path d="M5 7 H19"/><path d="M7 7 L8 19.5 A1.6 1.6 0 0 0 9.6 21 H14.4 A1.6 1.6 0 0 0 16 19.5 L17 7 Z" fill="currentColor" opacity=".12" stroke="none"/><path d="M7 7 L8 19.5 A1.6 1.6 0 0 0 9.6 21 H14.4 A1.6 1.6 0 0 0 16 19.5 L17 7"/><path d="M9.5 7 V5.2 A1.4 1.4 0 0 1 10.9 3.8 H13.1 A1.4 1.4 0 0 1 14.5 5.2 V7"/>'),
+    cloche:_svg('<path d="M4 17 C4 11 7.5 7.5 12 7.5 C16.5 7.5 20 11 20 17 Z" fill="currentColor" opacity=".14" stroke="none"/><path d="M4 17 C4 11 7.5 7.5 12 7.5 C16.5 7.5 20 11 20 17"/><line x1="2.5" y1="17" x2="21.5" y2="17"/><line x1="12" y1="7.5" x2="12" y2="5"/><circle cx="12" cy="4" r="1.2" fill="currentColor" stroke="none"/>'),
+    plate:_svg('<circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".1" stroke="none"/><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5" opacity=".6"/>'),
+  });
 
   const CATALOG=[
     {id:"preset_oyster",da:"Østers åbnet",en:"Oysters opened",cat:"aabnet-mad",icon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 38c0-14 9-22 22-22s22 8 22 22"/><path d="M10 38c4 7 12 12 22 12s18-5 22-12"/><ellipse cx="32" cy="40" rx="10" ry="6" fill="currentColor" opacity=".18"/><path d="M32 20c-2 4-3 10-3 18"/></svg>'},
@@ -710,7 +772,10 @@
   // Craft-rating (fælles vin-katalog + ratings) — spejler serverens WINE_RATINGS_ENABLED.
   let _wineRatingsEnabled=false;
 
-  const WINE_FLAGS={"Frankrig":"🇫🇷","France":"🇫🇷","Italien":"🇮🇹","Italy":"🇮🇹","Spanien":"🇪🇸","Spain":"🇪🇸","Portugal":"🇵🇹","Tyskland":"🇩🇪","Germany":"🇩🇪","Østrig":"🇦🇹","Austria":"🇦🇹","USA":"🇺🇸","Australien":"🇦🇺","Australia":"🇦🇺","New Zealand":"🇳🇿","Sydafrika":"🇿🇦","South Africa":"🇿🇦","Chile":"🇨🇱","Argentina":"🇦🇷","Grækenland":"🇬🇷","Greece":"🇬🇷","Ungarn":"🇭🇺","Hungary":"🇭🇺","Georgien":"🇬🇪","Georgia":"🇬🇪","Libanon":"🇱🇧","Lebanon":"🇱🇧","Danmark":"🇩🇰","Denmark":"🇩🇰","Slovenien":"🇸🇮","Kroatien":"🇭🇷"};
+  // Lande-koder (custom chips i stedet for flag-emojis).
+  const WINE_CC={"Frankrig":"FR","France":"FR","Italien":"IT","Italy":"IT","Spanien":"ES","Spain":"ES","Portugal":"PT","Tyskland":"DE","Germany":"DE","Østrig":"AT","Austria":"AT","USA":"US","Australien":"AU","Australia":"AU","New Zealand":"NZ","Sydafrika":"ZA","South Africa":"ZA","Chile":"CL","Argentina":"AR","Grækenland":"GR","Greece":"GR","Ungarn":"HU","Hungary":"HU","Georgien":"GE","Georgia":"GE","Libanon":"LB","Lebanon":"LB","Danmark":"DK","Denmark":"DK","Slovenien":"SI","Slovenia":"SI","Kroatien":"HR","Croatia":"HR"};
+  function _landCC(land){return WINE_CC[land]||(land?land.trim().slice(0,2).toUpperCase():"");}
+  function _ccChip(land){const cc=_landCC(land);return cc?'<span class="cc-chip">'+esc(cc)+'</span>':'';}
   const REGION_TO_LAND={"toscana":"Italien","tuscany":"Italien","piemonte":"Italien","piedmont":"Italien","veneto":"Italien","sicilia":"Italien","sicily":"Italien","lombardia":"Italien","lombardy":"Italien","emilia-romagna":"Italien","emilia romagna":"Italien","friuli":"Italien","puglia":"Italien","campania":"Italien","abruzzo":"Italien","umbria":"Italien","lazio":"Italien","marche":"Italien","brunello":"Italien","chianti":"Italien","barolo":"Italien","amarone":"Italien","bordeaux":"Frankrig","bourgogne":"Frankrig","burgundy":"Frankrig","champagne":"Frankrig","alsace":"Frankrig","loire":"Frankrig","rhône":"Frankrig","rhone":"Frankrig","provence":"Frankrig","languedoc":"Frankrig","roussillon":"Frankrig","côtes du rhône":"Frankrig","cotes du rhone":"Frankrig","médoc":"Frankrig","medoc":"Frankrig","saint-émilion":"Frankrig","pomerol":"Frankrig","rioja":"Spanien","ribera del duero":"Spanien","priorat":"Spanien","penedès":"Spanien","penedes":"Spanien","rias baixas":"Spanien","catalonia":"Spanien","catalunya":"Spanien","rueda":"Spanien","jumilla":"Spanien","douro":"Portugal","alentejo":"Portugal","vinho verde":"Portugal","dão":"Portugal","dao":"Portugal","setúbal":"Portugal","setubal":"Portugal","mosel":"Tyskland","rheingau":"Tyskland","pfalz":"Tyskland","nahe":"Tyskland","rheinhessen":"Tyskland","franken":"Tyskland","wachau":"Østrig","kamptal":"Østrig","burgenland":"Østrig","steiermark":"Østrig","napa valley":"USA","napa":"USA","sonoma":"USA","willamette valley":"USA","columbia valley":"USA","barossa valley":"Australien","barossa":"Australien","yarra valley":"Australien","mclaren vale":"Australien","coonawarra":"Australien","margaret river":"Australien","marlborough":"New Zealand","central otago":"New Zealand","hawke's bay":"New Zealand","stellenbosch":"Sydafrika","swartland":"Sydafrika","constantia":"Sydafrika","mendoza":"Argentina","patagonia":"Argentina","salta":"Argentina","maipo":"Chile","colchagua":"Chile","casablanca":"Chile","aconcagua":"Chile","nemea":"Grækenland","naoussa":"Grækenland","tokaj":"Ungarn","eger":"Ungarn","kakheti":"Georgien","bekaa valley":"Libanon"};
   function wLand(w){const l=(w.land||"").trim();return REGION_TO_LAND[l.toLowerCase()]||l;}
 
@@ -1239,10 +1304,10 @@
   }
   function showBadgeToast(b){
     const name=lang==="en"?b.en:b.da;
-    showToast(b.icon+" "+t("new_badge")+": "+name);
+    showToast(t("new_badge")+": "+name);
     haptic(60);
     if(Notification&&Notification.permission==="granted"){
-      try{new Notification(b.icon+" "+t("new_badge"),{body:name,icon:"/icons/icon.svg",silent:true});}catch(e){}
+      try{new Notification(t("new_badge"),{body:name,icon:"/icons/icon.svg",silent:true});}catch(e){}
     }
   }
 
@@ -1880,10 +1945,10 @@
     const avgMs=hist.length?hist.reduce((a,s)=>a+s.durationMs,0)/hist.length:0;
     const longestMs=hist.length?Math.max(...hist.map(s=>s.durationMs)):0;
     const tiles=[
-      {ico:"📊",col:VD_COLORS[2],val:hist.length?fmtWorkTime(avgMs):"—",lbl:lang==="da"?"Snit/vagt":"Avg/shift"},
-      {ico:"🏅",col:VD_COLORS[3],val:hist.length?fmtWorkTime(longestMs):"—",lbl:lang==="da"?"Længste vagt":"Longest shift"},
-      {ico:"🗂",col:VD_COLORS[4],val:fmtNum(state.counters.length),lbl:lang==="da"?"Kategorier":"Categories"},
-      {ico:"📆",col:VD_COLORS[5],val:fmtNum(totalActiveDays()),lbl:lang==="da"?"Dage aktiv":"Active days"},
+      {ico:icon("chart"),col:VD_COLORS[2],val:hist.length?fmtWorkTime(avgMs):"—",lbl:lang==="da"?"Snit/vagt":"Avg/shift"},
+      {ico:icon("medal"),col:VD_COLORS[3],val:hist.length?fmtWorkTime(longestMs):"—",lbl:lang==="da"?"Længste vagt":"Longest shift"},
+      {ico:icon("layers"),col:VD_COLORS[4],val:fmtNum(state.counters.length),lbl:lang==="da"?"Kategorier":"Categories"},
+      {ico:icon("calendar"),col:VD_COLORS[5],val:fmtNum(totalActiveDays()),lbl:lang==="da"?"Dage aktiv":"Active days"},
     ];
     container.innerHTML='<div class="vd2-qgrid">'+tiles.map(x=>
       '<div class="vd2-qtile" style="cursor:default">'
@@ -1896,7 +1961,7 @@
   // ── Stats: achievements-grid ──
   function _badgeTile(b,has){
     const name=lang==="en"?b.en:b.da;
-    return '<div class="badge-item'+(has?"":" badge-locked")+'" title="'+esc(name)+'"><div class="badge-icon">'+b.icon+'</div><div class="badge-label">'+esc(name)+'</div></div>';
+    return '<div class="badge-item'+(has?"":" badge-locked")+'" title="'+esc(name)+'"><div class="badge-icon">'+_badgeSvg(b.icon)+'</div><div class="badge-label">'+esc(name)+'</div></div>';
   }
   function _buildStatsBadges(container){
     if(!container)return;
@@ -2258,7 +2323,7 @@
       +'<button class="wedit" data-act="edit">⋯</button></div>';
     const wrap=document.createElement("div");wrap.className="wrow-wrap";
     const del=document.createElement("button");del.className="wrow-del";del.dataset.delId=w.id;
-    del.innerHTML='<span class="wrow-del-icon">🗑</span>'+(lang==="da"?"Slet":"Del");
+    del.innerHTML='<span class="wrow-del-icon">'+icon("trash")+'</span>'+(lang==="da"?"Slet":"Del");
     wrap.appendChild(row);wrap.appendChild(del);
     return wrap;
   }
@@ -2276,7 +2341,7 @@
     });
     const topLand=Object.keys(CC).sort((a,b)=>CC[b]-CC[a])[0];
     const topGrape=Object.keys(GC).sort((a,b)=>GC[b]-GC[a])[0];
-    const flag=topLand?(WINE_FLAGS[topLand]||"\ud83c\udf0d"):"";
+    const flag=topLand?_landCC(topLand):"";
     const info=getLevelInfo(computeXP());
     const r=52,circ=+(2*Math.PI*r).toFixed(2);
     const arcLen=+(circ*Math.min(1,info.pct/100)).toFixed(2);
@@ -2321,7 +2386,7 @@
           +'</div>'
         +'</button>'
         +'<div class="vd2-tiles">'
-          +(topLand?'<button class="vd2-tile vd2-tile-btn" id="wStatLandTile" type="button"><div class="vd2-tile-ico" style="background:rgba(255,179,107,.16);font-size:17px">'+flag+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+esc(topLand)+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Top land":"Top country")+'</div></div></button>':'')
+          +(topLand?'<button class="vd2-tile vd2-tile-btn" id="wStatLandTile" type="button"><div class="vd2-tile-ico" style="background:rgba(255,179,107,.16);font-size:13px;font-weight:700;color:var(--accent)">'+esc(flag)+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+esc(topLand)+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Top land":"Top country")+'</div></div></button>':'')
           +(topGrape?'<button class="vd2-tile vd2-tile-btn" id="wStatGrapeTile" type="button"><div class="vd2-tile-ico" style="background:rgba(126,200,192,.16);color:#7EC8C0">'+grapeSvg+'</div><div class="vd2-tile-txt"><div class="vd2-tile-val">'+esc(topGrape)+'</div><div class="vd2-tile-lbl">'+(lang==="da"?"Top drue":"Top grape")+'</div></div></button>':'')
         +'</div>'
       +'</div>'
@@ -2347,7 +2412,7 @@
       const total=state.wines.length||1;const max=CC[sorted[0]]||1;
       openStatsModal(lang==="da"?"Lande":"Countries",sorted.map(k=>{
         const pct=Math.round(CC[k]/total*100);
-        const fl=WINE_FLAGS[k]||"";const bott=CB[k]||0;
+        const fl="";const bott=CB[k]||0;
         const bottStr=bott>0?" · "+bott+(lang==="da"?" fl.":" btl."):"";
         return '<div class="wstat-row">'
           +'<div class="wstat-top"><span class="wstat-name">'+(fl?fl+" ":"")+esc(k)+"</span>"
@@ -2424,10 +2489,10 @@
     const multiGroup=sortedLands.length+(noCountry.length?1:0)>1;
     function renderCountryGroup(land,wines,startOpen){
       const head=document.createElement("div");
-      const flag=WINE_FLAGS[land]||"🍷";
+      
       const isOpen=!multiGroup||startOpen;
       head.className="wine-country-head"+(isOpen?" wch-open":"");
-      head.innerHTML='<span class="wine-country-flag">'+flag+'</span><span class="wine-country-name">'+esc(land)+'</span><span class="wine-country-count">'+wines.length+'</span><span class="wine-country-chev">›</span>';
+      head.innerHTML=_ccChip(land)+'<span class="wine-country-name">'+esc(land)+'</span><span class="wine-country-count">'+wines.length+'</span><span class="wine-country-chev">›</span>';
       list.appendChild(head);
       const grp=document.createElement("div");grp.className="winelist-group"+(isOpen?"":" wch-hidden");
       wines.forEach(w=>grp.appendChild(makeWRow(w)));
@@ -3003,12 +3068,12 @@
     const content=document.getElementById("wAchievContent");if(!content)return;
     const xp=computeXP();const info=getLevelInfo(xp);
     const cats={};_ACHS.forEach(a=>{const c=lang==="da"?a.cat.da:a.cat.en;if(!cats[c])cats[c]=[];cats[c].push(a);});
-    const nextTxt=info.nextXp?(lang==="da"?`Næste: ${info.nextTitle} · ${info.nextXp-xp} XP mangler`:`Next: ${info.nextTitle} · ${info.nextXp-xp} XP to go`):(lang==="da"?"Max level! 🎉":"Max level! 🎉");
-    let html=`<div class="wach-level-card"><div class="wach-level-icon">🏆</div><div class="wach-level-name">${esc(info.title)}</div><div class="wach-level-xp">${xp} XP</div><div class="wach-level-xp-wrap"><div class="wach-level-xp-fill" style="width:${info.pct}%"></div></div><div class="wach-level-next">${esc(nextTxt)}</div></div>`;
+    const nextTxt=info.nextXp?(lang==="da"?`Næste: ${info.nextTitle} · ${info.nextXp-xp} XP mangler`:`Next: ${info.nextTitle} · ${info.nextXp-xp} XP to go`):(lang==="da"?"Max level!":"Max level!");
+    let html=`<div class="wach-level-card"><div class="wach-level-icon">${icon("trophy")}</div><div class="wach-level-name">${esc(info.title)}</div><div class="wach-level-xp">${xp} XP</div><div class="wach-level-xp-wrap"><div class="wach-level-xp-fill" style="width:${info.pct}%"></div></div><div class="wach-level-next">${esc(nextTxt)}</div></div>`;
     Object.entries(cats).forEach(([cat,list])=>{
       const unlockedCount=list.filter(a=>a.check(state)).length;
       html+=`<div class="wach-section"><div class="wach-section-ttl wach-open">${esc(cat)}<span style="font-size:10px;color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">${unlockedCount}/${list.length}</span><span class="wach-section-chev">›</span></div><div class="wach-grid">`;
-      list.forEach(a=>{const on=a.check(state);html+=`<div class="wach-badge${on?" on":""}"><div class="wach-badge-icon">${a.icon}</div><div class="wach-badge-name">${esc(lang==="da"?a.da:a.en)}</div></div>`;});
+      list.forEach(a=>{const on=a.check(state);html+=`<div class="wach-badge${on?" on":""}"><div class="wach-badge-icon">${_badgeSvg(a.icon)}</div><div class="wach-badge-name">${esc(lang==="da"?a.da:a.en)}</div></div>`;});
       html+="</div></div>";
     });
     content.innerHTML=html;
@@ -3041,7 +3106,7 @@
     }
     save();renderWines();renderCareer();
     const newXp=computeXP();const newLvl=getLevelInfo(newXp).title;
-    if(newLvl!==prevLvl)showToast("🏆 "+newLvl+"!");
+    if(newLvl!==prevLvl)showToast(newLvl+"!");
     else if(newXp>prevXp)showToast("+"+(newXp-prevXp)+" XP");
     if(resultWine){openWineSheet(resultWine.id,"view");}else closeWineSheet();
   }
@@ -3340,7 +3405,7 @@
   function _speechPlugin(){return (window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition)||null;}
   function _voiceSetLive(on){
     _voiceOn=on;const mic=$("#qlogOvMic");if(mic)mic.classList.toggle("live",on);
-    const hint=$("#qlogOvHint");if(hint)hint.textContent=on?(lang==="da"?"🎙️ Lytter… sig fx \"3 cortado\"":"🎙️ Listening… e.g. \"3 cortado\""):t("qlog_hint_full");
+    const hint=$("#qlogOvHint");if(hint)hint.textContent=on?(lang==="da"?"Lytter… sig fx \"3 cortado\"":"Listening… e.g. \"3 cortado\""):t("qlog_hint_full");
   }
   function _voiceText(v){const inp=$("#qlogOverlayInput");if(!inp||v==null)return;inp.value=v;inp.style.height="auto";inp.style.height=inp.scrollHeight+"px";renderQlogAc(v);}
   async function startVoice(){
@@ -3535,7 +3600,7 @@
     const meta=document.getElementById("themeColorMeta");
     if(meta)meta.setAttribute("content",theme==="dark"?"#171114":"#8A2E3F");
     const ico=$("#themeDrawerIcon"),lbl=$("#themeDrawerLbl");
-    if(ico)ico.textContent=theme==="dark"?"☀️":"🌙";
+    if(ico)ico.innerHTML=theme==="dark"?icon("sun"):icon("moon");
     if(lbl)lbl.textContent=theme==="dark"?(lang==="da"?"Lyst tema":"Light theme"):(lang==="da"?"Mørkt tema":"Dark theme");
   }
   _applyTheme(localStorage.getItem("mise_theme")||"light");
@@ -3572,7 +3637,7 @@
     }); }
   { const pc=$("#paywallClose"); if(pc)pc.addEventListener("click",closePaywall);
     const ps=$("#paywallScrim"); if(ps)ps.addEventListener("click",e=>{if(e.target===ps)closePaywall();});
-    const pcta=$("#paywallCta"); if(pcta)pcta.addEventListener("click",()=>{ showToast(lang==="da"?"Køb åbner snart 🚀":"Purchases open soon 🚀"); }); }
+    const pcta=$("#paywallCta"); if(pcta)pcta.addEventListener("click",()=>{ showToast(lang==="da"?"Køb åbner snart":"Purchases open soon"); }); }
   function closeLogDrawer(){$("#logDrawer").classList.remove("open");$("#logScrim").classList.remove("open");}
   var _burgerBtn=$("#burgerBtn");if(_burgerBtn)_burgerBtn.addEventListener("click",openLogDrawer);
   var _drawerClose=$("#logDrawerClose");if(_drawerClose)_drawerClose.addEventListener("click",closeLogDrawer);
@@ -3651,7 +3716,7 @@
   }
 
   let _lbPeriod="week";
-  function _lbMedalHtml(i){return i===0?'🥇':i===1?'🥈':i===2?'🥉':'<span style="font-size:12px;color:var(--faint)">'+(i+1)+'</span>';}
+  function _lbMedalHtml(i){var m=["#C68A3E","#9BA0A6","#B07A4B"];return i<3?'<span class="lb-medal" style="color:'+m[i]+'">'+icon("medal")+'</span>':'<span style="font-size:12px;color:var(--faint)">'+(i+1)+'</span>';}
   function _lbRowsHtml(rows,myId){
     if(!rows.length)return '<div class="lb-empty">'+esc(t("lb_empty"))+'</div>';
     return rows.map((r,i)=>{
@@ -3735,7 +3800,7 @@
     if(navigator.share){
       try{await navigator.share({title:"Craft Tracker",text:msg});return;}catch(e){if(e&&e.name==="AbortError")return;}
     }
-    try{await navigator.clipboard.writeText(msg);showToast(lang==="da"?"Invitation kopieret 📋":"Invite copied 📋");}catch(e){}
+    try{await navigator.clipboard.writeText(msg);showToast(lang==="da"?"Invitation kopieret":"Invite copied");}catch(e){}
   }
 
   async function renderSocialTeam(){
@@ -3760,7 +3825,7 @@
         const l=document.getElementById("tlist-"+av.dataset.toggleList);if(l)l.classList.toggle("open");haptic(15);
       }));
       el.querySelectorAll(".tcard-code").forEach(c=>c.addEventListener("click",()=>{
-        navigator.clipboard.writeText(c.dataset.code||"").then(()=>{showToast(lang==="da"?"Kode kopieret 📋":"Code copied 📋");haptic(25);}).catch(()=>{});
+        navigator.clipboard.writeText(c.dataset.code||"").then(()=>{showToast(lang==="da"?"Kode kopieret":"Code copied");haptic(25);}).catch(()=>{});
       }));
       el.querySelectorAll(".tcard-share").forEach(b=>b.addEventListener("click",()=>shareTeamInvite(b.dataset.shareCode,b.dataset.shareName)));
       el.querySelectorAll(".tcard-leave").forEach(btn=>btn.addEventListener("click",async()=>{
@@ -3854,7 +3919,7 @@
         const r=await fetch(base+"/api/teams",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body)});
         if(!r.ok){showToast(lang==="da"?"Kunne ikke oprette — prøv igen":"Couldn't create — try again");return;}
         invalidateLabTeams();haptic(50);renderSocialTeam();
-        showToast(isResto?(lang==="da"?"Restaurant oprettet — afventer godkendelse 🕘":"Restaurant created — pending approval 🕘"):(lang==="da"?"Holdet er oprettet — del koden med kollegerne 🎉":"Team created — share the code 🎉"));
+        showToast(isResto?(lang==="da"?"Restaurant oprettet — afventer godkendelse":"Restaurant created — pending approval"):(lang==="da"?"Holdet er oprettet — del koden med kollegerne":"Team created — share the code"));
       }catch(e){
         showToast(lang==="da"?"Ingen forbindelse — prøv igen":"No connection — try again");
       }
@@ -4008,10 +4073,10 @@
 
   // ── Unified signup-setup: rolle/workplace (trin 1) → bekræft (trin 2) ──
   const ROLE_META=[
-    {id:"chef",emoji:"👨‍🍳",color:"#1F7A4D",soft:"rgba(31,122,77,.14)",items:["preset_main","preset_starter","preset_dessert","preset_mise","preset_sauce"]},
-    {id:"waiter",emoji:"🤵",color:"#C9762F",soft:"rgba(201,118,47,.14)",items:["preset_cover","preset_bottle","preset_coffee","preset_tableset","preset_bill"]},
-    {id:"bartender",emoji:"🍸",color:"#2E6FA8",soft:"rgba(46,111,168,.14)",items:["preset_cocktail","preset_bottle","preset_welcome","preset_snaps","preset_coffee_art"]},
-    {id:"barista",emoji:"☕",color:"#8A2E3F",soft:"rgba(138,46,63,.14)",items:["preset_coffee_art","preset_coffee","preset_water","preset_cocktail","preset_welcome"]},
+    {id:"chef",emoji:icon("chef"),color:"#1F7A4D",soft:"rgba(31,122,77,.14)",items:["preset_main","preset_starter","preset_dessert","preset_mise","preset_sauce"]},
+    {id:"waiter",emoji:icon("bowtie"),color:"#C9762F",soft:"rgba(201,118,47,.14)",items:["preset_cover","preset_bottle","preset_coffee","preset_tableset","preset_bill"]},
+    {id:"bartender",emoji:icon("cocktail"),color:"#2E6FA8",soft:"rgba(46,111,168,.14)",items:["preset_cocktail","preset_bottle","preset_welcome","preset_snaps","preset_coffee_art"]},
+    {id:"barista",emoji:icon("coffee"),color:"#8A2E3F",soft:"rgba(138,46,63,.14)",items:["preset_coffee_art","preset_coffee","preset_water","preset_cocktail","preset_welcome"]},
   ];
   function _roleLabel(id2){
     const k="su_role_"+id2,ks="su_role_"+id2+"_sub";
@@ -4117,7 +4182,7 @@
       }
       btn.disabled=false;
       $("#signupSetupScrim").classList.remove("open");
-      showToast(lang==="da"?"Din konto er klar — god service! 🎉":"Your account is ready — have a great service! 🎉");
+      showToast(lang==="da"?"Din konto er klar — god service!":"Your account is ready — have a great service!");
       haptic(40);
       _afterSignupSetup();
     });
@@ -4638,7 +4703,7 @@
     const initial=(e.nickname||e.username||"?").charAt(0).toUpperCase();
     const catLabel=lang==="en"?(e.categoryEn||e.category||""):e.category||"";
     const numStr=(e.delta>0?"+":"")+e.delta;
-    const likeIcon=e.liked?"❤️":"🤍";
+    const likeIcon=e.liked?icon("heartFull"):icon("heart");
     const fs=e._followStatus||"none";
     const followBtn=e.isOwn?'':('<button class="'+followBtnClass(fs)+'" data-follow="'+esc(e.userId)+'" data-follow-status="'+esc(fs)+'">'+esc(followBtnLabel(fs))+'</button>');
 
@@ -4659,7 +4724,7 @@
         +(e.summary?'<div class="feed-photo-caption">'+esc(e.summary)+'</div>':'')
         +'<div class="feed-photo-actions">'
         +'<button class="feed-photo-action'+(e.liked?" liked":"")+'" data-like="'+esc(e.id)+'">'+likeIcon+' <span class="like-count">'+e.likes+'</span></button>'
-        +'<button class="feed-photo-action" data-comments="'+esc(e.id)+'">💬 <span class="comment-count">'+e.comments+'</span></button>'
+        +'<button class="feed-photo-action" data-comments="'+esc(e.id)+'">'+icon("chat")+' <span class="comment-count">'+e.comments+'</span></button>'
         +'</div>'
         +'</div>'
         +'</div>';
@@ -4680,7 +4745,7 @@
       +((e.delta>0)?'<div class="feed-stat"><span class="feed-num">'+esc(numStr)+'</span>'+(catLabel?'<span>'+esc(catLabel)+'</span>':'')+'</div>':'')
       +'<div class="feed-actions">'
       +'<button class="feed-action-btn'+(e.liked?" liked":"")+'" data-like="'+esc(e.id)+'">'+likeIcon+' <span class="like-count">'+e.likes+'</span></button>'
-      +'<button class="feed-action-btn" data-comments="'+esc(e.id)+'">💬 <span class="comment-count">'+e.comments+'</span></button>'
+      +'<button class="feed-action-btn" data-comments="'+esc(e.id)+'">'+icon("chat")+' <span class="comment-count">'+e.comments+'</span></button>'
       +'</div>'
       +'</div>';
   }
@@ -4759,7 +4824,7 @@
       }
       if(entries.length)feedCursor=entries[entries.length-1].loggedAt;
     }catch(e){
-      if(!append)el.innerHTML='<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-title">'+(lang==="da"?"Kunne ikke hente feed":"Could not load feed")+'</div><div class="empty-state-sub">'+esc(e.message||"")+'</div><button class="btn ghost btn-sm" style="margin-top:12px" onclick="window._reloadFeed&&window._reloadFeed()">Prøv igen</button></div>';
+      if(!append)el.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+icon("warn")+'</div><div class="empty-state-title">'+(lang==="da"?"Kunne ikke hente feed":"Could not load feed")+'</div><div class="empty-state-sub">'+esc(e.message||"")+'</div><button class="btn ghost btn-sm" style="margin-top:12px" onclick="window._reloadFeed&&window._reloadFeed()">Prøv igen</button></div>';
     }
     feedLoading=false;
   }
@@ -4796,7 +4861,7 @@
       btn.classList.toggle("liked",!liked);
       btn.querySelector(".like-count").textContent=d.likes||0;
       btn.textContent="";
-      btn.insertAdjacentHTML("beforeend",(btn.classList.contains("liked")?"❤️":"🤍")+' <span class="like-count">'+((d.likes)||0)+'</span>');
+      btn.insertAdjacentHTML("beforeend",(btn.classList.contains("liked")?icon("heartFull"):icon("heart"))+' <span class="like-count">'+((d.likes)||0)+'</span>');
     }catch(e){}
   }
 
@@ -4902,8 +4967,8 @@
     const r=getResume();
     const name=r.name||(lang==="da"?"Dit navn":"Your name");
     const stats=_resumeStats(),yrs=_resumeYears(),meta=[];
-    if(r.location)meta.push('📍 '+esc(r.location));
-    if(yrs!=null)meta.push('🔪 '+yrs+(lang==="da"?" år i faget":" yrs in the trade"));
+    if(r.location)meta.push(icon('pin')+' '+esc(r.location));
+    if(yrs!=null)meta.push(icon('chef')+' '+yrs+(lang==="da"?" år i faget":" yrs in the trade"));
     const avInner=r.photo?'<img src="'+esc(r.photo)+'" alt="">':esc(_resumeInitial());
     let html='<div class="rc-head"><div class="rc-avatar'+(r.photo?' has-photo':'')+'">'+avInner+'</div>'
       +'<div class="rc-who"><div class="rc-name">'+esc(name)+'</div>'
@@ -5120,9 +5185,9 @@
     const moreBtn=all.length>8?'<button class="pf-ach-more" id="pfAchMore">'+esc(moreLbl)+'</button>':'';
     let inner;
     if(_achExpanded){
-      inner='<div class="pf-ach-grid">'+all.map(b=>'<div class="pf-badge"><div class="pf-badge-ic">'+b.icon+'</div><div class="pf-badge-lbl">'+esc(lang==="da"?b.da:b.en)+'</div></div>').join("")+'</div>';
+      inner='<div class="pf-ach-grid">'+all.map(b=>'<div class="pf-badge"><div class="pf-badge-ic">'+_badgeSvg(b.icon)+'</div><div class="pf-badge-lbl">'+esc(lang==="da"?b.da:b.en)+'</div></div>').join("")+'</div>';
     }else{
-      inner='<div class="pf-ach-strip">'+all.map(b=>'<div class="pf-ach-ic" title="'+esc(lang==="da"?b.da:b.en)+'">'+b.icon+'</div>').join("")+'</div>';
+      inner='<div class="pf-ach-strip">'+all.map(b=>'<div class="pf-ach-ic" title="'+esc(lang==="da"?b.da:b.en)+'">'+_badgeSvg(b.icon)+'</div>').join("")+'</div>';
     }
     return '<div class="pf-ach"><div class="pf-ach-head"><span class="pf-ach-title">Achievements · '+all.length+'</span>'+moreBtn+'</div>'+inner+'</div>';
   }
@@ -6033,7 +6098,7 @@
     var list=$("#labList");if(!list)return;
     list.innerHTML='<div style="display:flex;justify-content:center;padding:36px"><div class="lab-spinner"></div></div>';
     var base=apiBase();var token=await getToken();
-    if(!base||!token){list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🍳</div><div class="empty-state-title">'+(lang==="da"?"Ingen retter endnu":"No dishes yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tryk \"Ny ret\" for at starte":"Tap \"New dish\" to start")+'</div></div>';return;}
+    if(!base||!token){list.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+icon("pan")+'</div><div class="empty-state-title">'+(lang==="da"?"Ingen retter endnu":"No dishes yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tryk \"Ny ret\" for at starte":"Tap \"New dish\" to start")+'</div></div>';return;}
     try{
       var r=await fetch(base+"/api/lab/dishes",{headers:{"Authorization":"Bearer "+token}});
       var d=await r.json();
@@ -6047,7 +6112,7 @@
     var statusLabels={idea:lang==="da"?"Idé":"Idea",testing:"Test",ready:lang==="da"?"Klar":"Ready",menu:lang==="da"?"På menu":"On menu"};
     var filtered=_labFilter==="all"?_labDishes:_labDishes.filter(function(d){return d.status===_labFilter;});
     if(!filtered.length){
-      list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🍳</div><div class="empty-state-title">'+(lang==="da"?"Ingen retter endnu":"No dishes yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tryk \"Ny ret\" for at starte":"Tap \"New dish\" to start")+'</div></div>';
+      list.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+icon("pan")+'</div><div class="empty-state-title">'+(lang==="da"?"Ingen retter endnu":"No dishes yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Tryk \"Ny ret\" for at starte":"Tap \"New dish\" to start")+'</div></div>';
       return;
     }
     list.innerHTML=filtered.map(function(dish){
@@ -6060,7 +6125,7 @@
       var updTxt=diffDays===0?(lang==="da"?"I dag":"Today"):diffDays===1?(lang==="da"?"I går":"Yesterday"):(lang==="da"?"For "+diffDays+" dage siden":diffDays+" days ago");
       return '<div class="dish-card" data-dish-id="'+esc(dish.id)+'">'
         +(dish.heroUrl?'<img class="dish-card-img" src="'+esc(dish.heroUrl)+'" loading="lazy" alt="'+esc(dish.name||"")+'">'
-          :'<div class="dish-card-img" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--bg)">🍽</div>')
+          :'<div class="dish-card-img" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--bg)">'+icon("cloche")+'</div>')
         +'<div class="dish-card-body">'
         +'<div class="dish-card-top"><span class="dish-card-name">'+esc(dish.name||"Ny ret")+'</span>'
         +'<span class="dish-status dish-status-'+esc(dish.status||"idea")+'">'+esc(statusLabels[dish.status||"idea"]||dish.status)+'</span></div>'
@@ -6088,19 +6153,19 @@
       var d=await r.json();
       _sharedCache=d.dishes||[];
       renderSharedList(seg,d);
-    }catch(e){list.innerHTML='<div class="empty-state"><div class="empty-state-icon">📡</div><div class="empty-state-title">'+(lang==="da"?"Kunne ikke hente":"Couldn\u2019t load")+'</div></div>';}
+    }catch(e){list.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+icon("signal")+'</div><div class="empty-state-title">'+(lang==="da"?"Kunne ikke hente":"Couldn\u2019t load")+'</div></div>';}
   }
   function renderSharedList(seg,resp){
     if(_labSeg!==seg)return;
     var list=$("#labList");if(!list)return;
     var statusLabels=_dishStatusLabels();
     if(seg==="kitchen"&&resp&&resp.noTeam){
-      list.innerHTML='<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-title">'+(lang==="da"?"Du er ikke på et hold endnu":"You\u2019re not on a team yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Opret eller join et hold under Rangliste → Hold, så deler I retter automatisk her":"Create or join a team under Leaderboard → Team to share dishes here")+'</div><button class="btn primary btn-sm" id="labGoTeam" style="margin-top:12px">'+(lang==="da"?"Gå til Hold":"Go to Teams")+'</button></div>';
+      list.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+icon("people")+'</div><div class="empty-state-title">'+(lang==="da"?"Du er ikke på et hold endnu":"You\u2019re not on a team yet")+'</div><div class="empty-state-sub">'+(lang==="da"?"Opret eller join et hold under Rangliste → Hold, så deler I retter automatisk her":"Create or join a team under Leaderboard → Team to share dishes here")+'</div><button class="btn primary btn-sm" id="labGoTeam" style="margin-top:12px">'+(lang==="da"?"Gå til Hold":"Go to Teams")+'</button></div>';
       var go=$("#labGoTeam");if(go)go.addEventListener("click",goToTeams);
       return;
     }
     if(!_sharedCache.length){
-      list.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+(seg==="kitchen"?"🍳":"📖")+'</div><div class="empty-state-title">'+(seg==="kitchen"?(lang==="da"?"Ingen delte retter endnu":"No shared dishes yet"):(lang==="da"?"Ingen kogebøger endnu":"No cookbooks yet"))+'</div><div class="empty-state-sub">'+(seg==="kitchen"?(lang==="da"?"Sæt en ret til 👥 Holdet i editoren, så ser hele holdet den her":"Set a dish to 👥 Team in the editor and your whole team sees it here"):(lang==="da"?"Følg andre kokke i Feed — deres offentlige retter samles her":"Follow other chefs in Feed — their public dishes appear here"))+'</div></div>';
+      list.innerHTML='<div class="empty-state"><div class="empty-state-icon">'+(seg==="kitchen"?icon("pan"):icon("book"))+'</div><div class="empty-state-title">'+(seg==="kitchen"?(lang==="da"?"Ingen delte retter endnu":"No shared dishes yet"):(lang==="da"?"Ingen kogebøger endnu":"No cookbooks yet"))+'</div><div class="empty-state-sub">'+(seg==="kitchen"?(lang==="da"?"Sæt en ret til Holdet i editoren, så ser hele holdet den her":"Set a dish to Team in the editor and your whole team sees it here"):(lang==="da"?"Følg andre kokke i Feed — deres offentlige retter samles her":"Follow other chefs in Feed — their public dishes appear here"))+'</div></div>';
       return;
     }
     var groups={};var order=[];
@@ -6109,10 +6174,10 @@
       var dishes=groups[author];
       var hdr='<div class="shift-log-head" style="margin-top:6px">'+esc(author)+' · '+dishes.length+'</div>';
       return hdr+dishes.map(function(dish){
-        var vis=dish.visibility==="public"?"🌍":"👥";
+        var vis=dish.visibility==="public"?icon("globe"):icon("people");
         return '<div class="dish-card" data-shared-id="'+esc(dish.id)+'">'
           +(dish.heroUrl?'<img class="dish-card-img" src="'+esc(dish.heroUrl)+'" loading="lazy" alt="">'
-            :'<div class="dish-card-img" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--bg)">🍽</div>')
+            :'<div class="dish-card-img" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--bg)">'+icon("cloche")+'</div>')
           +'<div class="dish-card-body">'
           +'<div class="dish-card-top"><span class="dish-card-name">'+esc(dish.name||"")+'</span>'
           +'<span class="dish-status dish-status-'+esc(dish.status||"idea")+'">'+esc(statusLabels[dish.status||"idea"]||dish.status)+'</span></div>'
@@ -6251,10 +6316,10 @@
     updateVisChips(vis);markDirty();saveDish(false);
     var local=_labDishes.find(function(d){return d.id===_currentDish.id;});
     if(local){local.visibility=vis;local.teamId=_currentDish.teamId||null;}
-    if(vis==="team")showToast(lang==="da"?"Deles nu med holdet 👥":"Now shared with your team 👥");
+    if(vis==="team")showToast(lang==="da"?"Deles nu med holdet":"Now shared with your team");
     if(firstPublish){
-      showToast(lang==="da"?"Publiceret i din kogebog 🌍":"Published to your cookbook 🌍");
-      syncLogEntry(lang==="da"?"Ret publiceret":"Dish published",1,_currentDish.heroUrl||null,false,(lang==="da"?"📖 Publicerede \"":"📖 Published \"")+(_currentDish.name||"")+(lang==="da"?"\" i kogebogen":"\" to the cookbook"));
+      showToast(lang==="da"?"Publiceret i din kogebog":"Published to your cookbook");
+      syncLogEntry(lang==="da"?"Ret publiceret":"Dish published",1,_currentDish.heroUrl||null,false,(lang==="da"?"Publicerede \"":"Published \"")+(_currentDish.name||"")+(lang==="da"?"\" i kogebogen":"\" to the cookbook"));
     }
     if(vis==="private")showToast(lang==="da"?"Retten er privat igen":"Dish is private again");
   }
@@ -6265,7 +6330,7 @@
       list.innerHTML="";
       teams.forEach(function(tm){
         var b=document.createElement("button");b.className="btn ghost";b.style.cssText="width:100%;margin-bottom:8px;justify-content:flex-start";
-        b.textContent="👥 "+(tm.name||"?");
+        b.innerHTML=icon("people")+" "+esc(tm.name||"?");
         b.addEventListener("click",function(){scrim.classList.remove("open");resolve(tm);});
         list.appendChild(b);
       });
@@ -6281,9 +6346,9 @@
     var sub=$("#labProSub");if(sub)sub.textContent=lang==="da"?"Du har nået grænsen for delte retter på gratis-planen":"You\u2019ve reached the free plan\u2019s sharing limit";
     var feats=$("#labProFeats");
     if(feats)feats.innerHTML=[
-      ["♾️",lang==="da"?"Ubegrænset deling med dit hold":"Unlimited team sharing"],
-      ["📖",lang==="da"?"Ubegrænset offentlig kogebog":"Unlimited public cookbook"],
-      ["🤖",lang==="da"?"AI-opsummeringer af service-noter":"AI service-note summaries"],
+      [icon("infinity"),lang==="da"?"Ubegrænset deling med dit hold":"Unlimited team sharing"],
+      [icon("book"),lang==="da"?"Ubegrænset offentlig kogebog":"Unlimited public cookbook"],
+      [icon("robot"),lang==="da"?"AI-opsummeringer af service-noter":"AI service-note summaries"],
     ].map(function(f){return '<div class="labpro-feat"><span class="labpro-feat-ic">'+f[0]+'</span><span>'+f[1]+'</span></div>';}).join("");
     var ok=$("#labProOk");
     if(ok)ok.textContent=_proWaitJoined
