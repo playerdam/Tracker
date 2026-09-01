@@ -103,7 +103,7 @@
       tab_social:"Rangliste",
       challenge_title:"Ugens udfordring",challenge_days:"dage tilbage",challenge_ends:"{0} dage tilbage",
       lb_title:"Ugentlig rangliste",lb_week:"uge fra",lb_anon:"Anonym",lb_you:"dig",lb_empty:"Ingen data endnu",
-      stab_global:"Global",stab_challenge:"Ugens",
+      stab_global:"Global",stab_challenge:"Udfordring",
       lb_period_week:"Uge",lb_period_month:"Måned",lb_period_all:"Altid",
       lb_total_pts:"pt i alt",team_lb_title:"Dit hold",team_no_team:"Ikke på et hold endnu",
       team_title:"Hold",team_create_ph:"fx Noma Kitchen",team_create_btn:"Opret hold",
@@ -128,7 +128,7 @@
       feed_empty:"Følg nogen for at se deres aktivitet her",
       feed_empty_own:"Du har ikke postet noget endnu",
       feed_load_more:"Indlæs mere",
-      feed_search_ph:"Søg navn, titel el. sted (fx kok, Noma)…",
+      feed_search_ph:"Søg kollega, titel el. sted…",
       lab_sub:"Eksperimenter med dine retter",
       lab_new:"Nyt eksperiment",
       lab_photo_lbl:"Tag et billede",
@@ -252,7 +252,7 @@
       tab_social:"Leaderboard",
       challenge_title:"Weekly challenge",challenge_days:"days left",challenge_ends:"{0} days left",
       lb_title:"Weekly leaderboard",lb_week:"week from",lb_anon:"Anonymous",lb_you:"you",lb_empty:"No data yet",
-      stab_global:"Global",stab_challenge:"Weekly",
+      stab_global:"Global",stab_challenge:"Challenge",
       lb_period_week:"Week",lb_period_month:"Month",lb_period_all:"All time",
       lb_total_pts:"pts total",team_lb_title:"Your team",team_no_team:"Not on a team yet",
       team_title:"Team",team_create_ph:"e.g. Noma Kitchen",team_create_btn:"Create team",
@@ -309,7 +309,7 @@
       feed_empty:"Follow someone to see their activity here",
       feed_empty_own:"You have not posted anything yet",
       feed_load_more:"Load more",
-      feed_search_ph:"Search name, role or place (e.g. chef, Noma)…",
+      feed_search_ph:"Search colleague, role or place…",
       feed_follow:"Follow",feed_unfollow:"Following",
       feed_like:"Like",feed_comment:"Comment",
       feed_comments:"Comments",feed_comment_ph:"Write a comment…",
@@ -412,6 +412,7 @@
     document.querySelectorAll(".shift-nudge-chip").forEach(btn=>{const v=snChips[btn.dataset.min];if(v)btn.textContent=v;});
     const dTitle=$("#logDrawerTitle");if(dTitle)dTitle.textContent=lang==="da"?"Menu":"Menu";
     const fSearch=$("#feedSearch");if(fSearch)fSearch.placeholder=t("feed_search_ph");
+    const fSearchBtn=$("#feedSearchBtn");if(fSearchBtn)fSearchBtn.setAttribute("aria-label",lang==="da"?"Søg":"Search");
     const fcl=$("#feedComposeLbl");if(fcl)fcl.textContent=lang==="da"?"Del et foto…":"Share a photo…";
     const fpt=$("#feedPostTitle");if(fpt)fpt.textContent=lang==="da"?"Del et foto":"Share a photo";
     const fppl=$("#feedPostPickLbl");if(fppl)fppl.textContent=lang==="da"?"Vælg et foto":"Pick a photo";
@@ -1094,7 +1095,15 @@
     s.wines=(s.wines||[]).map(w=>({id:w.id||id(),name:w.name||"",producer:w.producer||"",land:w.land||"",region:w.region||"",grape:w.grape||"",vint:w.vint||"",glasses:w.glasses||0,bottles:w.bottles||0,opened:w.opened||0,type:w.type||"andet",imageUrl:w.imageUrl||null,about:w.about||"",fromLineup:w.fromLineup||false}));
     s.log=Array.isArray(s.log)?s.log.filter(e=>e&&e.ts&&e.text):[];
     s.customCats=Array.isArray(s.customCats)?s.customCats.map(c=>({id:c.id||id(),name:c.name||"",icon:c.icon||"",iconPending:!!c.iconPending})):[];
-    s.shiftHistory=Array.isArray(s.shiftHistory)?s.shiftHistory:[];
+    s.shiftHistory=Array.isArray(s.shiftHistory)?s.shiftHistory.map(x=>{
+      // Vagter gemt før durationMs fandtes viste "NaNt NaNm" for altid. Udled
+      // varigheden af start og slut, så gammel historik retter sig ved indlæsning.
+      if(x&&!x.durationMs&&x.startedAt&&x.endedAt){
+        const d=new Date(x.endedAt)-new Date(x.startedAt);
+        if(d>0)x.durationMs=d;
+      }
+      return x;
+    }).filter(Boolean):[];
     s.labelI18n=(s.labelI18n&&typeof s.labelI18n==="object"&&!Array.isArray(s.labelI18n))?s.labelI18n:{};
     Object.keys(s.labelI18n).forEach(da=>{const en=s.labelI18n[da];if(en){_LBL_DA2EN[da.toLowerCase()]=en;_LBL_EN2DA[en.toLowerCase()]=da;}});
     s.resume=_normResume(s.resume);
@@ -2303,8 +2312,9 @@
   function makeWRow(w){
     const parts=[];if(w.type&&w.type!=="andet")parts.push(esc(t("wine_type_"+w.type)));[w.producer,w.region,w.land,w.grape].forEach(v=>{if(v)parts.push(esc(v));});
     const metaMid=parts.join('<span class="sep">·</span>');
-    const vintHtml=w.vint?'<span class="vint">'+esc(w.vint)+'</span>':'<span class="novint" data-act="edit">'+esc(t("add_vintage"))+'</span>';
-    const meta=vintHtml+(parts.length?'<span class="sep">·</span>'+metaMid:'');
+    // Årgangen står allerede i titlen — metalinjen viser kun opfordringen når den mangler.
+    const vintHtml=w.vint?'':'<span class="novint" data-act="edit">'+esc(t("add_vintage"))+'</span>';
+    const meta=vintHtml+(parts.length?(vintHtml?'<span class="sep">·</span>':'')+metaMid:'');
     const baseName=w.name||w.producer||w.region||w.grape||(lang==="en"?"Unnamed wine":"Unavngiven vin");
     const disp=baseName+(w.vint?" "+w.vint:"");
     const row=document.createElement("div");row.className="wrow";row.dataset.id=w.id;
@@ -2321,7 +2331,7 @@
         +'<div class="stepblock"><div class="steplabel">'+esc(t("glasses"))+'</div><div class="stepctrl"><button class="sbtn" data-act="g-">−</button><span class="tnum" data-k="glasses">'+w.glasses+'</span><button class="sbtn plus" data-act="g+">+</button></div></div>'+
         '<div class="stepblock"><div class="steplabel">'+esc(t("bottles"))+'</div><div class="stepctrl"><button class="sbtn" data-act="b-">−</button><span class="tnum" data-k="bottles">'+w.bottles+'</span><button class="sbtn plus" data-act="b+">+</button></div></div>'
         +'</div></div>'+
-      '<button class="wedit" data-act="share" aria-label="Del til feed"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></button>'
+      '<button class="wedit" data-act="share" aria-label='+JSON.stringify(lang==="da"?"Del til feed":"Share to feed")+'><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></button>'
       +'<button class="wedit" data-act="edit">⋯</button></div>';
     const wrap=document.createElement("div");wrap.className="wrow-wrap";
     const del=document.createElement("button");del.className="wrow-del";del.dataset.delId=w.id;
@@ -2357,7 +2367,7 @@
       const col=(WTYPE_COLORS[x.w.type]||WTYPE_COLORS.andet)[0];
       const len=+(mc*Math.min(1,x.tot/maxTot)).toFixed(2);
       const nm=x.w.name||x.w.producer||x.w.grape||(lang==="da"?"Uden navn":"Unnamed");
-      return '<button class="vd2-mini vd2-mini-tap" data-wine-ring aria-label="'+esc(nm)+': '+fmtNum(x.tot)+'. '+(lang==="da"?"Tryk for overblik":"Tap for overview")+'">'
+      return '<button class="vd2-mini vd2-mini-tap" data-wine-ring aria-label="'+esc(nm)+': '+fmtNum(x.tot)+' '+(lang==="da"?"serveringer":"servings")+'. '+(lang==="da"?"Tryk for overblik":"Tap for overview")+'">'
         +'<div class="vd2-mini-ringwrap">'
           +'<svg class="vd2-mini-svg" viewBox="0 0 60 60"><circle class="vd2-mini-track" cx="30" cy="30" r="'+mr+'"/><circle class="vd2-mini-arc" cx="30" cy="30" r="'+mr+'" stroke="'+col+'" stroke-dasharray="'+len+' '+mc+'"/></svg>'
           +'<span class="vd2-mini-num">'+fmtNum(x.tot)+'</span>'
@@ -2365,12 +2375,12 @@
         +'<span class="vd2-mini-lbl">'+esc(nm)+'</span>'
       +'</button>';
     }).join("")
-    +'<button class="vd2-mini vd2-mini-all" id="wineRankBtn" aria-label="Achievements">'
+    +'<button class="vd2-mini vd2-mini-all" id="wineRankBtn" aria-label="'+(lang==="da"?"Achievements — se alle":"Achievements — see all")+'">'
       +'<div class="vd2-mini-ringwrap">'
         +'<svg class="vd2-mini-svg" viewBox="0 0 60 60"><circle class="vd2-mini-track dashed" cx="30" cy="30" r="'+mr+'"/></svg>'
-        +'<span class="vd2-mini-num" style="font-size:17px">\ud83c\udfc6</span>'
+        +'<span class="vd2-mini-num vd2-mini-num-sm">'+getBadgesEarned().length+'<span class="vd2-mini-of">/'+BADGE_DEFS.length+'</span></span>'
       +'</div>'
-      +'<span class="vd2-mini-lbl">'+(lang==="da"?"Rang":"Rank")+'</span>'
+      +'<span class="vd2-mini-lbl">Achievements</span>'
     +'</button>'
     +'</div>';
     el.innerHTML='<div class="vd2-hero">'
@@ -3737,7 +3747,7 @@
       return '<div class="lb-row'+(isMe?" lb-me":"")+'">'
         +'<span class="lb-medal">'+_lbMedalHtml(i)+'</span>'
         +'<span class="lb-name">'+nick+prof+'</span>'
-        +'<span class="lb-score">'+(r.total||0)+'</span></div>';
+        +'<span class="lb-score">'+fmtNum(r.total||0)+'</span></div>';
     }).join("");
   }
   async function renderLeaderboard(period){
@@ -3859,7 +3869,7 @@
     }
     const div=document.createElement("div");
     div.className="tjoin";
-    div.innerHTML='<div class="tjoin-title">'+(lang==="da"?"Join et hold":"Join a team")+'</div>'
+    div.innerHTML='<div class="tjoin-title">'+(lang==="da"?"Gå med i et hold":"Join a team")+'</div>'
       +'<div class="tjoin-sub">'+(lang==="da"?"Indtast 6-tegns koden fra en kollega — I deler rangliste og opskrifter":"Enter the 6-char code from a colleague — you share the leaderboard and recipes")+'</div>'
       +'<div class="otp-row" id="otpRow">'+Array.from({length:6}).map((_,k)=>'<input class="otp-box" data-otp="'+k+'" maxlength="1" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" inputmode="text">').join("")+'</div>'
       +'<div class="otp-hint" id="otpHint"></div>'
@@ -4760,7 +4770,7 @@
         +(e.summary?'<div class="feed-photo-caption">'+esc(e.summary)+'</div>':'')
         +'<div class="feed-photo-actions">'
         +'<button class="feed-photo-action'+(e.liked?" liked":"")+'" data-like="'+esc(e.id)+'">'+likeIcon+' <span class="like-count">'+e.likes+'</span></button>'
-        +'<button class="feed-photo-action" data-comments="'+esc(e.id)+'">'+icon("chat")+' <span class="comment-count">'+e.comments+'</span></button>'
+        +'<button class="feed-photo-action" data-comments="'+esc(e.id)+'">'+icon("chat")+' <span class="comment-count">'+(e.comments||0)+'</span></button>'
         +'</div>'
         +'</div>'
         +'</div>';
@@ -4781,7 +4791,7 @@
       +((e.delta>0)?'<div class="feed-stat"><span class="feed-num">'+esc(numStr)+'</span>'+(catLabel?'<span>'+esc(catLabel)+'</span>':'')+'</div>':'')
       +'<div class="feed-actions">'
       +'<button class="feed-action-btn'+(e.liked?" liked":"")+'" data-like="'+esc(e.id)+'">'+likeIcon+' <span class="like-count">'+e.likes+'</span></button>'
-      +'<button class="feed-action-btn" data-comments="'+esc(e.id)+'">'+icon("chat")+' <span class="comment-count">'+e.comments+'</span></button>'
+      +'<button class="feed-action-btn" data-comments="'+esc(e.id)+'">'+icon("chat")+' <span class="comment-count">'+(e.comments||0)+'</span></button>'
       +'</div>'
       +'</div>';
   }
@@ -6161,7 +6171,7 @@
       var updTxt=diffDays===0?(lang==="da"?"I dag":"Today"):diffDays===1?(lang==="da"?"I går":"Yesterday"):(lang==="da"?"For "+diffDays+" dage siden":diffDays+" days ago");
       return '<div class="dish-card" data-dish-id="'+esc(dish.id)+'">'
         +(dish.heroUrl?'<img class="dish-card-img" src="'+esc(dish.heroUrl)+'" loading="lazy" alt="'+esc(dish.name||"")+'">'
-          :'<div class="dish-card-img" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--bg)">'+icon("cloche")+'</div>')
+          :'<div class="dish-card-img is-empty">'+icon("cloche")+'</div>')
         +'<div class="dish-card-body">'
         +'<div class="dish-card-top"><span class="dish-card-name">'+esc(dish.name||"Ny ret")+'</span>'
         +'<span class="dish-status dish-status-'+esc(dish.status||"idea")+'">'+esc(statusLabels[dish.status||"idea"]||dish.status)+'</span></div>'
@@ -6213,7 +6223,7 @@
         var vis=dish.visibility==="public"?icon("globe"):icon("people");
         return '<div class="dish-card" data-shared-id="'+esc(dish.id)+'">'
           +(dish.heroUrl?'<img class="dish-card-img" src="'+esc(dish.heroUrl)+'" loading="lazy" alt="">'
-            :'<div class="dish-card-img" style="display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--bg)">'+icon("cloche")+'</div>')
+            :'<div class="dish-card-img is-empty">'+icon("cloche")+'</div>')
           +'<div class="dish-card-body">'
           +'<div class="dish-card-top"><span class="dish-card-name">'+esc(dish.name||"")+'</span>'
           +'<span class="dish-status dish-status-'+esc(dish.status||"idea")+'">'+esc(statusLabels[dish.status||"idea"]||dish.status)+'</span></div>'

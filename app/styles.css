@@ -517,6 +517,7 @@
   .username-wrap input{flex:1;border:none;background:transparent;color:var(--text);font-family:inherit;font-size:15px;padding:10px 12px 10px 4px;outline:none}
   .username-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .username-status{font-size:12px;margin-top:5px;min-height:16px;font-weight:500}
+  .username-status:empty{min-height:0;margin-top:0}
   .username-status.ok{color:#16a34a}.username-status.err{color:#dc2626}.username-status.checking{color:var(--dim)}
   .follow-req-banner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
   .follow-req-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;border-bottom:1px solid var(--border)}
@@ -558,6 +559,9 @@
   .dish-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:.12s}
   .dish-card:active{opacity:.85}
   .dish-card-img{width:100%;height:130px;object-fit:cover;background:var(--bg);display:block}
+  /* Uden foto skal pladsholderen markere, ikke fylde. */
+  .dish-card-img.is-empty{height:56px;display:flex;align-items:center;justify-content:center;color:var(--faint)}
+  .dish-card-img.is-empty svg{width:22px;height:22px}
   .dish-card-body{padding:11px 14px 13px}
   .dish-card-top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
   .dish-card-name{font-family:"Fraunces",serif;font-size:17px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1090,6 +1094,9 @@
   .vd2-mini-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-size:13px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
   .vd2-mini-num.tick{animation:numPop .22s cubic-bezier(.34,1.4,.64,1)}
   .vd2-mini-lbl{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.6);max-width:100%;text-align:center;line-height:1.25;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  .vd2-mini-lbl{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden}
+  .vd2-mini-num-sm{font-size:15px}
+  .vd2-mini-of{opacity:.55;font-size:.72em}
   .vd2-mini-tap{appearance:none;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform .12s;touch-action:manipulation;user-select:none}
   .vd2-mini-tap:active{transform:scale(.88)}
   .vd2-mini-all{appearance:none;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform .1s}
