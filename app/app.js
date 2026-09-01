@@ -40,7 +40,7 @@
       tagline:"track your career",total_label:"karriere",
       tab_station:"Stationen",tab_wine:"Vin",tab_vagt:"Overblik",tab_lab:"Lab",
       view_grid:"Gitteroversigt",view_list:"Listevisning",
-      qlog_ph:"Skriv hvad du har lavet — fx åbnet 500 Gillardeau østers",
+      qlog_ph:"Hvad lavede du?",
       loading:"Indlæser…",
       add_counter:"+ Ny tæller",add_sub:"+ underkategori",sub_ph:"Skriv en type…",
       add_wine:"+ Tilføj vin manuelt",wine_search_ph:"Søg i dine vine…",
@@ -177,7 +177,7 @@
       new_cat_title:"Ny kategori",new_cat_lbl:"Navn",new_cat_save:"Opret",new_cat_cancel:"Annullér",
       new_cat_hint:"Claude genererer automatisk et ikon i baggrunden.",
       new_cat_btn:"+ Ny kategori",
-      qlog_hint:"Enter for at logge",qlog_hint_full:"Enter for at logge · Esc for at lukke",
+      qlog_hint:"Enter for at logge",qlog_hint_full:"fx «åbnet 500 østers» · Enter for at logge",
       catalog_title:"Katalog",cat_search_ph:"Søg i katalog...",new_cat_ph:"fx Anrettet, Sauce, Garnish...",
       onboard_sub:"Track din dag. Del med holdet.",onboard_btn:"Kom i gang",
       onboard_feat1_title:"Log hvad du laver",onboard_feat1_sub:"Opsæt kategorier og tæl anretninger, kokteails eller hvad du nu tracker",
@@ -189,7 +189,7 @@
       tagline:"track your career",total_label:"career",
       tab_station:"Station",tab_wine:"Wine",tab_vagt:"Overview",tab_lab:"Lab",
       view_grid:"Grid view",view_list:"List view",
-      qlog_ph:"Log what you've done — e.g. opened 500 Gillardeau oysters",
+      qlog_ph:"What did you do?",
       loading:"Loading…",
       add_counter:"+ New counter",add_sub:"+ subcategory",sub_ph:"Type a variety…",
       add_wine:"+ Add wine manually",wine_search_ph:"Search your wines…",
@@ -326,7 +326,7 @@
       new_cat_title:"New category",new_cat_lbl:"Name",new_cat_save:"Create",new_cat_cancel:"Cancel",
       new_cat_hint:"Claude will automatically generate an icon in the background.",
       new_cat_btn:"+ New category",
-      qlog_hint:"Enter to log",qlog_hint_full:"Enter to log · Esc to close",
+      qlog_hint:"Enter to log",qlog_hint_full:"e.g. «opened 500 oysters» · Enter to log",
       catalog_title:"Catalogue",cat_search_ph:"Search catalogue...",new_cat_ph:"e.g. Plated, Sauce, Garnish...",
       onboard_sub:"Track your day. Share with the team.",onboard_btn:"Get started",
       onboard_feat1_title:"Log what you do",onboard_feat1_sub:"Set up categories and count dishes, cocktails, or whatever you track",
@@ -405,9 +405,9 @@
     const pwC=$("#paywallCta");if(pwC)pwC.textContent=lang==="da"?"Opgrader til Pro":"Upgrade to Pro";
     const pwF=$("#paywallFine");if(pwF)pwF.textContent=lang==="da"?"Basics er altid gratis.":"Basics are always free.";
     const pwFeats=$("#paywallFeats");if(pwFeats){const F=lang==="da"?[[icon("wine"),"Vin-styring — kælder, ratings, label-scanning"],[icon("pan"),"The Lab — opskriftsudvikling, hold-deling, kogebøger"],[icon("sparkle"),"Smart AI-logning — skriv i naturligt sprog"],[icon("chart"),"Spørg om dine stats i naturligt sprog"]]:[[icon("wine"),"Wine management — cellar, ratings, label scanning"],[icon("pan"),"The Lab — recipe development, team sharing, cookbooks"],[icon("sparkle"),"Smart AI logging — write in natural language"],[icon("chart"),"Ask about your stats in natural language"]];pwFeats.innerHTML=F.map(f=>'<li><span class="pf-ic">'+f[0]+'</span><span>'+esc(f[1])+'</span></li>').join("");}
-    const snTitle=$("#shiftNudgeTitle");if(snTitle)snTitle.textContent=lang==="da"?"Ser ud til du er i gang":"Looks like you're working";
-    const snSub=$("#shiftNudgeSub");if(snSub)snSub.textContent=lang==="da"?"Ingen vagt kører — hvor længe har du arbejdet?":"No shift is running — how long have you been working?";
-    const snDismiss=$("#shiftNudgeDismiss");if(snDismiss)snDismiss.textContent=lang==="da"?"Nej tak":"No thanks";
+    const snTitle=$("#shiftNudgeTitle");if(snTitle)snTitle.textContent=lang==="da"?"Hvornår startede du?":"When did you start?";
+    const snSub=$("#shiftNudgeSub");if(snSub)snSub.textContent=lang==="da"?"Ret vagtens starttidspunkt":"Adjust when the shift started";
+    const snDismiss=$("#shiftNudgeDismiss");if(snDismiss)snDismiss.textContent=lang==="da"?"Behold":"Keep as is";
     const snChips={0:lang==="da"?"Lige nu":"Just now",15:"15 min",30:"30 min",60:lang==="da"?"1 time":"1 hour",90:lang==="da"?"1,5 time":"1.5 hours",120:lang==="da"?"2 timer":"2 hours"};
     document.querySelectorAll(".shift-nudge-chip").forEach(btn=>{const v=snChips[btn.dataset.min];if(v)btn.textContent=v;});
     const dTitle=$("#logDrawerTitle");if(dTitle)dTitle.textContent=lang==="da"?"Menu":"Menu";
@@ -1300,11 +1300,12 @@
   function checkBadges(){
     const earned=getBadgesEarned();let newOnes=[];
     BADGE_DEFS.forEach(b=>{if(!earned.includes(b.id)&&b.check(state)){earned.push(b.id);newOnes.push(b);}});
-    if(newOnes.length){saveBadgesEarned(earned);newOnes.forEach((b,i)=>setTimeout(()=>showBadgeToast(b),i*3200));}
+    // Vent til kvitteringen for logningen er set — ellers overskriver badget den.
+    if(newOnes.length){saveBadgesEarned(earned);newOnes.forEach((b,i)=>setTimeout(()=>showBadgeToast(b),(i+1)*3200));}
   }
   function showBadgeToast(b){
     const name=lang==="en"?b.en:b.da;
-    showToast(t("new_badge")+": "+name);
+    showToast(t("new_badge")+": "+name,{undo:false});
     haptic(60);
     if(Notification&&Notification.permission==="granted"){
       try{new Notification(t("new_badge"),{body:name,icon:"/icons/icon.svg",silent:true});}catch(e){}
@@ -1772,7 +1773,8 @@
     if(!container)return;
     const sm=_vagtSnapMap(shift);
     const totals=_vagtCounterTotals(sm);
-    const topCats=[...totals].sort((a,b)=>b.tot-a.tot).slice(0,5);
+    const valgte=new Set([...totals].sort((a,b)=>b.tot-a.tot).slice(0,5).map(x=>x.id));
+    const topCats=totals.filter(x=>valgte.has(x.id));
     const hiddenN=totals.length-topCats.length;
     if(!topCats.length){container.innerHTML="";return;}
     const moreTile='<button class="vd2-qtile vd2-qtile-more" aria-label="'+(lang==="da"?"Alle kategorier":"All categories")+'">'
@@ -2059,13 +2061,13 @@
   function _buildFirstRunGuide(){
     const da=lang==="da";
     const steps=da?[
-      ["Start en vagt","Tryk på kortet ovenfor når servicen går i gang"],
-      ["Skriv hvad du laver","«åbnet 12 østers» — appen finder tælleren selv"],
+      ["Skriv hvad du lavede","«åbnet 12 østers» — appen finder tælleren selv"],
       ["Se håndværket vokse","Ringen, stats og achievements fyldes op"],
+      ["Vagten passer sig selv","Den starter ved din første logning — uret kan rettes bagefter"],
     ]:[
-      ["Start a shift","Tap the card above when service begins"],
-      ["Write what you do","«opened 12 oysters» — the app finds the counter"],
+      ["Write what you did","«opened 12 oysters» — the app finds the counter"],
       ["Watch your craft grow","The ring, stats and achievements fill up"],
+      ["The shift runs itself","It starts on your first log — the clock can be fixed after"],
     ];
     return '<div class="vd-guide">'
       +'<div class="vd-guide-h">'+(da?"Velkommen ":"Welcome ")+icon("hand")+'</div>'
@@ -3243,7 +3245,7 @@
     });
     return actions;
   }
-  let toastTimer=null,undoSnapshot=null;
+  let toastTimer=null,undoSnapshot=null,_autoStartedShift=false;
   // Feed-sync venter til fortryd-vinduet er lukket, så Fortryd også gælder serveren
   let _deferredSync=null,_deferredSyncTimer=null;
   function deferSync(items,imageUrl,summary){
@@ -3258,8 +3260,10 @@
     if(d)d.items.forEach(x=>syncLogEntry(x.categoryLabel,x.delta,d.imageUrl,false,d.summary));
   }
   function cancelDeferredSync(){if(_deferredSyncTimer){clearTimeout(_deferredSyncTimer);_deferredSyncTimer=null;}_deferredSync=null;}
-  function showToast(msg){
+  function showToast(msg,opts){
     clearTimeout(toastTimer);$("#toastMsg").textContent=msg;
+    // Fortryd hører til en logning. En badge-besked har intet at fortryde.
+    const undo=$("#toastUndo");if(undo)undo.hidden=!!(opts&&opts.undo===false);
     const toast=$("#toast");toast.classList.add("show");
     toastTimer=setTimeout(()=>toast.classList.remove("show"),6500);
   }
@@ -3278,20 +3282,24 @@
     if(!actions.length){showToast(t("toast_unknown"));input.focus();return;}
     undoSnapshot=clone(state);
     _logOps=[];
-    const summary=[],ask=[],syncItems=[],cats=[];
-    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems,cats);});
+    const summary=[],ask=[],syncItems=[],cats=[],direkte=[];
+    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else direkte.push(a);});
+    _autoStartedShift=direkte.length?autoStartShiftIfNeeded():false;
+    direkte.forEach(a=>applyOne(a,summary,syncItems,cats));
     input.value="";save();renderCounters();renderWines();renderCareer();
     if(!ask.length){finishLog(summary,syncItems,imageUrl,cats);return;}
     processAsk(ask,0,summary,syncItems,imageUrl,cats);
   }
   function finishLog(summary,syncItems,imageUrl,cats){
-    const msg=summary.length?(t("toast_logged")+summary.join(", ")):t("toast_nothing");
+    const startede=_autoStartedShift;_autoStartedShift=false;
+    const msg=summary.length
+      ?(t("toast_logged")+summary.join(", ")+(startede?(lang==="da"?" · vagt startet":" · shift started"):""))
+      :t("toast_nothing");
     showToast(msg);
     if(summary.length){addLogEntry(summary.join(" · "),imageUrl,cats&&cats[0],_logOps);haptic(40);}
     const logSummary=summary.join(" · ");
     deferSync(syncItems,imageUrl,logSummary);
     checkBadges();checkRecords();
-    if(summary.length)maybeNudgeShiftStart();
     $("#qlogInput").focus();
   }
   function processAsk(ask,i,summary,syncItems,imageUrl,cats){if(i>=ask.length){finishLog(summary,syncItems,imageUrl,cats);return;}openAsk(ask[i],()=>processAsk(ask,i+1,summary,syncItems,imageUrl,cats),summary,syncItems,imageUrl,cats);}
@@ -3330,8 +3338,10 @@
     if(!actions.length){showToast(t("toast_unknown"));inp.focus();return;}
     undoSnapshot=clone(state);
     _logOps=[];
-    const summary=[],ask=[],syncItems=[],cats=[];
-    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else applyOne(a,summary,syncItems,cats);});
+    const summary=[],ask=[],syncItems=[],cats=[],direkte=[];
+    actions.forEach(a=>{if(a.kind==="counter"&&!findCounter(a.counter))ask.push(a);else direkte.push(a);});
+    _autoStartedShift=direkte.length?autoStartShiftIfNeeded():false;
+    direkte.forEach(a=>applyOne(a,summary,syncItems,cats));
     inp.value="";save();renderCounters();renderWines();renderCareer();
     if(!ask.length){finishLog(summary,syncItems,null,cats);return;}
     processAsk(ask,0,summary,syncItems,null,cats);
@@ -3370,13 +3380,14 @@
     _logOps=[];
     const summary=[],syncItems=[],cats=[];
     const a={kind:"counter",counter:label,delta:delta};if(sub)a.sub=sub;
+    const startede=autoStartShiftIfNeeded();
     applyOne(a,summary,syncItems,cats);
     save();renderCounters();renderWines();renderCareer();
     if(summary.length){
-      showToast(t("toast_logged")+summary.join(", "));
+      showToast(t("toast_logged")+summary.join(", ")+(startede?(lang==="da"?" · vagt startet":" · shift started"):""));
       addLogEntry(summary.join(" · "),null,cats&&cats[0],_logOps);haptic(40);
       deferSync(syncItems,null,summary.join(" · "));
-      checkBadges();checkRecords();maybeNudgeShiftStart();
+      checkBadges();checkRecords();
     }
     renderQlogChips();
   }
@@ -3447,7 +3458,7 @@
     ov.classList.add("open");
     _computeQlogOrder();renderQlogChips();renderQlogAc(inp?inp.value:"");
     reflectPendingPhoto();
-    setTimeout(()=>{if(inp){inp.focus();inp.style.height="auto";inp.style.height=inp.scrollHeight+"px";}},60);
+    setTimeout(()=>{if(inp){inp.focus();inp.style.height="auto";if(inp.value)inp.style.height=inp.scrollHeight+"px";}},60);
   }
   function closeQlogOverlay(){
     if(_voiceOn)stopVoice();
@@ -4226,10 +4237,10 @@
 
   // ---- shift ----
   const SHIFT_KEY="mise_shift";
-  let shiftTimerInterval=null,shiftPhotoDataUrl=null,_shiftNudgeShown=false;
+  let shiftTimerInterval=null,shiftPhotoDataUrl=null;
 
   function getShift(){try{return JSON.parse(localStorage.getItem(SHIFT_KEY)||"null");}catch(e){return null;}}
-  function saveShift(s){if(s)localStorage.setItem(SHIFT_KEY,JSON.stringify(s));else{localStorage.removeItem(SHIFT_KEY);_shiftNudgeShown=false;}}
+  function saveShift(s){if(s)localStorage.setItem(SHIFT_KEY,JSON.stringify(s));else localStorage.removeItem(SHIFT_KEY);}
   function recordShiftEnd(sh){
     if(!sh||!sh.startedAt)return;
     const endedAt=Date.now();
@@ -4312,30 +4323,55 @@
     localStorage.setItem("mise_vagt_detail","1");
     const snap=state.counters.map(c=>({id:c.id,count:c.count,subs:c.subs.map(s=>({id:s.id,count:s.count}))}));
     saveShift({startedAt:new Date(Date.now()-(backdateMs||0)).toISOString(),snap});
-    _shiftNudgeShown=false;
     renderShiftBar();
   }
 
-  // ── Glemte du at starte vagten? Spørg når der logges uden en aktiv vagt ──
-  function maybeNudgeShiftStart(){
-    if(getShift()||_shiftNudgeShown)return;
-    _shiftNudgeShown=true;
-    setTimeout(()=>{const scrim=$("#shiftNudgeScrim");if(scrim)scrim.classList.add("open");},700);
+  // ── Logger man uden en kørende vagt, starter den selv fra nu af. Før blev der
+  // spurgt i en modal oven på kvitteringen; rettelsen sker nu på brugerens initiativ
+  // ved at trykke på uret, så et tryk ikke koster syv valg midt i en service. ──
+  function autoStartShiftIfNeeded(){
+    if(getShift())return false;
+    startShift(0);
+    return true;
+  }
+  // Ret starttidspunktet på en KØRENDE vagt. Snapshottet bevares — ellers ville
+  // vagtens hidtidige tællinger blive nulstillet.
+  function adjustShiftStart(backdateMs){
+    const s=getShift();if(!s)return;
+    s.startedAt=new Date(Date.now()-(backdateMs||0)).toISOString();
+    saveShift(s);renderShiftBar();renderVagt();
+    showToast(lang==="da"?"Starttidspunkt rettet":"Start time updated",{undo:false});
+  }
+  let _fixFraShiftModal=false;
+  function openShiftStartFix(){const scrim=$("#shiftNudgeScrim");if(scrim)scrim.classList.add("open");}
+  // Kom man fra afslut-dialogen, skal den tilbage — ellers står man i ingenting,
+  // og varigheden skal genberegnes med den nye starttid.
+  function lukShiftStartFix(){
+    const scrim=$("#shiftNudgeScrim");if(scrim)scrim.classList.remove("open");
+    if(_fixFraShiftModal){_fixFraShiftModal=false;openShiftModal();}
   }
   function setupShiftNudge(){
     const scrim=$("#shiftNudgeScrim");if(!scrim)return;
     scrim.querySelectorAll(".shift-nudge-chip").forEach(btn=>{
       btn.addEventListener("click",()=>{
         const min=parseInt(btn.dataset.min,10)||0;
-        startShift(min*60000);
-        scrim.classList.remove("open");
-        renderVagt();
-        showToast(lang==="da"?"Vagt startet":"Shift started");
+        if(getShift())adjustShiftStart(min*60000);
+        else{startShift(min*60000);renderVagt();showToast(lang==="da"?"Vagt startet":"Shift started");}
+        lukShiftStartFix();
         haptic(30);
       });
     });
     const dismiss=$("#shiftNudgeDismiss");
-    if(dismiss)dismiss.addEventListener("click",()=>scrim.classList.remove("open"));
+    if(dismiss)dismiss.addEventListener("click",lukShiftStartFix);
+    const barTimer=$("#shiftTimer");
+    if(barTimer)barTimer.addEventListener("click",openShiftStartFix);
+    const durEl=$("#shiftDuration");
+    if(durEl)durEl.addEventListener("click",()=>{
+      if(!getShift())return;
+      const sc=$("#shiftScrim");if(sc)sc.classList.remove("open");
+      _fixFraShiftModal=true;
+      openShiftStartFix();
+    });
   }
 
   function renderShiftBar(){
